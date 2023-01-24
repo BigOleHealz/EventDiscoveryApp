@@ -15,48 +15,27 @@ server = app.server
 # Layout of Dash App
 app.layout = html.Div(
     children=[
+        # html.Div(className="eight columns div-for-charts bg-grey", style={'width' : '100%', 'height' : "10%"}),
         html.Div(
             className="row",
             children=[
-                # Column for user controls
-                controls(app),
-                # Column for app graphs and plots
+                # row for app graphs and plots
                 html.Div(
                     className="eight columns div-for-charts bg-grey",
                     children=[
-                        dcc.Graph(id="map-graph", config={ 'displayModeBar': False }),
-                        html.Div(
-                            className="text-padding",
-                            children="Select any of the bars on the histogram to section data by time."
-                        ),
+                        dcc.Graph(id="map-graph",
+                                    config={ 'displayModeBar': False},
+                                    style={'width' : '100%', 'height' : "100%"}
+                                ),
                         dcc.Graph(id="histogram", config={ 'displayModeBar': False }),
                     ],
                 ),
+                # Column for user controls
+                controls(app),
             ],
         )
     ]
 )
-
-
-# # Layout of Dash App
-# app.layout = dbc.Row([
-#     # Column for user controls
-#     controls(app),
-
-#     # Column for app graphs and plots
-#     dbc.Col(
-#         children=[
-#             dcc.Graph(id="map-graph", config={ 'displayModeBar': False }),
-#             html.Div(
-#                 className="text-padding",
-#                 children="Select any of the bars on the histogram to section data by time."
-#             ),
-#             dcc.Graph(id="histogram", config={ 'displayModeBar': False }),
-#         ],
-#         className="div-for-charts bg-grey",
-#         md=8,
-#     ),
-# ])
 
 
 @callback(
@@ -85,27 +64,6 @@ def update_selected_data(clickData):
         return {"points": []}
 
 
-@callback(
-    Output("total-rides", "children"), 
-    Input("date-picker", "date"),
-)
-def update_total_rides(datePicked):
-    " Update the total number of rides Tag "
-    date_picked = dt.strptime(datePicked, "%Y-%m-%d")
-    total_rides = len(totalList[date_picked.month - 4][date_picked.day - 1])
-    return f"Total Number of rides: {total_rides:,d}"
-
-
-@callback(
-    Output("total-rides-selection", "children"), 
-    Output("date-value", "children"),
-    Input("date-picker", "date"), 
-    Input("bar-selector", "value"),
-)
-def update_total_rides_selection(date_picked, bars_selected):
-    " Update the total number of rides in selected times "
-    return total_rides_calculation(date_picked, bars_selected)
-
 
 @callback(
     Output("histogram", "figure"),
@@ -123,9 +81,9 @@ def update_histogram(date_picked, bars_selected):
     Input("bar-selector", "value"),
     Input("location-dropdown", "value"),
 )
-def update_graph(date_picked, bars_selected, location):
+def update_graph(date_picked, bars_selected, location): # date_picked, bars_selected, 
     " Update Map Graph based on date-picker, selected data on histogram and location dropdown "
-    return figmap(date_picked, bars_selected, location)
+    return figmap(date_picked, bars_selected, location) # date_picked, bars_selected, 
 
 
 if __name__ == "__main__":

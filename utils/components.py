@@ -9,18 +9,8 @@ def controls(app):
     className="div-user-controls",
     md=4,
     children=[
-        html.Div([
-            html.A(
-                html.Img(
-                    className="logo",
-                    src=app.get_asset_url("images/plotly-logo-dark-theme.png"),
-                ),
-                href="https://plotly.com/get-demo/",
-            ),
-            html.A("LEARN MORE", href="https://plotly.com/dash/", target="_blank", className="demo-button")
-        ], className="logos"),
-
-        html.H2("DASH - UBER DATA APP"),
+ 
+        html.H2("Events Near You"),
         html.P(
             """Select different days using the date picker or by selecting
             different time frames on the histogram."""

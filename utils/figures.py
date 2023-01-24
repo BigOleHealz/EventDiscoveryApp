@@ -5,7 +5,7 @@ import numpy as np
 from utils.helper_functions import get_selection, getLatLonColor
 from constants import dict_of_locations, mapbox_access_token
 
-def map(date_picked, bars_selected, location):
+def map(date_picked=None, bars_selected=None, location=None):
     zoom = 12.0
     latInitial = 40.7272
     lonInitial = -73.991251
@@ -16,7 +16,9 @@ def map(date_picked, bars_selected, location):
         latInitial = dict_of_locations[location]["lat"]
         lonInitial = dict_of_locations[location]["lon"]
 
-    date_picked = dt.strptime(date_picked, "%Y-%m-%d")
+    print(date_picked)
+    
+    date_picked = dt.strptime(date_picked, "%Y-%m-%d") if date_picked else dt.today().date()
     monthPicked = date_picked.month - 4
     dayPicked = date_picked.day - 1
     listCoords = getLatLonColor(bars_selected, monthPicked, dayPicked)

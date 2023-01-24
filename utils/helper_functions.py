@@ -3,6 +3,11 @@ import numpy as np
 
 from constants import totalList
 
+def get_user_location():
+    import geocoder
+    latlng = geocoder.ip('me').latlng
+    return {'Lat' : latlng[0], 'Lng' : latlng[-1]}
+    
 def get_selection(month, day, selection):
     """
         Get the amount of rides per hour based on the time selected
