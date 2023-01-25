@@ -5,23 +5,23 @@ import numpy as np
 from utils.helper_functions import get_selection, getLatLonColor
 from constants import dict_of_locations, mapbox_access_token
 
-def map(date_picked=None, bars_selected=None, location=None):
+def figmap(date_picked=None, time_range=None, location=None):
     zoom = 12.0
-    latInitial = 40.7272
-    lonInitial = -73.991251
+    latInitial = 39.9526
+    lonInitial = -75.1652
     bearing = 0
 
     if location:
         zoom = 15.0
         latInitial = dict_of_locations[location]["lat"]
         lonInitial = dict_of_locations[location]["lon"]
-
-    print(date_picked)
+    
     
     date_picked = dt.strptime(date_picked, "%Y-%m-%d") if date_picked else dt.today().date()
     monthPicked = date_picked.month - 4
     dayPicked = date_picked.day - 1
-    listCoords = getLatLonColor(bars_selected, monthPicked, dayPicked)
+    
+    listCoords = getLatLonColor(monthPicked, dayPicked, time_range)
 
     return go.Figure(
         data=[
@@ -31,10 +31,10 @@ def map(date_picked=None, bars_selected=None, location=None):
                 lon=listCoords["Lon"],
                 mode="markers",
                 hoverinfo="lat+lon+text",
-                text=listCoords.index.hour,
+                text=listCoords['Date/Time'].dt.hour,
                 marker=dict(
                     showscale=True,
-                    color=np.append(np.insert(listCoords.index.hour, 0, 0), 23),
+                    color=listCoords['Date/Time'].dt.hour,
                     opacity=0.5,
                     size=5,
                     colorscale=[
@@ -124,64 +124,64 @@ def map(date_picked=None, bars_selected=None, location=None):
     )
 
 
-def histogram(date_picked, bars_selected):
-    date_picked = dt.strptime(date_picked, "%Y-%m-%d")
-    monthPicked = date_picked.month - 4
-    dayPicked = date_picked.day - 1
+# def histogram(date_picked, bars_selected):
+#     date_picked = dt.strptime(date_picked, "%Y-%m-%d")
+#     monthPicked = date_picked.month - 4
+#     dayPicked = date_picked.day - 1
 
-    [xVal, yVal, colorVal] = get_selection(monthPicked, dayPicked, bars_selected)
+#     [xVal, yVal, colorVal] = get_selection(monthPicked, dayPicked, bars_selected)
 
-    layout = go.Layout(
-        bargap=0.01,
-        bargroupgap=0,
-        barmode="group",
-        margin=go.layout.Margin(l=10, r=0, t=0, b=50),
-        showlegend=False,
-        plot_bgcolor="#323130",
-        paper_bgcolor="#323130",
-        dragmode="select",
-        font=dict(color="white"),
-        xaxis=dict(
-            range=[-0.5, 23.5],
-            showgrid=False,
-            nticks=25,
-            fixedrange=True,
-            ticksuffix=":00",
-        ),
-        yaxis=dict(
-            range=[0, max(yVal) + max(yVal) / 4],
-            showticklabels=False,
-            showgrid=False,
-            fixedrange=True,
-            rangemode="nonnegative",
-            zeroline=False,
-        ),
-        annotations=[
-            dict(
-                x=xi,
-                y=yi,
-                text=str(yi),
-                xanchor="center",
-                yanchor="bottom",
-                showarrow=False,
-                font=dict(color="white"),
-            )
-            for xi, yi in zip(xVal, yVal)
-        ],
-    )
+#     layout = go.Layout(
+#         bargap=0.01,
+#         bargroupgap=0,
+#         barmode="group",
+#         margin=go.layout.Margin(l=10, r=0, t=0, b=50),
+#         showlegend=False,
+#         plot_bgcolor="#323130",
+#         paper_bgcolor="#323130",
+#         dragmode="select",
+#         font=dict(color="white"),
+#         xaxis=dict(
+#             range=[-0.5, 23.5],
+#             showgrid=False,
+#             nticks=25,
+#             fixedrange=True,
+#             ticksuffix=":00",
+#         ),
+#         yaxis=dict(
+#             range=[0, max(yVal) + max(yVal) / 4],
+#             showticklabels=False,
+#             showgrid=False,
+#             fixedrange=True,
+#             rangemode="nonnegative",
+#             zeroline=False,
+#         ),
+#         annotations=[
+#             dict(
+#                 x=xi,
+#                 y=yi,
+#                 text=str(yi),
+#                 xanchor="center",
+#                 yanchor="bottom",
+#                 showarrow=False,
+#                 font=dict(color="white"),
+#             )
+#             for xi, yi in zip(xVal, yVal)
+#         ],
+#     )
 
-    return go.Figure(
-        data=[
-            go.Bar(x=xVal, y=yVal, marker=dict(color=colorVal), hoverinfo="x"),
-            go.Scatter(
-                opacity=0,
-                x=xVal,
-                y=yVal / 2,
-                hoverinfo="none",
-                mode="markers",
-                marker=dict(color="rgb(66, 134, 244, 0)", symbol="square", size=40),
-                visible=True,
-            ),
-        ],
-        layout=layout,
-    )
+#     return go.Figure(
+#         data=[
+#             go.Bar(x=xVal, y=yVal, marker=dict(color=colorVal), hoverinfo="x"),
+#             go.Scatter(
+#                 opacity=0,
+#                 x=xVal,
+#                 y=yVal / 2,
+#                 hoverinfo="none",
+#                 mode="markers",
+#                 marker=dict(color="rgb(66, 134, 244, 0)", symbol="square", size=40),
+#                 visible=True,
+#             ),
+#         ],
+#         layout=layout,
+#     )

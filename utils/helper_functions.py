@@ -55,21 +55,15 @@ def get_selection(month, day, selection):
     return [np.array(xVal), np.array(yVal), np.array(colorVal)]
 
 
-def getLatLonColor(selectedData, month, day):
+def getLatLonColor(month: int, day: int, time_range: list):
     " Get the Coordinates of the chosen months, dates and times "
-    listCoords = totalList[month][day]
-
-    # No times selected, output all times for chosen month and date
-    if selectedData is None or len(selectedData) == 0:
-        return listCoords
-    listStr = "listCoords["
-    for time in selectedData:
-        if selectedData.index(time) != len(selectedData) - 1:
-            listStr += "(totalList[month][day].index.hour==" + str(int(time)) + ") | "
-        else:
-            listStr += "(totalList[month][day].index.hour==" + str(int(time)) + ")]"
-    return eval(listStr)
-
+    df_listCoords = totalList[month][day].reset_index()
+    
+    min_time, max_time = time_range[0], time_range[-1]
+    
+    df_listCoords = df_listCoords[(min_time <= df_listCoords['Date/Time'].dt.hour) & (df_listCoords['Date/Time'].dt.hour <= time_range[-1])]
+    return df_listCoords
+    
 
 def total_rides_calculation(date_picked, bars_selected):
     
