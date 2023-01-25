@@ -3,3 +3,4 @@ myvenv/etc/*
 myvenv/share/*
 *__pycache__*
 mapbox_access_token.txt
+Testing/data/*
