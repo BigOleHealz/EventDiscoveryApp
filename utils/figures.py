@@ -2,8 +2,8 @@ from datetime import datetime as dt, timedelta
 from typing import List, Mapping
 from plotly import graph_objs as go
 
-from utils.helper_functions import getLatLonColor
-from constants import dict_of_locations, mapbox_access_token
+from utils.helper_functions import get_events_by_timestamp
+from utils.constants import dict_of_locations, mapbox_access_token
 
 def figmap(date_picked: str, time_range: List[int]=None, location: Mapping[None, str]=None):
     zoom = 12.0
@@ -23,22 +23,24 @@ def figmap(date_picked: str, time_range: List[int]=None, location: Mapping[None,
     min_timestamp = date_picked + timedelta(hours=time_range[0])
     max_timestamp = date_picked + timedelta(hours=time_range[-1])
     
-    listCoords = getLatLonColor(min_timestamp, max_timestamp)
+    df_events = get_events_by_timestamp(min_timestamp, max_timestamp)
+    import pdb; pdb.set_trace()
+    
     
 
     return go.Figure(
         data=[
             # Data for all rides based on date and time
             go.Scattermapbox(
-                lat=listCoords["Lat"],
-                lon=listCoords["Lon"],
+                lat=df_events["Lat"],
+                lon=df_events["Lon"],
                 mode="markers",
                 hoverinfo="lat+lon+text",
-                text=listCoords['Date/Time'].dt.hour,
+                text=df_events['Date/Time'].dt.hour,
                 marker=dict(
                     showscale=True,
-                    color=listCoords['Date/Time'].dt.hour,
-                    opacity=0.5,
+                    color=df_events['Date/Time'].dt.hour,
+                    opacity=0.75,
                     size=15,
                     colorscale=[
                         [0, "#F4EC15"],

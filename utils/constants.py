@@ -1,6 +1,8 @@
 import os
 import pandas as pd
 
+LOGO_PATH = os.path.join(os.getcwd(), 'assets', 'images', 'kraken.png')
+
 # Plotly mapbox public token
 mapbox_access_token_filename = 'mapbox_access_token.txt'
 if mapbox_access_token_filename in os.listdir(os.getcwd()):
