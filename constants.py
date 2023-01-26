@@ -1,6 +1,5 @@
 import os
 import pandas as pd
-# import numpy as np
 
 # Plotly mapbox public token
 mapbox_access_token_filename = 'mapbox_access_token.txt'
@@ -23,19 +22,5 @@ dict_of_locations = {
     "The Met - Philadelphia": {"lat": 39.969672, "lon": -75.160099},
 }
 
-# Initialize data frame
-df = pd.read_csv(os.path.join(os.getcwd(), 'Testing', 'data', 'uber-rides-data1.csv'), dtype=object )
-
-################ Remove ###################
-# df = df.head(1000)
-################ Remove ###################
-
+df = pd.read_csv(os.path.join(os.getcwd(), 'Testing', 'data', 'sample_data.csv'), dtype={'EventID' : int, 'Lon' : float, 'Lat' : float})
 df["Date/Time"] = pd.to_datetime(df["Date/Time"], format="%Y-%m-%d %H:%M")
-df.index = df["Date/Time"]
-df.drop("Date/Time", axis=1, inplace=True)
-totalList = []
-for month in df.groupby(df.index.month):
-    dailyList = []
-    for day in month[1].groupby(month[1].index.day):
-        dailyList.append(day[1])
-    totalList.append(dailyList)

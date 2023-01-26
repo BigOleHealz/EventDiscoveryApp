@@ -1,12 +1,15 @@
+from datetime import datetime as dt
+from typing import List, Mapping
+
 from dash import Dash, dcc, html, Input, Output, callback
 import dash_bootstrap_components as dbc
 
 from utils.figures import figmap
-from constants import totalList, dict_of_locations
-from utils.helper_functions import total_rides_calculation
-from datetime import datetime as dt
+from constants import dict_of_locations
 
 PLOTLY_LOGO = "https://images.plot.ly/logo/new-branding/plotly-logomark.png"
+
+import pdb; pdb.set_trace()
 
 
 app = Dash(__name__, title = "New York Uber Rides", external_stylesheets=[dbc.themes.BOOTSTRAP, dbc.icons.FONT_AWESOME])
@@ -71,23 +74,8 @@ sidebar = html.Div(
         html.Hr(),
         dbc.Nav(
             [
-                # dbc.NavLink(
-                #     [html.I(className="fas fa-home me-2"), html.Span("Home")],
-                #     # href="/",
-                #     active="exact",
-                # ),
-                # dbc.NavLink(
-                #     [
-                #         html.I(className="fas fa-calendar-alt me-2"),
-                #         html.Span("Calendar"),
-                #     ],
-                #     # href="/calendar",
-                #     active="exact",
-                # ),
                 dcc.DatePickerSingle(
                     id="date-picker",
-                    # min_date_allowed=df['Date/Time'].min(),
-                    # max_date_allowed=df['Date/Time'].max(),
                     initial_visible_month=dt.today(),
                     date=dt.today().date(),
                     display_format="MMMM D, YYYY",
@@ -106,9 +94,10 @@ sidebar = html.Div(
                 # Dropdown for locations on map
                 dcc.Dropdown(
                     id="location-dropdown",
-                    options=[{'label': k, 'value': k} for k, v in dict_of_locations.items()],
+                    options=[{'label': k, 'value': k} for k, _ in dict_of_locations.items()],
                     placeholder="Select a location",
                     className="div-for-dropdown",
+                    value=tuple(dict_of_locations.keys())
                 ),
             ],
             vertical=True,
@@ -151,9 +140,8 @@ app.layout = html.Div(
     Input("time-slider", "value"),
     Input("location-dropdown", "value")
 )
-def update_graph(date_picked, time_range, location):
+def update_graph(date_picked: str, time_range: List[int], location: Mapping[None, str]):
     " Update Map Graph based on date-picker, selected data on histogram and location dropdown "
-    
     return figmap(date_picked, time_range, location)
 
 
