@@ -97,8 +97,8 @@ def figmap(date_picked: str, time_range: List[int]=None, location: Mapping[None,
                                 args=[
                                     {
                                         "mapbox.zoom": 12,
-                                        "mapbox.center.lon": "-73.991251",
-                                        "mapbox.center.lat": "40.7272",
+                                        "mapbox.center.lon": str(dict_of_locations[location]["lon"]),
+                                        "mapbox.center.lat": str(dict_of_locations[location]["lat"]),
                                         "mapbox.bearing": 0,
                                         "mapbox.style": "dark",
                                     }
