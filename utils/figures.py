@@ -24,9 +24,6 @@ def figmap(date_picked: str, time_range: List[int]=None, location: Mapping[None,
     max_timestamp = date_picked + timedelta(hours=time_range[-1])
     
     df_events = get_events_by_timestamp(min_timestamp, max_timestamp)
-    import pdb; pdb.set_trace()
-    
-    
 
     return go.Figure(
         data=[
