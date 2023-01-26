@@ -1,11 +1,11 @@
-from datetime import datetime as dt
+from datetime import datetime as dt, timedelta
+from typing import List, Mapping
 from plotly import graph_objs as go
-import numpy as np
 
-from utils.helper_functions import get_selection, getLatLonColor
+from utils.helper_functions import getLatLonColor
 from constants import dict_of_locations, mapbox_access_token
 
-def figmap(date_picked=None, time_range=None, location=None):
+def figmap(date_picked: str, time_range: List[int]=None, location: Mapping[None, str]=None):
     zoom = 12.0
     latInitial = 39.9526
     lonInitial = -75.1652
@@ -16,12 +16,15 @@ def figmap(date_picked=None, time_range=None, location=None):
         latInitial = dict_of_locations[location]["lat"]
         lonInitial = dict_of_locations[location]["lon"]
     
+    if time_range is None:
+        time_range = [0, 23]
     
     date_picked = dt.strptime(date_picked, "%Y-%m-%d") if date_picked else dt.today().date()
-    monthPicked = date_picked.month - 4
-    dayPicked = date_picked.day - 1
+    min_timestamp = date_picked + timedelta(hours=time_range[0])
+    max_timestamp = date_picked + timedelta(hours=time_range[-1])
     
-    listCoords = getLatLonColor(monthPicked, dayPicked, time_range)
+    listCoords = getLatLonColor(min_timestamp, max_timestamp)
+    
 
     return go.Figure(
         data=[
@@ -36,7 +39,7 @@ def figmap(date_picked=None, time_range=None, location=None):
                     showscale=True,
                     color=listCoords['Date/Time'].dt.hour,
                     opacity=0.5,
-                    size=5,
+                    size=15,
                     colorscale=[
                         [0, "#F4EC15"],
                         [0.04167, "#DAF017"],
@@ -82,7 +85,7 @@ def figmap(date_picked=None, time_range=None, location=None):
             showlegend=False,
             mapbox=dict(
                 accesstoken=mapbox_access_token,
-                center=dict(lat=latInitial, lon=lonInitial),  # 40.7272  # -73.991251
+                center=dict(lat=latInitial, lon=lonInitial),
                 style="dark",
                 bearing=bearing,
                 zoom=zoom,
@@ -122,66 +125,3 @@ def figmap(date_picked=None, time_range=None, location=None):
             ],
         ),
     )
-
-
-# def histogram(date_picked, bars_selected):
-#     date_picked = dt.strptime(date_picked, "%Y-%m-%d")
-#     monthPicked = date_picked.month - 4
-#     dayPicked = date_picked.day - 1
-
-#     [xVal, yVal, colorVal] = get_selection(monthPicked, dayPicked, bars_selected)
-
-#     layout = go.Layout(
-#         bargap=0.01,
-#         bargroupgap=0,
-#         barmode="group",
-#         margin=go.layout.Margin(l=10, r=0, t=0, b=50),
-#         showlegend=False,
-#         plot_bgcolor="#323130",
-#         paper_bgcolor="#323130",
-#         dragmode="select",
-#         font=dict(color="white"),
-#         xaxis=dict(
-#             range=[-0.5, 23.5],
-#             showgrid=False,
-#             nticks=25,
-#             fixedrange=True,
-#             ticksuffix=":00",
-#         ),
-#         yaxis=dict(
-#             range=[0, max(yVal) + max(yVal) / 4],
-#             showticklabels=False,
-#             showgrid=False,
-#             fixedrange=True,
-#             rangemode="nonnegative",
-#             zeroline=False,
-#         ),
-#         annotations=[
-#             dict(
-#                 x=xi,
-#                 y=yi,
-#                 text=str(yi),
-#                 xanchor="center",
-#                 yanchor="bottom",
-#                 showarrow=False,
-#                 font=dict(color="white"),
-#             )
-#             for xi, yi in zip(xVal, yVal)
-#         ],
-#     )
-
-#     return go.Figure(
-#         data=[
-#             go.Bar(x=xVal, y=yVal, marker=dict(color=colorVal), hoverinfo="x"),
-#             go.Scatter(
-#                 opacity=0,
-#                 x=xVal,
-#                 y=yVal / 2,
-#                 hoverinfo="none",
-#                 mode="markers",
-#                 marker=dict(color="rgb(66, 134, 244, 0)", symbol="square", size=40),
-#                 visible=True,
-#             ),
-#         ],
-#         layout=layout,
-#     )
