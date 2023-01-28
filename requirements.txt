@@ -3,3 +3,4 @@ pandas
 gunicorn==20.1.0
 dash-bootstrap-components==1.2.1
 geocoder==1.38.1
+neo4j==5.5.0
