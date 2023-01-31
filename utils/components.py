@@ -112,12 +112,20 @@ class Components:
         className="sidebar-left"
     )
 
+    alert_box = html.Div(
+                    children=[],
+                    className='alert',
+                    id='alert_box'
+                )
+    
     @staticmethod
-    def alerts(messages: list=None):
-        if messages is None:
-            messages = []
-        return [dbc.Alert([msg], color='#FF0000') for msg in messages]
-        
+    def create_alert_message_child(message: str, color: str):
+        return [
+                    html.P(
+                    message,
+                    className=f"alert alert-{color}"
+                )]
+
     def sidebar_right(self, event_name: str=None, event_date: str=None, starttime: int=0, endtime: int=23, event_type_id: int=None, friends_invited: list=None):
         
         if event_date is None:

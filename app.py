@@ -22,7 +22,7 @@ components = Components(neo4j_db_connector=neo4j)
 app.layout = html.Div(
     children=[
         dbc.Popover(target="right_sidebar", trigger="hover", id="popover"),
-        # html.Div(children=components.alerts(), id="alerts", className='alert'),
+        components.alert_box,
         dcc.Location(id="url"),
         components.header,
         components.sidebar_left,
@@ -53,10 +53,8 @@ def right_sidebar_style(popover: bool=False):
     return {'width' : '16rem'} if popover is True else {'width' : '5rem'}
 
 @callback(
-    # [
-    Output("right_sidebar", "children"),
-    # Output("alerts", "children")
-    # ],
+    [Output("right_sidebar", "children"),
+    Output("alert_box", "children")],
     [Input("event_name-input", "value"),
     Input("event_date-setter", "date"),
     Input("starttime-dropdown", "value"),
@@ -77,18 +75,41 @@ def create_event(event_name: str, event_date: str, starttime: int, endtime: int,
     if n_clicks is not None:
         if all([val is not None for val in required_args]):
             created_at = dt.now().strftime('%Y-%m-%d %H:%M:%S')
-            properties = {'CreatedByID': int(os.environ['USER_ACCOUNT_ID']), 'EventName' : event_name, 'StartTimestamp' : start_ts, 'EndTimestamp' : end_ts, 'EventTypeID' : event_type_id, 'CreatedAt': created_at}
-            
+            properties = {
+                            'CreatedByID': int(os.environ['USER_ACCOUNT_ID']),
+                            'EventName' : event_name,
+                            'StartTimestamp' : start_ts,
+                            'EndTimestamp' : end_ts,
+                            'EventTypeID' : event_type_id,
+                            'CreatedAt': created_at
+                        }
             neo4j.create_event(properties=properties, friends_invited=friends_invited)
-                
-            return components.sidebar_right() # , None
+            return components.sidebar_right(), components.create_alert_message_child(message="Successfully create Event!", color='success')
+        
         elif any([val is None for val in required_args]):
-            return components.sidebar_right(event_name=event_name, event_date=event_date, starttime=starttime, endtime=endtime, event_type_id=event_type_id, friends_invited=friends_invited) # , ["All fields are required"]
-            
+            return components.sidebar_right(event_name=event_name,
+                                            event_date=event_date,
+                                            starttime=starttime,
+                                            endtime=endtime,
+                                            event_type_id=event_type_id,
+                                            friends_invited=friends_invited
+                    ), components.create_alert_message_child(message="All fields are required", color='danger')
         else:
-            return components.sidebar_right(event_name=event_name, event_date=event_date, starttime=starttime, endtime=endtime, event_type_id=event_type_id, friends_invited=friends_invited) # , None
+            return components.sidebar_right(event_name=event_name,
+                                            event_date=event_date,
+                                            starttime=starttime,
+                                            endtime=endtime,
+                                            event_type_id=event_type_id,
+                                            friends_invited=friends_invited
+                    ), None
     else:
-        return components.sidebar_right(event_name=event_name, event_date=event_date, starttime=starttime, endtime=endtime, event_type_id=event_type_id, friends_invited=friends_invited)# , None
+        return components.sidebar_right(event_name=event_name,
+                                        event_date=event_date,
+                                        starttime=starttime,
+                                        endtime=endtime,
+                                        event_type_id=event_type_id,
+                                        friends_invited=friends_invited
+                ), None
 
 
 if __name__ == "__main__":

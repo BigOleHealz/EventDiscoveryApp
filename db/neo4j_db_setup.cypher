@@ -1,1 +1,1 @@
-CREATE CONSTRAINT FOR (business:Business) REQUIRE business.title IS UNIQUE;
+CREATE CONSTRAINT FOR (uesr:User) REQUIRE user.Email IS UNIQUE;
