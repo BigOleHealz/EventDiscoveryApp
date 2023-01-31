@@ -5,7 +5,7 @@
 /* Main Layout ––––––––––––––––––––––––––––––––––––––––––––––––––*/
 body {
   background-color: #1E1E1E;
-  color: #d8d8d8;
+  color: #222222;
 }
 
 h1,
@@ -286,7 +286,7 @@ p {
 }
 
 /* This creates a skinny side bar fixed to the left of the page */
-.sidebar {
+.sidebar-left {
   position: fixed;
   top: 0;
   left: 0;
@@ -299,31 +299,31 @@ p {
 }
 
 /* when the user hovers on the sidebar, expand it */
-.sidebar:hover {
+.sidebar-left:hover {
   width: 16rem;
 }
 
 /* make sure the contents of the navlink don't wrap when navbar collapses */
-.sidebar .nav-link {
+.sidebar-left .nav-link {
   width: 100%;
   overflow: hidden;
   white-space: nowrap;
 }
 
 /* fix the width of the icons */
-.sidebar .nav-link i {
+.sidebar-left .nav-link i {
   width: 1rem;
 }
 
 /* hide the navlink labels by default */
-.sidebar .nav-link span {
+.sidebar-left .nav-link span {
   visibility: hidden;
   opacity: 0;
   transition: opacity 0.1s ease-in-out;
 }
 
 /* when the sidebar is hovered, reveal the labels */
-.sidebar:hover .nav-link span {
+.sidebar-left:hover .nav-link span {
   visibility: visible;
   opacity: 1;
 }
@@ -331,7 +331,7 @@ p {
 /* container for the sidebar header. make sure the contents don't wrap when
  * the sidebar is collapsed.
  */
-.sidebar-header {
+.sidebar-header-left {
   display: flex;
   justify-content: left;
   align-items: center;
@@ -340,7 +340,7 @@ p {
 }
 
 /* position the header relative to the logo and hide by default */
-.sidebar-header h2 {
+.sidebar-header-left h2 {
   opacity: 0;
   margin-left: 1rem;
   margin-bottom: 0;
@@ -348,7 +348,7 @@ p {
 }
 
 /* reveal the header when the sidebar is toggled */
-.sidebar:hover .sidebar-header h2 {
+.sidebar-left:hover .sidebar-header-left h2 {
   opacity: 1;
 }
 
@@ -357,4 +357,77 @@ p {
   margin-left: 7rem;
   margin-right: 2rem;
   padding: 2rem 1rem;
+}
+
+.sidebar-right {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 5rem;
+  padding: 2rem 1rem;
+  background-color: #f8f9fa;
+  z-index: 1050;
+  transition: width 0.1s ease-in-out;
+}
+
+.sidebar-header {
+  display: flex;
+  justify-content: left;
+  align-items: center;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* when the user hovers on the sidebar, expand it */
+.sidebar-right:hover {
+  width: 16rem;
+}
+
+/* make sure the contents of the navlink don't wrap when navbar collapses */
+.sidebar-right .nav-link {
+  width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* fix the width of the icons */
+.sidebar-right .nav-link i {
+  width: 1rem;
+}
+
+/* hide the navlink labels by default */
+.sidebar-right .nav-link span {
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.1s ease-in-out;
+}
+
+/* when the sidebar is hovered, reveal the labels */
+.sidebar-right:hover .nav-link span {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* container for the sidebar header. make sure the contents don't wrap when
+ * the sidebar is collapsed.
+ */
+/* position the header relative to the logo and hide by default */
+.sidebar-right-header h2 {
+  opacity: 0;
+  margin-left: 1rem;
+  margin-bottom: 0;
+  transition: opacity 0.1s ease-in-out;
+}
+
+/* reveal the header when the sidebar is toggled */
+.sidebar-right:hover .sidebar-header-right h2 {
+  opacity: 1;
+}
+
+.alert {
+  text-align: center;
+  background-color: #ffa5a5;
+  color: #ff0000;
+
 }
