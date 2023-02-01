@@ -9,12 +9,18 @@ class Neo4jDB:
         self.cxn_string = "bolt://100.26.167.168:7687"
         self.graph = Graph(self.cxn_string, auth=("neo4j", os.environ.get('NEO4J_PASSWORD')))
     
-    
-    ###### DO BETTER #####
+    #######################
+    ###### DO BETTER ######
+    #######################
     @staticmethod
     def __dict_to_cypher_props(property_dict: dict):
         def caster(val):
-            return val if isinstance(val, int) else f'"{val}"'
+            if val is True:
+                return 'true'
+            elif isinstance(val, int):
+                return val
+            else:
+                return f'"{val}"'
         return '{' + ', '.join([f"{k}: {caster(v)}" for k, v in property_dict.items()]) + '}'
     
     @staticmethod
@@ -24,7 +30,9 @@ class Neo4jDB:
     @staticmethod
     def __create_account_invite_string(accound_ids: list):
         return ', '.join([f'(u{i})-[:INVITED]->(event)' for i in range(len(accound_ids))])
-    ###### DO BETTER #####
+    #######################
+    ###### DO BETTER ######
+    #######################
     
     def run_command(self, command: str):
         return self.graph.run(command)
@@ -63,13 +71,13 @@ class Neo4jDB:
             if friends_invited is None:
                 friends_invited = []
             props = self.__dict_to_cypher_props(property_dict=properties)
-            command = queries.CREATE_EVENT_WITH_RELATIONSHIPS.format(properties=props, event_type_id=properties['EventTypeID'],
+            command = queries.CREATE_EVENT_WITH_RELATIONSHIPS.format(properties=props,
+                                                                    event_type_id=properties['EventTypeID'],
                                                                     account_match_str=self.__create_account_match_string(friends_invited),
                                                                     account_invite_str=self.__create_account_invite_string(friends_invited),
                                                                     creator_id=int(os.environ['USER_ACCOUNT_ID'])
-                                                                    
-                                                                    )
-            self.run_command(command=command)
+                                                                )
+        self.run_command(command=command)
         except Exception as error:
             print(error)
             if event_node:

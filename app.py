@@ -56,16 +56,17 @@ def right_sidebar_style(popover: bool=False):
     [Output("right_sidebar", "children"),
     Output("alert_box", "children")],
     [Input("event_name-input", "value"),
-    Input("event_date-setter", "date"),
+    Input("event_date-picker", "date"),
     Input("starttime-dropdown", "value"),
     Input("endtime-dropdown", "value"),
     Input("event_type-dropdown", "value"),
     Input("friends_invited-checklist", "value"),
+    Input("public_event-switch", "on"),
     Input("submit-button", "n_clicks")]
 )
-def create_event(event_name: str, event_date: str, starttime: int, endtime: int, event_type_id: int, friends_invited: List[int], n_clicks: int):
-    # your code for inserting the record into the database
-    
+# def create_event(event_name: str, event_date: str, starttime: int, endtime: int, event_type_id: int, friends_invited: List[int], public_event_flag: bool, n_clicks: int):
+def create_event(*args, **kwargs):
+    event_name, event_date, starttime, endtime, event_type_id, friends_invited, public_event_flag, n_clicks = args
     required_args = [event_name, event_type_id]
     event_date_dt = dt.strptime(event_date, '%Y-%m-%d')
         
@@ -81,10 +82,11 @@ def create_event(event_name: str, event_date: str, starttime: int, endtime: int,
                             'StartTimestamp' : start_ts,
                             'EndTimestamp' : end_ts,
                             'EventTypeID' : event_type_id,
-                            'CreatedAt': created_at
+                            'CreatedAt': created_at,
+                            'PublicEvent' : public_event_flag
                         }
             neo4j.create_event(properties=properties, friends_invited=friends_invited)
-            return components.sidebar_right(), components.create_alert_message_child(message="Successfully create Event!", color='success')
+            return components.sidebar_right(), components.create_alert_message_child(message="Successfully created Event!", color='success')
         
         elif any([val is None for val in required_args]):
             return components.sidebar_right(event_name=event_name,
@@ -92,7 +94,8 @@ def create_event(event_name: str, event_date: str, starttime: int, endtime: int,
                                             starttime=starttime,
                                             endtime=endtime,
                                             event_type_id=event_type_id,
-                                            friends_invited=friends_invited
+                                            friends_invited=friends_invited,
+                                            public_event_flag=public_event_flag
                     ), components.create_alert_message_child(message="All fields are required", color='danger')
         else:
             return components.sidebar_right(event_name=event_name,
@@ -100,7 +103,8 @@ def create_event(event_name: str, event_date: str, starttime: int, endtime: int,
                                             starttime=starttime,
                                             endtime=endtime,
                                             event_type_id=event_type_id,
-                                            friends_invited=friends_invited
+                                            friends_invited=friends_invited,
+                                            public_event_flag=public_event_flag
                     ), None
     else:
         return components.sidebar_right(event_name=event_name,
@@ -108,7 +112,8 @@ def create_event(event_name: str, event_date: str, starttime: int, endtime: int,
                                         starttime=starttime,
                                         endtime=endtime,
                                         event_type_id=event_type_id,
-                                        friends_invited=friends_invited
+                                        friends_invited=friends_invited,
+                                        public_event_flag=public_event_flag
                 ), None
 
 

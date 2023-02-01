@@ -2,6 +2,7 @@ import base64, os
 from datetime import datetime as dt
 
 from dash import dcc, html
+import dash_daq as daq
 import dash_bootstrap_components as dbc
 
 from utils.constants import dict_of_locations, LOGO_PATH
@@ -126,7 +127,7 @@ class Components:
                     className=f"alert alert-{color}"
                 )]
 
-    def sidebar_right(self, event_name: str=None, event_date: str=None, starttime: int=0, endtime: int=23, event_type_id: int=None, friends_invited: list=None):
+    def sidebar_right(self, event_name: str=None, event_date: str=None, starttime: int=0, endtime: int=23, event_type_id: int=None, friends_invited: list=None, public_event_flag: bool=False):
         
         if event_date is None:
             event_date = dt.today().date()
@@ -144,7 +145,7 @@ class Components:
                             value=event_name
                         ),
                         dcc.DatePickerSingle(
-                            id="event_date-setter",
+                            id="event_date-picker",
                             initial_visible_month=dt.today(),
                             date=event_date,
                             display_format="MMMM D, YYYY",
@@ -175,9 +176,12 @@ class Components:
                         dcc.Checklist(
                             id='friends_invited-checklist',
                             options=[{'label': rec['Name'], 'value': rec['AccountID']} for rec in self.user_friends],
+                            labelStyle={'display' : 'block'},
                             value=friends_invited
                         ),
                         html.Button('Submit', id='submit-button'),
+                        html.Hr(),
+                        daq.BooleanSwitch(id='public_event-switch', label='Make This A Public Event?', on=public_event_flag),
                     ],
                     vertical=True,
                     pills=True,
