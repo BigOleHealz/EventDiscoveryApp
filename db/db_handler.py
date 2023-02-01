@@ -77,7 +77,7 @@ class Neo4jDB:
                                                                     account_invite_str=self.__create_account_invite_string(friends_invited),
                                                                     creator_id=int(os.environ['USER_ACCOUNT_ID'])
                                                                 )
-        self.run_command(command=command)
+            self.run_command(command=command)
         except Exception as error:
             print(error)
             if event_node:

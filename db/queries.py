@@ -26,3 +26,19 @@ CREATE_EVENT_WITH_RELATIONSHIPS = '''MERGE (event:Event {properties})
                                     CREATE (event)-[:CREATED_BY]->(creator);
                                     '''
 
+QUERY_ALL_EVENTS_BY_USER = '''
+                            MATCH (user:User)
+                                WHERE ID(user) = {node_id}
+                            WITH user
+                            MATCH (event:Event)
+                            WHERE 
+                                ((user)-[:INVITED|:CREATED_EVENT]->(event) OR event.PublicEvent = true)
+                                AND (
+                                    {start_ts} <= event.StartTimestamp < {end_ts}
+                                    OR
+                                    {start_ts} < event.EndTimestamp <= {end_ts}
+                                    OR
+                                    (event.StartTimestamp <= {start_ts} AND {end_ts} <= event.EndTimestamp)
+                                )
+                            RETURN event;
+                            '''
