@@ -2,6 +2,7 @@
 
 import os
 from datetime import datetime as dt, timedelta
+from typing import Mapping, List
 
 from dash import Dash, dcc, html, Input, Output, callback
 import dash_bootstrap_components as dbc
@@ -9,6 +10,7 @@ import dash_bootstrap_components as dbc
 from utils.figures import figmap
 from utils.components import Components
 from db.db_handler import Neo4jDB
+from db import queries
 
 
 app = Dash(__name__,
@@ -38,19 +40,22 @@ app.layout = html.Div(
     ]
 )
 
-# @callback(
-#     Output("map-graph", "figure"),
-#     Input("date-picker", "date"),
-#     Input("time-slider", "value"),
-#     Input("location-dropdown", "value")
-# )
-# def update_graph(date_picked: str, time_range: List[int], location: Mapping[None, str]):
-#     " Update Map Graph based on date-picker, selected data on histogram and location dropdown "
-#     return figmap(date_picked, time_range, location)
-@app.callback(Output('coordinate-click-id', 'children'),
-                Input('map-id', 'click_lat_lng'))
-def click_coord(click_data):
-    print(click_data)
+@app.callback(
+        Output('map-id', 'children'),
+        Input("date-picker", "date"),
+        Input("time-slider", "value"),
+        Input("location-dropdown", "value"),
+        Input('map-id', 'center'),
+        Input('map-id', 'zoom')
+)
+def click_coord(date_picked: str, time_range: List[int], location: Mapping[None, str], center: list, zoom: int):
+    return figmap(
+                    neo4j_connector=neo4j,
+                    date_picked=date_picked,
+                    time_range=time_range,
+                    location=location,
+                    center=center
+                )
 
 
 @callback(
@@ -72,7 +77,6 @@ def right_sidebar_style(popover: bool=False):
     Input("public_event-switch", "on"),
     Input("submit-button", "n_clicks")]
 )
-# def create_event(event_name: str, event_date: str, starttime: int, endtime: int, event_type_id: int, friends_invited: List[int], public_event_flag: bool, n_clicks: int):
 def create_event(*args, **kwargs):
     event_name, event_date, starttime, endtime, event_type_id, friends_invited, public_event_flag, n_clicks = args
     required_args = [event_name, event_type_id]

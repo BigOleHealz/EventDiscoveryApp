@@ -36,22 +36,22 @@ GET_NODE_IDS_FOR_ALL_EVENT_TYPES = '''
                                     WHERE n:EventType
                                     RETURN id(n) AS _id;
                                     '''
-GET_ALL_EVENTS_BY_USER = '''
-                            MATCH (user:User)
-                                WHERE ID(user) = {node_id}
-                            WITH user
-                            MATCH (event:Event)
-                            WHERE 
-                                ((user)-[:INVITED|:CREATED_EVENT]->(event) OR event.PublicEvent = true)
-                                AND (
-                                    {start_ts} <= event.StartTimestamp < {end_ts}
-                                    OR
-                                    {start_ts} < event.EndTimestamp <= {end_ts}
-                                    OR
-                                    (event.StartTimestamp <= {start_ts} AND {end_ts} <= event.EndTimestamp)
-                                )
-                            RETURN event;
-                            '''
+GET_EVENTS_BY_USER = '''
+                    MATCH (n:User)
+                        WHERE n.AccountID = {account_id}
+                    WITH n
+                    MATCH (event:Event)
+                    WHERE 
+                        ((n)-[:INVITED|:CREATED_EVENT]->(event) OR event.PublicEvent = true)
+                        AND (
+                            "{start_ts}" <= event.StartTimestamp < "{end_ts}"
+                            OR
+                            "{start_ts}" < event.EndTimestamp <= "{end_ts}"
+                            OR
+                            (event.StartTimestamp <= "{start_ts}" AND "{end_ts}" <= event.EndTimestamp)
+                        )
+                    RETURN event;
+                    '''
 
 ##### GET INIVIDUAL #####
 GET_USER_BY_ID = 'MATCH (n:User {{AccountID: {account_id}}}) RETURN n.AccountID AS AccountID, n.Name AS Name LIMIT 1;'
@@ -59,7 +59,7 @@ GET_USER_BY_ID = 'MATCH (n:User {{AccountID: {account_id}}}) RETURN n.AccountID 
 GET_EVENT_TYPE_BY_ID = 'MATCH (n:EventType) WHERE ID(n) = {event_type_id} RETURN n;'
 
 
-GET_USERS_FRIENDS_NAMES = 'MATCH (:User {{AccountID: {account_id}}})-[:FRIENDS_WITH]->(n) RETURN n.AccountID AS AccountID, n.Name AS Name;'
+GET_USERS_FRIENDS_NAMES = 'MATCH (:User {{Email: "{email}"}})-[:FRIENDS_WITH]->(n) RETURN n.AccountID AS AccountID, n.Name AS Name;'
 
 GET_USERS_FRIENDS_IDS = '''
                         MATCH (n:User)
