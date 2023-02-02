@@ -2,7 +2,6 @@
 
 import os
 from datetime import datetime as dt, timedelta
-from typing import List, Mapping
 
 from dash import Dash, dcc, html, Input, Output, callback
 import dash_bootstrap_components as dbc
@@ -12,7 +11,11 @@ from utils.components import Components
 from db.db_handler import Neo4jDB
 
 
-app = Dash(__name__, title = "Event Finder", external_stylesheets=[dbc.themes.BOOTSTRAP, dbc.icons.FONT_AWESOME])
+app = Dash(__name__,
+            title="Event Finder",
+            external_stylesheets=[dbc.themes.BOOTSTRAP, dbc.icons.FONT_AWESOME],
+            external_scripts=['https://codepen.io/chriddyp/pen/bWLwgP.css']
+        )
 server = app.server
 
 neo4j = Neo4jDB()
@@ -30,19 +33,24 @@ app.layout = html.Div(
                 id="right_sidebar",
                 className="sidebar-right"
                 ),
-        components.map_content
+        components.map_content,
+        html.Div(id='coordinate-click-id')
     ]
 )
 
-@callback(
-    Output("map-graph", "figure"),
-    Input("date-picker", "date"),
-    Input("time-slider", "value"),
-    Input("location-dropdown", "value")
-)
-def update_graph(date_picked: str, time_range: List[int], location: Mapping[None, str]):
-    " Update Map Graph based on date-picker, selected data on histogram and location dropdown "
-    return figmap(date_picked, time_range, location)
+# @callback(
+#     Output("map-graph", "figure"),
+#     Input("date-picker", "date"),
+#     Input("time-slider", "value"),
+#     Input("location-dropdown", "value")
+# )
+# def update_graph(date_picked: str, time_range: List[int], location: Mapping[None, str]):
+#     " Update Map Graph based on date-picker, selected data on histogram and location dropdown "
+#     return figmap(date_picked, time_range, location)
+@app.callback(Output('coordinate-click-id', 'children'),
+                Input('map-id', 'click_lat_lng'))
+def click_coord(click_data):
+    print(click_data)
 
 
 @callback(

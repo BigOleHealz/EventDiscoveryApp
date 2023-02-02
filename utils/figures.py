@@ -1,11 +1,13 @@
 from datetime import datetime as dt, timedelta
 from typing import List, Mapping
 from plotly import graph_objs as go
+import dash_leaflet as dl
 
 from utils.helper_functions import get_events_by_timestamp
 from utils.constants import dict_of_locations, mapbox_access_token
 
 def figmap(date_picked: str, time_range: List[int]=None, location: Mapping[None, str]=None):
+# def figmap():
     zoom = 12.0
     latInitial = 39.9526
     lonInitial = -75.1652
@@ -24,6 +26,16 @@ def figmap(date_picked: str, time_range: List[int]=None, location: Mapping[None,
     max_timestamp = date_picked + timedelta(hours=time_range[-1])
     
     df_events = get_events_by_timestamp(min_timestamp, max_timestamp)
+
+    
+    # return dl.Map(
+    #             id='map-id',
+    #             style={'width': '1000px', 'height': '500px'},
+    #             center=[32.7, -96.8],
+    #             zoom=5,
+    #             children=[
+    #                 dl.TileLayer()
+    #             ])
 
     return go.Figure(
         data=[

@@ -4,13 +4,13 @@ from datetime import datetime as dt
 from dash import dcc, html
 import dash_daq as daq
 import dash_bootstrap_components as dbc
+import dash_leaflet as dl
 
 from utils.constants import dict_of_locations, LOGO_PATH
 from db.db_handler import Neo4jDB
 from db import queries
 
 
-# event_types = [rec['EventName'] for rec in neo4j.execute_query(queries.GET_ALL_EVENT_TYPE_NAMES)]
 class Components:
     def __init__(self, neo4j_db_connector: Neo4jDB):
         self.neo4j_db_connector = neo4j_db_connector
@@ -191,15 +191,21 @@ class Components:
         
 
     map_content = html.Div(
-                style={'width' : '100%', 'height' : "90vh"},
+                style={'width' : '100%', 'height' : "100%"},
                 className="row",
                 children=[
                     html.Div(
                         className="eight columns div-for-charts bg-grey",
                         children=[
-                            dcc.Graph(id="map-graph",
-                                        config={ 'displayModeBar': False}
-                                    ),
+                            dl.Map(
+                                id='map-id',
+                                style={'width': '100%', 'height': '90%'},
+                                center=[32.7, -96.8],
+                                zoom=5,
+                                children=[
+                                    dl.TileLayer()
+                                ]
+                            )
                         ],
                     )
                 ],
