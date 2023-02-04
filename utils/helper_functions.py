@@ -1,14 +1,22 @@
-from datetime import datetime as dt
+import base64
 
-from utils.constants import df
+from PIL import Image
+from utils.constants import ICON_SIZE
+
+def get_scaled_dimensions(image_path: str):
+    image = Image.open(image_path)
+    width, height = image.size
+    
+    if height > width:
+        return (int(ICON_SIZE * width / height), ICON_SIZE)
+    else:
+        return (ICON_SIZE, int(ICON_SIZE * width / height))
 
 def get_user_location():
     import geocoder
     latlng = geocoder.ip('me').latlng
     return {'Lat' : latlng[0], 'Lng' : latlng[-1]}
-    
 
-def get_events_by_timestamp(min_timestamp: dt, max_timestamp: dt):
-    " Get the Coordinates of the chosen months, dates and times "
-    data_df = df[(min_timestamp <= df['Date/Time']) & (df['Date/Time'] <= max_timestamp)].reset_index(drop=True)
-    return data_df
+def format_decode_image(path: str):
+    return 'data:image/png;base64,{}'.format(base64.b64encode(open(path, 'rb').read()).decode('ascii'))
+
