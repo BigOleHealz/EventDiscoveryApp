@@ -1,22 +1,23 @@
 import base64, os
-from datetime import datetime as dt
+from datetime import datetime as dt, timedelta
 
 from dash import dcc, html
 import dash_daq as daq
 import dash_bootstrap_components as dbc
 
 from utils.constants import dict_of_locations, LOGO_PATH
+from utils.map_handler import get_map_content
+from utils.helper_functions import format_decode_image
 from db.db_handler import Neo4jDB
 from db import queries
 
 
-# event_types = [rec['EventName'] for rec in neo4j.execute_query(queries.GET_ALL_EVENT_TYPE_NAMES)]
 class Components:
     def __init__(self, neo4j_db_connector: Neo4jDB):
         self.neo4j_db_connector = neo4j_db_connector
         self.event_type_mappings = self.neo4j_db_connector.execute_query(queries.GET_ALL_EVENT_TYPE_NAMES)
         
-        self.user_friends = self.neo4j_db_connector.execute_query(queries.GET_USERS_FRIENDS.format(account_id=int(os.environ['USER_ACCOUNT_ID'])))
+        self.user_friends = self.neo4j_db_connector.execute_query(queries.GET_USERS_FRIENDS_NAMES_BY_EMAIL.format(email=os.environ['USER_ACCOUNT_EMAIL']))
     
     header = dbc.Navbar(
         dbc.Container(
@@ -67,9 +68,7 @@ class Components:
         [
             html.Div(
                 [
-                    # width: 3rem ensures the logo is the exact width of the
-                    # collapsed sidebar (accounting for padding)
-                    html.Img(src='data:image/png;base64,{}'.format(base64.b64encode(open(LOGO_PATH, 'rb').read()).decode('ascii')),
+                    html.Img(src=format_decode_image(path=LOGO_PATH),
                                 style={"width": "15rem"},
                                 alt='image'
                             )
@@ -82,7 +81,6 @@ class Components:
                 [
                     dcc.DatePickerSingle(
                         id="date-picker",
-                        initial_visible_month=dt.today(),
                         date=dt.today().date(),
                         display_format="MMMM D, YYYY",
                         style={"border": "0px solid black"},
@@ -127,7 +125,15 @@ class Components:
                     className=f"alert alert-{color}"
                 )]
 
-    def sidebar_right(self, event_name: str=None, event_date: str=None, starttime: int=0, endtime: int=23, event_type_id: int=None, friends_invited: list=None, public_event_flag: bool=False):
+    def sidebar_right(self,
+                    event_name: str=None,
+                    event_date: str=None,
+                    starttime: int=0,
+                    endtime: int=23,
+                    event_type_id: int=None,
+                    friends_invited: list=None,
+                    public_event_flag: bool=False
+                ):
         
         if event_date is None:
             event_date = dt.today().date()
@@ -142,7 +148,8 @@ class Components:
                             id="event_name-input",
                             type="text",
                             placeholder="Input Event Name",
-                            value=event_name
+                            value=event_name,
+                            className="component"
                         ),
                         dcc.DatePickerSingle(
                             id="event_date-picker",
@@ -150,27 +157,27 @@ class Components:
                             date=event_date,
                             display_format="MMMM D, YYYY",
                             style={"border": "0px solid black"},
-                            className="div-for-dropdown"
+                            className="component"
                         ),
                         # Dropdown for locations on map
                         dcc.Dropdown(
                             id="starttime-dropdown",
                             options=[{'label': t, 'value': t} for t in range(0,24)],
                             placeholder="Select a Start Time",
-                            className="div-for-dropdown",
+                            className="component",
                             value=starttime
                         ),
                         dcc.Dropdown(
                             id="endtime-dropdown",
                             options=[{'label': t, 'value': t} for t in range(0,24)],
                             placeholder="Select an End Time",
-                            className="div-for-dropdown",
+                            className="component",
                             value=endtime
                         ),
                         dcc.Dropdown(
                             id="event_type-dropdown",
                             options=[{'label': event_type['EventName'], 'value': event_type['EventTypeID']} for event_type in self.event_type_mappings],
-                            className="div-for-dropdown",
+                            className="component",
                             value=event_type_id
                         ),
                         dcc.Checklist(
@@ -179,7 +186,7 @@ class Components:
                             labelStyle={'display' : 'block'},
                             value=friends_invited
                         ),
-                        html.Button('Submit', id='submit-button'),
+                        html.Button('Submit', id='submit-button', className='component'),
                         html.Hr(),
                         daq.BooleanSwitch(id='public_event-switch', label='Make This A Public Event?', on=public_event_flag),
                     ],
@@ -189,18 +196,7 @@ class Components:
                 ),
             ]
         
+    @staticmethod
+    def map_content(neo4j_connector: Neo4jDB):
+        return get_map_content(neo4j_connector=neo4j_connector)
 
-    map_content = html.Div(
-                style={'width' : '100%', 'height' : "90vh"},
-                className="row",
-                children=[
-                    html.Div(
-                        className="eight columns div-for-charts bg-grey",
-                        children=[
-                            dcc.Graph(id="map-graph",
-                                        config={ 'displayModeBar': False}
-                                    ),
-                        ],
-                    )
-                ],
-            )
