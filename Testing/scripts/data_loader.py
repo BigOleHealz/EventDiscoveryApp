@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-import os, sys
+import os, sys, random
 
 import pandas as pd
 
@@ -62,22 +62,43 @@ class DataLoader:
     def load_events_to_neo4j_db(self):
         print('Loading Events')
         df = pd.read_csv(os.path.join(self.enriched_data_folder_path, 'events.csv'))
-        property_label_list = ['CreatedByID', 'Lat', 'Lon', 'StartTimestamp', 'EndTimestamp', 'PublicEventFlag', 'EventTypeID', 'EventCreatedAt', 'EventName']
+        property_label_list = ['CreatedByID', 'Lat', 'Lon', 'StartTimestamp', 'EndTimestamp', 'PublicEventFlag', 'EventTypeID', 'EventCreatedAt', 'EventName', "Host", "Address"]
         
         for _, row in df.iterrows():
             properties = row[property_label_list].to_dict()
             self.neo4j.load_event(created_by_id=row['CreatedByID'], properties=properties, friends_invited=row['InviteList'])
             
+    def load_attending_relationships(self):
+        print('Loading Attending Relationships')
+        users = self.neo4j.execute_query(queries.GET_ALL_USERS_NODES)
+        
+        invited_flags = [True, False, False]
+        for user in users:
+            user_node = user['n']
+            account_id = user_node['AccountID']
+            invited_events = self.neo4j.execute_query(queries.GET_ALL_EVENT_INVITED_BY_USER_ACCOUNT_ID.format(account_id=account_id))
+
+            for event_rec in invited_events:
+                event_node = event_rec['e']
+                if random.choice(invited_flags) is True:
+                    self.neo4j.create_attending_relationship(attendee_node=user_node, event_node=event_node)
+                
+            
+            
+            
+        
+
 
 if __name__ == '__main__':
     dl = DataLoader()
     
     # dl.wipe_events()
-    dl.wipe_data()
-    dl.load_event_types_to_neo4j_db()
-    dl.load_users_to_neo4j_db()
+    # dl.wipe_data()
+    # dl.load_event_types_to_neo4j_db()
+    # dl.load_users_to_neo4j_db()
     dl.load_businesses_to_neo4j_db()
     
-    ctd = CreateTestData()
-    ctd.create_events_csv()
-    dl.load_events_to_neo4j_db()
+    # ctd = CreateTestData()
+    # ctd.create_events_csv()
+    # dl.load_events_to_neo4j_db()
+    # dl.load_attending_relationships()

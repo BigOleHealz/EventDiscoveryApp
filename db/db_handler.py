@@ -1,4 +1,5 @@
 import os, traceback
+from typing import Mapping
 
 from py2neo import Graph, Node, Relationship
 from db import queries
@@ -39,14 +40,21 @@ class Neo4jDB:
     
     def execute_query(self, query: str):
         result = self.run_command(query)
+        
         result = [rec for rec in result]
         
         return result
         
-    def __create_node(self, node_type: str, properties: dict=None):
+    def __create_node(self, node_labels: Mapping[str, list], properties: dict=None):
         if properties is None:
             properties = {}
-        node = Node(node_type, **properties)
+        import pdb; pdb.set_trace()
+        if isinstance(node_labels, str):
+            node = Node(node_labels, **properties)
+        elif isinstance(node_labels, list):
+            node = Node(*node_labels, **properties)
+        else:
+            raise TypeError(f'Argument "node_labels" must be of type str or list but received {type(node_labels)}')
         self.graph.create(node)
         
         return node
@@ -73,19 +81,19 @@ class Neo4jDB:
         self.graph.create(relationship)
     
     def create_event_node(self, properties: dict=None):
-        node = self.__create_node(node_type='Event', properties=properties)
+        node = self.__create_node(node_labels='Event', properties=properties)
         return node
     
     def create_business_node(self, properties: dict=None):
-        node = self.__create_node(node_type='Business', properties=properties)
+        node = self.__create_node(node_labels=['Account', 'Business'], properties=properties)
         return node
     
     def create_event_type_node(self, properties: dict=None):
-        node = self.__create_node(node_type='EventType', properties=properties)
+        node = self.__create_node(node_labels='EventType', properties=properties)
         return node
     
     def create_user_node(self, properties: dict=None):
-        node = self.__create_node(node_type='User', properties=properties)
+        node = self.__create_node(node_labels=['Account', 'User'], properties=properties)
         return node
     
     def delete_node_by_id(self, node_id: int):
@@ -114,6 +122,13 @@ class Neo4jDB:
             print(traceback.format_exc())
             tx.rollback()
             raise error
+    
+    def create_attending_relationship(self, attendee_node: Node, event_node: Node):
+        try:
+            self.create_relationship(a_node=attendee_node, relationship_label='ATTENDING', b_node=event_node)
+        except:
+            raise Exception(f'Could not created ATTENDING relationshup between user_node: {attendee_node=} ->{event_node=}')
+        
 
 if __name__ == '__main__':
     neo4j = Neo4jDB()

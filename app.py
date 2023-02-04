@@ -7,7 +7,7 @@ from typing import Mapping, List
 from dash import Dash, dcc, html, Input, Output, callback
 import dash_bootstrap_components as dbc
 
-from utils.figures import figmap
+from utils.map_handler import tile_layer
 from utils.components import Components
 from db.db_handler import Neo4jDB
 from db import queries
@@ -16,7 +16,6 @@ from db import queries
 app = Dash(__name__,
             title="Event Finder",
             external_stylesheets=[dbc.themes.BOOTSTRAP, dbc.icons.FONT_AWESOME],
-            external_scripts=['https://codepen.io/chriddyp/pen/bWLwgP.css']
         )
 server = app.server
 
@@ -26,16 +25,15 @@ components = Components(neo4j_db_connector=neo4j)
 # Layout of Dash App
 app.layout = html.Div(
     children=[
-        dbc.Popover(target="right_sidebar", trigger="hover", id="popover"),
         components.alert_box,
         dcc.Location(id="url"),
         components.header,
         components.sidebar_left,
-        html.Div(children=components.sidebar_right(),
+        html.Div(components.sidebar_right(),
                 id="right_sidebar",
                 className="sidebar-right"
-                ),
-        components.map_content,
+            ),
+        components.map_content(neo4j_connector=neo4j),
         html.Div(id='coordinate-click-id')
     ]
 )
@@ -44,26 +42,18 @@ app.layout = html.Div(
         Output('map-id', 'children'),
         Input("date-picker", "date"),
         Input("time-slider", "value"),
-        Input("location-dropdown", "value"),
-        Input('map-id', 'center'),
-        Input('map-id', 'zoom')
+        Input("location-dropdown", "value")
 )
-def click_coord(date_picked: str, time_range: List[int], location: Mapping[None, str], center: list, zoom: int):
-    return figmap(
+def update_preferences(date_picked: str,
+                        time_range: List[int],
+                        location: Mapping[None, str],
+                    ):
+    return tile_layer(
                     neo4j_connector=neo4j,
                     date_picked=date_picked,
                     time_range=time_range,
                     location=location,
-                    center=center
                 )
-
-
-@callback(
-    Output("right_sidebar", "style"),
-    Input("popover", "is_open")
-)
-def right_sidebar_style(popover: bool=False):
-    return {'width' : '16rem'} if popover is True else {'width' : '5rem'}
 
 @callback(
     [Output("right_sidebar", "children"),

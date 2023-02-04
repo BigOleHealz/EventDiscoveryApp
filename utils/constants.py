@@ -16,3 +16,6 @@ dict_of_locations = {
     "The Met - Philadelphia": {"lat": 39.969672, "lon": -75.160099},
 }
 
+datetime_format = '%Y-%m-%dT%H:%M:%S'
+
+ICON_SIZE = 80
