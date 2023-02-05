@@ -13,13 +13,13 @@ date_output_format = '%Y-%m-%d %H:%M:%S'
 
 
 icon_paths = {
-    "Bars": "assets/images/Bars.png",
-    "Crypto": "assets/images/Crypto.png",
-    "Food": "assets/images/Food.png",
-    "Golf": "assets/images/Golf.png",
-    "Music": "assets/images/Music.png",
-    "Professional": "assets/images/Professional.png",
-    "Sports": "assets/images/Sports.png",
+        "Bars": "assets/images/Bars.png",
+        "Crypto": "assets/images/Crypto.png",
+        "Food": "assets/images/Food.png",
+        "Golf": "assets/images/Golf.png",
+        "Music": "assets/images/Music.png",
+        "Professional": "assets/images/Professional.png",
+        "Sports": "assets/images/Sports.png",
     }
 icon_mappings = {key : {'iconUrl' : val} for key, val in icon_paths.items()}
 for key, val in icon_paths.items():
@@ -28,16 +28,15 @@ for key, val in icon_paths.items():
     icon_mappings[key]["iconAnchor"] = [width // 2, height],
     icon_mappings[key]["popupAnchor"] = [0, 0]
 
-print(icon_mappings)
 def tile_layer(neo4j_connector: Neo4jDB,
             date_picked: str=None,
             time_range: List[int]=None,
-            location: Mapping[None, str]=None,
+            selected_location: Mapping[None, str]=None,
         ):
     
     if time_range is None:
         time_range = [0, 23]
-    
+
     date_picked = dt.strptime(date_picked, "%Y-%m-%d") if date_picked else dt.today().date()
     
     min_timestamp = (date_picked + timedelta(hours=time_range[0])).strftime(datetime_format)
@@ -86,7 +85,10 @@ def tile_layer(neo4j_connector: Neo4jDB,
     
     layer_control = dl.LayersControl([
                                         dl.BaseLayer(
-                                            dl.TileLayer(url='https://b.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png', id='tile-layer'),
+                                            dl.TileLayer(
+                                                url='https://b.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png',
+                                                id='tile-layer'
+                                            ),
                                             checked=True,
                                         ),
                                     ])

@@ -97,9 +97,15 @@ GET_EVENT_BY_PERSON_AND_TS = '''
 
 
 ##### GET INIVIDUAL #####
-GET_EVENT_TYPE_BY_ID = '''
+GET_ACCOUNT_NODE_BY_EMAIL = '''
+                            MATCH (n:Account)
+                                WHERE n.Email = "{email}"
+                            RETURN n;
+                            '''
+
+GET_EVENT_TYPE_BY_EVENTTYPEID = '''
                         MATCH (n:EventType)
-                            WHERE ID(n) = {event_type_id}
+                            WHERE n.EventTypeID = {event_type_id}
                         RETURN n;
                         '''
 
@@ -166,7 +172,13 @@ GET_ATTENDEE_COUNT_FOR_EVENTS_BY_ID = '''
                                     '''
 
 
-
+CREATE_INVITE_RELATIONSHIPS_FROM_INVITE_LIST_TO_EVENT = '''
+                                                        WITH {invite_list} as user_id_list, {event_id} as event_id
+                                                        UNWIND user_id_list as user_id
+                                                        MATCH (u:User) WHERE ID(u) = user_id
+                                                        MATCH (e:Event) WHERE ID(e) = event_id
+                                                        CREATE (u)-[:INVITED {properties}]->(e)
+                                                        '''
 # ##### CREATES #####
 # CREATE_EVENT_WITH_RELATIONSHIPS = '''MERGE (event:Event {properties})
 #                                     MERGE (event_type:EventType {{EventTypeID:{event_type_id}}})
