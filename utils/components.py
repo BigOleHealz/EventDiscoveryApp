@@ -17,7 +17,7 @@ class Components:
         self.neo4j_db_connector = neo4j_db_connector
         self.event_type_mappings = self.neo4j_db_connector.execute_query(queries.GET_ALL_EVENT_TYPE_NAMES)
         
-        self.user_friends = self.neo4j_db_connector.execute_query(queries.GET_USERS_FRIENDS_NAMES_BY_EMAIL.format(email=os.environ['USER_ACCOUNT_EMAIL']))
+        self.person_friends = self.neo4j_db_connector.execute_query(queries.GET_PERSON_FRIENDS_NAMES_BY_EMAIL.format(email=os.environ['ACCOUNT_EMAIL']))
     
     header = dbc.Navbar(
         dbc.Container(
@@ -40,16 +40,12 @@ class Components:
                                     dbc.NavItem(dbc.NavLink("Page 1")),
                                     dbc.NavItem(
                                         dbc.NavLink("Page 2"),
-                                        # add an auto margin after page 2 to
-                                        # push later links to end of nav
                                         className="me-auto",
                                     ),
                                     dbc.NavItem(dbc.NavLink("Help")),
                                     dbc.NavItem(dbc.NavLink("About")),
                                 ],
-                                # make sure nav takes up the full width for auto
-                                # margin to get applied
-                                # className="w-100",
+                                className="w-100",
                             ),
                             id="navbar-collapse",
                             is_open=False,
@@ -182,7 +178,7 @@ class Components:
                         ),
                         dcc.Checklist(
                             id='friends_invited-checklist',
-                            options=[{'label': rec['Name'], 'value': rec['AccountID']} for rec in self.user_friends],
+                            options=[{'label': rec['Name'], 'value': rec['ID']} for rec in self.person_friends],
                             labelStyle={'display' : 'block'},
                             value=friends_invited
                         ),

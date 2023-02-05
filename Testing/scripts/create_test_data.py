@@ -30,8 +30,8 @@ city_data = {
 
 
 min_date = dt.today().date()
-max_date = min_date + timedelta(days=21)
-max_num_events = 50
+max_date = min_date + timedelta(days=7)
+max_num_events = 25
 decimal_precision = 7
 
 PUBLIC_EVENT_FLAG_LIST = [True, False]
@@ -76,8 +76,8 @@ class CreateTestData:
     def create_events_csv(self):
         df = pd.DataFrame(columns=['CreatedByID', 'Lon', 'Lat', 'StartTimestamp', 'EndTimestamp', 'PublicEventFlag', 'InviteList'])
         
-        user_ids = [rec['_id'] for rec in self.neo4j.run_command(queries.GET_NODE_IDS_FOR_ALL_USERS)]
-        account_ids = [rec['_id'] for rec in self.neo4j.run_command(queries.GET_NODE_IDS_FOR_ALL_BUSINESSES_AND_USERS)]
+        person_ids = [rec['_id'] for rec in self.neo4j.run_command(queries.GET_NODE_IDS_FOR_ALL_PERSONS)]
+        account_ids = [rec['_id'] for rec in self.neo4j.run_command(queries.GET_NODE_IDS_FOR_ALL_BUSINESSES_AND_PERSONS)]
         event_type_ids = [int(rec['_id']) for rec in self.neo4j.run_command(queries.GET_NODE_IDS_FOR_ALL_EVENT_TYPES)]
         
         for date in pd.date_range(min_date, max_date, freq='d'):
@@ -92,8 +92,8 @@ class CreateTestData:
                 
                 event_node = self.neo4j.get_node_by_id(node_id=created_by_id)
                 
-                if created_by_id in user_ids:
-                    friends_list = [rec['_id'] for rec in self.neo4j.execute_query(queries.GET_USERS_FRIENDS_IDS.format(node_id=created_by_id))]
+                if created_by_id in person_ids:
+                    friends_list = [rec['_id'] for rec in self.neo4j.execute_query(queries.GET_PERSON_FRIENDS_IDS.format(node_id=created_by_id))]
                     invite_list = random.sample(friends_list, random.randint(0, len(friends_list)))
                     lat = round(random.uniform(city_data['Philadelphia']['lat']['min'], city_data['Philadelphia']['lat']['max']), decimal_precision)
                     lon = round(random.uniform(city_data['Philadelphia']['lon']['min'], city_data['Philadelphia']['lon']['max']), decimal_precision)

@@ -10,37 +10,11 @@ class Neo4jDB:
         self.cxn_string = "bolt://100.26.167.168:7687"
         self.graph = Graph(self.cxn_string, auth=("neo4j", os.environ.get('NEO4J_PASSWORD')))
 
-    #######################
-    ###### DO BETTER ######
-    #######################
-    @staticmethod
-    def __dict_to_cypher_props(property_dict: dict):
-        def caster(val):
-            if val is True:
-                return 'true'
-            elif isinstance(val, int):
-                return val
-            else:
-                return f'"{val}"'
-        return '{' + ', '.join([f"{k}: {caster(v)}" for k, v in property_dict.items()]) + '}'
-    
-    @staticmethod
-    def __create_account_match_string(accound_ids: list):
-        return ', '.join([f'(u{i}:User {{AccountID:{account_id}}})' for i, account_id in enumerate(accound_ids)])
-    
-    @staticmethod
-    def __create_account_invite_string(accound_ids: list):
-        return ', '.join([f'(u{i})-[:INVITED]->(event)' for i in range(len(accound_ids))])
-    #######################
-    ###### DO BETTER ######
-    #######################
-    
     def run_command(self, command: str):
         return self.graph.run(command)
     
     def execute_query(self, query: str):
         result = self.run_command(query)
-        
         result = [rec for rec in result]
         
         return result
@@ -48,13 +22,12 @@ class Neo4jDB:
     def __create_node(self, node_labels: Mapping[str, list], properties: dict=None):
         if properties is None:
             properties = {}
-        import pdb; pdb.set_trace()
         if isinstance(node_labels, str):
             node = Node(node_labels, **properties)
         elif isinstance(node_labels, list):
             node = Node(*node_labels, **properties)
         else:
-            raise TypeError(f'Argument "node_labels" must be of type str or list but received {type(node_labels)}')
+            raise TypeError(f'Argument "node_labels" must be of type str or list but received type: {type(node_labels)}')
         self.graph.create(node)
         
         return node
@@ -92,8 +65,8 @@ class Neo4jDB:
         node = self.__create_node(node_labels='EventType', properties=properties)
         return node
     
-    def create_user_node(self, properties: dict=None):
-        node = self.__create_node(node_labels=['Account', 'User'], properties=properties)
+    def create_person_node(self, properties: dict=None):
+        node = self.__create_node(node_labels=['Account', 'Person'], properties=properties)
         return node
     
     def delete_node_by_id(self, node_id: int):
@@ -103,10 +76,10 @@ class Neo4jDB:
         event_node = None
         tx = self.graph.begin()
         try:
-            user_node = self.get_node_by_id(node_id=created_by_id)
+            person_node = self.get_node_by_id(node_id=created_by_id)
             event_node = self.create_event_node(properties=properties)
-            self.create_relationship(a_node=user_node, relationship_label='CREATED_EVENT', b_node=event_node)
-            self.create_relationship(a_node=event_node, relationship_label='CREATED_BY', b_node=user_node)
+            self.create_relationship(a_node=person_node, relationship_label='CREATED_EVENT', b_node=event_node)
+            self.create_relationship(a_node=event_node, relationship_label='CREATED_BY', b_node=person_node)
             
             event_type_node = self.get_event_type_node_by_event_type_id(event_type_id=properties['EventTypeID'])
             self.create_relationship(a_node=event_type_node, relationship_label='RELATED_EVENT', b_node=event_node)
@@ -127,9 +100,4 @@ class Neo4jDB:
         try:
             self.create_relationship(a_node=attendee_node, relationship_label='ATTENDING', b_node=event_node)
         except:
-            raise Exception(f'Could not created ATTENDING relationshup between user_node: {attendee_node=} ->{event_node=}')
-        
-
-if __name__ == '__main__':
-    neo4j = Neo4jDB()
-    neo4j.execute_query('MATCH (n:EventType) RETURN n.EventName;')
+            raise Exception(f'Could not created ATTENDING relationship between person_node: {attendee_node=} ->{event_node=}')
