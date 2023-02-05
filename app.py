@@ -4,19 +4,22 @@ import os
 from datetime import datetime as dt, timedelta
 from typing import Mapping, List
 
-from dash import Dash, dcc, html, Input, Output, callback
+from dash import Dash, callback_context, dcc, html, Input, Output, callback
 import dash_bootstrap_components as dbc
 
 from utils.map_handler import tile_layer
 from utils.components import Components
 from db.db_handler import Neo4jDB
+from utils.constants import CURRENTLY_ATTENDING_BUTTON_TEXT, NOT_CURRENTLY_ATTENDING_BUTTON_TEXT
 from db import queries
 
 
 app = Dash(__name__,
             title="Event Finder",
             external_stylesheets=[dbc.themes.BOOTSTRAP, dbc.icons.FONT_AWESOME],
+            suppress_callback_exceptions=True
         )
+app.suppress_callback_exceptions=True
 server = app.server
 
 neo4j = Neo4jDB()
@@ -119,6 +122,35 @@ def create_event(*args, **kwargs):
                                         friends_invited=friends_invited,
                                         public_event_flag=public_event_flag
                 ), None
+
+
+
+# @callback(
+#         Output(f"attend-button", "children"),
+#         [Input(f"attend-button", "children"),
+#         Input(f"attend-button", "n_clicks")]
+#     )
+# def attend_event(attend_button_text: str, n_clicks: int):
+#     ctx = callback_context
+#     if not ctx.triggered:
+#         return 'No button has been clicked yet'
+#     else:
+#         import pdb; pdb.set_trace()
+        
+    # if n_clicks is not None:
+    #     print(attend_button_text)
+        
+    #     if attend_button_text == CURRENTLY_ATTENDING_BUTTON_TEXT:
+    #         return NOT_CURRENTLY_ATTENDING_BUTTON_TEXT
+    #     elif attend_button_text == NOT_CURRENTLY_ATTENDING_BUTTON_TEXT:
+    #         return CURRENTLY_ATTENDING_BUTTON_TEXT
+    #     else:
+    #         raise Exception("Something weird is going on in attend_event callback")
+    # else:
+    #     print(f"{n_clicks=}")
+    #     return "WTF"
+            
+    
 
 
 if __name__ == "__main__":

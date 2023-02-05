@@ -1,13 +1,13 @@
 import os
 from datetime import datetime as dt, timedelta
 from typing import List, Mapping
-from dash import html, dcc
+from dash import html, dcc, Input, Output, callback
 import dash_leaflet as dl
 
 from utils.helper_functions import get_scaled_dimensions
 from db.db_handler import Neo4jDB
 from db import queries
-from utils.constants import datetime_format
+from utils.constants import datetime_format, CURRENTLY_ATTENDING_BUTTON_TEXT, NOT_CURRENTLY_ATTENDING_BUTTON_TEXT
 
 date_output_format = '%Y-%m-%d %H:%M:%S'
 
@@ -45,13 +45,20 @@ def tile_layer(neo4j_connector: Neo4jDB,
     events = neo4j_connector.execute_query(queries.GET_EVENT_BY_PERSON_AND_TS.format(email=os.environ['ACCOUNT_EMAIL'], start_ts=min_timestamp, end_ts=max_timestamp))
     
     markers = []
-    for event in events:
+    for i, event in enumerate(events):
         event_node = event['Event']
         attendee_count = event['AttendeeCount']
         
         event_name_str = f"Event Name: {event_node['EventName']}"
         event_host_str = f"Host: {event_node['Host']}"
         address_str = f"Address: {event_node['Address']}"
+        
+        component_id = f'attend-button_{i}'
+        
+        if event_node['ATTENDING_BOOLEAN']:
+            attend_button = html.Button(CURRENTLY_ATTENDING_BUTTON_TEXT, id=component_id)
+        else:
+            attend_button = html.Button(NOT_CURRENTLY_ATTENDING_BUTTON_TEXT, id=component_id)
         
         markers.append(
             dl.Marker(
@@ -71,16 +78,18 @@ def tile_layer(neo4j_connector: Neo4jDB,
                     ),
                     dl.Popup(
                             html.Div(children=[
-                                    html.P(event_name_str),
-                                    html.P(event_host_str),
-                                    html.P(address_str),
-                                    html.Button("I'm Going!!", id='test-button')
-                                ]
-                            )
-                        ),
+                                html.P(event_name_str),
+                                html.P(event_host_str),
+                                html.P(address_str),
+                                html.P(f"Current People Attending: {attendee_count}"),
+                                attend_button
+                            ]),
+                        className='component'),
                 ],
             )
         )
+    
+
     cluster = dl.MarkerClusterGroup(id="markers", children=markers)
     
     layer_control = dl.LayersControl([

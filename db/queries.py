@@ -76,7 +76,7 @@ GET_EVENTS_BY_PERSON = '''
 
 GET_EVENT_BY_PERSON_AND_TS = '''
                             MATCH (n:Person)
-                                WHERE n.Email = "{email}"
+                            WHERE n.Email = "{email}"
                             WITH n
                             MATCH (e:Event)
                             WHERE 
@@ -88,13 +88,17 @@ GET_EVENT_BY_PERSON_AND_TS = '''
                                     OR
                                     (e.StartTimestamp <= "{start_ts}" AND "{end_ts}" <= e.EndTimestamp)
                                 )
-                            WITH COLLECT(e) as events
+                            WITH n, COLLECT(e) as events
                             UNWIND events as event
                             OPTIONAL MATCH (u:Person)-[r:ATTENDING]->(event)
                             OPTIONAL MATCH (et:EventType) WHERE ID(et) = event.EventTypeID
-                            RETURN event as Event, COALESCE(count(r), 0) as AttendeeCount, et.EventName as EventName;
+                            WITH n, event, COALESCE(count(r), 0) as AttendeeCount, et.EventName as EventName,
+                                CASE
+                                    WHEN (n)-[:ATTENDING]->(event) THEN True
+                                    ELSE False
+                                END as ATTENDING_BOOLEAN
+                            RETURN event as Event, AttendeeCount, EventName, ATTENDING_BOOLEAN;
                             '''
-
 
 ##### GET INIVIDUAL #####
 GET_ACCOUNT_NODE_BY_EMAIL = '''
@@ -164,11 +168,11 @@ GET_RECOMMENDED_EVENTS = '''
                         '''
 
 GET_ATTENDEE_COUNT_FOR_EVENTS_BY_ID = '''
-                                    WITH {event_id_list} as event_id_list
-                                    UNWIND event_id_list as event_id
-                                    MATCH (e:Event) WHERE ID(e) = event_id
-                                    OPTIONAL MATCH (u:Person)-[r:ATTENDING]->(e)
-                                    RETURN ID(e) as EventID, COALESCE(count(r), 0) as AttendeeCount;
+WITH {event_id_list} as event_id_list
+UNWIND event_id_list as event_id
+MATCH (e:Event) WHERE ID(e) = event_id
+OPTIONAL MATCH (u:Person)-[r:ATTENDING]->(e)
+RETURN ID(e) as EventID, COALESCE(count(r), 0) as AttendeeCount;
                                     '''
 
 
