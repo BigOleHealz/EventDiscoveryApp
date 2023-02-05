@@ -4,7 +4,7 @@ import pandas as pd
 LOGO_PATH = os.path.join(os.getcwd(), 'assets', 'images', 'kraken.png')
 
     
-# Dictionary of important locations in New York
+# Dictionary of important locations in Philly
 dict_of_locations = {
     "City Hall": {"lat": 39.952433, "lon": -75.163800},
     "Art Museum": {"lat": 39.965257, "lon": -75.180456},

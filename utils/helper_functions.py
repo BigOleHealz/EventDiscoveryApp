@@ -12,7 +12,7 @@ def get_scaled_dimensions(image_path: str):
     else:
         return (ICON_SIZE, int(ICON_SIZE * width / height))
 
-def get_user_location():
+def get_device_location():
     import geocoder
     latlng = geocoder.ip('me').latlng
     return {'Lat' : latlng[0], 'Lng' : latlng[-1]}
