@@ -1,8 +1,10 @@
 import os, traceback
+from datetime import datetime
 from typing import Mapping
 
 from py2neo import Graph, Node, Relationship
 from db import queries
+from utils.constants import datetime_format
 
 class Neo4jDB:
     def __init__(self):
@@ -38,9 +40,18 @@ class Neo4jDB:
             raise ValueError(f'Could not find node with id = {node_id}')
         node = result[0]['n']
         return node
+    
+    def get_account_node_by_email(self, email: str):
+        result = self.execute_query(queries.GET_ACCOUNT_NODE_BY_EMAIL.format(email=email))
+        if len(result) == 1:
+            return result[0]['n']
+        elif len(result) == 0:
+            raise Exception(f"No Account found with email address: {email}")
+        else:
+            raise Exception(f"Multiple Accounts found with email address: {email}")
 
     def get_event_type_node_by_event_type_id(self, event_type_id: int):
-        result = self.execute_query(queries.GET_EVENT_TYPE_BY_ID.format(event_type_id=event_type_id))
+        result = self.execute_query(queries.GET_EVENT_TYPE_BY_EVENTTYPEID.format(event_type_id=event_type_id))
         if len(result) == 0:
             raise ValueError(f'Could not find EventType node with EventTypeID = {event_type_id}')
         node = result[0]['n']
@@ -71,15 +82,39 @@ class Neo4jDB:
     
     def delete_node_by_id(self, node_id: int):
         self.run_command(queries.DELETE_NODE_BY_ID.format(node_id=node_id))
-        
-    def load_event(self, created_by_id: int, properties: dict, friends_invited: list=None):
+    
+    def create_event_with_relationships(self, creator_node: Node=None, properties: dict=None, friends_invited: list=None):
         event_node = None
         tx = self.graph.begin()
         try:
-            person_node = self.get_node_by_id(node_id=created_by_id)
             event_node = self.create_event_node(properties=properties)
-            self.create_relationship(a_node=person_node, relationship_label='CREATED_EVENT', b_node=event_node)
-            self.create_relationship(a_node=event_node, relationship_label='CREATED_BY', b_node=person_node)
+            self.create_relationship(a_node=creator_node, relationship_label='CREATED_EVENT', b_node=event_node)
+            self.create_relationship(a_node=event_node, relationship_label='CREATED_BY', b_node=creator_node)
+            
+            event_type_node = self.get_event_type_node_by_event_type_id(event_type_id=properties['EventTypeID'])
+            self.create_relationship(a_node=event_type_node, relationship_label='RELATED_EVENT', b_node=event_node)
+            self.create_relationship(a_node=event_node, relationship_label='EVENT_TYPE', b_node=event_type_node)
+            
+            invite_properties = {'INVITED_BY_ID' : creator_node.identity, 'INVITED_DATE': datetime.now().strftime(datetime_format)}
+            
+            for invitee_id in friends_invited:
+                invitee_node = self.get_node_by_id(node_id=invitee_id)
+                self.create_relationship(a_node=invitee_node, relationship_label='INVITED', b_node=event_node, properties=invite_properties)
+            tx.commit()
+            
+        except Exception as error:
+            print(traceback.format_exc())
+            tx.rollback()
+            raise error
+    
+    def backload_event(self, created_by_id: int=None, creator_node: Node=None, properties: dict=None, friends_invited: list=None):
+        event_node = None
+        tx = self.graph.begin()
+        try:
+            creator_node = self.get_node_by_id(node_id=created_by_id)
+            event_node = self.create_event_node(properties=properties)
+            self.create_relationship(a_node=creator_node, relationship_label='CREATED_EVENT', b_node=event_node)
+            self.create_relationship(a_node=event_node, relationship_label='CREATED_BY', b_node=creator_node)
             
             event_type_node = self.get_event_type_node_by_event_type_id(event_type_id=properties['EventTypeID'])
             self.create_relationship(a_node=event_type_node, relationship_label='RELATED_EVENT', b_node=event_node)

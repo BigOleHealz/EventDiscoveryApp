@@ -20,9 +20,11 @@ app = Dash(__name__,
 server = app.server
 
 neo4j = Neo4jDB()
+
+session_account_node = neo4j.get_account_node_by_email(email=os.environ['ACCOUNT_EMAIL'])
+
 components = Components(neo4j_db_connector=neo4j)
 
-# Layout of Dash App
 app.layout = html.Div(
     children=[
         components.alert_box,
@@ -46,13 +48,13 @@ app.layout = html.Div(
 )
 def update_preferences(date_picked: str,
                         time_range: List[int],
-                        location: Mapping[None, str],
+                        selected_location: Mapping[None, str],
                     ):
     return tile_layer(
                     neo4j_connector=neo4j,
                     date_picked=date_picked,
                     time_range=time_range,
-                    location=location,
+                    selected_location=selected_location,
                 )
 
 @callback(
@@ -87,7 +89,7 @@ def create_event(*args, **kwargs):
                             'CreatedAt': created_at,
                             'PublicEvent' : public_event_flag
                         }
-            neo4j.create_event(properties=properties, friends_invited=friends_invited)
+            neo4j.create_event_with_relationships(creator_node=session_account_node, properties=properties, friends_invited=friends_invited)
             return components.sidebar_right(), components.create_alert_message_child(message="Successfully created Event!", color='success')
         
         elif any([val is None for val in required_args]):

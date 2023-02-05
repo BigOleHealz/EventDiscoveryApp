@@ -155,7 +155,6 @@ class Components:
                             style={"border": "0px solid black"},
                             className="component"
                         ),
-                        # Dropdown for locations on map
                         dcc.Dropdown(
                             id="starttime-dropdown",
                             options=[{'label': t, 'value': t} for t in range(0,24)],
