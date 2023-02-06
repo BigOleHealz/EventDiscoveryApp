@@ -1,26 +1,27 @@
 #!/usr/bin/python3
 
-import os
+import os, traceback, sys
 from datetime import datetime as dt, timedelta
 from typing import Mapping, List
 
-from dash import Dash, dcc, html, Input, Output, callback
+from dash import Dash, dcc, html, Input, Output, State, callback, MATCH
 import dash_bootstrap_components as dbc
 
 from utils.map_handler import tile_layer
 from utils.components import Components
+from utils.logger import Logger
 from db.db_handler import Neo4jDB
-from db import queries
+from utils.constants import CURRENTLY_ATTENDING_BUTTON_TEXT, NOT_CURRENTLY_ATTENDING_BUTTON_TEXT
 
 
 app = Dash(__name__,
             title="Event Finder",
-            external_stylesheets=[dbc.themes.BOOTSTRAP, dbc.icons.FONT_AWESOME],
+            external_stylesheets=[dbc.themes.BOOTSTRAP, dbc.icons.FONT_AWESOME]
         )
-server = app.server
 
-neo4j = Neo4jDB()
+logger = Logger(name=__file__)
 
+neo4j = Neo4jDB(logger=logger)
 session_account_node = neo4j.get_account_node_by_email(email=os.environ['ACCOUNT_EMAIL'])
 
 components = Components(neo4j_db_connector=neo4j)
@@ -50,6 +51,7 @@ def update_preferences(date_picked: str,
                         time_range: List[int],
                         selected_location: Mapping[None, str],
                     ):
+    logger.debug(f'Running {sys._getframe().f_code.co_name}')
     return tile_layer(
                     neo4j_connector=neo4j,
                     date_picked=date_picked,
@@ -70,6 +72,7 @@ def update_preferences(date_picked: str,
     Input("submit-button", "n_clicks")]
 )
 def create_event(*args, **kwargs):
+    logger.debug(f'Running {sys._getframe().f_code.co_name}')
     event_name, event_date, starttime, endtime, event_type_id, friends_invited, public_event_flag, n_clicks = args
     required_args = [event_name, event_type_id]
     event_date_dt = dt.strptime(event_date, '%Y-%m-%d')
@@ -81,7 +84,7 @@ def create_event(*args, **kwargs):
         if all([val is not None for val in required_args]):
             created_at = dt.now().strftime('%Y-%m-%d %H:%M:%S')
             properties = {
-                            'CreatedByID': int(os.environ['USER_ACCOUNT_ID']),
+                            'CreatedByID': session_account_node.identity,
                             'EventName' : event_name,
                             'StartTimestamp' : start_ts,
                             'EndTimestamp' : end_ts,
@@ -121,5 +124,27 @@ def create_event(*args, **kwargs):
                 ), None
 
 
+
+@callback(
+        Output({'type': 'buttons', 'index': MATCH}, 'children'),
+        Input({'type': 'buttons', 'index': MATCH}, 'n_clicks'),
+        Input({'type': 'buttons', 'index': MATCH}, 'children'),
+        State({'type': 'buttons', 'index': MATCH}, 'id')
+    )
+def attend_event(n_clicks: int, value: str, button_data: dict):
+    logger.debug(f'Running {sys._getframe().f_code.co_name}')
+    if n_clicks is not None:
+        if value == CURRENTLY_ATTENDING_BUTTON_TEXT:
+            neo4j.delete_attending_relationship(attendee_node_id=session_account_node.identity, event_node_id=button_data['index'])
+            return NOT_CURRENTLY_ATTENDING_BUTTON_TEXT
+        elif value == NOT_CURRENTLY_ATTENDING_BUTTON_TEXT:
+            neo4j.create_attending_relationship_by_id(attendee_node_id=session_account_node.identity, event_node_id=button_data['index'])
+            return CURRENTLY_ATTENDING_BUTTON_TEXT
+        else:
+            raise Exception(traceback.format_exc())
+    else:
+        return value
+
+
 if __name__ == "__main__":
-    app.run_server(debug=True)
+    app.run_server('0.0.0.0', port=8050, debug=True)

@@ -19,3 +19,7 @@ dict_of_locations = {
 datetime_format = '%Y-%m-%dT%H:%M:%S'
 
 ICON_SIZE = 80
+
+CURRENTLY_ATTENDING_BUTTON_TEXT = "Unattend"
+
+NOT_CURRENTLY_ATTENDING_BUTTON_TEXT = "I'm Going!!"
