@@ -48,3 +48,10 @@ aws ec2 describe-images \
    --region us-east-1 \
    --owner 385155106615 \
    --query "Images[*].{ImageId:ImageId,Name:Name}"
+
+
+# Install agent for Secure Session Manager
+sudo yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
+
+# install python3.8
+sudo amazon-linux-extras install python3.8
