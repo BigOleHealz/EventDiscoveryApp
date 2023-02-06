@@ -1,29 +1,25 @@
 #!/usr/bin/python3
 
-import os
+import os, traceback
 from datetime import datetime as dt, timedelta
 from typing import Mapping, List
 
-from dash import Dash, callback_context, dcc, html, Input, Output, callback
+from dash import Dash, dcc, html, Input, Output, State, callback, MATCH
 import dash_bootstrap_components as dbc
 
 from utils.map_handler import tile_layer
 from utils.components import Components
 from db.db_handler import Neo4jDB
 from utils.constants import CURRENTLY_ATTENDING_BUTTON_TEXT, NOT_CURRENTLY_ATTENDING_BUTTON_TEXT
-from db import queries
 
 
 app = Dash(__name__,
             title="Event Finder",
-            external_stylesheets=[dbc.themes.BOOTSTRAP, dbc.icons.FONT_AWESOME],
-            suppress_callback_exceptions=True
+            external_stylesheets=[dbc.themes.BOOTSTRAP, dbc.icons.FONT_AWESOME]
         )
-app.suppress_callback_exceptions=True
 server = app.server
 
 neo4j = Neo4jDB()
-
 session_account_node = neo4j.get_account_node_by_email(email=os.environ['ACCOUNT_EMAIL'])
 
 components = Components(neo4j_db_connector=neo4j)
@@ -84,7 +80,7 @@ def create_event(*args, **kwargs):
         if all([val is not None for val in required_args]):
             created_at = dt.now().strftime('%Y-%m-%d %H:%M:%S')
             properties = {
-                            'CreatedByID': int(os.environ['USER_ACCOUNT_ID']),
+                            'CreatedByID': session_account_node.identity,
                             'EventName' : event_name,
                             'StartTimestamp' : start_ts,
                             'EndTimestamp' : end_ts,
@@ -125,30 +121,24 @@ def create_event(*args, **kwargs):
 
 
 
-# @callback(
-#         Output(f"attend-button", "children"),
-#         [Input(f"attend-button", "children"),
-#         Input(f"attend-button", "n_clicks")]
-#     )
-# def attend_event(attend_button_text: str, n_clicks: int):
-#     ctx = callback_context
-#     if not ctx.triggered:
-#         return 'No button has been clicked yet'
-#     else:
-#         import pdb; pdb.set_trace()
-        
-    # if n_clicks is not None:
-    #     print(attend_button_text)
-        
-    #     if attend_button_text == CURRENTLY_ATTENDING_BUTTON_TEXT:
-    #         return NOT_CURRENTLY_ATTENDING_BUTTON_TEXT
-    #     elif attend_button_text == NOT_CURRENTLY_ATTENDING_BUTTON_TEXT:
-    #         return CURRENTLY_ATTENDING_BUTTON_TEXT
-    #     else:
-    #         raise Exception("Something weird is going on in attend_event callback")
-    # else:
-    #     print(f"{n_clicks=}")
-    #     return "WTF"
+@callback(
+        Output({'type': 'buttons', 'index': MATCH}, 'children'),
+        Input({'type': 'buttons', 'index': MATCH}, 'n_clicks'),
+        Input({'type': 'buttons', 'index': MATCH}, 'children'),
+        State({'type': 'buttons', 'index': MATCH}, 'id')
+    )
+def attend_event(n_clicks: int, value: str, button_data: dict):
+    if n_clicks is not None:
+        if value == CURRENTLY_ATTENDING_BUTTON_TEXT:
+            neo4j.delete_attending_relationship(attendee_node_id=session_account_node.identity, event_node_id=button_data['index'])
+            return NOT_CURRENTLY_ATTENDING_BUTTON_TEXT
+        elif value == NOT_CURRENTLY_ATTENDING_BUTTON_TEXT:
+            neo4j.create_attending_relationship_by_id(attendee_node_id=session_account_node.identity, event_node_id=button_data['index'])
+            return CURRENTLY_ATTENDING_BUTTON_TEXT
+        else:
+            raise Exception(traceback.format_exc())
+    else:
+        return value
             
     
 

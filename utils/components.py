@@ -179,6 +179,7 @@ class Components:
                             id='friends_invited-checklist',
                             options=[{'label': rec['Name'], 'value': rec['ID']} for rec in self.person_friends],
                             labelStyle={'display' : 'block'},
+                            className="checklist",
                             value=friends_invited
                         ),
                         html.Button('Submit', id='submit-button', className='component'),

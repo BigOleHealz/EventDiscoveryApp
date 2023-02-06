@@ -39,6 +39,7 @@ p {
   margin-bottom: 10px;
 }
 
+
 .bg-grey {
   background-color: #31302F;
 }
@@ -420,6 +421,10 @@ p {
 
 }
 
+.checklist {
+  color: var(--component-font-color);
+}
+
 .box-shadow {
   float: left;
   box-shadow: 7px 7px 7px #666666;
@@ -433,13 +438,23 @@ p {
 }
 
 .sticky-tooltip {
-  pointer-events: none;
-  background: var(--component-font-color);
-  border: 1px solid #ddd;
+  /* pointer-events: none; */
+  /* background: var(--component-font-color); */
+  background-color: #212529;
+  color: #bbbbbb;
+  /* z-index: 100; */
+  /* transform: translate(-50%, 0); */
+  /* top: 100%; */
+  /* left: 20px; */
+  /* position: absolute; */
+  /* border: 1px solid #ddd;
   border-radius: 4px;
-  padding: 8px;
-  position: absolute;
-  z-index: 1000;
+  padding: 8px; */
+}
+
+.popup {
+  background-color: #212529;
+  color: #bbbbbb;
 }
 
 .sticky-tooltip:hover {
