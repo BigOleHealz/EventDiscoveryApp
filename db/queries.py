@@ -13,6 +13,11 @@ DELETE_ALL_EVENT_TYPE_NODES = 'MATCH (n:EventType) DETACH DELETE n;'
 
 DELETE_ALL_EVENT_NODES = 'MATCH (n:Event) DETACH DELETE n;'
 
+DELETE_ATTENDING_RELATIONSHIP_BY_NODES_IDS = '''
+                                MATCH (p:Person)-[rel:ATTENDING]->(e:Event)
+                                WHERE ID(p) = {person_id} AND ID(e) = {event_id}
+                                DELETE rel;
+                            '''
 
 ##### GETS #####
 
@@ -183,6 +188,14 @@ CREATE_INVITE_RELATIONSHIPS_FROM_INVITE_LIST_TO_EVENT = '''
                                                         MATCH (e:Event) WHERE ID(e) = event_id
                                                         CREATE (u)-[:INVITED {properties}]->(e)
                                                         '''
+
+CREATE_ATTENDING_RELATIONSHIP_BY_NODES_IDS = '''
+                                        MATCH (p:Person), (e:Event)
+                                        WHERE ID(p) = {person_id} AND ID(e) = {event_id}
+                                        CREATE (p)-[:ATTENDING]->(e);
+                                        '''
+
+
 # ##### CREATES #####
 # CREATE_EVENT_WITH_RELATIONSHIPS = '''MERGE (event:Event {properties})
 #                                     MERGE (event_type:EventType {{EventTypeID:{event_type_id}}})

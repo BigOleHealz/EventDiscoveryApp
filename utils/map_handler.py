@@ -1,7 +1,7 @@
 import os
 from datetime import datetime as dt, timedelta
 from typing import List, Mapping
-from dash import html, dcc, Input, Output, callback
+from dash import Dash, html, dcc, Input, Output, callback
 import dash_leaflet as dl
 
 from utils.helper_functions import get_scaled_dimensions
@@ -26,9 +26,10 @@ for key, val in icon_paths.items():
     width, height = get_scaled_dimensions(image_path=val)
     icon_mappings[key]['iconSize'] = [width, height]
     icon_mappings[key]["iconAnchor"] = [width // 2, height],
-    icon_mappings[key]["popupAnchor"] = [0, 0]
+    icon_mappings[key]["popupAnchor"] = [width // 2, 0]
 
-def tile_layer(neo4j_connector: Neo4jDB,
+def tile_layer(
+            neo4j_connector: Neo4jDB,
             date_picked: str=None,
             time_range: List[int]=None,
             selected_location: Mapping[None, str]=None,
@@ -49,16 +50,16 @@ def tile_layer(neo4j_connector: Neo4jDB,
         event_node = event['Event']
         attendee_count = event['AttendeeCount']
         
+        attending_boolean = event['ATTENDING_BOOLEAN']
+        
         event_name_str = f"Event Name: {event_node['EventName']}"
         event_host_str = f"Host: {event_node['Host']}"
         address_str = f"Address: {event_node['Address']}"
         
-        component_id = f'attend-button_{i}'
-        
-        if event_node['ATTENDING_BOOLEAN']:
-            attend_button = html.Button(CURRENTLY_ATTENDING_BUTTON_TEXT, id=component_id)
+        if attending_boolean:
+            attend_button = html.Button(CURRENTLY_ATTENDING_BUTTON_TEXT, id={'type':'buttons', 'index':event_node.identity})
         else:
-            attend_button = html.Button(NOT_CURRENTLY_ATTENDING_BUTTON_TEXT, id=component_id)
+            attend_button = html.Button(NOT_CURRENTLY_ATTENDING_BUTTON_TEXT, id={'type':'buttons', 'index':event_node.identity})
         
         markers.append(
             dl.Marker(
@@ -75,6 +76,7 @@ def tile_layer(neo4j_connector: Neo4jDB,
                             ])
                         ],
                         className='sticky-tooltip',
+                        sticky=True
                     ),
                     dl.Popup(
                             html.Div(children=[
@@ -83,13 +85,13 @@ def tile_layer(neo4j_connector: Neo4jDB,
                                 html.P(address_str),
                                 html.P(f"Current People Attending: {attendee_count}"),
                                 attend_button
-                            ]),
-                        className='component'),
+                            ]
+                        ),
+                        className='popup-class'
+                    ),
                 ],
             )
         )
-    
-
     cluster = dl.MarkerClusterGroup(id="markers", children=markers)
     
     layer_control = dl.LayersControl([

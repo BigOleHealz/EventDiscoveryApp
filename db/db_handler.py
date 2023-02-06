@@ -132,7 +132,22 @@ class Neo4jDB:
             raise error
     
     def create_attending_relationship(self, attendee_node: Node, event_node: Node):
+        ### Make this function so that it can take attendee nodes or IDs
         try:
             self.create_relationship(a_node=attendee_node, relationship_label='ATTENDING', b_node=event_node)
         except:
             raise Exception(f'Could not created ATTENDING relationship between person_node: {attendee_node=} ->{event_node=}')
+
+
+    def delete_attending_relationship(self, attendee_node_id: int, event_node_id: int):
+        try:
+            self.run_command(queries.DELETE_ATTENDING_RELATIONSHIP_BY_NODES_IDS.format(person_id=attendee_node_id, event_id=event_node_id))
+        except:
+            raise Exception(f'Could not delete ATTENDING relationship between person_node: {attendee_node_id=} ->{event_node_id=}')
+
+
+    def create_attending_relationship_by_id(self, attendee_node_id: int, event_node_id: int):
+        try:
+            self.run_command(queries.CREATE_ATTENDING_RELATIONSHIP_BY_NODES_IDS.format(person_id=attendee_node_id, event_id=event_node_id))
+        except:
+            raise Exception(f'Could not create ATTENDING relationship between person_node: {attendee_node_id=} ->{event_node_id=}')
