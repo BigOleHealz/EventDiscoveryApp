@@ -16,4 +16,3 @@ class Logger(logging.Logger):
 
         # add handler to logger
         self.addHandler(handler)
-        
