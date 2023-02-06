@@ -9,17 +9,15 @@ from db.db_handler import Neo4jDB
 from db import queries
 from utils.constants import datetime_format, CURRENTLY_ATTENDING_BUTTON_TEXT, NOT_CURRENTLY_ATTENDING_BUTTON_TEXT
 
-date_output_format = '%Y-%m-%d %H:%M:%S'
-
 
 icon_paths = {
-        "Bars": "assets/images/Bars.png",
-        "Crypto": "assets/images/Crypto.png",
-        "Food": "assets/images/Food.png",
-        "Golf": "assets/images/Golf.png",
-        "Music": "assets/images/Music.png",
-        "Professional": "assets/images/Professional.png",
-        "Sports": "assets/images/Sports.png",
+        "Bars"         : "assets/images/Bars.png",
+        "Crypto"       : "assets/images/Crypto.png",
+        "Food"         : "assets/images/Food.png",
+        "Golf"         : "assets/images/Golf.png",
+        "Music"        : "assets/images/Music.png",
+        "Professional" : "assets/images/Professional.png",
+        "Sports"       : "assets/images/Sports.png",
     }
 icon_mappings = {key : {'iconUrl' : val} for key, val in icon_paths.items()}
 for key, val in icon_paths.items():
@@ -38,7 +36,7 @@ def tile_layer(
     if time_range is None:
         time_range = [0, 23]
 
-    date_picked = dt.strptime(date_picked, "%Y-%m-%d") if date_picked else dt.today().date()
+    date_picked = dt.strptime(date_picked, "%Y-%m-%d") if date_picked else dt.combine(dt.today(), dt.min.time())
     
     min_timestamp = (date_picked + timedelta(hours=time_range[0])).strftime(datetime_format)
     max_timestamp = (date_picked + timedelta(hours=time_range[-1])).strftime(datetime_format)

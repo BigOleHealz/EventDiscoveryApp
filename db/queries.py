@@ -19,9 +19,11 @@ DELETE_ATTENDING_RELATIONSHIP_BY_NODES_IDS = '''
                                 DELETE rel;
                             '''
 
+################
 ##### GETS #####
+################
 
-##### GET ALL #####
+##### GET ALL NODES#####
 GET_ALL_NODES = 'MATCH (n) RETURN n;'
 
 GET_NODE_BY_ID = 'MATCH (n) WHERE ID(n) = {node_id} RETURN n'
@@ -37,38 +39,71 @@ GET_ALL_EVENT_TYPE_NODES = 'MATCH (n:EventType) RETURN n;'
 GET_ALL_EVENT_NODES = 'MATCH (n:Event) RETURN n;'
 
 
+##### GET ALL NODE IDS BY LABEL #####
+GET_ALL_NODE_IDS = 'MATCH (n) RETURN ID(n) AS _id;'
 
-GET_ALL_EVENT_TYPE_NAMES = '''
-                            MATCH (n:EventType)
-                            RETURN
-                                n.EventTypeID AS EventTypeID,
-                                n.EventName AS EventName;
-                            '''
+GET_ALL_ACCOUNT_NODE_IDS = 'MATCH (n:Account) RETURN ID(n) AS _id;'
 
-GET_NODE_IDS_FOR_ALL_PERSONS = '''
-                                MATCH (n)
-                                WHERE n:Person
-                                RETURN id(n) AS _id;
+GET_ALL_PERSON_NODE_IDS = 'MATCH (n:Person) RETURN ID(n) AS _id;'
+
+GET_ALL_BUSINESS_NODE_IDS = 'MATCH (n:Business) RETURN ID(n) AS _id;'
+
+GET_ALL_ACCOUNT_NODE_IDS = 'MATCH (n:Account) RETURN ID(n) AS _id;'
+
+GET_ALL_EVENT_TYPE_NODE_IDS = 'MATCH (n:EventType) RETURN ID(n) AS _id;'
+
+GET_ALL_EVENT_NODE_IDS = 'MATCH (n:Event) RETURN ID(n) AS _id;'
+
+
+##### GET ALL NODES BY TYPE AS LIST #####
+
+GET_EVENT_TYPE_NAMES_MAPPINGS = '''
+                                MATCH (n:EventType)
+                                RETURN
+                                    ID(n) AS _id,
+                                    n.EventName AS EventName;
                                 '''
 
-GET_NODE_IDS_FOR_ALL_BUSINESSES_AND_PERSONS = '''
-                                            MATCH (n)
-                                            WHERE n:Business OR n:Person
-                                            RETURN id(n) AS _id;
-                                            '''
 
-GET_NODE_IDS_FOR_ALL_EVENT_TYPES = '''
-                                    MATCH (n)
-                                    WHERE n:EventType
-                                    RETURN id(n) AS _id;
-                                    '''
+###############################
+##### GET INDIVIDUAL NODE #####
+###############################
+
+GET_ACCOUNT_NODE_BY_ID = '''
+                            MATCH (n:Account)
+                                WHERE ID(n) = "{node_id}"
+                            RETURN n;
+                            '''
+
+GET_ACCOUNT_NODE_BY_EMAIL = '''
+                            MATCH (n:Account)
+                                WHERE n.Email = "{email}"
+                            RETURN n;
+                            '''
+
+GET_BUSINESS_BY_TITLE = '''
+                        MATCH (n:Business)
+                            WHERE n.Title = "{title}"
+                        RETURN n;
+                        '''
+
+GET_EVENT_TYPE_BY_EVENTTYPEID = '''
+                        MATCH (n:EventType)
+                            WHERE ID(n) = {event_type_id}
+                        RETURN n;
+                        '''
+
+
+#####################################
+######## GET BY RELATIONSHIP ########
+#####################################
 GET_EVENTS_BY_PERSON = '''
                     MATCH (n:Person)
                         WHERE n.Email = "{email}"
                     WITH n
                     MATCH (e:Event)
                     WHERE 
-                        ((n)-[:INVITED|:CREATED_EVENT]->(e) OR e.PublicEvent = true)
+                        ((n)-[:INVITED|:CREATED_EVENT]->(e) OR e.PublicEventFlag = true)
                         AND (
                             "{start_ts}" <= e.StartTimestamp < "{end_ts}"
                             OR
@@ -85,7 +120,7 @@ GET_EVENT_BY_PERSON_AND_TS = '''
                             WITH n
                             MATCH (e:Event)
                             WHERE 
-                                ((n)-[:INVITED|:CREATED_EVENT]->(e) OR e.PublicEvent = true)
+                                ((n)-[:INVITED|:CREATED_EVENT]->(e) OR e.PublicEventFlag = true)
                                 AND (
                                     "{start_ts}" <= e.StartTimestamp < "{end_ts}"
                                     OR
@@ -105,39 +140,12 @@ GET_EVENT_BY_PERSON_AND_TS = '''
                             RETURN event as Event, AttendeeCount, EventName, ATTENDING_BOOLEAN;
                             '''
 
-##### GET INIVIDUAL #####
-GET_ACCOUNT_NODE_BY_EMAIL = '''
-                            MATCH (n:Account)
-                                WHERE n.Email = "{email}"
-                            RETURN n;
-                            '''
 
-GET_EVENT_TYPE_BY_EVENTTYPEID = '''
-                        MATCH (n:EventType)
-                            WHERE n.EventTypeID = {event_type_id}
-                        RETURN n;
-                        '''
+GET_PERSON_FRIENDS_ID_NAME_MAPPINGS_BY_EMAIL = '''MATCH (:Person {{Email: "{email}"}})-[:FRIENDS_WITH]->(n)
+                                                RETURN ID(n) as _id,
+                                                n.Name AS Name;
+                                                '''
 
-# GET_BUSINESS_BY_TITLE = '''
-#                         MATCH (n:Business)
-#                             WHERE n.Title = "{title}"
-#                         RETURN n;
-#                         '''
-
-
-GET_PERSON_FRIENDS_NAMES_BY_EMAIL = '''MATCH (:Person {{Email: "{email}"}})-[:FRIENDS_WITH]->(n)
-                                    RETURN ID(n) as ID,
-                                    n.Name AS Name;
-                                    '''
-
-GET_PERSON_FRIENDS_IDS = '''
-                        MATCH (n:Person)
-                            WHERE n.Email = "{email}"
-                        WITH n
-                        MATCH (f:Person)
-                            WHERE (n)-[:FRIENDS_WITH]->(f)
-                        RETURN id(f) AS _id;
-                        '''
 
 GET_ALL_EVENT_INVITED = '''
                         MATCH (n:Person)
@@ -149,10 +157,12 @@ GET_ALL_EVENT_INVITED = '''
                         RETURN e;
                         '''
 
+
 GET_EVENTS_PERSON_IS_ATTENDING = '''
                                 MATCH (p:Person {{Email: "{email}"}})-[:ATTENDING]->(e:Event)
                                 RETURN p, e;
                                 '''
+
 
 GET_PERSON_INTERESTS = '''
                     MATCH (u:Person {{Email: "{email}"}})-[:INTERESTED_IN]->(et:EventType)
@@ -173,13 +183,28 @@ GET_RECOMMENDED_EVENTS = '''
                         '''
 
 GET_ATTENDEE_COUNT_FOR_EVENTS_BY_ID = '''
-WITH {event_id_list} as event_id_list
-UNWIND event_id_list as event_id
-MATCH (e:Event) WHERE ID(e) = event_id
-OPTIONAL MATCH (u:Person)-[r:ATTENDING]->(e)
-RETURN ID(e) as EventID, COALESCE(count(r), 0) as AttendeeCount;
-                                    '''
+                                        WITH {event_id_list} as event_id_list
+                                        UNWIND event_id_list as event_id
+                                        MATCH (e:Event) WHERE ID(e) = event_id
+                                        OPTIONAL MATCH (u:Person)-[r:ATTENDING]->(e)
+                                        RETURN ID(e) as EventID, COALESCE(count(r), 0) as AttendeeCount;
+                                        '''
 
+
+#####################
+###### CREATES ######
+#####################
+CREATE_EVENT_WITH_RELATIONSHIPS = '''MERGE (event:Event {properties})
+                                    MERGE (event_type:EventType {{EventTypeID:{event_type_id}}})
+                                    CREATE (event)-[:EVENT_IS_TYPE]->(event_type)
+                                    WITH event
+                                    MATCH {account_match_str}
+                                    CREATE {account_invite_str}
+                                    WITH event
+                                    MATCH (creator:Person {{AccountID:{creator_id}}})
+                                    CREATE (creator)-[:CREATED_EVENT]->(event)
+                                    CREATE (event)-[:CREATED_BY]->(creator);
+                                    '''
 
 CREATE_INVITE_RELATIONSHIPS_FROM_INVITE_LIST_TO_EVENT = '''
                                                         WITH {invite_list} as user_id_list, {event_id} as event_id
@@ -194,17 +219,3 @@ CREATE_ATTENDING_RELATIONSHIP_BY_NODES_IDS = '''
                                         WHERE ID(p) = {person_id} AND ID(e) = {event_id}
                                         CREATE (p)-[:ATTENDING]->(e);
                                         '''
-
-
-# ##### CREATES #####
-# CREATE_EVENT_WITH_RELATIONSHIPS = '''MERGE (event:Event {properties})
-#                                     MERGE (event_type:EventType {{EventTypeID:{event_type_id}}})
-#                                     CREATE (event)-[:EVENT_IS_TYPE]->(event_type)
-#                                     WITH event
-#                                     MATCH {account_match_str}
-#                                     CREATE {account_invite_str}
-#                                     WITH event
-#                                     MATCH (creator:Person {{AccountID:{creator_id}}})
-#                                     CREATE (creator)-[:CREATED_EVENT]->(event)
-#                                     CREATE (event)-[:CREATED_BY]->(creator);
-#                                     '''

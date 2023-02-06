@@ -15,9 +15,9 @@ from db import queries
 class Components:
     def __init__(self, neo4j_db_connector: Neo4jDB):
         self.neo4j_db_connector = neo4j_db_connector
-        self.event_type_mappings = self.neo4j_db_connector.execute_query(queries.GET_ALL_EVENT_TYPE_NAMES)
+        self.event_type_mappings = self.neo4j_db_connector.execute_query(queries.GET_EVENT_TYPE_NAMES_MAPPINGS)
         
-        self.person_friends = self.neo4j_db_connector.execute_query(queries.GET_PERSON_FRIENDS_NAMES_BY_EMAIL.format(email=os.environ['ACCOUNT_EMAIL']))
+        self.person_friends = self.neo4j_db_connector.execute_query(queries.GET_PERSON_FRIENDS_ID_NAME_MAPPINGS_BY_EMAIL.format(email=os.environ['ACCOUNT_EMAIL']))
     
     header = dbc.Navbar(
         dbc.Container(
@@ -171,13 +171,13 @@ class Components:
                         ),
                         dcc.Dropdown(
                             id="event_type-dropdown",
-                            options=[{'label': event_type['EventName'], 'value': event_type['EventTypeID']} for event_type in self.event_type_mappings],
+                            options=[{'label': event_type['EventName'], 'value': event_type['_id']} for event_type in self.event_type_mappings],
                             className="component",
                             value=event_type_id
                         ),
                         dcc.Checklist(
                             id='friends_invited-checklist',
-                            options=[{'label': rec['Name'], 'value': rec['ID']} for rec in self.person_friends],
+                            options=[{'label': rec['Name'], 'value': rec['_id']} for rec in self.person_friends],
                             labelStyle={'display' : 'block'},
                             className="checklist",
                             value=friends_invited
