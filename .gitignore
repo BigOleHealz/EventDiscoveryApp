@@ -1,3 +1,5 @@
 *__pycache__*
 Testing/data/csv/enriched/events.csv
 utils/secrets_manager.py
+logs/*
+myvenv/*

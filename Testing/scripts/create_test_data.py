@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-import random, os, requests, sys
+import random, os, requests, sys, traceback
 from datetime import datetime as dt, timedelta
 import pandas as pd
 
@@ -14,6 +14,7 @@ sys.path.append(home)
 
 from db.db_handler import Neo4jDB
 from db import queries
+from utils.logger import Logger
 
 city_data = {
     'Philadelphia' : {
@@ -30,19 +31,23 @@ city_data = {
 
 
 min_date = dt.today().date()
-max_date = min_date + timedelta(days=7)
-max_num_events = 25
+max_date = min_date + timedelta(days=21)
+max_num_events = 50
 decimal_precision = 7
 
 PUBLIC_EVENT_FLAG_LIST = [True, False]
 
 
 class CreateTestData:
-    def __init__(self):
+    def __init__(self, logger: Logger=None):
         self.__data_folder_path = os.path.join(os.getcwd(), '..', 'data')
         self.__raw_data_folder_path = os.path.join(self.__data_folder_path, 'csv', 'raw')
         self.__enriched_data_folder_path = os.path.join(self.__data_folder_path, 'csv', 'enriched')
-        self.neo4j = Neo4jDB()
+        
+        if logger is None:
+            logger = Logger(__name__)
+        self.logger = logger
+        self.neo4j = Neo4jDB(logger=self.logger)
     
     @staticmethod
     def __lat_lon_from_address(address: str):
@@ -76,9 +81,9 @@ class CreateTestData:
     def create_events_csv(self):
         df = pd.DataFrame(columns=['CreatedByID', 'Lon', 'Lat', 'StartTimestamp', 'EndTimestamp', 'PublicEventFlag', 'InviteList'])
         
-        person_ids = [rec['_id'] for rec in self.neo4j.run_command(queries.GET_NODE_IDS_FOR_ALL_PERSONS)]
-        account_ids = [rec['_id'] for rec in self.neo4j.run_command(queries.GET_NODE_IDS_FOR_ALL_BUSINESSES_AND_PERSONS)]
-        event_type_ids = [int(rec['_id']) for rec in self.neo4j.run_command(queries.GET_NODE_IDS_FOR_ALL_EVENT_TYPES)]
+        person_ids = [rec['_id'] for rec in self.neo4j.run_command(queries.GET_ALL_PERSON_NODE_IDS)]
+        account_ids = [rec['_id'] for rec in self.neo4j.run_command(queries.GET_ALL_ACCOUNT_NODE_IDS)]
+        event_type_ids = [int(rec['_id']) for rec in self.neo4j.run_command(queries.GET_ALL_EVENT_TYPE_NODE_IDS)]
         
         for date in pd.date_range(min_date, max_date, freq='d'):
             print(date)
@@ -90,22 +95,22 @@ class CreateTestData:
                 end_ts = start_ts + timedelta(hours=random.randint(0, 23))
                 public_event_flag = random.choice(PUBLIC_EVENT_FLAG_LIST)
                 
-                event_node = self.neo4j.get_node_by_id(node_id=created_by_id)
+                event_creator_node = self.neo4j.get_node_by_id(node_id=created_by_id)
                 
                 if created_by_id in person_ids:
-                    friends_list = [rec['_id'] for rec in self.neo4j.execute_query(queries.GET_PERSON_FRIENDS_IDS.format(node_id=created_by_id))]
+                    friends_list = [rec['_id'] for rec in self.neo4j.execute_query(queries.GET_PERSON_FRIENDS_ID_NAME_MAPPINGS_BY_EMAIL.format(email=event_creator_node['Email']))]
                     invite_list = random.sample(friends_list, random.randint(0, len(friends_list)))
                     lat = round(random.uniform(city_data['Philadelphia']['lat']['min'], city_data['Philadelphia']['lat']['max']), decimal_precision)
                     lon = round(random.uniform(city_data['Philadelphia']['lon']['min'], city_data['Philadelphia']['lon']['max']), decimal_precision)
                     
                     address = self.__address_from_lat_lon(lat=lat, lon=lon)
-                    creator_name = event_node.get('Name')
+                    creator_name = event_creator_node.get('Name')
                 else:
                     invite_list = []
-                    lon = event_node.get('Lng')
-                    lat = event_node.get('Lat')
-                    address = event_node.get('Address')
-                    creator_name = event_node.get('Title')
+                    lon = event_creator_node.get('Lng')
+                    lat = event_creator_node.get('Lat')
+                    address = event_creator_node.get('Address')
+                    creator_name = event_creator_node.get('Title')
                     
                 params = {'Address' : address, 'Host' : creator_name}
                 
@@ -121,6 +126,7 @@ class CreateTestData:
                         **params
                     }
                 df = pd.concat([df, pd.Series(row).to_frame().T])
+                    
 
         df["EventCreatedAt"] = df.apply(lambda x: x["StartTimestamp"] - timedelta(days=random.randint(0, 7), hours=random.randint(0, 23), minutes=random.randint(0, 59)), axis=1)
 
@@ -129,7 +135,7 @@ class CreateTestData:
         df["EventCreatedAt"] = df["EventCreatedAt"].apply(lambda x: x.strftime('%Y-%m-%dT%H:%M:%S'))
         
         len_df = len(df)
-        print(f'{len_df=}')
+        print(f'{len_df}')
         event_name_list = []
         for i in range(len(df)):
             event_name_list.append(rw.get_random_word())
