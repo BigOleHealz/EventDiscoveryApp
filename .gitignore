@@ -1,3 +1,5 @@
 *__pycache__*
-mapbox_access_token.txt
-Testing/data/*
+Testing/data/csv/enriched/events.csv
+utils/secrets_manager.py
+logs/*
+myvenv/*
