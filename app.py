@@ -21,9 +21,9 @@ app = Dash(__name__,
 
 logger = Logger(name=__file__)
 
+
 neo4j = Neo4jDB(logger=logger)
 session_account_node = neo4j.get_account_node_by_email(email=os.environ['ACCOUNT_EMAIL'])
-
 components = Components(neo4j_db_connector=neo4j)
 
 app.layout = html.Div(
@@ -40,6 +40,8 @@ app.layout = html.Div(
         html.Div(id='coordinate-click-id')
     ]
 )
+
+
 
 @app.callback(
         Output('map-id', 'children'),
@@ -147,4 +149,4 @@ def attend_event(n_clicks: int, value: str, button_data: dict):
 
 
 if __name__ == "__main__":
-    app.run_server('0.0.0.0', port=8050, debug=True)
+    app.run_server('0.0.0.0', port=8051, debug=True)
