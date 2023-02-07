@@ -84,9 +84,9 @@ class CreateTestData:
     def create_events_csv(self):
         df = pd.DataFrame(columns=['CreatedByID', 'Lon', 'Lat', 'StartTimestamp', 'EndTimestamp', 'PublicEventFlag', 'InviteList'])
         
-        person_ids = [rec['_id'] for rec in self.neo4j.run_command(queries.GET_ALL_PERSON_NODE_IDS)]
-        account_ids = [rec['_id'] for rec in self.neo4j.run_command(queries.GET_ALL_ACCOUNT_NODE_IDS)]
-        event_type_ids = [int(rec['_id']) for rec in self.neo4j.run_command(queries.GET_ALL_EVENT_TYPE_NODE_IDS)]
+        person_ids = [rec['_id'] for rec in self.neo4j.run_command(queries.GET_ALL_NODE_IDS_BY_LABEL.format(label='Person'))]
+        account_ids = [rec['_id'] for rec in self.neo4j.run_command(queries.GET_ALL_NODE_IDS_BY_LABEL.format(label='Account'))]
+        event_type_ids = [int(rec['_id']) for rec in self.neo4j.run_command(queries.GET_ALL_NODE_IDS_BY_LABEL.format(label='EventType'))]
         
         for date in pd.date_range(min_date, max_date, freq='d'):
             print(date)

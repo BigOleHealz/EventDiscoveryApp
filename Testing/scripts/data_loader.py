@@ -29,7 +29,7 @@ class DataLoader:
         
     def wipe_events(self):
         self.logger.debug("Wiping Events")
-        self.neo4j.run_command(queries.DELETE_ALL_EVENT_NODES)
+        self.neo4j.run_command(queries.DELETE_ALL_NODES_BY_LABEL.format(label='Event'))
     
     def load_event_types_to_neo4j_db(self):
         self.logger.debug('Loading Event Types')
@@ -74,7 +74,7 @@ class DataLoader:
             
     def load_attending_relationships(self):
         self.logger.debug('Loading Attending Relationships')
-        persons = self.neo4j.execute_query(queries.GET_ALL_PERSON_NODES)
+        persons = self.neo4j.execute_query(queries.GET_ALL_NODES_BY_LABEL.format(label='Person'))
         
         invited_flags = [True, False, False]
         for person in persons:
