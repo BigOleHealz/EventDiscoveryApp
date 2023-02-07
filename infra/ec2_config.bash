@@ -55,3 +55,7 @@ sudo yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/late
 
 # install python3.8
 sudo amazon-linux-extras install python3.8
+
+alias venv='source $EVENT_APP_HOME/myvenv/bin/activate'
+alias cdm='cd $EVENT_APP_HOME'
+alias kp3="pkill -f 'python3*' & pkill -f '/usr/bin/python3*'"
