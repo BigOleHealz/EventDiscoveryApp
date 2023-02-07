@@ -16,3 +16,23 @@ class Logger(logging.Logger):
 
         # add handler to logger
         self.addHandler(handler)
+
+    def log(self, msg: str, level: str):
+        INFO_LEVEL_STRING = 'INFO'
+        DEBUG_LEVEL_STRING = 'DEBUG'
+        WARNING_LEVEL_STRING = 'WARNING'
+        CRITICAL_LEVEL_STRING = 'CRITICAL'
+        ERROR_LEVEL_STRING = 'ERROR'
+        
+        acceptable_log_level_strings = [INFO_LEVEL_STRING, DEBUG_LEVEL_STRING, WARNING_LEVEL_STRING, CRITICAL_LEVEL_STRING, ERROR_LEVEL_STRING]
+        
+        if level not in acceptable_log_level_strings:
+            raise ValueError(f"Received argument {level} for parameter 'level'. Argument 'level must be one of the" + \
+                            f"following values: [{','.join(acceptable_log_level_strings)}]")
+        
+        if level == INFO_LEVEL_STRING:
+            self.info(msg)
+        elif level == DEBUG_LEVEL_STRING:
+            self.debug(msg)
+        else:
+            pass
