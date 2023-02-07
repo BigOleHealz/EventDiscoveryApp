@@ -15,6 +15,7 @@ sys.path.append(home)
 from db.db_handler import Neo4jDB
 from db import queries
 from utils.logger import Logger
+from utils.aws_handler import AWSHandler
 
 city_data = {
     'Philadelphia' : {
@@ -48,18 +49,20 @@ class CreateTestData:
             logger = Logger(__name__)
         self.logger = logger
         self.neo4j = Neo4jDB(logger=self.logger)
+        
+        aws_handler = AWSHandler(logger=self.logger)
+        self.google_maps_api_key = aws_handler.get_secret('google_maps_api_key')['GOOGLE_MAPS_API_KEY']
+        
     
-    @staticmethod
-    def __lat_lon_from_address(address: str):
-        url = f"https://maps.googleapis.com/maps/api/geocode/json?address={address}&key={os.environ['GOOGLE_MAPS_API_KEY']}"
+    def __lat_lon_from_address(self, address: str):
+        url = f"https://maps.googleapis.com/maps/api/geocode/json?address={address}&key={self.google_maps_api_key}"
         response = requests.get(url)
         resp_json_payload = response.json()
         lat_lon = resp_json_payload['results'][0]['geometry']['location']
         return lat_lon
     
-    @staticmethod
-    def __address_from_lat_lon(lat: float, lon: float):
-        url = f"https://maps.googleapis.com/maps/api/geocode/json?latlng={lat},{lon}&key={os.environ['GOOGLE_MAPS_API_KEY']}"
+    def __address_from_lat_lon(self, lat: float, lon: float):
+        url = f"https://maps.googleapis.com/maps/api/geocode/json?latlng={lat},{lon}&key={self.google_maps_api_key}"
         
         response = requests.get(url)
         resp_json_payload = response.json()
