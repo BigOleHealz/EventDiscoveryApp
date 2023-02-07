@@ -6,7 +6,10 @@ from typing import Mapping, List
 
 from dash import Dash, dcc, html, Input, Output, State, callback, MATCH
 import dash_bootstrap_components as dbc
+# from flask_session import Session
+from flask import session
 
+from utils.aws_handler import AWSHandler
 from utils.map_handler import tile_layer
 from utils.components import Components
 from utils.logger import Logger
@@ -21,9 +24,9 @@ app = Dash(__name__,
 
 logger = Logger(name=__file__)
 
+
 neo4j = Neo4jDB(logger=logger)
 session_account_node = neo4j.get_account_node_by_email(email=os.environ['ACCOUNT_EMAIL'])
-
 components = Components(neo4j_db_connector=neo4j)
 
 app.layout = html.Div(
@@ -40,6 +43,13 @@ app.layout = html.Div(
         html.Div(id='coordinate-click-id')
     ]
 )
+
+@app.server.route("/")
+def index():
+    aws_handler = AWSHandler(logger=logger)
+    session['SECRETS'] = aws_handler.get_secret()
+    return "Session data stored"
+
 
 @app.callback(
         Output('map-id', 'children'),
