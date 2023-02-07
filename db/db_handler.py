@@ -6,13 +6,20 @@ from py2neo import Graph, Node, Relationship
 from db import queries
 from utils.constants import datetime_format
 from utils.logger import Logger
+from utils.aws_handler import AWSHandler
 
 class Neo4jDB:
     def __init__(self, logger: Logger):
-        # Connection string for the Neo4j database
-        self.cxn_string = "bolt://172.31.56.80:7687"
-        self.graph = Graph(self.cxn_string, auth=("neo4j", os.environ.get('NEO4J_PASSWORD')))
         self.logger = logger
+        
+        # Connection string for the Neo4j database
+        aws_handler = AWSHandler(logger=self.logger)
+        neo4j_secrets = aws_handler.get_secret('neo4j_credentials')
+        
+        self.graph = Graph(neo4j_secrets['CONNECTION_STRING'],
+                           auth=(neo4j_secrets['USER'],
+                                 neo4j_secrets['PASSWORD']
+                            ))
     
     def run_command(self, command: str):
         self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
@@ -174,3 +181,4 @@ class Neo4jDB:
         except:
             self.logger.error(traceback.format_exc())
             raise Exception(f'Could not create ATTENDING relationship between person_node: {attendee_node_id} ->{event_node_id}')
+
