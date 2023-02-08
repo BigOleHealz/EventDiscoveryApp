@@ -9,6 +9,9 @@ from db.db_handler import Neo4jDB
 from db import queries
 from utils.constants import datetime_format, CURRENTLY_ATTENDING_BUTTON_TEXT, NOT_CURRENTLY_ATTENDING_BUTTON_TEXT
 
+def write_query_to_file(query: str):
+    with open('Testing/recent_query.cypher', 'w') as file:
+        file.write(query)
 
 icon_paths = {
         "Bars"         : "assets/images/Bars.png",
@@ -41,6 +44,7 @@ def tile_layer(
     min_timestamp = (date_picked + timedelta(hours=time_range[0])).strftime(datetime_format)
     max_timestamp = (date_picked + timedelta(hours=time_range[-1])).strftime(datetime_format)
 
+    write_query_to_file(queries.GET_EVENT_BY_PERSON_AND_TS.format(email=os.environ['ACCOUNT_EMAIL'], start_ts=min_timestamp, end_ts=max_timestamp))
     events = neo4j_connector.execute_query(queries.GET_EVENT_BY_PERSON_AND_TS.format(email=os.environ['ACCOUNT_EMAIL'], start_ts=min_timestamp, end_ts=max_timestamp))
     
     markers = []

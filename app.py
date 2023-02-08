@@ -4,27 +4,26 @@ import os, traceback, sys
 from datetime import datetime as dt, timedelta
 from typing import Mapping, List
 
-from dash import Dash, dcc, html, Input, Output, State, callback, MATCH
+from dash import Dash, dcc, html, Input, Output, State, callback, callback_context, MATCH
 import dash_bootstrap_components as dbc
 
-from utils.map_handler import tile_layer
 from utils.components import Components
 from utils.logger import Logger
 from db.db_handler import Neo4jDB
-from utils.constants import CURRENTLY_ATTENDING_BUTTON_TEXT, NOT_CURRENTLY_ATTENDING_BUTTON_TEXT
+from utils.map_handler import tile_layer
+from utils.callback_functions import callback_create_event, callback_attend_event
 
 
+logger = Logger(name=__file__)
 app = Dash(__name__,
             title="Event Finder",
             external_stylesheets=[dbc.themes.BOOTSTRAP, dbc.icons.FONT_AWESOME]
         )
-
-logger = Logger(name=__file__)
-
+logger.info("Dash app initialized")
 
 neo4j = Neo4jDB(logger=logger)
 session_account_node = neo4j.get_account_node_by_email(email=os.environ['ACCOUNT_EMAIL'])
-components = Components(neo4j_db_connector=neo4j)
+components = Components(neo4j_connector=neo4j)
 
 app.layout = html.Div(
     children=[
@@ -41,90 +40,58 @@ app.layout = html.Div(
     ]
 )
 
-
-
-@app.callback(
-        Output('map-id', 'children'),
+@callback(
+    [
+        Output("right_sidebar", "children"),
+        Output("alert_box", "children"),
+        Output("map-id", "children")
+    ],
+    [
+        # Filter events args (left sidebar)
         Input("date-picker", "date"),
         Input("time-slider", "value"),
-        Input("location-dropdown", "value")
-)
-def update_preferences(date_picked: str,
-                        time_range: List[int],
-                        selected_location: Mapping[None, str],
-                    ):
-    logger.debug(f'Running {sys._getframe().f_code.co_name}')
-    return tile_layer(
-                    neo4j_connector=neo4j,
-                    date_picked=date_picked,
-                    time_range=time_range,
-                    selected_location=selected_location,
-                )
+        Input("location-dropdown", "value"),
 
-@callback(
-    [Output("right_sidebar", "children"),
-    Output("alert_box", "children")],
-    [Input("event_name-input", "value"),
-    Input("event_date-picker", "date"),
-    Input("starttime-dropdown", "value"),
-    Input("endtime-dropdown", "value"),
-    Input("event_type-dropdown", "value"),
-    Input("friends_invited-checklist", "value"),
-    Input("public_event-switch", "on"),
-    Input("submit-button", "n_clicks")]
+        # Create event args (right sidebar)
+        Input("event_name-input", "value"),
+        Input("event_date-picker", "date"),
+        Input("starttime-dropdown", "value"),
+        Input("endtime-dropdown", "value"),
+        Input("event_type-dropdown", "value"),
+        Input("friends_invited-checklist", "value"),
+        Input("public_event-switch", "on"),
+        Input("map-id", "click_lat_lng"),
+        Input("submit-button", "n_clicks")
+    ]
 )
-def create_event(*args, **kwargs):
+def update_map(*args, **kwargs):
     logger.debug(f'Running {sys._getframe().f_code.co_name}')
-    event_name, event_date, starttime, endtime, event_type_id, friends_invited, public_event_flag, n_clicks = args
-    required_args = [event_name, event_type_id]
-    event_date_dt = dt.strptime(event_date, '%Y-%m-%d')
-        
-    start_ts = (event_date_dt + timedelta(hours=starttime)).strftime('%Y-%m-%d %H:%M:%S')
-    end_ts = (event_date_dt + timedelta(hours=endtime)).strftime('%Y-%m-%d %H:%M:%S')
     
-    if n_clicks is not None:
-        if all([val is not None for val in required_args]):
-            created_at = dt.now().strftime('%Y-%m-%d %H:%M:%S')
-            properties = {
-                            'CreatedByID': session_account_node.identity,
-                            'EventName' : event_name,
-                            'StartTimestamp' : start_ts,
-                            'EndTimestamp' : end_ts,
-                            'EventTypeID' : event_type_id,
-                            'CreatedAt': created_at,
-                            'PublicEvent' : public_event_flag
-                        }
-            neo4j.create_event_with_relationships(creator_node=session_account_node, properties=properties, friends_invited=friends_invited)
-            return components.sidebar_right(), components.create_alert_message_child(message="Successfully created Event!", color='success')
+    (date_picked, time_range, selected_location, event_name, event_date, starttime, endtime, event_type_id, friends_invited, public_event_flag, click_lat_lng, n_clicks) = args
+    
+    # callback_create_event must come before tile_layer refresh so that database is updated before 
+    return *callback_create_event(
+                        neo4j_connector=neo4j,
+                        session_account_node=session_account_node,
+                        event_name=event_name,
+                        event_date=event_date,
+                        starttime=starttime,
+                        endtime=endtime,
+                        event_type_id=event_type_id,
+                        friends_invited=friends_invited,
+                        public_event_flag=public_event_flag,
+                        click_lat_lng=click_lat_lng,
+                        n_clicks=n_clicks
+                    ), tile_layer(
+                        neo4j_connector=neo4j, 
+                        date_picked=date_picked,
+                        time_range=time_range,
+                        selected_location=selected_location
+                    )
+                
+    
         
-        elif any([val is None for val in required_args]):
-            return components.sidebar_right(event_name=event_name,
-                                            event_date=event_date,
-                                            starttime=starttime,
-                                            endtime=endtime,
-                                            event_type_id=event_type_id,
-                                            friends_invited=friends_invited,
-                                            public_event_flag=public_event_flag
-                    ), components.create_alert_message_child(message="All fields are required", color='danger')
-        else:
-            return components.sidebar_right(event_name=event_name,
-                                            event_date=event_date,
-                                            starttime=starttime,
-                                            endtime=endtime,
-                                            event_type_id=event_type_id,
-                                            friends_invited=friends_invited,
-                                            public_event_flag=public_event_flag
-                    ), None
-    else:
-        return components.sidebar_right(event_name=event_name,
-                                        event_date=event_date,
-                                        starttime=starttime,
-                                        endtime=endtime,
-                                        event_type_id=event_type_id,
-                                        friends_invited=friends_invited,
-                                        public_event_flag=public_event_flag
-                ), None
-
+        
 
 
 @callback(
@@ -133,19 +100,16 @@ def create_event(*args, **kwargs):
         Input({'type': 'buttons', 'index': MATCH}, 'children'),
         State({'type': 'buttons', 'index': MATCH}, 'id')
     )
-def attend_event(n_clicks: int, value: str, button_data: dict):
+def attend_event(*args, **kwargs):
     logger.debug(f'Running {sys._getframe().f_code.co_name}')
-    if n_clicks is not None:
-        if value == CURRENTLY_ATTENDING_BUTTON_TEXT:
-            neo4j.delete_attending_relationship(attendee_node_id=session_account_node.identity, event_node_id=button_data['index'])
-            return NOT_CURRENTLY_ATTENDING_BUTTON_TEXT
-        elif value == NOT_CURRENTLY_ATTENDING_BUTTON_TEXT:
-            neo4j.create_attending_relationship_by_id(attendee_node_id=session_account_node.identity, event_node_id=button_data['index'])
-            return CURRENTLY_ATTENDING_BUTTON_TEXT
-        else:
-            raise Exception(traceback.format_exc())
-    else:
-        return value
+    return callback_attend_event(
+                                neo4j,
+                                session_account_node, # remove after session works
+                                *args,
+                                **kwargs
+                            )
+    
+
 
 
 if __name__ == "__main__":
