@@ -20,6 +20,7 @@ class Neo4jDB:
                            auth=(neo4j_secrets['USER'],
                                  neo4j_secrets['PASSWORD']
                             ))
+        self.logger.info("Successfully connected to Neo4j DB")
     
     def run_command(self, command: str):
         self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
@@ -123,6 +124,7 @@ class Neo4jDB:
                 invitee_node = self.get_node_by_id(node_id=invitee_id)
                 self.create_relationship(a_node=invitee_node, relationship_label='INVITED', b_node=event_node, properties=invite_properties)
             tx.commit()
+            return event_node
             
         except Exception as error:
             self.logger.error(traceback.format_exc())
