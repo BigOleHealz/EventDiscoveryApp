@@ -7,6 +7,7 @@ from db import queries
 from utils.constants import datetime_format
 from utils.logger import Logger
 from utils.aws_handler import AWSHandler
+from utils.helper_functions import hash_password
 
 class Neo4jDB:
     def __init__(self, logger: Logger):
@@ -23,11 +24,11 @@ class Neo4jDB:
         self.logger.info("Successfully connected to Neo4j DB")
     
     def run_command(self, command: str):
-        self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
+        self.logger.debug(f'Running {sys._getframe().f_code.co_name}:\n{command}')
         return self.graph.run(command)
     
     def execute_query(self, query: str):
-        self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
+        self.logger.debug(f'Running {sys._getframe().f_code.co_name}:\n{query}')
         result = self.run_command(query)
         result = [rec for rec in result]
         
@@ -184,3 +185,20 @@ class Neo4jDB:
             self.logger.error(traceback.format_exc())
             raise Exception(f'Could not create ATTENDING relationship between person_node: {attendee_node_id} ->{event_node_id}')
 
+    def authenticate_account(self, email: str, password: str):
+        self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
+        password_hash = hash_password(input_string=password)
+        response = self.execute_query(queries.AUTHENTICATE_ACCOUNT_EMAIL_AND_PASSWORD.format(email=email, password_hash=password_hash))
+        if len(response) == 0:
+            self.logger.info(f'No account with that email-password_hash combination:\n{email=}\n{password_hash=}')
+            return response, 'No account with that email-password combination'
+        elif len(response) == 1:
+            self.logger.info(f'Account Authenticated: {email=}')
+            return response[0]['n'], 'Success'
+        elif len(response) > 1:
+            self.logger.info(f'Multiple accounts exist with that email-password_hash combination:\n{email=}\n{password_hash=}')
+            return response, 'Multiple accounts exist with that email-password combination'
+        else:
+            error_string = f"len(response) is not an int: {type(len(response))=}"
+            self.logger.error(error_string)        
+            raise ValueError(error_string)

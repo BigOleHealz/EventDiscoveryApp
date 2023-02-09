@@ -66,6 +66,12 @@ GET_EVENT_TYPE_BY_EVENTTYPEID = '''
                         RETURN n;
                         '''
 
+AUTHENTICATE_ACCOUNT_EMAIL_AND_PASSWORD = '''
+                                        MATCH (n:Account)
+                                            WHERE
+                                                n.Email = "{email}" AND n.PasswordHash = "{password_hash}"
+                                        RETURN n;
+                                        '''
 
 #####################################
 ######## GET BY RELATIONSHIP ########

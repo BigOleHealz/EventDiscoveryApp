@@ -14,6 +14,7 @@ from db.db_handler import Neo4jDB
 from db import queries
 from create_test_data import CreateTestData
 from utils.logger import Logger
+from utils.helper_functions import hash_password
 
 
 class DataLoader:
@@ -48,7 +49,8 @@ class DataLoader:
         df = pd.read_csv(os.path.join(self.enriched_data_folder_path, 'persons.csv'))
         person_properties_list = ['Name','Email']
         for _, row in df[person_properties_list].iterrows():
-            self.neo4j.create_person_node(properties=row[person_properties_list].to_dict())
+            row['PasswordHash'] = hash_password(row['Email'].split('@')[0])
+            self.neo4j.create_person_node(properties=row.to_dict())
             
         for _, row in df[['Email', 'Interests','Friends']].iterrows():
             person_node = self.neo4j.graph.nodes.match("Person", Email=row['Email']).first()
