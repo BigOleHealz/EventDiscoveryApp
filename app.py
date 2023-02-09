@@ -9,7 +9,7 @@ from flask_login import login_user, LoginManager, logout_user, current_user
 from dash import Dash, dcc, html, Input, Output, State, callback, callback_context, MATCH, no_update
 import dash_bootstrap_components as dbc
 
-from utils.layouts import LayoutHandler # main_app_layout_children, login_layout_children, failed_layout_children, logout_layout_children
+from utils.layouts import LayoutHandler
 from utils.entities import Account
 from utils.components import Components
 from utils.logger import Logger
@@ -45,24 +45,15 @@ app.layout = html.Div(
         dcc.Store(id='login-status', storage_type='session'),
         html.Div(id='user-status-div'),
         html.Div(id='page-content'),
-        # components.header,
-        # components.sidebar_left,
-        # html.Div(components.sidebar_right(),
-        #         id="right_sidebar",
-        #         className="sidebar-right"
-        #     ),
-        # components.map_content(neo4j_connector=neo4j),
-        # html.Div(id='coordinate-click-id')
     ]
 )
 
 @ login_manager.user_loader
-def load_user(email: str):
-    return Account(neo4j.get_account_node_by_email(email=email))
+def load_user(node_id: str):
+    return Account(neo4j.get_account_node(node_id=node_id))
 
 
 @callback(
-            Output('user-status-div', 'children'),
             Output('login-status', 'data'),
             [Input('url', 'pathname')]
         )
@@ -70,9 +61,10 @@ def login_status(url):
     ''' callback to display login/logout link in the header '''
     if hasattr(current_user, 'is_authenticated') and current_user.is_authenticated \
             and url != '/logout':  # If the URL is /logout, then the user is about to be logged out anyways
-        return dcc.Link('logout', href='/logout'), current_user.get_id()
+        return current_user.identity
     else:
-        return None, 'loggedout'
+        return 'loggedout'
+
 
 @callback(
     [
@@ -100,13 +92,12 @@ def login_status(url):
 )
 def update_map(*args, **kwargs):
     logger.debug(f'Running {sys._getframe().f_code.co_name}')
-    
     (date_picked, time_range, selected_location, event_name, event_date, starttime, endtime, event_type_id, friends_invited, public_event_flag, click_lat_lng, n_clicks) = args
     
     # callback_create_event must come before tile_layer refresh so that database is updated before 
     return *callback_create_event(
                         neo4j_connector=neo4j,
-                        session_account_node=session_account_node,
+                        session_account_node=current_user,
                         event_name=event_name,
                         event_date=event_date,
                         starttime=starttime,
@@ -134,10 +125,11 @@ def attend_event(*args, **kwargs):
     logger.debug(f'Running {sys._getframe().f_code.co_name}')
     return callback_attend_event(
                                 neo4j,
-                                session_account_node, # remove after session works
+                                current_user, # remove after session works
                                 *args,
                                 **kwargs
                             )
+
 
 @callback(
     Output('url_login', 'pathname'),
@@ -147,13 +139,11 @@ def attend_event(*args, **kwargs):
      State('pwd-box', 'value')])
 def login_button_click(n_clicks: int, email: str, password: str):
     if n_clicks > 0:
-        account_node, auth_status = neo4j.authenticate_account(email=email, password=password)
+        (account_node, auth_status) = neo4j.authenticate_account(email=email, password=password)
         
         if auth_status == 'Success':
-        # if email == 'matt@gmail.com' and password == 'matt':
             account = Account(account_node)
             login_user(account)
-            # current_user.is_authenticated = True
             return '/main_app', ''
         else:
             return '/login', 'Incorrect email or password'

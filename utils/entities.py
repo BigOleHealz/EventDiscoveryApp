@@ -3,8 +3,11 @@ from py2neo import Node
 
 class Account(UserMixin, Node):
     def __init__(self, node: Node):
-        super().__init__(node)
-        self.__node = node
+        super().__init__(UserMixin)
+        self.node = node
+    
+    def __str__(self):
+        return f'<Account Email: {self.Email} identity={self.identity}>'
     
     @property
     def is_authenticated(self):
@@ -12,13 +15,17 @@ class Account(UserMixin, Node):
     
     @property
     def Email(self):
-        return self.__node['Email']
+        return self.node['Email']
     
     def is_active(self):
         return True
     
     def is_anonymous(self):
         return False
+    
+    @property
+    def identity(self):
+        return self.node.identity
     
     def get_id(self):
         return self.identity

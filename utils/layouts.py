@@ -1,6 +1,7 @@
 
 from dash import dcc, html
 
+from flask_login import current_user
 from utils.components import Components
 from db.db_handler import Neo4jDB
 
@@ -8,7 +9,9 @@ class LayoutHandler:
     
     @staticmethod
     def main_app_layout_children(neo4j_connector: Neo4jDB):
+        components = Components(neo4j_connector=neo4j_connector)
         return [
+                components.header,
                 components.sidebar_left,
                 html.Div(components.sidebar_right(),
                         id="right_sidebar",

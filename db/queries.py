@@ -44,7 +44,7 @@ GET_EVENT_TYPE_NAMES_MAPPINGS = '''
 
 GET_ACCOUNT_NODE_BY_ID = '''
                             MATCH (n:Account)
-                                WHERE ID(n) = "{node_id}"
+                                WHERE ID(n) = {node_id}
                             RETURN n;
                             '''
 

@@ -44,6 +44,7 @@ class Components:
                                     ),
                                     dbc.NavItem(dbc.NavLink("Help")),
                                     dbc.NavItem(dbc.NavLink("About")),
+                                    dbc.NavItem(dbc.NavLink('Logout', href='/logout'))
                                 ],
                                 className="w-100",
                             ),
