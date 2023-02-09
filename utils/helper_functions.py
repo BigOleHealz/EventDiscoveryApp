@@ -1,4 +1,4 @@
-import base64
+import base64, hashlib
 
 from PIL import Image
 from utils.constants import ICON_SIZE
@@ -20,3 +20,8 @@ def get_device_location():
 def format_decode_image(path: str):
     return 'data:image/png;base64,{}'.format(base64.b64encode(open(path, 'rb').read()).decode('ascii'))
 
+def hash_password(input_string: str):
+    sha256 = hashlib.sha256()
+    sha256.update(input_string.encode())
+    return sha256.hexdigest()
+    
