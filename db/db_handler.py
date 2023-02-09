@@ -56,9 +56,17 @@ class Neo4jDB:
         node = result[0]['n']
         return node
     
-    def get_account_node_by_email(self, email: str):
+    def get_account_node(self, node_id: int=None, email: str=None):
         self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
-        result = self.execute_query(queries.GET_ACCOUNT_NODE_BY_EMAIL.format(email=email))
+        if all([arg is None for arg in [node_id, email]]):
+            raise ValueError(f'{sys._getframe().f_code.co_name} requires either node_id or email arg but received None for both')
+        elif node_id:
+            result = self.execute_query(queries.GET_ACCOUNT_NODE_BY_ID.format(node_id=node_id))
+        elif email:
+            result = self.execute_query(queries.GET_ACCOUNT_NODE_BY_EMAIL.format(email=email))
+        else:
+            self.logger.error(f'Something strange goign on in {sys._getframe().f_code.co_name}')
+        
         if len(result) == 1:
             return result[0]['n']
         elif len(result) == 0:
