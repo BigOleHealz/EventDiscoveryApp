@@ -9,12 +9,12 @@ from flask_login import login_user, LoginManager, logout_user, current_user
 from dash import Dash, dcc, html, Input, Output, State, callback, callback_context, MATCH, no_update
 import dash_bootstrap_components as dbc
 
-from utils.layouts import LayoutHandler
+from ui.layouts import LayoutHandler
 from utils.entities import Account
-from utils.components import Components
+from ui.components import Components
 from utils.logger import Logger
 from db.db_handler import Neo4jDB
-from utils.map_handler import tile_layer
+from ui.map_handler import tile_layer
 from utils.callback_functions import callback_create_event, callback_attend_event
 
 
@@ -24,7 +24,7 @@ server = Flask(__name__)
 app = Dash(__name__,
             server=server,
             title="Event Finder",
-            external_stylesheets=[dbc.themes.BOOTSTRAP, dbc.icons.FONT_AWESOME],
+            external_stylesheets=['assets/css/style.css', dbc.themes.BOOTSTRAP, dbc.icons.FONT_AWESOME],
             suppress_callback_exceptions=True
         )
 logger.info("Dash app initialized")
@@ -39,13 +39,21 @@ neo4j = Neo4jDB(logger=logger)
 
 app.layout = html.Div(
     children=[
-        Components.alert_box,
         dcc.Location(id='url', refresh=False),
         dcc.Location(id='redirect', refresh=True),
         dcc.Store(id='login-status', storage_type='session'),
         html.Div(id='user-status-div'),
-        html.Div(id='page-content'),
-    ]
+        
+        
+        dcc.Store(id='alert-msg-store', storage_type='session'),
+        html.Div(id='alert_msg'),
+                
+        dcc.Store(id='main_app_layout_alert-store', storage_type='session'),
+        dcc.Store(id='login_layout_alert-store', storage_type='session'),
+        dcc.Store(id='create_account_layout_alert-store', storage_type='session'),
+        
+        html.Div(children=[html.Div(id='page-content')], className='primary-div')
+    ],
 )
 
 @ login_manager.user_loader
@@ -67,9 +75,25 @@ def login_status(url):
 
 
 @callback(
+    Output('alert_msg', 'children'),
+    [
+        Input('main_app_layout_alert-store', 'data'),
+        Input('login_layout_alert-store', 'data'),
+        Input('create_account_layout_alert-store', 'data'),
+     ])
+def set_alert(main_app_layout_alert, login_layout_alert, create_account_layout_alert):
+    
+    triggered_input = callback_context.triggered[0]['prop_id'].split('.')[0]
+    for i, arg in enumerate([main_app_layout_alert, login_layout_alert, create_account_layout_alert]):
+        if arg is not None:
+            return arg
+    return ''
+
+
+@callback(
     [
         Output("right_sidebar", "children"),
-        Output("alert_box", "children"),
+        Output("main_app_layout_alert-store", "data"),
         Output("map-id", "children")
     ],
     [
@@ -88,8 +112,7 @@ def login_status(url):
         Input("public_event-switch", "on"),
         Input("map-id", "click_lat_lng"),
         Input("submit-button", "n_clicks")
-    ]
-)
+    ])
 def update_map(*args, **kwargs):
     logger.debug(f'Running {sys._getframe().f_code.co_name}')
     (date_picked, time_range, selected_location, event_name, event_date, starttime, endtime, event_type_id, friends_invited, public_event_flag, click_lat_lng, n_clicks) = args
@@ -97,7 +120,6 @@ def update_map(*args, **kwargs):
     # callback_create_event must come before tile_layer refresh so that database is updated before 
     return *callback_create_event(
                         neo4j_connector=neo4j,
-                        session_account_node=current_user,
                         event_name=event_name,
                         event_date=event_date,
                         starttime=starttime,
@@ -132,11 +154,12 @@ def attend_event(*args, **kwargs):
 
 
 @callback(
-    Output('url_login', 'pathname'),
-    Output('output-state', 'children'),
+    [Output('url_login', 'pathname'),
+    Output('login_layout_alert-store', 'data')],
     [Input('login-button', 'n_clicks')],
-    [State('uname-box', 'value'),
-     State('pwd-box', 'value')])
+    [State('login-email-box', 'value'),
+     State('login-pwd-box', 'value')]
+    )
 def login_button_click(n_clicks: int, email: str, password: str):
     if n_clicks > 0:
         (account_node, auth_status) = neo4j.authenticate_account(email=email, password=password)
@@ -148,29 +171,48 @@ def login_button_click(n_clicks: int, email: str, password: str):
         else:
             return '/login', 'Incorrect email or password'
     else:
-        return '/login', 'Incorrect email or password'
+        return '/login', ''
+
+@callback(
+    [
+        Output('url', 'pathname'),
+        Output('create_account_layout_alert-store', 'data'),
+    ],
+    [
+    State('create-account-first-name-box', 'value'),
+    State('create-account-last-name-box', 'value'),
+    State('create-account-email-box', 'value'),
+    State('create-account-pwd-box', 'value'),
+    State('create-account-confirm-pwd-box', 'value'),
+    State('url', 'pathname')],
+    [Input('create-account-button', 'n_clicks')])
+def create_account(first_name: str, last_name: str, email: str, password: str, password_confirm: str, url: str, n_clicks: int):
+    if url == '/create_account':
+        if n_clicks > 0:
+            if password != password_confirm:
+                return '/create_account', 'Password fields do not match'
+            
+            if all([var for var in [first_name, last_name, email, password, password_confirm]]):
+                properties = {'FirstName' : first_name, 'LastName' : last_name, 'Email' : email}
+                neo4j.create_person_node(properties=properties, password=password)
+                return '/login', "Account Created Successfully"
+            else:
+                return '/create_account', 'All fields are required'
+        else:
+            return url, ''
+    return '/login', ''
 
 
-@callback(Output('page-content', 'children'), Output('redirect', 'pathname'),
-              [Input('url', 'pathname')])
+@callback(Output('page-content', 'children'),
+          [Input('url', 'pathname')]
+    )
 def display_page(pathname):
     ''' callback to determine layout to return '''
-    # We need to determine two things for everytime the user navigates:
-    # Can they access this page? If so, we just return the view
-    # Otherwise, if they need to be authenticated first, we need to redirect them to the login page
-    # So we have two outputs, the first is which view we'll return
-    # The second one is a redirection to another page is needed
-    # In most cases, we won't need to redirect. Instead of having to return two variables everytime in the if statement
-    # We setup the defaults at the beginning, with redirect to dash.no_update; which simply means, just keep the requested url
-    # view = None
-    
-    url = no_update
     if pathname == '/login':
         view = LayoutHandler.login_layout_children
     elif pathname == '/success':
         if current_user.is_authenticated:
-            view = LayoutHandler.main_app_layout_children(neo4j_connector=neo4j)
-            url = '/main_app'
+            view = LayoutHandler.main_app_layout(neo4j_connector=neo4j)
         else:
             view = LayoutHandler.failed_layout_children
     elif pathname == '/logout':
@@ -179,21 +221,20 @@ def display_page(pathname):
             view = LayoutHandler.logout_layout_children
         else:
             view = LayoutHandler.login_layout_children
-            url = '/login'
 
     elif pathname == '/main_app':
-        print(f"{current_user.is_authenticated=}")
         if current_user.is_authenticated:
-            view = LayoutHandler.main_app_layout_children(neo4j_connector=neo4j)
+            view = LayoutHandler.main_app_layout(neo4j_connector=neo4j)
         else:
             view = 'Redirecting to login...'
-            url = '/login'
+    elif pathname == '/create_account':
+        view = LayoutHandler.create_account_children
+        
     else:
         view = LayoutHandler.login_layout_children
-        url = '/login'
-        
-    # You could also return a 404 "URL not found" page here
-    return view, url
+    
+    return view
+
 
 
 if __name__ == "__main__":

@@ -4,6 +4,7 @@ from py2neo import Node
 class Account(UserMixin, Node):
     def __init__(self, node: Node):
         super().__init__(UserMixin)
+        # super().__init__(Node)
         self.node = node
     
     def __str__(self):
@@ -16,6 +17,16 @@ class Account(UserMixin, Node):
     @property
     def Email(self):
         return self.node['Email']
+    
+    @property
+    def Name(self):
+        if 'Person' in self.node._labels:
+            return self.node['Name']
+        elif 'Business' in self.node._labels:
+            return self.node['Title']
+        else:
+            raise TypeError(f"Account node does not have either label 'Person' or 'Business'")
+        
     
     def is_active(self):
         return True

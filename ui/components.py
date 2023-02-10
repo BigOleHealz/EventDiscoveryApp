@@ -6,7 +6,7 @@ import dash_daq as daq
 import dash_bootstrap_components as dbc
 
 from utils.constants import dict_of_locations, LOGO_PATH
-from utils.map_handler import get_map_content
+from ui.map_handler import get_map_content
 from utils.helper_functions import format_decode_image
 from db.db_handler import Neo4jDB
 from db import queries
@@ -108,10 +108,20 @@ class Components:
         className="sidebar-left"
     )
 
-    alert_box = html.Div(
-                    children=[],
+    @staticmethod
+    def invisible_alert_box(id: str):
+        return html.Div(
+                    children=[html.Label(id=id)],
                     className='alert',
-                    id='alert_box'
+                    style={'visible' : False},
+                )
+    
+    @staticmethod
+    def alert_box(id: str):
+        return html.Div(
+                    children=[html.Label(id=id)],
+                    className='alert',
+                    id=id
                 )
     
     @staticmethod

@@ -3,9 +3,25 @@
 @import url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap');
 
 /* Main Layout ––––––––––––––––––––––––––––––––––––––––––––––––––*/
+
+
+:root {
+  --main-color: #212529;
+  --component-font-color: #bbbbbb;
+  --default-margin: 20px;
+}
+
+
+.base-style {
+  background-color: var(--main-color);
+  color: var(--component-font-color);
+  margin: var(--default-margin);
+}
+
+
 body {
-  background-color: #1E1E1E;
-  color: #222222;
+  background-color: var(--main-color);
+  color: var(--component-font-color);
 }
 
 h1,
@@ -18,6 +34,7 @@ h5 {
   letter-spacing: 2.1px;
   font-size: 21px;
   padding-left: 12px;
+  color: var(--component-font-color);
 }
 
 p {
@@ -27,17 +44,60 @@ p {
   padding-left: 12px;
 }
 
-:root {
-  --main-color: #212529;
-  --component-font-color: #bbbbbb;
+.primary-div {
+  all: inherit;
+  height: 100vh;
+}
+
+
+
+.login-parent-div {
+  background-color: var(--main-color);
+  color: var(--component-font-color);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 50vw;
+  height: 50vh;
+}
+
+.default-input-style {
+  margin: var(--default-margin);
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  box-shadow: 2px 2px 20px rgba(0, 0, 0, 0.7);
+  transition: all 0.3s ease-in-out;
+  width: 100%;
+}
+.default-input-style:focus {
+  box-shadow: 10px 5px 20px rgba(0, 0, 0, 1);
+}
+
+.no-account-label {
+  font-size: 16;
+  font-weight: bold;
+  margin-top: 15px;
+  margin-left: 20px;
+  margin-right: 5px;
+}
+
+.create-account-hyperlink {
+  font-size: 16;
+  font-weight: bold;
+
 }
 
 .component {
-  background-color: #111111;
+  background-color: var(--main-color);
   color: var(--component-font-color);
-  margin-top: 5px;
-  margin-bottom: 10px;
+  margin: var(--default-margin);
 }
+
+
+
 
 
 .bg-grey {
@@ -437,24 +497,14 @@ p {
   -webkit-filter: drop-shadow(7px 7px 7px #666666);
 }
 
-.sticky-tooltip {
-  /* pointer-events: none; */
-  /* background: var(--component-font-color); */
-  background-color: #212529;
-  color: #bbbbbb;
-  /* z-index: 100; */
-  /* transform: translate(-50%, 0); */
-  /* top: 100%; */
-  /* left: 20px; */
-  /* position: absolute; */
-  /* border: 1px solid #ddd;
-  border-radius: 4px;
-  padding: 8px; */
+.custom-tooltip {
+  background-color: var(--main-color);
+  color: var(--component-font-color);
 }
 
-.popup {
-  background-color: #212529;
-  color: #bbbbbb;
+.custom-map-popup {
+  background-color: var(--main-color);
+  color: var(--component-font-color);
 }
 
 .sticky-tooltip:hover {
