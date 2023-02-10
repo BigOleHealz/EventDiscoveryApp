@@ -9,7 +9,9 @@ from utils.logger import Logger
 
 
 class AWSHandler:
-    def __init__(self, logger: Logger):
+    def __init__(self, logger: Logger=None):
+        if logger is None:
+            logger = Logger(__name__)
         self.logger = logger
         self.session = boto3.session.Session()
 

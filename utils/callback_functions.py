@@ -3,14 +3,15 @@ from datetime import datetime as dt, timedelta
 from typing import Mapping, List
 
 from py2neo import Node
+from flask_login import current_user
 
-from utils.components import Components
 from db.db_handler import Neo4jDB
-from utils.map_handler import tile_layer
+from ui.components import Components
+from utils.helper_functions import get_address_from_lat_lon
+from ui.map_handler import tile_layer
 from utils.constants import CURRENTLY_ATTENDING_BUTTON_TEXT, NOT_CURRENTLY_ATTENDING_BUTTON_TEXT, datetime_format
 
 def callback_create_event(neo4j_connector: Neo4jDB,
-                            session_account_node: Node,  # remove after session works
                             event_name: str,
                             event_date: str,
                             starttime: int,
@@ -33,18 +34,24 @@ def callback_create_event(neo4j_connector: Neo4jDB,
     if n_clicks is not None:
         if all([val is not None for val in required_args]):
             created_at = dt.now().strftime(datetime_format)
+            latitude, longitude = click_lat_lng[0], click_lat_lng[-1]
+            
             properties = {
-                            'CreatedByID'    : session_account_node.identity,
+                            'CreatedByID'    : current_user.identity,
                             'EventName'      : event_name,
                             'StartTimestamp' : start_ts,
                             'EndTimestamp'   : end_ts,
                             'EventTypeID'    : event_type_id,
                             'CreatedAt'      : created_at,
-                            'PublicEvent'    : public_event_flag,
-                            'Lat'            : click_lat_lng[0],
-                            'Lon'            : click_lat_lng[-1]
+                            'PublicEventFlag': public_event_flag,
+                            'Host'           : current_user.Name,
+                            'Lat'            : latitude,
+                            'Lon'            : longitude,
+                            'Address'        : get_address_from_lat_lon(lat=latitude, lon=longitude),
+                            'EventCreatedAt' : dt.now().strftime(datetime_format)
                         }
-            node = neo4j_connector.create_event_with_relationships(creator_node=session_account_node, properties=properties, friends_invited=friends_invited)
+
+            node = neo4j_connector.create_event_with_relationships(creator_node=current_user.node, properties=properties, friends_invited=friends_invited)
             return components.sidebar_right(), components.create_alert_message_child(message="Successfully created Event!", color='success')
         
         else:
@@ -67,19 +74,19 @@ def callback_create_event(neo4j_connector: Neo4jDB,
                 ), []
 
 def callback_attend_event(neo4j_connector: Neo4jDB,
-                            session_account_node: Node,  # remove after session works
+                            current_user: Node,
                             n_clicks: int,
-                            value: str,
+                            button_value: str,
                             button_data: dict
                         ):
     if n_clicks is not None:
-        if value == CURRENTLY_ATTENDING_BUTTON_TEXT:
-            neo4j_connector.delete_attending_relationship(attendee_node_id=session_account_node.identity, event_node_id=button_data['index'])
+        if button_value == CURRENTLY_ATTENDING_BUTTON_TEXT:
+            neo4j_connector.delete_attending_relationship(attendee_node_id=current_user.identity, event_node_id=button_data['index'])
             return NOT_CURRENTLY_ATTENDING_BUTTON_TEXT
-        elif value == NOT_CURRENTLY_ATTENDING_BUTTON_TEXT:
-            neo4j_connector.create_attending_relationship_by_id(attendee_node_id=session_account_node.identity, event_node_id=button_data['index'])
+        elif button_value == NOT_CURRENTLY_ATTENDING_BUTTON_TEXT:
+            neo4j_connector.create_attending_relationship_by_id(attendee_node_id=current_user.identity, event_node_id=button_data['index'])
             return CURRENTLY_ATTENDING_BUTTON_TEXT
         else:
             raise Exception(traceback.format_exc())
     else:
-        return value
+        return button_value

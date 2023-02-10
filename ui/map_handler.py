@@ -63,6 +63,7 @@ def tile_layer(
         else:
             attend_button = html.Button(NOT_CURRENTLY_ATTENDING_BUTTON_TEXT, id={'type':'buttons', 'index':event_node.identity})
         
+        
         markers.append(
             dl.Marker(
                 position=(event_node['Lat'], event_node['Lon']),
@@ -77,7 +78,7 @@ def tile_layer(
                                 html.P(f"Current People Attending: {attendee_count}")
                             ])
                         ],
-                        className='sticky-tooltip',
+                        className='custom-tooltip',
                         sticky=True
                     ),
                     dl.Popup(
@@ -85,11 +86,11 @@ def tile_layer(
                                 html.P(event_name_str),
                                 html.P(event_host_str),
                                 html.P(address_str),
-                                html.P(f"Current People Attending: {attendee_count}"),
+                                html.Div([html.P(f"Current People Attending: "), html.P(attendee_count)]),
                                 attend_button
                             ]
                         ),
-                        className='popup-class'
+                        className='custom-map-popup'
                     ),
                 ],
             )

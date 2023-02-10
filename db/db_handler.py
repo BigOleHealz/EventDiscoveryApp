@@ -95,7 +95,11 @@ class Neo4jDB:
         node = self.__create_node(node_labels='Event', properties=properties)
         return node
     
-    def create_business_node(self, properties: dict=None):
+    def create_business_node(self, properties: dict=None, password: str=None):
+        if password is None:
+            password = ''
+        password_hash = hash_password(input_string=password)
+        properties['PasswordHash'] = password_hash
         self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
         node = self.__create_node(node_labels=['Account', 'Business'], properties=properties)
         return node
@@ -105,7 +109,11 @@ class Neo4jDB:
         node = self.__create_node(node_labels='EventType', properties=properties)
         return node
     
-    def create_person_node(self, properties: dict=None):
+    def create_person_node(self, properties: dict=None, password: str=None):
+        if password is None:
+            password = ''
+        password_hash = hash_password(input_string=password)
+        properties['PasswordHash'] = password_hash
         self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
         node = self.__create_node(node_labels=['Account', 'Person'], properties=properties)
         return node
@@ -174,7 +182,6 @@ class Neo4jDB:
         except:
             self.logger.error(traceback.format_exc())
             raise Exception(f'Could not created ATTENDING relationship between person_node: {attendee_node} ->{event_node}')
-
 
     def delete_attending_relationship(self, attendee_node_id: int, event_node_id: int):
         self.logger.debug(f'Running {sys._getframe().f_code.co_name}')

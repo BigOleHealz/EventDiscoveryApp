@@ -54,21 +54,6 @@ class CreateTestData:
         self.google_maps_api_key = aws_handler.get_secret('google_maps_api_key')['GOOGLE_MAPS_API_KEY']
         
     
-    def __lat_lon_from_address(self, address: str):
-        url = f"https://maps.googleapis.com/maps/api/geocode/json?address={address}&key={self.google_maps_api_key}"
-        response = requests.get(url)
-        resp_json_payload = response.json()
-        lat_lon = resp_json_payload['results'][0]['geometry']['location']
-        return lat_lon
-    
-    def __address_from_lat_lon(self, lat: float, lon: float):
-        url = f"https://maps.googleapis.com/maps/api/geocode/json?latlng={lat},{lon}&key={self.google_maps_api_key}"
-        
-        response = requests.get(url)
-        resp_json_payload = response.json()
-        address = resp_json_payload['results'][0]['formatted_address']
-            
-        return address
 
     def create_enriched_locations_data_csv(self):
         input_fule = os.path.join(self.__raw_data_folder_path, 'business_addresses.csv')
