@@ -5,12 +5,14 @@ from dash import dcc, html
 import dash_daq as daq
 import dash_bootstrap_components as dbc
 
-from utils.constants import dict_of_locations, LOGO_PATH
+from utils.constants import dict_of_locations, LOGO_PATH, FRIENDS_ICON_PATH, NOTIFICATIONS_ICON_PATH
 from ui.map_handler import get_map_content
 from utils.helper_functions import format_decode_image
 from db.db_handler import Neo4jDB
 from db import queries
 
+print(FRIENDS_ICON_PATH)
+encoded_img = base64.b64encode(open(FRIENDS_ICON_PATH, 'rb').read()).decode('ascii')
 
 class Components:
     def __init__(self, neo4j_connector: Neo4jDB):
@@ -37,10 +39,10 @@ class Components:
                             dbc.Nav(
                                 [
                                     dbc.NavItem(dbc.NavLink("Home")),
-                                    dbc.NavItem(dbc.NavLink("Page 1")),
                                     dbc.NavItem(
-                                        dbc.NavLink("Page 2"),
-                                        className="me-auto",
+                                        html.Img(src=format_decode_image(path=FRIENDS_ICON_PATH),
+                                            style={'margin' : '5px'}
+                                        )
                                     ),
                                     dbc.NavItem(dbc.NavLink("Help")),
                                     dbc.NavItem(dbc.NavLink("About")),
