@@ -23,3 +23,10 @@ ICON_SIZE = 80
 CURRENTLY_ATTENDING_BUTTON_TEXT = "Unattend"
 
 NOT_CURRENTLY_ATTENDING_BUTTON_TEXT = "I'm Going!!"
+
+class RouteManager:
+    login = '/login'
+    home_page = '/home_page'
+    create_account = '/create_account'
+    logout = '/logout'
+    success = '/success'

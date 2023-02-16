@@ -63,6 +63,8 @@ p {
 }
 
 .default-input-style {
+  background-color: var(--main-color);
+  color: var(--component-font-color);
   margin: var(--default-margin);
   padding: 10px;
   border: none;
@@ -84,16 +86,36 @@ p {
   margin-right: 5px;
 }
 
-.create-account-hyperlink {
+.hyperlink {
   font-size: 16;
   font-weight: bold;
 
 }
 
 .component {
-  background-color: var(--main-color);
-  color: var(--component-font-color);
+  background-color: #212529;
+  color: #bbbbbb;
   margin: var(--default-margin);
+}
+
+.custom-tooltip {
+  /* background-color: var(--main-color);
+  color: var(--component-font-color); */
+  background-color: #212529;
+  color: #bbbbbb;
+  margin: 0px;
+  padding: 0px;
+}
+
+.custom-tooltip:hover {
+  width: 16rem;
+  visibility: visible;
+}
+
+
+.custom-map-popup {
+  background-color: #212529;
+  color: #bbbbbb;
 }
 
 
@@ -497,17 +519,3 @@ p {
   -webkit-filter: drop-shadow(7px 7px 7px #666666);
 }
 
-.custom-tooltip {
-  background-color: var(--main-color);
-  color: var(--component-font-color);
-}
-
-.custom-map-popup {
-  background-color: var(--main-color);
-  color: var(--component-font-color);
-}
-
-.sticky-tooltip:hover {
-  width: 16rem;
-  visibility: visible;
-}

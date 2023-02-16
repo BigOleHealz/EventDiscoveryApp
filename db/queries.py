@@ -97,9 +97,16 @@ GET_EVENT_BY_PERSON_AND_TS = '''
                             MATCH (n:Person)
                             WHERE n.Email = "{email}"
                             WITH n
-                            MATCH (e:Event)
+                            MATCH (e:Event), (et:EventType)
                             WHERE 
-                                ((n)-[:INVITED|:CREATED_EVENT]->(e) OR e.PublicEventFlag = true)
+                                (
+                                    (n)-[:INVITED|:CREATED_EVENT]->(e) 
+                                    OR (
+                                        e.PublicEventFlag = true
+                                        AND
+                                        (n)-[:INTERESTED_IN]->(et)-[:RELATED_EVENT]->(e)
+                                    )
+                                )
                                 AND (
                                     "{start_ts}" <= e.StartTimestamp < "{end_ts}"
                                     OR
@@ -198,3 +205,9 @@ CREATE_ATTENDING_RELATIONSHIP_BY_NODES_IDS = '''
                                         WHERE ID(p) = {person_id} AND ID(e) = {event_id}
                                         CREATE (p)-[:ATTENDING]->(e);
                                         '''
+
+CREATE_ACCOUNT_INTERESTED_IN_RELATIONSHIPS = '''
+                                            MATCH (a:Account), (et:EventType)
+                                            WHERE ID(a) = {account_id} AND ID(et) IN {interest_id_list}
+                                            CREATE (a)-[:INTERESTED_IN]->(et);
+                                            '''

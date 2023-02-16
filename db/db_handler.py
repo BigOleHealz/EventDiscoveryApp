@@ -1,6 +1,6 @@
 import os, traceback, sys
 from datetime import datetime
-from typing import Mapping
+from typing import Mapping, Union
 
 from py2neo import Graph, Node, Relationship
 from db import queries
@@ -81,6 +81,9 @@ class Neo4jDB:
             raise ValueError(f'Could not find EventType node with EventTypeID = {event_type_id}')
         node = result[0]['n']
         return node
+
+    def get_event_type_mappings(self):
+        return self.execute_query(queries.GET_EVENT_TYPE_NAMES_MAPPINGS)
 
     def create_relationship(self, a_node: Node, relationship_label: str, b_node: Node, properties: dict=None):
         self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
@@ -200,6 +203,13 @@ class Neo4jDB:
             self.logger.error(traceback.format_exc())
             raise Exception(f'Could not create ATTENDING relationship between person_node: {attendee_node_id} ->{event_node_id}')
 
+    def create_interested_in_relationship(self, account_id: int, event_type_ids: Union[int, list]):
+        if isinstance(event_type_ids, int):
+            event_type_id_list = [event_type_ids]
+        else:
+            event_type_id_list = event_type_ids
+        self.run_command(queries.CREATE_ACCOUNT_INTERESTED_IN_RELATIONSHIPS.format(account_id=account_id, interest_id_list=event_type_ids))
+    
     def authenticate_account(self, email: str, password: str):
         self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
         password_hash = hash_password(input_string=password)
