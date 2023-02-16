@@ -1,7 +1,10 @@
 import os
 import pandas as pd
 
-LOGO_PATH = os.path.join(os.getcwd(), 'assets', 'images', 'kraken.png')
+images_dir = os.path.join(os.getcwd(), 'assets', 'images')
+LOGO_PATH = os.path.join(images_dir, 'kraken.png')
+FRIENDS_ICON_PATH = os.path.join(images_dir, 'Friends.png')
+NOTIFICATIONS_ICON_PATH = os.path.join(images_dir, 'Notifications.png')
 
     
 # Dictionary of important locations in Philly
