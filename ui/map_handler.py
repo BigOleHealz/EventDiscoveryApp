@@ -1,8 +1,10 @@
 import os
 from datetime import datetime as dt, timedelta
 from typing import List, Mapping
+
 from dash import Dash, html, dcc, Input, Output, callback
 import dash_leaflet as dl
+from flask_login import current_user
 
 from utils.helper_functions import get_scaled_dimensions
 from db.db_handler import Neo4jDB
@@ -44,8 +46,8 @@ def tile_layer(
     min_timestamp = (date_picked + timedelta(hours=time_range[0])).strftime(datetime_format)
     max_timestamp = (date_picked + timedelta(hours=time_range[-1])).strftime(datetime_format)
 
-    write_query_to_file(queries.GET_EVENT_BY_PERSON_AND_TS.format(email=os.environ['ACCOUNT_EMAIL'], start_ts=min_timestamp, end_ts=max_timestamp))
-    events = neo4j_connector.execute_query(queries.GET_EVENT_BY_PERSON_AND_TS.format(email=os.environ['ACCOUNT_EMAIL'], start_ts=min_timestamp, end_ts=max_timestamp))
+    write_query_to_file(queries.GET_EVENT_BY_PERSON_AND_TS.format(email=current_user.Email, start_ts=min_timestamp, end_ts=max_timestamp))
+    events = neo4j_connector.execute_query(queries.GET_EVENT_BY_PERSON_AND_TS.format(email=current_user.Email, start_ts=min_timestamp, end_ts=max_timestamp))
     
     markers = []
     for i, event in enumerate(events):
