@@ -139,3 +139,76 @@ def toggle_modal(n1, n2, submit_button_clicks, is_open):
     if n1 or n2:
         return not is_open
     return is_open
+
+
+@callback(
+    Output("add-friends-container", "style"),
+    Output("add-friends-button", "n_clicks"),
+    Input("add-friends-button", "n_clicks"),
+    State("add-friends-container", "style"),
+    State("add-friends-container", "n_clicks"),
+    prevent_initial_call=True
+)
+def toggle_add_friends_container(n1: int, style: dict, n2: int):
+    if n1 is None:
+        return style, None
+    else:
+        if style["display"] == "none":
+            return {"display": "block"}, n1
+        elif n2 is None:
+            return {"display": "none"}, None
+        else:
+            return style, n1
+
+@callback(
+        Output('friend-request-alert-box', 'children'),
+        Output('friend-request-alert-box', 'color'),
+        Output('friend-request-alert-box', 'is_open'),
+        Input('submit-friend-request-button', 'n_clicks'),
+        State('friend-request-input', 'value')
+)
+def send_friend_request(n_clicks: int, person_email_username: str):
+    if n_clicks:
+        person_node = neo4j.get_account_by_username_or_password(email_or_username=person_email_username)
+        print(f'{person_node=}')
+        if person_node is None:
+            return 'No user with that email or username exists', 'danger', True
+        else:
+            friendship_status = neo4j.get_friend_request_sent_or_if_already_friends(node_a_id=current_user.identity, node_b_id=person_node.identity)
+            
+            if friendship_status is None:
+                neo4j.create_friend_request(node_a_id=current_user.identity, node_b_id=person_node.identity)
+                return 'Friend Request Sent', 'success', True
+            if friendship_status['friends_with'] is True:
+                return 'You are already friends with this person', 'danger', True
+            elif friendship_status['friend_request_sent'] is True:
+                if friendship_status['friend_request_status'] == 'PENDING':
+                    return 'You already have a pending friend request to this person', 'danger', True
+                else:
+                    neo4j.create_friend_request(node_a_id=current_user.identity, node_b_id=person_node.identity)
+                    return 'Friend Request Sent', 'success', True
+            else:
+                neo4j.create_friend_request(node_a_id=current_user.identity, node_b_id=person_node.identity)
+                return 'Friend Request Sent', 'success', True
+    else:
+        return '', 'green', False
+
+
+# @callback(
+#     Output("notifications-container", "style"),
+#     Output("add-notifications-button", "n_clicks"),
+#     Input("add-notifications-button", "n_clicks"),
+#     State("notifications-container", "style"),
+#     State("notifications-container", "n_clicks"),
+#     prevent_initial_call=True
+# )
+# def toggle_notifications_container(n1: int, style: dict, n2: int):
+#     if n1 is None:
+#         return style, None
+#     else:
+#         if style["display"] == "none":
+#             return {"display": "block"}, n1
+#         elif n2 is None:
+#             return {"display": "none"}, None
+#         else:
+#             return style, n1

@@ -54,6 +54,22 @@ GET_ACCOUNT_NODE_BY_EMAIL = '''
                             RETURN n;
                             '''
 
+GET_ACCOUNT_NODE_BY_USERNAME = '''
+                                MATCH (n:Account)
+                                    WHERE n.Username = "{username}"
+                                RETURN n;
+                                '''
+
+GET_ACCOUNT_NODE_BY_EMAIL_OR_USERNAME = '''
+                                        MATCH (n:Account)
+                                            WHERE (
+                                                n.Email = "{email_or_username}"
+                                                OR
+                                                n.Username = "{email_or_username}"
+                                            )
+                                        RETURN n LIMIT 1;
+                                        '''
+
 GET_BUSINESS_BY_TITLE = '''
                         MATCH (n:Business)
                             WHERE n.Title = "{title}"
@@ -65,6 +81,34 @@ GET_EVENT_TYPE_BY_EVENTTYPEID = '''
                             WHERE ID(n) = {event_type_id}
                         RETURN n;
                         '''
+
+DETERMINE_IF_FRIEND_REQUESTS_ALREADY_EXISTS_OR_USERS_ALREADY_FRIENDS = '''
+                                                                        MATCH (a)-[r:FRIEND_REQUEST]->(b)
+                                                                        WHERE ID(a) = {node_a_id} AND ID(b) = {node_b_id}
+                                                                        RETURN EXISTS((a)-[:FRIENDS_WITH]->(b)) AS friends_with,
+                                                                        EXISTS((a)-[r:FRIEND_REQUEST]->(b)) AS friend_request_sent,
+                                                                          CASE
+                                                                            WHEN r IS NOT NULL
+                                                                            THEN r.STATUS
+                                                                            ELSE False
+                                                                        END AS friend_request_status;
+                                                                        '''
+
+GET_FRIEND_REQUEST_STATUS = '''
+                            MATCH (a), (b)
+                            WHERE ID(a) = {node_a_id} AND ID(b) = {node_b_id}
+                            RETURN EXISTS((a)-[:FRIEND_REQUEST]->(b)) AS friend_request_sent,
+                            EXISTS((a)-[:FRIENDS_WITH]->(b)) AS friends_with;
+                            
+MATCH (a)-[r:FRIEND_REQUEST]->(b)
+WHERE ID(a) = {node_a_id} AND ID(b) = {node_b_id}//  AND r.status = {desired_status}
+RETURN r.status
+
+                            '''
+
+
+                                                                        # RETURN ((a)-[:FRIEND_REQUEST_STATUS]->(b)) AS friend_request_sent,
+
 
 AUTHENTICATE_ACCOUNT_EMAIL_AND_PASSWORD = '''
                                         MATCH (n:Account)
@@ -211,3 +255,11 @@ CREATE_ACCOUNT_INTERESTED_IN_RELATIONSHIPS = '''
                                             WHERE ID(a) = {account_id} AND ID(et) IN {interest_id_list}
                                             CREATE (a)-[:INTERESTED_IN]->(et);
                                             '''
+
+CREATE_FRIEND_REQUEST = '''
+                        MATCH (a), (b)
+                        WHERE ID(a) = {node_a_id} AND ID(b) = {node_b_id}
+                        CREATE (a)-[r:FRIEND_REQUEST]->(b)
+                        SET r.SINCE = datetime(), r.STATUS = 'PENDING'
+                        RETURN r;
+                        '''

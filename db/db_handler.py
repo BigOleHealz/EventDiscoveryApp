@@ -83,7 +83,26 @@ class Neo4jDB:
         return node
 
     def get_event_type_mappings(self):
+        self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
         return self.execute_query(queries.GET_EVENT_TYPE_NAMES_MAPPINGS)
+    
+    def get_account_by_username_or_password(self, email_or_username: str):
+        self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
+        result = self.execute_query(queries.GET_ACCOUNT_NODE_BY_EMAIL_OR_USERNAME.format(email_or_username=email_or_username))
+        if len(result) == 0:
+            return None
+        else:
+            return result[0]['n']
+    
+    def get_friend_request_sent_or_if_already_friends(self, node_a_id: int, node_b_id: int):
+        self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
+        cursor = self.run_command(queries.DETERMINE_IF_FRIEND_REQUESTS_ALREADY_EXISTS_OR_USERS_ALREADY_FRIENDS.format(node_a_id=node_a_id, node_b_id=node_b_id))
+        cursor_data = cursor.data()
+        if len(cursor_data) == 0:
+            return None
+        else:
+            return cursor_data[0]
+        
 
     def create_relationship(self, a_node: Node, relationship_label: str, b_node: Node, properties: dict=None):
         self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
@@ -99,6 +118,7 @@ class Neo4jDB:
         return node
     
     def create_business_node(self, properties: dict=None, password: str=None):
+        self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
         if password is None:
             password = ''
         password_hash = hash_password(input_string=password)
@@ -113,6 +133,7 @@ class Neo4jDB:
         return node
     
     def create_person_node(self, properties: dict=None, password: str=None):
+        self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
         if password is None:
             password = ''
         password_hash = hash_password(input_string=password)
@@ -204,6 +225,7 @@ class Neo4jDB:
             raise Exception(f'Could not create ATTENDING relationship between person_node: {attendee_node_id} ->{event_node_id}')
 
     def create_interested_in_relationship(self, account_id: int, event_type_ids: Union[int, list]):
+        self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
         if isinstance(event_type_ids, int):
             event_type_id_list = [event_type_ids]
         else:
@@ -227,3 +249,7 @@ class Neo4jDB:
             error_string = f"len(response) is not an int: {type(len(response))=}"
             self.logger.error(error_string)        
             raise ValueError(error_string)
+    
+    def create_friend_request(self, node_a_id: int, node_b_id: int):
+        self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
+        return self.run_command(queries.CREATE_FRIEND_REQUEST.format(node_a_id=node_a_id, node_b_id=node_b_id))
