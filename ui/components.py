@@ -11,8 +11,6 @@ from utils.helper_functions import format_decode_image
 from db.db_handler import Neo4jDB
 from db import queries
 
-print(FRIENDS_ICON_PATH)
-encoded_img = base64.b64encode(open(FRIENDS_ICON_PATH, 'rb').read()).decode('ascii')
 
 class Components:
     def __init__(self, neo4j_connector: Neo4jDB):
@@ -38,15 +36,22 @@ class Components:
                         dbc.Collapse(
                             dbc.Nav(
                                 [
-                                    dbc.NavItem(dbc.NavLink("Home")),
+                                    dbc.NavItem(dbc.NavLink("Home"), className='navbar-component'),
                                     dbc.NavItem(
                                         html.Img(src=format_decode_image(path=FRIENDS_ICON_PATH),
-                                            style={'margin' : '5px'}
-                                        )
+                                            id='add-friends-button'
+                                        ),
+                                        className='navbar-component'
                                     ),
-                                    dbc.NavItem(dbc.NavLink("Help")),
-                                    dbc.NavItem(dbc.NavLink("About")),
-                                    dbc.NavItem(dbc.NavLink('Logout', href='/logout'))
+                                    dbc.NavItem(
+                                        html.Img(src=format_decode_image(path=NOTIFICATIONS_ICON_PATH),
+                                            id='add-notifications-button'
+                                        ),
+                                        className='navbar-component'
+                                    ),
+                                    dbc.NavItem(dbc.NavLink("Help"), className='navbar-component'),
+                                    dbc.NavItem(dbc.NavLink("About"), className='navbar-component'),
+                                    dbc.NavItem(dbc.NavLink('Logout', href='/logout'), className='navbar-component')
                                 ],
                                 className="w-100",
                             ),
@@ -56,11 +61,39 @@ class Components:
                         ),
                     ],
                 ),
+                html.Div(
+                    [
+                        dbc.Alert("", id='friend-request-alert-box', color="success", dismissable=True, is_open=False),
+                        dcc.Input(placeholder='Enter the email or username of friend',
+                                className='default-input-style',
+                                id='friend-request-input'
+                            ),
+                        dbc.Button("Send Request", id="submit-friend-request-button", className="ml-auto"),
+                    ],
+                    id="add-friends-container",
+                    style={"display": "none"},
+                    className='add-friends-container'
+                ),
+                
+                # html.Div(
+                #     [
+                #         # dbc.Alert("", id='friend-request-alert-box', color="success", dismissable=True, is_open=False),
+                #         # dcc.Input(placeholder='Enter the email or username of friend',
+                #         #         className='default-input-style',
+                #         #         id='friend-request-input'
+                #         #     ),
+                #         dbc.Button("Notifications", className="ml-auto"),
+                #     ],
+                #     id="notifications-container",
+                #     style={"display": "none"},
+                #     className='notifications-container'
+                # ),
             ],
             fluid=True,
         ),
         dark=True,
         color="dark",
+        className='navbar'
     )
 
     sidebar_left = html.Div(

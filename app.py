@@ -15,7 +15,8 @@ from ui.components import Components
 from utils.logger import Logger
 from db.db_handler import Neo4jDB
 from ui.map_handler import tile_layer
-from utils.callback_functions import create_event, callback_attend_event, toggle_modal
+from utils.callback_functions import create_event, callback_attend_event, toggle_modal, toggle_add_friends_container, \
+    send_friend_request #, toggle_notifications_container
 from utils.constants import RouteManager as routes
 
 
@@ -53,7 +54,7 @@ app.layout = html.Div(
         dcc.Store(id='login_layout_alert-store', storage_type='session', data=None),
         dcc.Store(id='create_account_layout_alert-store', storage_type='session', data=None),
         
-        html.Div(children=[html.Div(id='page-content')], className='primary-div')
+        html.Div(children=[html.Div(id='page-content')], className='primary-div'),
     ],
 )
 
@@ -203,7 +204,18 @@ def create_account(first_name: str, last_name: str, email: str, password: str, p
 def display_page(pathname: str):
     ''' callback to determine layout to return '''
     if pathname == routes.login:
-        view = LayoutHandler.login_layout_children
+        
+        ###################################### TEST ######################################
+        
+        (account_node, auth_status) = neo4j.authenticate_account(email='matt@gmail.com', password='matt')
+        
+        if auth_status == 'Success':
+            account = Account(account_node)
+            login_user(account)
+        view = LayoutHandler.home_page_layout(neo4j_connector=neo4j)
+        ###################################### TEST ######################################
+        
+        # view = LayoutHandler.login_layout_children
     elif pathname == routes.success:
         if current_user.is_authenticated:
             view = LayoutHandler.home_page_layout(neo4j_connector=neo4j)
