@@ -81,17 +81,21 @@ GET_EVENT_TYPE_BY_EVENTTYPEID = '''
                             WHERE ID(n) = {event_type_id}
                         RETURN n;
                         '''
-
+                                                                        
 DETERMINE_IF_FRIEND_REQUESTS_ALREADY_EXISTS_OR_USERS_ALREADY_FRIENDS = '''
-                                                                        MATCH (a)-[r:FRIEND_REQUEST]->(b)
+                                                                        MATCH (a), (b)
                                                                         WHERE ID(a) = {node_a_id} AND ID(b) = {node_b_id}
-                                                                        RETURN EXISTS((a)-[:FRIENDS_WITH]->(b)) AS friends_with,
-                                                                        EXISTS((a)-[r:FRIEND_REQUEST]->(b)) AS friend_request_sent,
-                                                                          CASE
-                                                                            WHEN r IS NOT NULL
-                                                                            THEN r.STATUS
-                                                                            ELSE False
-                                                                        END AS friend_request_status;
+                                                                        WITH a, b
+                                                                        OPTIONAL MATCH (a)-[fr:FRIEND_REQUEST]->(b)
+                                                                        with a, b, fr
+                                                                        RETURN 
+                                                                            EXISTS((a)-[:FRIENDS_WITH]->(b)) as friends_with,
+                                                                            CASE
+                                                                                WHEN EXISTS((a)-[:FRIEND_REQUEST]->(b)) = true
+                                                                                THEN fr.STATUS
+                                                                                ELSE False
+                                                                            END AS friend_request_status
+                                                                        ;
                                                                         '''
 
 GET_FRIEND_REQUEST_STATUS = '''
@@ -107,7 +111,6 @@ RETURN r.status
                             '''
 
 
-                                                                        # RETURN ((a)-[:FRIEND_REQUEST_STATUS]->(b)) AS friend_request_sent,
 
 
 AUTHENTICATE_ACCOUNT_EMAIL_AND_PASSWORD = '''
@@ -256,10 +259,27 @@ CREATE_ACCOUNT_INTERESTED_IN_RELATIONSHIPS = '''
                                             CREATE (a)-[:INTERESTED_IN]->(et);
                                             '''
 
+CREATE_ACCOUNT_INTERESTED_IN_RELATIONSHIPSBY_MANUALLY_ASSIGNED_ID = '''
+                                                                    MATCH (a:Account), (et:EventType)
+                                                                    WHERE ID(a) = {account_id} AND et.EventTypeID IN {interest_id_list}
+                                                                    CREATE (a)-[:INTERESTED_IN]->(et);
+                                                                    '''
+
 CREATE_FRIEND_REQUEST = '''
                         MATCH (a), (b)
                         WHERE ID(a) = {node_a_id} AND ID(b) = {node_b_id}
                         CREATE (a)-[r:FRIEND_REQUEST]->(b)
-                        SET r.SINCE = datetime(), r.STATUS = 'PENDING'
+                        SET r.FRIEND_REQUEST_TS = datetime(), r.STATUS = 'PENDING'
                         RETURN r;
                         '''
+
+CREATE_FRIENDSHIP = '''
+                    MATCH (a:Person), (b:Person)
+                    WHERE ID(a) = {node_a_id} AND ID(b) = {node_b_id}
+                    WITH a, b, datetime() as dt
+                    CREATE (a)-[abr:FRIENDS_WITH]->(b)
+                    SET abr.FRIENDS_SINCE = dt
+                    CREATE (b)-[bar:FRIENDS_WITH]->(a)
+                    SET bar.FRIENDS_SINCE = dt
+                    RETURN abr, bar;
+                    '''

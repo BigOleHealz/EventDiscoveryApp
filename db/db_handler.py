@@ -253,3 +253,8 @@ class Neo4jDB:
     def create_friend_request(self, node_a_id: int, node_b_id: int):
         self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
         return self.run_command(queries.CREATE_FRIEND_REQUEST.format(node_a_id=node_a_id, node_b_id=node_b_id))
+
+    def create_friendship(self, node_a_id: int, node_b_id: int):
+        self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
+        return self.run_command(queries.CREATE_FRIENDSHIP.format(node_a_id=node_a_id, node_b_id=node_b_id))
+        

@@ -15,8 +15,7 @@ from ui.components import Components
 from utils.logger import Logger
 from db.db_handler import Neo4jDB
 from ui.map_handler import tile_layer
-from utils.callback_functions import create_event, callback_attend_event, toggle_modal, toggle_add_friends_container, \
-    send_friend_request #, toggle_notifications_container
+from utils.callback_functions import create_event, callback_attend_event, toggle_modal, toggle_add_friends_container, toggle_notifications_container
 from utils.constants import RouteManager as routes
 
 
@@ -199,23 +198,21 @@ def create_account(first_name: str, last_name: str, email: str, password: str, p
     return routes.login, ''
 
 @callback(Output('page-content', 'children'),
-          [Input('url', 'pathname')]
-    )
+            Input('url', 'pathname'))
 def display_page(pathname: str):
     ''' callback to determine layout to return '''
     if pathname == routes.login:
         
-        ###################################### TEST ######################################
+        # ###################################### TEST ######################################
+        # (account_node, auth_status) = neo4j.authenticate_account(email='matt@gmail.com', password='matt')
         
-        (account_node, auth_status) = neo4j.authenticate_account(email='matt@gmail.com', password='matt')
+        # if auth_status == 'Success':
+        #     account = Account(account_node)
+        #     login_user(account)
+        # view = LayoutHandler.home_page_layout(neo4j_connector=neo4j)
+        # ###################################### TEST ######################################
         
-        if auth_status == 'Success':
-            account = Account(account_node)
-            login_user(account)
-        view = LayoutHandler.home_page_layout(neo4j_connector=neo4j)
-        ###################################### TEST ######################################
-        
-        # view = LayoutHandler.login_layout_children
+        view = LayoutHandler.login_layout_children
     elif pathname == routes.success:
         if current_user.is_authenticated:
             view = LayoutHandler.home_page_layout(neo4j_connector=neo4j)
@@ -225,7 +222,6 @@ def display_page(pathname: str):
         if current_user.is_authenticated:
             logout_user()
         view = LayoutHandler.logout_layout_children
-
     elif pathname == routes.home_page:
         if current_user.is_authenticated:
             view = LayoutHandler.home_page_layout(neo4j_connector=neo4j)
@@ -233,11 +229,36 @@ def display_page(pathname: str):
             view = LayoutHandler.login_layout_children
     elif pathname == routes.create_account:
         view = LayoutHandler.create_account_children(neo4j_connector=neo4j)
-        
     else:
         view = LayoutHandler.login_layout_children
-    
     return view
+
+
+@callback(
+        Output('friend-request-alert-box', 'children'),
+        Output('friend-request-alert-box', 'color'),
+        Output('friend-request-alert-box', 'is_open'),
+        Input('submit-friend-request-button', 'n_clicks'),
+        State('friend-request-input', 'value'))
+def send_friend_request(n_clicks: int, person_email_username: str):
+    if not n_clicks:
+        return '', 'green', False
+
+    person_node = neo4j.get_account_by_username_or_password(email_or_username=person_email_username)
+    if person_node is None:
+        return 'No user with that email or username exists', 'danger', True
+
+    friendship_status = neo4j.get_friend_request_sent_or_if_already_friends(node_a_id=current_user.identity, node_b_id=person_node.identity)
+
+    if friendship_status['friends_with'] is True:
+        return 'You are already friends with this person', 'danger', True
+
+    if friendship_status['friend_request_status'] == 'PENDING':
+        return 'You already have a pending friend request to this person', 'danger', True
+
+    neo4j.create_friend_request(node_a_id=current_user.identity, node_b_id=person_node.identity)
+    return 'Friend Request Sent', 'success', True
+
 
 if __name__ == "__main__":
     app.run_server('0.0.0.0', port=8050, debug=True)
