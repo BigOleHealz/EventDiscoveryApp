@@ -47,22 +47,21 @@ class DataLoader:
     def load_persons_to_neo4j_db(self):
         self.logger.debug('Loading Persons')
         df = pd.read_csv(os.path.join(self.enriched_data_folder_path, 'persons.csv'))
-        person_properties_list = ['Name','Email']
+        person_properties_list = ['FirstName','LastName','Username','Email']
         for _, row in df[person_properties_list].iterrows():
             row['PasswordHash'] = hash_password(row['Email'].split('@')[0])
             self.neo4j.create_person_node(properties=row.to_dict())
             
         for _, row in df[['Email', 'Interests','Friends']].iterrows():
             person_node = self.neo4j.graph.nodes.match("Person", Email=row['Email']).first()
-            
-            for interest_id in eval(row['Interests']):
-                
-                interest_node = self.neo4j.graph.nodes.match("EventType", EventTypeID=interest_id).first()
-                self.neo4j.create_relationship(a_node=person_node, relationship_label='INTERESTED_IN', b_node=interest_node)
+            self.neo4j.run_command(queries.CREATE_ACCOUNT_INTERESTED_IN_RELATIONSHIPSBY_MANUALLY_ASSIGNED_ID.format(
+                                                account_id=person_node.identity, interest_id_list=eval(row['Interests'])))
             
             for friend_email in eval(row['Friends']):
                 friend_node = self.neo4j.graph.nodes.match("Person", Email=friend_email).first()
-                self.neo4j.create_relationship(a_node=person_node, relationship_label='FRIENDS_WITH', b_node=friend_node)
+                
+                if not self.neo4j.graph.match((person_node, friend_node), r_type='FRIENDS_WITH').first():
+                    self.neo4j.create_friendship(node_a_id=person_node.identity, node_b_id=friend_node.identity)
                 
     
     def load_events_to_neo4j_db(self):

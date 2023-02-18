@@ -16,6 +16,7 @@ from db.db_handler import Neo4jDB
 from db import queries
 from utils.logger import Logger
 from utils.aws_handler import AWSHandler
+from utils.helper_functions import get_address_from_lat_lon, get_lat_lon_from_address
 
 city_data = {
     'Philadelphia' : {
@@ -32,7 +33,7 @@ city_data = {
 
 
 min_date = dt.today().date()
-max_date = min_date + timedelta(days=21)
+max_date = min_date + timedelta(days=7)
 max_num_events = 50
 decimal_precision = 7
 
@@ -91,7 +92,7 @@ class CreateTestData:
                     lat = round(random.uniform(city_data['Philadelphia']['lat']['min'], city_data['Philadelphia']['lat']['max']), decimal_precision)
                     lon = round(random.uniform(city_data['Philadelphia']['lon']['min'], city_data['Philadelphia']['lon']['max']), decimal_precision)
                     
-                    address = self.__address_from_lat_lon(lat=lat, lon=lon)
+                    address = get_address_from_lat_lon(lat=lat, lon=lon)
                     creator_name = event_creator_node.get('Name')
                 else:
                     invite_list = []

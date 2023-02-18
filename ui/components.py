@@ -75,19 +75,11 @@ class Components:
                     className='add-friends-container'
                 ),
                 
-                # html.Div(
-                #     [
-                #         # dbc.Alert("", id='friend-request-alert-box', color="success", dismissable=True, is_open=False),
-                #         # dcc.Input(placeholder='Enter the email or username of friend',
-                #         #         className='default-input-style',
-                #         #         id='friend-request-input'
-                #         #     ),
-                #         dbc.Button("Notifications", className="ml-auto"),
-                #     ],
-                #     id="notifications-container",
-                #     style={"display": "none"},
-                #     className='notifications-container'
-                # ),
+                html.Div(children=[],
+                        id="notifications-container",
+                        style={"display": "none"},
+                        className='notifications-container'
+                    ),
             ],
             fluid=True,
         ),
