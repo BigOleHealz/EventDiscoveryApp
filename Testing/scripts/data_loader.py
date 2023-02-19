@@ -49,8 +49,7 @@ class DataLoader:
         df = pd.read_csv(os.path.join(self.enriched_data_folder_path, 'persons.csv'))
         person_properties_list = ['FirstName','LastName','Username','Email']
         for _, row in df[person_properties_list].iterrows():
-            row['PasswordHash'] = hash_password(row['Email'].split('@')[0])
-            self.neo4j.create_person_node(properties=row.to_dict())
+            self.neo4j.create_person_node(properties=row.to_dict(), password=row['Email'].split('@')[0])
             
         for _, row in df[['Email', 'Interests','Friends']].iterrows():
             person_node = self.neo4j.graph.nodes.match("Person", Email=row['Email']).first()

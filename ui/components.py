@@ -4,6 +4,7 @@ from datetime import datetime as dt, timedelta
 from dash import dcc, html
 import dash_daq as daq
 import dash_bootstrap_components as dbc
+from flask_login import current_user
 
 from utils.constants import dict_of_locations, LOGO_PATH, FRIENDS_ICON_PATH, NOTIFICATIONS_ICON_PATH
 from ui.map_handler import get_map_content
@@ -17,7 +18,7 @@ class Components:
         self.neo4j_connector = neo4j_connector
         self.event_type_mappings = self.neo4j_connector.get_event_type_mappings()
         
-        self.person_friends = self.neo4j_connector.execute_query(queries.GET_PERSON_FRIENDS_ID_NAME_MAPPINGS_BY_EMAIL.format(email=os.environ['ACCOUNT_EMAIL']))
+        self.person_friends = self.neo4j_connector.execute_query(queries.GET_PERSON_FRIENDS_ID_NAME_MAPPINGS_BY_EMAIL.format(email=current_user.Email))
     
     header = dbc.Navbar(
         dbc.Container(
@@ -216,7 +217,7 @@ class Components:
                         ),
                         dcc.Checklist(
                             id='friends_invited-checklist',
-                            options=[{'label': rec['Name'], 'value': rec['_id']} for rec in self.person_friends],
+                            options=[{'label': f'{rec["FirstName"]} {rec["LastName"]}', 'value': rec['_id']} for rec in self.person_friends],
                             labelStyle={'display' : 'block'},
                             className="checklist",
                             value=friends_invited
