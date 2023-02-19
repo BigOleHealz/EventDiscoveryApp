@@ -176,7 +176,8 @@ GET_EVENT_BY_PERSON_AND_TS = '''
 
 GET_PERSON_FRIENDS_ID_NAME_MAPPINGS_BY_EMAIL = '''MATCH (:Person {{Email: "{email}"}})-[:FRIENDS_WITH]->(n)
                                                 RETURN ID(n) as _id,
-                                                n.Name AS Name;
+                                                n.FirstName AS FirstName,
+                                                n.LastName AS LastName;
                                                 '''
 
 
