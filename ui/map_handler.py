@@ -69,7 +69,7 @@ def tile_layer(
         markers.append(
             dl.Marker(
                 position=(event_node['Lat'], event_node['Lon']),
-                icon=icon_mappings[event['EventName']],
+                icon=icon_mappings[event['EventType']],
                 children=[
                     dl.Tooltip(
                         children=[

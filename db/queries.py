@@ -34,7 +34,7 @@ GET_EVENT_TYPE_NAMES_MAPPINGS = '''
                                 MATCH (n:EventType)
                                 RETURN
                                     ID(n) AS _id,
-                                    n.EventName AS EventName;
+                                    n.EventType AS EventType;
                                 '''
 
 
@@ -81,7 +81,14 @@ GET_EVENT_TYPE_BY_EVENTTYPEID = '''
                             WHERE ID(n) = {event_type_id}
                         RETURN n;
                         '''
-                                                                        
+
+
+GET_RELATIONSHIP_BY_UUID = '''
+                            MATCH ()-[r:{relationship_label}]->()
+                            WHERE r.UUID = "{uuid}"
+                            RETURN r
+                            '''                                 
+                                    
 DETERMINE_IF_FRIEND_REQUESTS_ALREADY_EXISTS_OR_USERS_ALREADY_FRIENDS = '''
                                                                         MATCH (a), (b)
                                                                         WHERE ID(a) = {node_a_id} AND ID(b) = {node_b_id}
@@ -165,16 +172,17 @@ GET_EVENT_BY_PERSON_AND_TS = '''
                             UNWIND events as event
                             OPTIONAL MATCH (u:Person)-[r:ATTENDING]->(event)
                             OPTIONAL MATCH (et:EventType) WHERE ID(et) = event.EventTypeID
-                            WITH n, event, COALESCE(count(r), 0) as AttendeeCount, et.EventName as EventName,
+                            WITH n, event, COALESCE(count(r), 0) as AttendeeCount, et.EventType as EventType,
                                 CASE
                                     WHEN (n)-[:ATTENDING]->(event) THEN True
                                     ELSE False
                                 END as ATTENDING_BOOLEAN
-                            RETURN event as Event, AttendeeCount, EventName, ATTENDING_BOOLEAN;
+                            RETURN event as Event, AttendeeCount, EventType, ATTENDING_BOOLEAN;
                             '''
 
 
-GET_PERSON_FRIENDS_ID_NAME_MAPPINGS_BY_EMAIL = '''MATCH (:Person {{Email: "{email}"}})-[:FRIENDS_WITH]->(n)
+GET_PERSON_FRIENDS_ID_NAME_MAPPINGS_BY_EMAIL = '''
+                                                MATCH (:Person {{Email: "{email}"}})-[:FRIENDS_WITH]->(n)
                                                 RETURN ID(n) as _id,
                                                 n.FirstName AS FirstName,
                                                 n.LastName AS LastName;
@@ -224,6 +232,47 @@ GET_ATTENDEE_COUNT_FOR_EVENTS_BY_ID = '''
                                         RETURN ID(e) as EventID, COALESCE(count(r), 0) as AttendeeCount;
                                         '''
 
+GET_PENDING_FRIEND_REQUESTS = '''
+                            MATCH (p:Person)<-[r:FRIEND_REQUEST]-(q:Person)
+                                WHERE p.Email = "{email}"
+                                AND
+                                r.STATUS = "PENDING"
+                            RETURN r
+                            '''
+
+GET_PENDING_EVENT_INVITES = '''
+                            MATCH (p:Person)
+                            WHERE
+                                p.Email = "{email}"
+                            WITH p
+                            MATCH (p)-[r:INVITED]->(e:Event)
+                            WHERE
+                                r.STATUS = "PENDING"
+                            RETURN r AS RELATIONSHIP, type(r) AS NOTIFICATION_TYPE, e AS NOTIFICATION_DETAILS
+                            '''
+
+GET_NOTIFICATIONS = '''
+                    MATCH (p2:Person)
+                    WHERE
+                        p2.Email = "{email}"
+                    WITH p2
+                    MATCH (p1:Person)-[r:FRIEND_REQUEST]->(p2)
+                    WHERE
+                        r.STATUS = "PENDING"
+                    RETURN type(r) AS NOTIFICATION_TYPE, p1 AS NOTIFICATION_DETAILS          
+                    UNION
+                    MATCH (p2)-[r:INVITED]->(e:Event)
+                    WHERE
+                        r.STATUS = "PENDING"
+                    RETURN type(r) AS NOTIFICATION_TYPE, e AS NOTIFICATION_DETAILS;
+                    '''
+          
+                        # AND
+                        # (
+                        #     datetime() <= datetime(e.StartTimestamp)
+                        #     OR
+                        #     datetime(e.StartTimestamp) <= datetime() <= datetime(e.EndTimestamp)
+                        # )
 
 #####################
 ###### CREATES ######
@@ -260,7 +309,7 @@ CREATE_ACCOUNT_INTERESTED_IN_RELATIONSHIPS = '''
                                             CREATE (a)-[:INTERESTED_IN]->(et);
                                             '''
 
-CREATE_ACCOUNT_INTERESTED_IN_RELATIONSHIPSBY_MANUALLY_ASSIGNED_ID = '''
+CREATE_ACCOUNT_INTERESTED_IN_RELATIONSHIPS_BY_MANUALLY_ASSIGNED_ID = '''
                                                                     MATCH (a:Account), (et:EventType)
                                                                     WHERE ID(a) = {account_id} AND et.EventTypeID IN {interest_id_list}
                                                                     CREATE (a)-[:INTERESTED_IN]->(et);
@@ -269,7 +318,7 @@ CREATE_ACCOUNT_INTERESTED_IN_RELATIONSHIPSBY_MANUALLY_ASSIGNED_ID = '''
 CREATE_FRIEND_REQUEST = '''
                         MATCH (a), (b)
                         WHERE ID(a) = {node_a_id} AND ID(b) = {node_b_id}
-                        CREATE (a)-[r:FRIEND_REQUEST]->(b)
+                        CREATE (a)-[r:FRIEND_REQUEST {properties}]->(b)
                         SET r.FRIEND_REQUEST_TS = datetime(), r.STATUS = 'PENDING'
                         RETURN r;
                         '''
@@ -278,9 +327,9 @@ CREATE_FRIENDSHIP = '''
                     MATCH (a:Person), (b:Person)
                     WHERE ID(a) = {node_a_id} AND ID(b) = {node_b_id}
                     WITH a, b, datetime() as dt
-                    CREATE (a)-[abr:FRIENDS_WITH]->(b)
+                    CREATE (a)-[abr:FRIENDS_WITH {properties}]->(b)
                     SET abr.FRIENDS_SINCE = dt
-                    CREATE (b)-[bar:FRIENDS_WITH]->(a)
+                    CREATE (b)-[bar:FRIENDS_WITH {properties}]->(a)
                     SET bar.FRIENDS_SINCE = dt
                     RETURN abr, bar;
                     '''

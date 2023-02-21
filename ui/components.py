@@ -5,8 +5,9 @@ from dash import dcc, html
 import dash_daq as daq
 import dash_bootstrap_components as dbc
 from flask_login import current_user
+from py2neo import Node, Relationship
 
-from utils.constants import dict_of_locations, LOGO_PATH, FRIENDS_ICON_PATH, NOTIFICATIONS_ICON_PATH
+from utils.constants import dict_of_locations, LOGO_PATH, FRIENDS_ICON_PATH, NOTIFICATIONS_ICON_PATH, NOTIFICATION_LABEL_MAPPINGS, datetime_format, accept_invite_button_id, decline_invite_button_id
 from ui.map_handler import get_map_content
 from utils.helper_functions import format_decode_image
 from db.db_handler import Neo4jDB
@@ -19,75 +20,133 @@ class Components:
         self.event_type_mappings = self.neo4j_connector.get_event_type_mappings()
         
         self.person_friends = self.neo4j_connector.execute_query(queries.GET_PERSON_FRIENDS_ID_NAME_MAPPINGS_BY_EMAIL.format(email=current_user.Email))
-    
-    header = dbc.Navbar(
-        dbc.Container(
-            [
-                html.A(
-                    dbc.Row(
-                        dbc.Col(dbc.NavbarBrand("")),
-                        align="center",
-                    ),
-                    href="/",
-                    style={"textDecoration": "none"},
-                ),
-                dbc.Row(
-                    [
-                        dbc.NavbarToggler(id="navbar-toggler"),
-                        dbc.Collapse(
-                            dbc.Nav(
-                                [
-                                    dbc.NavItem(dbc.NavLink("Home"), className='navbar-component'),
-                                    dbc.NavItem(
-                                        html.Img(src=format_decode_image(path=FRIENDS_ICON_PATH),
-                                            id='add-friends-button'
-                                        ),
-                                        className='navbar-component'
-                                    ),
-                                    dbc.NavItem(
-                                        html.Img(src=format_decode_image(path=NOTIFICATIONS_ICON_PATH),
-                                            id='add-notifications-button'
-                                        ),
-                                        className='navbar-component'
-                                    ),
-                                    dbc.NavItem(dbc.NavLink("Help"), className='navbar-component'),
-                                    dbc.NavItem(dbc.NavLink("About"), className='navbar-component'),
-                                    dbc.NavItem(dbc.NavLink('Logout', href='/logout'), className='navbar-component')
-                                ],
-                                className="w-100",
-                            ),
-                            id="navbar-collapse",
-                            is_open=False,
-                            navbar=True,
+        self.notifications_list = self.neo4j_connector.get_pending_event_invites(email=current_user.Email)
+
+    @staticmethod
+    def notifications_div(notifications_list: list):
+        notifications = []
+        for notification in notifications_list:
+            
+            uuid = notification["RELATIONSHIP"]["UUID"]
+            
+            # if notification['NOTIFICATION_TYPE'] == 'FRIEND_REQUEST':
+            #     notification_label_string = NOTIFICATION_LABEL_MAPPINGS[notification['NOTIFICATION_TYPE']]['display_name'].format(
+            #                                                 first_name=notification['NOTIFICATION_DETAILS']['FirstName'],
+            #                                                 last_name=notification['NOTIFICATION_DETAILS']['LastName'])
+            # elif notification['NOTIFICATION_TYPE'] == 'INVITED':
+            event_time = dt.strptime(notification["NOTIFICATION_DETAILS"]["StartTimestamp"], datetime_format)
+            notification_label_string = html.H6(f'Host: {notification["NOTIFICATION_DETAILS"]["Host"]}'), \
+                                        html.H6(f'Name: {notification["NOTIFICATION_DETAILS"]["EventName"]}'), \
+                                        html.H6(f'Address: {notification["NOTIFICATION_DETAILS"]["Address"]}'), \
+                                        html.H6(f'Date: {event_time.strftime("%Y-%m-%d")}'), \
+                                        html.H6(f'Starts At: {event_time.strftime("%H:%M:%S")}')
+                                            
+            
+            notifications.append(
+                html.Div([
+                    html.H5(NOTIFICATION_LABEL_MAPPINGS[notification['NOTIFICATION_TYPE']]['type']),
+                    html.Br(),
+                    html.Div([
+                        html.Div([
+                            html.Label(notification_label_string,
+                                   id='notifications-label',
+                                   style={'width' : '20vh'}),
+                            ],
+                            style={'display' : 'inline-block'}
                         ),
+                        html.Div([
+                            html.Button('Accept', id={'type':'invite_buttons', 'index': f'{accept_invite_button_id}_{uuid}'}, className=accept_invite_button_id),
+                            html.Button('Decline', id={'type':'invite_buttons', 'index': f'{decline_invite_button_id}_{uuid}'}, className=decline_invite_button_id)
+                        ],
+                        style={'display' : 'inline-block'},
+                        className='accept-decline-notification-div',
+                        )
                     ],
-                ),
-                html.Div(
-                    [
-                        dbc.Alert("", id='friend-request-alert-box', color="success", dismissable=True, is_open=False),
-                        dcc.Input(placeholder='Enter the email or username of friend',
-                                className='default-input-style',
-                                id='friend-request-input'
-                            ),
-                        dbc.Button("Send Request", id="submit-friend-request-button", className="ml-auto"),
-                    ],
-                    id="add-friends-container",
-                    style={"display": "none"},
-                    className='add-friends-container'
-                ),
-                
-                html.Div(children=[],
-                        id="notifications-container",
-                        style={"display": "none"},
-                        className='notifications-container'
+                    className='notification-details-div'
                     ),
-            ],
-            fluid=True,
-        ),
-        dark=True,
-        color="dark",
-        className='navbar'
-    )
+                ],
+                style={"display": "block"},
+                className='notifications-div',
+                id={'type':'event_invite_div', 'index': uuid}
+                
+                )
+            )
+            notifications.append(html.Hr(style={'margin' : '0px'}))
+        return notifications
+    
+            
+    @property
+    def header(self):
+        header = dbc.Navbar(
+            dbc.Container(
+                [
+                    html.A(
+                        dbc.Row(
+                            dbc.Col(dbc.NavbarBrand("")),
+                            align="center",
+                        ),
+                        href="/",
+                        style={"textDecoration": "none"},
+                    ),
+                    dbc.Row(
+                        [
+                            dbc.NavbarToggler(id="navbar-toggler"),
+                            dbc.Collapse(
+                                dbc.Nav(
+                                    [
+                                        dbc.NavItem(dbc.NavLink("Home"), className='navbar-component'),
+                                        dbc.NavItem(
+                                            html.Img(src=format_decode_image(path=FRIENDS_ICON_PATH),
+                                                id='add-friends-button'
+                                            ),
+                                            className='navbar-component'
+                                        ),
+                                        dbc.NavItem(
+                                            html.Img(src=format_decode_image(path=NOTIFICATIONS_ICON_PATH),
+                                                id='add-notifications-button'
+                                            ),
+                                            className='navbar-component'
+                                        ),
+                                        dbc.NavItem(dbc.NavLink("Help"), className='navbar-component'),
+                                        dbc.NavItem(dbc.NavLink("About"), className='navbar-component'),
+                                        dbc.NavItem(dbc.NavLink('Logout', href='/logout'), className='navbar-component')
+                                    ],
+                                    className="w-100",
+                                ),
+                                id="navbar-collapse",
+                                is_open=False,
+                                navbar=True,
+                            ),
+                        ],
+                    ),
+                    html.Div(
+                        [
+                            dbc.Alert("", id='friend-request-alert-box', color="success", dismissable=True, is_open=False),
+                            dcc.Input(placeholder='Enter the email or username of friend',
+                                    className='default-input-style',
+                                    id='friend-request-input'
+                                ),
+                            dbc.Button("Send Request", id="submit-friend-request-button", className="ml-auto"),
+                        ],
+                        id="add-friends-container",
+                        style={"display": "none"},
+                        className='add-friends-container'
+                    ),
+                    
+                    html.Div(
+                            children=self.notifications_div(notifications_list=self.notifications_list),
+                            id="notifications-container",
+                            style={"display": "none"},
+                            className='notifications-container'
+                        ),
+                ],
+                fluid=True,
+            ),
+            dark=True,
+            color="dark",
+            className='navbar'
+        )
+        return header
 
     sidebar_left = html.Div(
         [
@@ -210,7 +269,7 @@ class Components:
                         ),
                         dcc.Dropdown(
                             id="event_type-dropdown",
-                            options=[{'label': event_type['EventName'], 'value': event_type['_id']} for event_type in self.event_type_mappings],
+                            options=[{'label': event_type['EventType'], 'value': event_type['_id']} for event_type in self.event_type_mappings],
                             className="component",
                             value=event_type_id,
                             placeholder='Event Type'

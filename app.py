@@ -16,7 +16,7 @@ from utils.logger import Logger
 from db.db_handler import Neo4jDB
 from ui.map_handler import tile_layer
 from utils.callback_functions import create_event, callback_attend_event, toggle_modal, toggle_add_friends_container, toggle_notifications_container
-from utils.constants import RouteManager as routes
+from utils.constants import RouteManager as routes, accept_invite_button_id, decline_invite_button_id
 
 
 logger = Logger(name=__file__)
@@ -62,8 +62,6 @@ def load_user(node_id: str):
     return Account(neo4j.get_account_node(node_id=node_id))
 
 
-
-
 @callback(
     Output('alert_msg', 'children'),
     [
@@ -72,7 +70,6 @@ def load_user(node_id: str):
         Input('create_account_layout_alert-store', 'data'),
      ])
 def set_alert(home_page_layout_alert, login_layout_alert, create_account_layout_alert):
-    
     triggered_input_data = callback_context.triggered[0]
     prop_id = ['prop_id']
     value = ['value']
@@ -92,14 +89,14 @@ def set_alert(home_page_layout_alert, login_layout_alert, create_account_layout_
         Input("location-dropdown", "value"),
 
         # Create event args (right sidebar)
-        Input("event_name-input", "value"),
-        Input("event_date-picker", "date"),
-        Input("starttime-dropdown", "value"),
-        Input("endtime-dropdown", "value"),
-        Input("event_type-dropdown", "value"),
-        Input("friends_invited-checklist", "value"),
-        Input("public_event-switch", "on"),
-        Input("map-id", "click_lat_lng"),
+        State("event_name-input", "value"),
+        State("event_date-picker", "date"),
+        State("starttime-dropdown", "value"),
+        State("endtime-dropdown", "value"),
+        State("event_type-dropdown", "value"),
+        State("friends_invited-checklist", "value"),
+        State("public_event-switch", "on"),
+        State("map-id", "click_lat_lng"),
         Input("submit-button", "n_clicks")
     ])
 def update_map(*args, **kwargs):
@@ -140,6 +137,28 @@ def attend_event(*args, **kwargs):
                                 *args,
                                 **kwargs
                             )
+
+
+@callback(
+        Output({'type': 'invite_buttons', 'index': MATCH}, 'children'),
+        Output({'type': 'event_invite_div', 'index': MATCH}, 'style'),
+        Input({'type': 'invite_buttons', 'index': MATCH}, 'n_clicks'),
+        # Input({'type': 'invite_buttons', 'index': MATCH}, 'children'),
+        State({'type': 'invite_buttons', 'index': MATCH}, 'id')
+    )
+def respond_to_event_invite(n_clicks: int, button_id: str):
+    if n_clicks:
+        
+        (button_clicked_id, relationship_uuid) = button_id['index'].split('_')
+        print(f'{button_clicked_id}')
+        print(f'{relationship_uuid}')
+        if button_clicked_id == accept_invite_button_id:
+            neo4j.accept_event_invite(event_invite_uuid=relationship_uuid)
+        elif button_clicked_id == decline_invite_button_id:
+            neo4j.decline_event_invite(event_invite_uuid=relationship_uuid)
+        else:
+            raise ValueError(f'button_id: {button_id} does not match format')
+    return Components.notifications_div(neo4j.get_pending_friend_requests(email=current_user.Email)), {'display' : 'none'}
 
 
 @callback(
@@ -197,20 +216,13 @@ def create_account(first_name: str, last_name: str, email: str, password: str, p
             return url, ''
     return routes.login, ''
 
+
 @callback(Output('page-content', 'children'),
             Input('url', 'pathname'))
 def display_page(pathname: str):
     ''' callback to determine layout to return '''
     if pathname == routes.login:
         
-        # ###################################### TEST ######################################
-        # (account_node, auth_status) = neo4j.authenticate_account(email='matt@gmail.com', password='matt')
-        
-        # if auth_status == 'Success':
-        #     account = Account(account_node)
-        #     login_user(account)
-        # view = LayoutHandler.home_page_layout(neo4j_connector=neo4j)
-        # ###################################### TEST ######################################
         
         view = LayoutHandler.login_layout_children
     elif pathname == routes.success:

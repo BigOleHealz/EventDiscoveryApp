@@ -34,7 +34,7 @@ city_data = {
 
 min_date = dt.today().date()
 max_date = min_date + timedelta(days=7)
-max_num_events = 50
+max_num_events = 10
 decimal_precision = 7
 
 PUBLIC_EVENT_FLAG_LIST = [True, False]
@@ -93,7 +93,7 @@ class CreateTestData:
                     lon = round(random.uniform(city_data['Philadelphia']['lon']['min'], city_data['Philadelphia']['lon']['max']), decimal_precision)
                     
                     address = get_address_from_lat_lon(lat=lat, lon=lon)
-                    creator_name = event_creator_node.get('Name')
+                    creator_name = f"{event_creator_node.get('FirstName')} {event_creator_node.get('LastName')}"
                 else:
                     invite_list = []
                     lon = event_creator_node.get('Lng')

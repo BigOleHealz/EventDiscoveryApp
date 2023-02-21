@@ -27,6 +27,20 @@ CURRENTLY_ATTENDING_BUTTON_TEXT = "Unattend"
 
 NOT_CURRENTLY_ATTENDING_BUTTON_TEXT = "I'm Going!!"
 
+NOTIFICATION_LABEL_MAPPINGS = {
+            'FRIEND_REQUEST' : {
+                'type'         : 'Friend Request',
+                'display_name' : '{first_name} {last_name}'
+            },
+            'INVITED' : {
+                'type'         : 'Event Invitation',
+                'display_name' : 'Host: {host}\nAddress: {address}\nStarts At: {starttime_ts}'
+            }
+        }
+
+accept_invite_button_id = 'accept-notification-button'
+decline_invite_button_id = 'decline-notification-button'
+
 class RouteManager:
     login = '/login'
     home_page = '/home_page'
