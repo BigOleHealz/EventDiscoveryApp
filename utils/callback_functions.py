@@ -144,40 +144,34 @@ def toggle_modal(n1, n2, submit_button_clicks, is_open):
 @callback(
     Output("add-friends-container", "style"),
     Output("add-friends-button", "n_clicks"),
-    Input("add-friends-button", "n_clicks"),
+    
     State("add-friends-container", "style"),
-    State("add-friends-container", "n_clicks"),
+    Input("add-friends-button", "n_clicks"),
     prevent_initial_call=True
 )
-def toggle_add_friends_container(n1: int, style: dict, n2: int):
+def toggle_add_friends_container(style: dict, n1: int):
     if n1 is None:
         return style, None
     else:
         if style["display"] == "none":
             return {"display": "block"}, n1
-        elif n2 is None:
-            return {"display": "none"}, None
         else:
-            return style, n1
+            return {"display": "none"}, n1
 
 @callback(
     Output('notifications-container', 'style'),
-    Output('notifications-container', 'children'),
+    # Output('notifications-container', 'children'),
     Output('add-notifications-button', 'n_clicks'),
     
-    Input('add-notifications-button', 'n_clicks'),
     State('notifications-container', 'style'),
-    State('notifications-container', 'n_clicks'),
+    Input('add-notifications-button', 'n_clicks'),
     prevent_initial_call=True
 )
-def toggle_notifications_container(n1: int, style: dict, n2: int):
+def toggle_notifications_container(style: dict, n1: int):
     if n1 is None:
-        return style, None, None
+        return style, None
     else:
-        if style['display'] == 'none':
-            
-            return {'display': 'block'}, [], n1
-        elif n2 is None:
-            return {'display': 'none'}, [], None
+        if style["display"] == "none":
+            return {"display": "block"}, n1
         else:
-            return style, [], n1
+            return {"display": "none"}, n1

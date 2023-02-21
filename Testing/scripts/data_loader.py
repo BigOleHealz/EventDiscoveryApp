@@ -53,14 +53,22 @@ class DataLoader:
             
         for _, row in df[['Email', 'Interests','Friends']].iterrows():
             person_node = self.neo4j.graph.nodes.match("Person", Email=row['Email']).first()
-            self.neo4j.run_command(queries.CREATE_ACCOUNT_INTERESTED_IN_RELATIONSHIPSBY_MANUALLY_ASSIGNED_ID.format(
+            self.neo4j.run_command(queries.CREATE_ACCOUNT_INTERESTED_IN_RELATIONSHIPS_BY_MANUALLY_ASSIGNED_ID.format(
                                                 account_id=person_node.identity, interest_id_list=eval(row['Interests'])))
             
             for friend_email in eval(row['Friends']):
                 friend_node = self.neo4j.graph.nodes.match("Person", Email=friend_email).first()
                 
-                if not self.neo4j.graph.match((person_node, friend_node), r_type='FRIENDS_WITH').first():
-                    self.neo4j.create_friendship(node_a_id=person_node.identity, node_b_id=friend_node.identity)
+                # Create Friend request if the friend has not already sent the person a request
+                if not self.neo4j.graph.match((friend_node, person_node), r_type='FRIEND_REQUEST').first():
+                    self.neo4j.create_friend_request(node_a=person_node, node_b=friend_node)
+
+        for person_node in self.neo4j.graph.nodes.match("Person"):
+            friend_requests = self.neo4j.get_pending_friend_requests(person_node=person_node)
+            for friend_request in friend_requests:
+                record = friend_request['r']
+                
+                self.neo4j.accept_friend_request(node_a=person_node, node_b=record.start_node, request_uuid=record['UUID'])
                 
     
     def load_events_to_neo4j_db(self):

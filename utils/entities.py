@@ -21,7 +21,7 @@ class Account(UserMixin, Node):
     @property
     def Name(self):
         if 'Person' in self.node._labels:
-            return self.node['Name']
+            return f"{self.node['FirstName']} {self.node['LastName']}"
         elif 'Business' in self.node._labels:
             return self.node['Title']
         else:

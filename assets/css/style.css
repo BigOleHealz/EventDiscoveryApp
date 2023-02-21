@@ -33,7 +33,6 @@ h5 {
   font-weight: bold;
   letter-spacing: 2.1px;
   font-size: 21px;
-  padding-left: 12px;
   color: var(--component-font-color);
 }
 
@@ -111,7 +110,6 @@ p {
   position: absolute;
   top: 5vh;
   right: 10%;
-  /* transform: translate(-50%, -50%); */
   z-index: 999;
   background-color: var(--main-color);
   border: 1px solid black;
@@ -140,38 +138,84 @@ body:not(:hover) .add-friends-container {
   width: 60vh;
 }
 
+
+
+
+
+
+
+
 .notifications-container {
   position: absolute;
   top: 5vh;
   right: 5%;
-  /* transform: translate(-50%, -50%); */
+  height: 95vh;
   z-index: 999;
   background-color: var(--main-color);
   border: 1px solid black;
-  padding: 5vh;
   width: 50vh;
   display: flex;
   align-items: center;
   justify-content: center;
   box-shadow: 2px 2px 20px rgba(0, 0, 0, 0.7);
+  overflow: scroll;
 }
 
 .notifications-div {
-  /* position: absolute; */
-  /* top: 5vh;
-  right: 5%; */
-  /* transform: translate(-50%, -50%); */
-  /* z-index: 999; */
   background-color: var(--main-color);
-  border: 1px solid black;
-  padding: 5vh;
-  width: 50vh;
+  padding: 3vh;
+  width: 40vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 2px 2px 20px rgba(0, 0, 0, 0.7);
   color: var(--component-font-color);
+  box-sizing: border-box;
+  width: 100%;
 }
+
+.notification-type-label {
+  font-weight: bold;
+  font-size: 20;
+}
+
+.notification-details-div {
+  display: flex;
+  flex-direction: row;
+}
+
+.accept-decline-notification-div {
+  align-items: center;
+  position: relative;
+  top: 75%;
+}
+
+.accept-notification-button {
+  border: 0;
+  background-color: #00ff00;
+  margin-right: 2px;
+  margin-left: 2px;
+}
+
+.accept-notification-button:hover {
+  background-color: #66ff66;
+}
+
+.decline-notification-button {
+  border: 0;
+  background-color: red;
+  margin-right: 2px;
+  margin-left: 2px;
+}
+
+.decline-notification-button:hover {
+  background-color: #ff2222;
+}
+
+
+
+
+
+
 
 
 .component {
