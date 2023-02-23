@@ -237,7 +237,7 @@ GET_PENDING_FRIEND_REQUESTS = '''
                                 WHERE p.Email = "{email}"
                                 AND
                                 r.STATUS = "PENDING"
-                            RETURN r
+                            RETURN r AS RELATIONSHIP, type(r) AS NOTIFICATION_TYPE, q AS NOTIFICATION_DETAILS
                             '''
 
 GET_PENDING_EVENT_INVITES = '''
@@ -315,13 +315,12 @@ CREATE_ACCOUNT_INTERESTED_IN_RELATIONSHIPS_BY_MANUALLY_ASSIGNED_ID = '''
                                                                     CREATE (a)-[:INTERESTED_IN]->(et);
                                                                     '''
 
-CREATE_FRIEND_REQUEST = '''
-                        MATCH (a), (b)
-                        WHERE ID(a) = {node_a_id} AND ID(b) = {node_b_id}
-                        CREATE (a)-[r:FRIEND_REQUEST {properties}]->(b)
-                        SET r.FRIEND_REQUEST_TS = datetime(), r.STATUS = 'PENDING'
-                        RETURN r;
-                        '''
+CREATE_FRIEND_REQUEST_BY_ID = '''
+                            MATCH (a), (b)
+                            WHERE ID(a) = {node_a_id} AND ID(b) = {node_b_id}
+                            CREATE (a)-[r:FRIEND_REQUEST {properties}]->(b)
+                            RETURN r;
+                            '''
 
 CREATE_FRIENDSHIP = '''
                     MATCH (a:Person), (b:Person)

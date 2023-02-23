@@ -50,7 +50,7 @@ def tile_layer(
     events = neo4j_connector.execute_query(queries.GET_EVENT_BY_PERSON_AND_TS.format(email=current_user.Email, start_ts=min_timestamp, end_ts=max_timestamp))
     
     markers = []
-    for i, event in enumerate(events):
+    for event in events:
         event_node = event['Event']
         attendee_count = event['AttendeeCount']
         

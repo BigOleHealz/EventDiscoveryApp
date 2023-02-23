@@ -159,15 +159,14 @@ def toggle_add_friends_container(style: dict, n1: int):
             return {"display": "none"}, n1
 
 @callback(
-    Output('notifications-container', 'style'),
-    # Output('notifications-container', 'children'),
-    Output('add-notifications-button', 'n_clicks'),
+    Output('event-invites-container', 'style'),
+    Output('event-invites-button', 'n_clicks'),
     
-    State('notifications-container', 'style'),
-    Input('add-notifications-button', 'n_clicks'),
+    State('event-invites-container', 'style'),
+    Input('event-invites-button', 'n_clicks'),
     prevent_initial_call=True
 )
-def toggle_notifications_container(style: dict, n1: int):
+def toggle_event_invites_container(style: dict, n1: int):
     if n1 is None:
         return style, None
     else:

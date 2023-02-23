@@ -5,7 +5,7 @@ class Account(UserMixin, Node):
     def __init__(self, node: Node):
         super().__init__(UserMixin)
         # super().__init__(Node)
-        self.node = node
+        self.__node = node
     
     def __str__(self):
         return f'<Account Email: {self.Email} identity={self.identity}>'
@@ -16,14 +16,14 @@ class Account(UserMixin, Node):
     
     @property
     def Email(self):
-        return self.node['Email']
+        return self.__node['Email']
     
     @property
     def Name(self):
-        if 'Person' in self.node._labels:
-            return f"{self.node['FirstName']} {self.node['LastName']}"
-        elif 'Business' in self.node._labels:
-            return self.node['Title']
+        if 'Person' in self.__node._labels:
+            return f"{self.__node['FirstName']} {self.__node['LastName']}"
+        elif 'Business' in self.__node._labels:
+            return self.__node['Title']
         else:
             raise TypeError(f"Account node does not have either label 'Person' or 'Business'")
         
@@ -36,7 +36,11 @@ class Account(UserMixin, Node):
     
     @property
     def identity(self):
-        return self.node.identity
+        return self.__node.identity
     
     def get_id(self):
         return self.identity
+    
+    @property
+    def node(self):
+        return self.__node
