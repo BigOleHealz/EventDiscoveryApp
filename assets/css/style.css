@@ -45,7 +45,7 @@ p {
 
 .primary-div {
   all: inherit;
-  height: 100vh;
+  height: 195vh;
 }
 
 
@@ -139,17 +139,11 @@ body:not(:hover) .add-friends-container {
 }
 
 
-
-
-
-
-
-
-.notifications-container {
+.friend-request-container {
   position: absolute;
   top: 5vh;
-  right: 5%;
-  height: 95vh;
+  right: 15%;
+  max-height: 95vh;
   z-index: 999;
   background-color: var(--main-color);
   border: 1px solid black;
@@ -161,7 +155,44 @@ body:not(:hover) .add-friends-container {
   overflow: scroll;
 }
 
-.notifications-div {
+.friend-request-div {
+  background-color: var(--main-color);
+  padding: 3vh;
+  width: 40vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--component-font-color);
+  box-sizing: border-box;
+  width: 100%;
+}
+
+
+
+
+
+
+
+
+
+
+.event-invites-container {
+  position: absolute;
+  top: 5vh;
+  right: 5%;
+  max-height: 95vh;
+  z-index: 999;
+  background-color: var(--main-color);
+  border: 1px solid black;
+  width: 50vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 2px 2px 20px rgba(0, 0, 0, 0.7);
+  overflow: scroll;
+}
+
+.event-invites-div {
   background-color: var(--main-color);
   padding: 3vh;
   width: 40vh;
@@ -481,6 +512,7 @@ body:not(:hover) .add-friends-container {
 /* This creates a skinny side bar fixed to the left of the page */
 .sidebar-left {
   position: fixed;
+  height: 95vh;
   top: 3rem;
   left: 0;
   bottom: 0;
@@ -553,6 +585,7 @@ body:not(:hover) .add-friends-container {
 }
 
 .sidebar-right {
+  height: 95vh;
   position: fixed;
   top: 3rem;
   right: 0;

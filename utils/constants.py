@@ -4,7 +4,7 @@ import pandas as pd
 images_dir = os.path.join(os.getcwd(), 'assets', 'images')
 LOGO_PATH = os.path.join(images_dir, 'kraken.png')
 FRIENDS_ICON_PATH = os.path.join(images_dir, 'Friends.png')
-NOTIFICATIONS_ICON_PATH = os.path.join(images_dir, 'Notifications.png')
+EVENT_INVITES_ICON_PATH = os.path.join(images_dir, 'Notifications.png')
 
     
 # Dictionary of important locations in Philly
@@ -38,8 +38,12 @@ NOTIFICATION_LABEL_MAPPINGS = {
             }
         }
 
-accept_invite_button_id = 'accept-notification-button'
-decline_invite_button_id = 'decline-notification-button'
+accept_event_invite_button_id = 'accept-notification-button'
+decline_event_invite_button_id = 'decline-notification-button'
+
+
+accept_friend_request_button_id = 'accept-friend-request-button'
+decline_friend_request_button_id = 'decline-friend-request-button'
 
 class RouteManager:
     login = '/login'

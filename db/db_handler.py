@@ -139,7 +139,7 @@ class Neo4jDB:
     
     def get_relationship_by_nodes_and_label(self, node_a: Node, relationship_label: str, node_b: Node):
         self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
-        relationship = self.graph.match((node_a, None, node_b), rel_type=relationship_label).first()
+        relationship = self.graph.match((node_a, node_b), r_type=relationship_label).first()
         if len(relationship) == 0:
             raise ValueError(f"No relationship found between {node_a}-[:{relationship_label}]->{node_b}")
         
@@ -150,7 +150,7 @@ class Neo4jDB:
         self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
         if properties is None:
             properties = {}
-        if not properties.get('UUID'):
+        if 'UUID' not in properties:
             properties['UUID'] = str(uuid4())
         relationship = Relationship(node_a, relationship_label, node_b)
         relationship.update(properties)
@@ -193,6 +193,8 @@ class Neo4jDB:
     def create_event_with_relationships(self, creator_node: Node=None, properties: dict=None, friends_invited: list=None):
         self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
         event_node = None
+        if friends_invited is None:
+            friends_invited = []
         tx = self.graph.begin()
         try:
             event_node = self.create_event_node(properties=properties)
@@ -203,10 +205,12 @@ class Neo4jDB:
             self.create_relationship(node_a=event_type_node, relationship_label='RELATED_EVENT', node_b=event_node)
             self.create_relationship(node_a=event_node, relationship_label='EVENT_TYPE', node_b=event_type_node)
             
-            invite_properties = {'INVITED_BY_ID' : creator_node.identity, 'INVITED_DATE': datetime.now().strftime(datetime_format), 'STATUS' : 'PENDING'}
+            invited_date = properties.get('INVITED_DATE', datetime.now().strftime(datetime_format))
+            invite_properties = {'INVITED_BY_ID' : creator_node.identity, 'INVITED_DATE': invited_date, 'STATUS' : 'PENDING'}
             
             for invitee_id in friends_invited:
                 invitee_node = self.get_node_by_id(node_id=invitee_id)
+                invite_properties = {'INVITED_BY_ID' : creator_node.identity, 'INVITED_DATE': invited_date, 'STATUS' : 'PENDING'}
                 self.create_relationship(node_a=invitee_node, relationship_label='INVITED', node_b=event_node, properties=invite_properties)
             tx.commit()
             return event_node
@@ -217,9 +221,11 @@ class Neo4jDB:
             tx.rollback()
             raise error
     
-    def backload_event(self, created_by_id: int=None, creator_node: Node=None, properties: dict=None, friends_invited: list=None):
+    def backload_event(self, created_by_id: int, properties: dict, friends_invited: list=None):
         self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
         event_node = None
+        if friends_invited is None:
+            friends_invited = []
         tx = self.graph.begin()
         try:
             creator_node = self.get_node_by_id(node_id=created_by_id)
@@ -295,11 +301,18 @@ class Neo4jDB:
             self.logger.error(error_string)        
             raise ValueError(error_string)
     
-    def create_friend_request(self, node_a: int, node_b: int):
+    def create_friend_request(self, node_a: Node=None, node_b: Node=None, email_a: str=None, email_b: str=None):
         self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
-        # properties = {'UUID' : uuid4()}
         properties = {'FRIEND_REQUEST_TS' : datetime.now().strftime(datetime_format), 'STATUS' : 'PENDING'}
-        self.create_relationship(node_a=node_a, relationship_label='FRIEND_REQUEST', node_b=node_b, properties=properties)
+        if node_a and node_b:
+            self.create_relationship(node_a=node_a, relationship_label='FRIEND_REQUEST', node_b=node_b, properties=properties)
+        elif email_a and email_b:
+            node_a = self.get_account_node(email=email_a)
+            node_b = self.get_account_node(email=email_b)
+            self.create_relationship(node_a=node_a, relationship_label='FRIEND_REQUEST', node_b=node_b, properties=properties)
+        else:
+            raise ValueError("create_friend_request requires both (node_a and node_b) or both (email_a and email_b)")
+            
         # return self.run_command(queries.CREATE_FRIEND_REQUEST.format(node_a=node_a, node_b=node_b, properties=properties))
 
     def accept_friend_request(self, node_a: int, node_b: int, friend_request_uuid: str):
@@ -357,6 +370,7 @@ class Neo4jDB:
     def decline_event_invite(self, event_invite_uuid: str):
         self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
         current_timestamp = datetime.now().strftime(datetime_format)
+        tx = self.graph.begin()
         try:
             relationship = self.get_relationship_by_uuid(relationship_label='INVITED', relationship_uuid=event_invite_uuid)
             relationship['STATUS'] = 'DECLINED'
