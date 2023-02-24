@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/home/bigolehealz/workspace/EventApp/myenv/bin/python3.8
 
 import os, traceback, sys, secrets
 from datetime import datetime as dt, timedelta
@@ -15,8 +15,8 @@ from ui.components import Components
 from utils.logger import Logger
 from db.db_handler import Neo4jDB
 from ui.map_handler import tile_layer
-from utils.callback_functions import create_event, callback_attend_event, toggle_modal, toggle_add_friends_container, toggle_notifications_container
-from utils.constants import RouteManager as routes, accept_invite_button_id, decline_invite_button_id
+from utils.callback_functions import create_event, callback_attend_event, toggle_modal, toggle_add_friends_container, toggle_event_invites_container
+from utils.constants import RouteManager as routes, accept_event_invite_button_id, decline_event_invite_button_id
 
 
 logger = Logger(name=__file__)
@@ -26,7 +26,8 @@ app = Dash(__name__,
             server=server,
             title="Event Finder",
             external_stylesheets=['assets/css/style.css', dbc.themes.BOOTSTRAP, dbc.icons.FONT_AWESOME],
-            suppress_callback_exceptions=True
+            suppress_callback_exceptions=True,
+            prevent_initial_callbacks=True
         )
 logger.info("Dash app initialized")
 
@@ -133,40 +134,69 @@ def attend_event(*args, **kwargs):
     logger.debug(f'Running {sys._getframe().f_code.co_name}')
     return callback_attend_event(
                                 neo4j,
-                                current_user, # remove after session works
+                                current_user,
                                 *args,
                                 **kwargs
                             )
 
+@callback(
+        Output('friend-request-alert-box', 'children'),
+        Output('friend-request-alert-box', 'color'),
+        Output('friend-request-alert-box', 'is_open'),
+        Input('submit-friend-request-button', 'n_clicks'),
+        State('friend-request-input', 'value'))
+def send_friend_request(n_clicks: int, person_email_username: str):
+    if not n_clicks:
+        return '', 'green', False
+
+    person_node = neo4j.get_account_by_username_or_password(email_or_username=person_email_username)
+    if person_node is None:
+        return 'No user with that email or username exists', 'danger', True
+
+    friendship_status = neo4j.get_friend_request_sent_or_if_already_friends(node_a_id=current_user.identity, node_b_id=person_node.identity)
+
+    if friendship_status['friends_with'] is True:
+        return 'You are already friends with this person', 'danger', True
+
+    if friendship_status['friend_request_status'] == 'PENDING':
+        return 'You already have a pending friend request to this person', 'danger', True
+
+    neo4j.create_friend_request(node_a=current_user.node, node_b=person_node)
+    return 'Friend Request Sent', 'success', True
+
 
 @callback(
-        Output({'type': 'invite_buttons', 'index': MATCH}, 'children'),
-        Output({'type': 'event_invite_div', 'index': MATCH}, 'style'),
+        Output({'type': 'invite_buttons', 'index': MATCH}, 'n_clicks'),
+        
         Input({'type': 'invite_buttons', 'index': MATCH}, 'n_clicks'),
-        # Input({'type': 'invite_buttons', 'index': MATCH}, 'children'),
-        State({'type': 'invite_buttons', 'index': MATCH}, 'id')
+        State({'type': 'invite_buttons', 'index': MATCH}, 'id'),
     )
 def respond_to_event_invite(n_clicks: int, button_id: str):
-    if n_clicks:
+    print(f'Running {sys._getframe().f_code.co_name}')
+    logger.debug(f'Running {sys._getframe().f_code.co_name}')
+    try:
+        if n_clicks:
+            (button_clicked_id, relationship_uuid) = button_id['index'].split('_')
+            
+            if button_clicked_id == accept_event_invite_button_id:
+                # Return the output object as the output of the function
+                neo4j.accept_event_invite(event_invite_uuid=relationship_uuid)
+            elif button_clicked_id == decline_event_invite_button_id:
+                neo4j.decline_event_invite(event_invite_uuid=relationship_uuid)
+            else:
+                raise ValueError(f'button_id: {button_id} does not match format')
+            
+        return None
+    except Exception as error:
+        print(traceback.format_exc())
         
-        (button_clicked_id, relationship_uuid) = button_id['index'].split('_')
-        print(f'{button_clicked_id}')
-        print(f'{relationship_uuid}')
-        if button_clicked_id == accept_invite_button_id:
-            neo4j.accept_event_invite(event_invite_uuid=relationship_uuid)
-        elif button_clicked_id == decline_invite_button_id:
-            neo4j.decline_event_invite(event_invite_uuid=relationship_uuid)
-        else:
-            raise ValueError(f'button_id: {button_id} does not match format')
-    return Components.notifications_div(neo4j.get_pending_friend_requests(email=current_user.Email)), {'display' : 'none'}
-
-
+        
 @callback(
     [Output('url_login', 'pathname'),
     Output('login_layout_alert-store', 'data')],
     [Input('login-button', 'n_clicks')],
     [State('login-email-box', 'value'),
-     State('login-pwd-box', 'value')]
+    State('login-pwd-box', 'value')]
     )
 def login_button_click(n_clicks: int, email: str, password: str):
     if n_clicks > 0:
@@ -223,6 +253,15 @@ def display_page(pathname: str):
     ''' callback to determine layout to return '''
     if pathname == routes.login:
         
+        # ###################################### TEST ######################################
+        # (account_node, auth_status) = neo4j.authenticate_account(email='nathan@gmail.com', password='nathan')
+        
+        # if auth_status == 'Success':
+        #     account = Account(account_node)
+        #     login_user(account)
+        # view = LayoutHandler.home_page_layout(neo4j_connector=neo4j)
+        # ###################################### TEST ######################################
+        
         
         view = LayoutHandler.login_layout_children
     elif pathname == routes.success:
@@ -246,31 +285,7 @@ def display_page(pathname: str):
     return view
 
 
-@callback(
-        Output('friend-request-alert-box', 'children'),
-        Output('friend-request-alert-box', 'color'),
-        Output('friend-request-alert-box', 'is_open'),
-        Input('submit-friend-request-button', 'n_clicks'),
-        State('friend-request-input', 'value'))
-def send_friend_request(n_clicks: int, person_email_username: str):
-    if not n_clicks:
-        return '', 'green', False
-
-    person_node = neo4j.get_account_by_username_or_password(email_or_username=person_email_username)
-    if person_node is None:
-        return 'No user with that email or username exists', 'danger', True
-
-    friendship_status = neo4j.get_friend_request_sent_or_if_already_friends(node_a_id=current_user.identity, node_b_id=person_node.identity)
-
-    if friendship_status['friends_with'] is True:
-        return 'You are already friends with this person', 'danger', True
-
-    if friendship_status['friend_request_status'] == 'PENDING':
-        return 'You already have a pending friend request to this person', 'danger', True
-
-    neo4j.create_friend_request(node_a_id=current_user.identity, node_b_id=person_node.identity)
-    return 'Friend Request Sent', 'success', True
 
 
 if __name__ == "__main__":
-    app.run_server('0.0.0.0', port=8050, debug=True)
+    app.run_server(port=8050, debug=True)
