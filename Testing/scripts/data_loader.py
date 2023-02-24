@@ -1,5 +1,3 @@
-#!/usr/bin/python3
-
 import os, sys, random
 
 import pandas as pd
@@ -66,9 +64,8 @@ class DataLoader:
         for person_node in self.neo4j.graph.nodes.match("Person"):
             friend_requests = self.neo4j.get_pending_friend_requests(person_node=person_node)
             for friend_request in friend_requests:
-                record = friend_request['r']
-                
-                self.neo4j.accept_friend_request(node_a=person_node, node_b=record.start_node, request_uuid=record['UUID'])
+                record = friend_request['RELATIONSHIP']
+                self.neo4j.accept_friend_request(node_a=person_node, node_b=record.start_node, friend_request_uuid=record['UUID'])
                 
     
     def load_events_to_neo4j_db(self):
@@ -78,7 +75,9 @@ class DataLoader:
         
         for _, row in df.iterrows():
             properties = row[property_label_list].to_dict()
-            self.neo4j.backload_event(created_by_id=row['CreatedByID'], properties=properties, friends_invited=row['InviteList'])
+            
+            creator_node = self.neo4j.get_node_by_id(node_id=properties['CreatedByID'])
+            self.neo4j.create_event_with_relationships(creator_node=creator_node, properties=properties, friends_invited=eval(row['InviteList']))
             
     def load_attending_relationships(self):
         self.logger.debug('Loading Attending Relationships')
@@ -99,12 +98,12 @@ class DataLoader:
 if __name__ == '__main__':
     dl = DataLoader()
     
-    dl.wipe_events()
     dl.wipe_data()
     dl.load_event_types_to_neo4j_db()
     dl.load_persons_to_neo4j_db()
     dl.load_businesses_to_neo4j_db()
     
+    dl.wipe_events()
     ctd = CreateTestData()
     ctd.create_events_csv()
     dl.load_events_to_neo4j_db()

@@ -38,8 +38,8 @@ NOTIFICATION_LABEL_MAPPINGS = {
             }
         }
 
-accept_invite_button_id = 'accept-notification-button'
-decline_invite_button_id = 'decline-notification-button'
+accept_event_invite_button_id = 'accept-notification-button'
+decline_event_invite_button_id = 'decline-notification-button'
 
 
 accept_friend_request_button_id = 'accept-friend-request-button'

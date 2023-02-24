@@ -7,7 +7,7 @@ import dash_bootstrap_components as dbc
 from flask_login import current_user
 from py2neo import Node, Relationship
 
-from utils.constants import dict_of_locations, LOGO_PATH, FRIENDS_ICON_PATH, EVENT_INVITES_ICON_PATH, datetime_format, accept_invite_button_id, decline_invite_button_id, accept_friend_request_button_id, decline_friend_request_button_id
+from utils.constants import dict_of_locations, LOGO_PATH, FRIENDS_ICON_PATH, EVENT_INVITES_ICON_PATH, datetime_format, accept_event_invite_button_id, decline_event_invite_button_id, accept_friend_request_button_id, decline_friend_request_button_id
 from ui.map_handler import get_map_content
 from utils.helper_functions import format_decode_image
 from db.db_handler import Neo4jDB
@@ -34,11 +34,11 @@ class Components:
             # if notification['NOTIFICATION_TYPE'] == 'FRIEND_REQUEST':
             # elif notification['NOTIFICATION_TYPE'] == 'INVITED':
             event_time = dt.strptime(event_invite["NOTIFICATION_DETAILS"]["StartTimestamp"], datetime_format)
-            event_invite_label_string = html.H6(f'Host: {event_invite["NOTIFICATION_DETAILS"]["Host"]}'), \
+            event_invite_label_string = [html.H6(f'Host: {event_invite["NOTIFICATION_DETAILS"]["Host"]}'), \
                                         html.H6(f'Name: {event_invite["NOTIFICATION_DETAILS"]["EventName"]}'), \
                                         html.H6(f'Address: {event_invite["NOTIFICATION_DETAILS"]["Address"]}'), \
                                         html.H6(f'Date: {event_time.strftime("%Y-%m-%d")}'), \
-                                        html.H6(f'Starts At: {event_time.strftime("%H:%M:%S")}')
+                                        html.H6(f'Starts At: {event_time.strftime("%H:%M:%S")}')]
                                             
             
             event_invites.append(
@@ -46,12 +46,12 @@ class Components:
                     html.H5('Event Invite'),
                     html.Br(),
                     html.Div([
-                        html.Div([event_invite_label_string],
+                        html.Div(event_invite_label_string,
                             style={'display' : 'inline-block'}
                         ),
                         html.Div([
-                            html.Button('Accept', id={'type':'invite_buttons', 'index': f'{accept_invite_button_id}_{uuid}'}, className=accept_invite_button_id),
-                            html.Button('Decline', id={'type':'invite_buttons', 'index': f'{decline_invite_button_id}_{uuid}'}, className=decline_invite_button_id)
+                            html.Button('Accept', id={'type':'invite_buttons', 'index': f'{accept_event_invite_button_id}_{uuid}'}, className=accept_event_invite_button_id),
+                            html.Button('Decline', id={'type':'invite_buttons', 'index': f'{decline_event_invite_button_id}_{uuid}'}, className=decline_event_invite_button_id)
                         ],
                         style={'display' : 'inline-block'},
                         className='accept-decline-notification-div',
@@ -62,7 +62,7 @@ class Components:
                 ],
                 style={"display": "block"},
                 className='event-invites-div',
-                id={'type':'event_invite_div', 'index': uuid}
+                id={'type':'event-invites-div', 'index': uuid}
                 
                 )
             )
@@ -94,8 +94,8 @@ class Components:
                         ),
                         html.Div([
                             
-                            html.Button('Accept', id={'type':'friend_request_buttons', 'index': f'{accept_friend_request_button_id}_{uuid}'}, className=accept_invite_button_id),
-                            html.Button('Decline', id={'type':'friend_request_buttons', 'index': f'{decline_friend_request_button_id}_{uuid}'}, className=decline_invite_button_id)
+                            html.Button('Accept', id={'type':'friend_request_buttons', 'index': f'{accept_friend_request_button_id}_{uuid}'}, className=accept_event_invite_button_id),
+                            html.Button('Decline', id={'type':'friend_request_buttons', 'index': f'{decline_friend_request_button_id}_{uuid}'}, className=decline_event_invite_button_id)
                         ],
                         style={'display' : 'inline-block'},
                         className='accept-decline-notification-div',
@@ -106,7 +106,7 @@ class Components:
                 ],
                 style={"display": "block"},
                 className='friend-requests-div',
-                id={'type':'friend_requests_div', 'index': uuid}
+                id={'type':'friend-requests-div', 'index': uuid}
                 
                 )
             )

@@ -141,36 +141,34 @@ def toggle_modal(n1, n2, submit_button_clicks, is_open):
     return is_open
 
 
+def toggle_container(style: dict, n_clicks: int):
+    if n_clicks is None:
+        return style, None
+    else:
+        if style["display"] == "none":
+            return {"display": "block"}, n_clicks
+        else:
+            return {"display": "none"}, n_clicks
+    
 @callback(
     Output("add-friends-container", "style"),
     Output("add-friends-button", "n_clicks"),
-    
+
     State("add-friends-container", "style"),
     Input("add-friends-button", "n_clicks"),
     prevent_initial_call=True
 )
-def toggle_add_friends_container(style: dict, n1: int):
-    if n1 is None:
-        return style, None
-    else:
-        if style["display"] == "none":
-            return {"display": "block"}, n1
-        else:
-            return {"display": "none"}, n1
+def toggle_add_friends_container(style: dict, n_clicks: int):
+        return toggle_container(style=style, n_clicks=n_clicks)
+
 
 @callback(
     Output('event-invites-container', 'style'),
     Output('event-invites-button', 'n_clicks'),
-    
+
     State('event-invites-container', 'style'),
     Input('event-invites-button', 'n_clicks'),
     prevent_initial_call=True
 )
-def toggle_event_invites_container(style: dict, n1: int):
-    if n1 is None:
-        return style, None
-    else:
-        if style["display"] == "none":
-            return {"display": "block"}, n1
-        else:
-            return {"display": "none"}, n1
+def toggle_event_invites_container(style: dict, n_clicks: int):
+        return toggle_container(style=style, n_clicks=n_clicks)

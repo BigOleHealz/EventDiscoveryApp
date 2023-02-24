@@ -150,7 +150,7 @@ class Neo4jDB:
         self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
         if properties is None:
             properties = {}
-        if not properties.get('UUID'):
+        if 'UUID' not in properties:
             properties['UUID'] = str(uuid4())
         relationship = Relationship(node_a, relationship_label, node_b)
         relationship.update(properties)
@@ -193,6 +193,8 @@ class Neo4jDB:
     def create_event_with_relationships(self, creator_node: Node=None, properties: dict=None, friends_invited: list=None):
         self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
         event_node = None
+        if friends_invited is None:
+            friends_invited = []
         tx = self.graph.begin()
         try:
             event_node = self.create_event_node(properties=properties)
@@ -203,10 +205,12 @@ class Neo4jDB:
             self.create_relationship(node_a=event_type_node, relationship_label='RELATED_EVENT', node_b=event_node)
             self.create_relationship(node_a=event_node, relationship_label='EVENT_TYPE', node_b=event_type_node)
             
-            invite_properties = {'INVITED_BY_ID' : creator_node.identity, 'INVITED_DATE': datetime.now().strftime(datetime_format), 'STATUS' : 'PENDING'}
+            invited_date = properties.get('INVITED_DATE', datetime.now().strftime(datetime_format))
+            invite_properties = {'INVITED_BY_ID' : creator_node.identity, 'INVITED_DATE': invited_date, 'STATUS' : 'PENDING'}
             
             for invitee_id in friends_invited:
                 invitee_node = self.get_node_by_id(node_id=invitee_id)
+                invite_properties = {'INVITED_BY_ID' : creator_node.identity, 'INVITED_DATE': invited_date, 'STATUS' : 'PENDING'}
                 self.create_relationship(node_a=invitee_node, relationship_label='INVITED', node_b=event_node, properties=invite_properties)
             tx.commit()
             return event_node
@@ -217,9 +221,11 @@ class Neo4jDB:
             tx.rollback()
             raise error
     
-    def backload_event(self, created_by_id: int=None, creator_node: Node=None, properties: dict=None, friends_invited: list=None):
+    def backload_event(self, created_by_id: int, properties: dict, friends_invited: list=None):
         self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
         event_node = None
+        if friends_invited is None:
+            friends_invited = []
         tx = self.graph.begin()
         try:
             creator_node = self.get_node_by_id(node_id=created_by_id)
