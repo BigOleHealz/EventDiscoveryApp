@@ -151,10 +151,10 @@ def toggle_container(style: dict, n_clicks: int):
             return {"display": "none"}, n_clicks
     
 @callback(
-    Output("add-friends-container", "style"),
+    Output("friends-container", "style"),
     Output("add-friends-button", "n_clicks"),
 
-    State("add-friends-container", "style"),
+    State("friends-container", "style"),
     Input("add-friends-button", "n_clicks"),
     prevent_initial_call=True
 )
