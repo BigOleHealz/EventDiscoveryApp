@@ -36,6 +36,19 @@ h5 {
   color: var(--component-font-color);
 }
 
+* {
+  margin: 0;
+  padding: 0;
+}
+
+hr {
+  color: black;
+  height: 2px;
+  border: none;
+  background: black;
+}
+
+
 p {
   font-family: "Open Sans";
   font-weight: 400;
@@ -93,12 +106,12 @@ p {
 .navbar {
   padding: 0px;
   height: 5vh;
+  align-items: right;
 }
 
 .navbar-component {
-  padding: 5px;
+  /* padding: 5px; */
   display: flex;
-  align-items: center;
   justify-content: center;
 }
 
@@ -106,43 +119,75 @@ p {
   background-color: #444444;
 }
 
-.add-friends-container {
+.friends-container {
   position: absolute;
-  top: 5vh;
+  /* top: 5vh; */
   right: 10%;
+  margin:0;
   z-index: 999;
+  max-height: 95vh;
   background-color: var(--main-color);
-  border: 1px solid black;
-  padding: 5vh;
+  /* border: 1px solid black; */
+  padding: 0;
   width: 50vh;
-  display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 2px 2px 20px rgba(0, 0, 0, 0.7);
+  /* box-shadow: 2px 2px 20px rgba(0, 0, 0, 0.7); */
+  overflow: scroll;
+  
+  display: flex;
+  flex-direction: column;
 }
 
-body:not(:hover) .add-friends-container {
+body:not(:hover) .friends-container {
   display: none;
 }
 
+.search-friends-container {
+  position: relative;
+  /* bottom: 0;
+  left: 0; */
+  margin: 2vh;
+  z-index: 999;
+  background-color: var(--main-color);
+  width: 80%;
+  align-items: center;
+  justify-content: center;
+  box-shadow: none;
+  border: none;
+  /* box-shadow: 2px 2px 20px rgba(0, 0, 0, 0.7); */
+
+  display: flex;
+  flex:1;
+}
+
+.friend-request-subdiv {
+  height: 10vh;
+  padding: 0;
+}
 .add-friend-input {
   background-color: var(--main-color);
   color: var(--component-font-color);
   /* margin: var(--default-margin); */
-  padding: 5vh;
-  border: none;
-  border-radius: 5px;
+  /* padding: 5vh; */
   font-size: 16px;
-  box-shadow: 2px 2px 20px rgba(0, 0, 0, 0.7);
+  border: 1px solid black;
+  border-radius: 2vh;
   transition: all 0.3s ease-in-out;
-  width: 60vh;
+  width: 60%;
+  height: 5vh;
+  box-shadow: 2px 2px 20px rgba(0, 0, 0, 0.7);
 }
 
 
+
+
 .friend-request-container {
-  position: absolute;
-  top: 5vh;
-  right: 15%;
+  position: relative;
+  bottom: 0;
+  left: 0;
+  /* top: 5vh; */
+  /* right: 15%; */
   max-height: 95vh;
   z-index: 999;
   background-color: var(--main-color);
@@ -159,12 +204,13 @@ body:not(:hover) .add-friends-container {
   background-color: var(--main-color);
   padding: 3vh;
   width: 40vh;
-  display: flex;
   align-items: center;
   justify-content: center;
   color: var(--component-font-color);
   box-sizing: border-box;
   width: 100%;
+  display: flex;
+  flex:1;
 }
 
 

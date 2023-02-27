@@ -254,7 +254,7 @@ def display_page(pathname: str):
     if pathname == routes.login:
         
         # ###################################### TEST ######################################
-        # (account_node, auth_status) = neo4j.authenticate_account(email='nathan@gmail.com', password='nathan')
+        # (account_node, auth_status) = neo4j.authenticate_account(email='nico@gmail.com', password='nico')
         
         # if auth_status == 'Success':
         #     account = Account(account_node)

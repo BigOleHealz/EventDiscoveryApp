@@ -23,23 +23,57 @@ class Components:
         self.friend_request_list = self.neo4j_connector.get_pending_friend_requests(email=current_user.Email)
         self.event_invite_list = self.neo4j_connector.get_pending_event_invites(email=current_user.Email)
 
+    
+    @staticmethod
+    def friend_requests_div(friend_request_list: list):
+        friend_requests = []
+        for friend_request in friend_request_list:
+            uuid = friend_request["RELATIONSHIP"]["UUID"]
+
+            friend_requests.append(
+                html.Div([
+                    html.H5('Friend Request'),
+                    html.Br(),
+                    html.Div([
+                        html.Div([
+                            html.H6(f'{friend_request["NOTIFICATION_DETAILS"]["FirstName"]} {friend_request["NOTIFICATION_DETAILS"]["LastName"]}'),
+                            ],
+                            style={'display' : 'inline-block'}
+                        ),
+                        html.Div([
+                            html.Button('Accept', id={'type':'friend_request_buttons', 'index': f'{accept_friend_request_button_id}_{uuid}'}, className=accept_event_invite_button_id),
+                            html.Button('Decline', id={'type':'friend_request_buttons', 'index': f'{decline_friend_request_button_id}_{uuid}'}, className=decline_event_invite_button_id)
+                        ],
+                        style={'display' : 'inline-block'},
+                        className='accept-decline-notification-div',
+                        )
+                    ],
+                    className='notification-details-div'
+                    ),
+                ],
+                style={"display": "block"},
+                className='friend-requests-div',
+                id={'type':'friend-requests-div', 'index': uuid}
+                
+                )
+            )
+            friend_requests.append(html.Hr(style={'margin' : '0px'}))
+        return friend_requests
+
+
     @staticmethod
     def event_invites_div(event_invite_list: list):
-        print(f'{event_invite_list=}')
         event_invites = []
         for event_invite in event_invite_list:
             
             uuid = event_invite["RELATIONSHIP"]["UUID"]
             
-            # if notification['NOTIFICATION_TYPE'] == 'FRIEND_REQUEST':
-            # elif notification['NOTIFICATION_TYPE'] == 'INVITED':
             event_time = dt.strptime(event_invite["NOTIFICATION_DETAILS"]["StartTimestamp"], datetime_format)
             event_invite_label_string = [html.H6(f'Host: {event_invite["NOTIFICATION_DETAILS"]["Host"]}'), \
                                         html.H6(f'Name: {event_invite["NOTIFICATION_DETAILS"]["EventName"]}'), \
                                         html.H6(f'Address: {event_invite["NOTIFICATION_DETAILS"]["Address"]}'), \
                                         html.H6(f'Date: {event_time.strftime("%Y-%m-%d")}'), \
                                         html.H6(f'Starts At: {event_time.strftime("%H:%M:%S")}')]
-                                            
             
             event_invites.append(
                 html.Div([
@@ -68,51 +102,7 @@ class Components:
             )
             event_invites.append(html.Hr(style={'margin' : '0px'}))
         return event_invites
-    
-    @staticmethod
-    def friend_requests_div(friend_request_list: list):
-        print(f'{friend_request_list=}')
-        friend_requests = []
-        for friend_request in friend_request_list:
-            
-            uuid = friend_request["RELATIONSHIP"]["UUID"]
-            
-            # friend_invite_label_string = html.H6(f'{friend_invite['NOTIFICATION_DETAILS']['FirstName']} {friend_invite['NOTIFICATION_DETAILS']['LastName']}')
 
-            friend_requests.append(
-                html.Div([
-                    html.H5('Friend Request'),
-                    html.Br(),
-                    html.Div([
-                        html.Div([
-                            html.H6(f'{friend_request["NOTIFICATION_DETAILS"]["FirstName"]} {friend_request["NOTIFICATION_DETAILS"]["LastName"]}'),
-                            # html.Label(event_invite_label_string,
-                            #        id='friend_requests-label',
-                            #        style={'width' : '20vh'}),
-                            ],
-                            style={'display' : 'inline-block'}
-                        ),
-                        html.Div([
-                            
-                            html.Button('Accept', id={'type':'friend_request_buttons', 'index': f'{accept_friend_request_button_id}_{uuid}'}, className=accept_event_invite_button_id),
-                            html.Button('Decline', id={'type':'friend_request_buttons', 'index': f'{decline_friend_request_button_id}_{uuid}'}, className=decline_event_invite_button_id)
-                        ],
-                        style={'display' : 'inline-block'},
-                        className='accept-decline-notification-div',
-                        )
-                    ],
-                    className='notification-details-div'
-                    ),
-                ],
-                style={"display": "block"},
-                className='friend-requests-div',
-                id={'type':'friend-requests-div', 'index': uuid}
-                
-                )
-            )
-            friend_requests.append(html.Hr(style={'margin' : '0px'}))
-        return friend_requests
-            
     @property
     def header(self):
         header = dbc.Navbar(
@@ -159,24 +149,33 @@ class Components:
                     ),
                     html.Div([
                         html.Div([
-                            dbc.Alert("", id='friend-request-alert-box', color="success", dismissable=True, is_open=False),
-                            dcc.Input(placeholder='Enter the email or username of friend',
-                                    className='default-input-style',
-                                    id='friend-request-input'
-                                ),
-                                dbc.Button("Send Request", id="submit-friend-request-button", className="ml-auto"),
-                                
-                        
-                                # html.Div(
-                                #     children=self.friend_requests_div(friend_request_list=self.friend_request_list),
-                                #     id='friend-request-container',
-                                #     className='friend-request-container'
-                                # )
+                            html.Div([
+                                html.Div([
+                                    dbc.Alert("", id='friend-request-alert-box', color="success", dismissable=True, is_open=False),
+                                    dcc.Input(placeholder='Enter the email or username of friend',
+                                            className='add-friend-input',
+                                            id='friend-request-input'
+                                        ),
+                                        dbc.Button("Send Request", id="submit-friend-request-button", className="ml-auto"),
                                 ],
-                                id="add-friends-container",
-                                style={"display": "none"},
-                                className='add-friends-container'
+                                className='friend-request-subdiv'
+                                ),
+
+                            ],
+                            id='search-friends-container',
+                            className= 'search-friends-container'
                             ),
+                            html.Div(
+                                children=self.friend_requests_div(friend_request_list=self.friend_request_list),
+                                id='friend-request-container',
+                                className='friend-request-container'
+                            )
+                        ],
+                        id="friends-container",
+                        style={"display": "none"},
+                        className='friends-container'
+                        ),
+
                     ]),
                     
                     html.Div(
