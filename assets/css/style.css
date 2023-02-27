@@ -121,7 +121,7 @@ p {
 
 .friends-container {
   position: absolute;
-  /* top: 5vh; */
+  top: 5vh;
   right: 10%;
   margin:0;
   z-index: 999;
@@ -132,7 +132,7 @@ p {
   width: 50vh;
   align-items: center;
   justify-content: center;
-  /* box-shadow: 2px 2px 20px rgba(0, 0, 0, 0.7); */
+  box-shadow: 2px 2px 20px rgba(0, 0, 0, 0.7);
   overflow: scroll;
   
   display: flex;
@@ -151,28 +151,33 @@ body:not(:hover) .friends-container {
   z-index: 999;
   background-color: var(--main-color);
   width: 80%;
+
+  display: flex;
   align-items: center;
   justify-content: center;
   box-shadow: none;
   border: none;
   /* box-shadow: 2px 2px 20px rgba(0, 0, 0, 0.7); */
 
-  display: flex;
   flex:1;
 }
 
 .friend-request-subdiv {
   height: 10vh;
+  width: 80vh;
   padding: 0;
+  margin: 1vh;
 }
+
 .add-friend-input {
   background-color: var(--main-color);
   color: var(--component-font-color);
+  margin: 1vh;
   /* margin: var(--default-margin); */
   /* padding: 5vh; */
   font-size: 16px;
   border: 1px solid black;
-  border-radius: 2vh;
+  border-radius: 1vh;
   transition: all 0.3s ease-in-out;
   width: 60%;
   height: 5vh;
