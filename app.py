@@ -172,7 +172,6 @@ def send_friend_request(n_clicks: int, person_email_username: str):
         State({'type': 'invite_buttons', 'index': MATCH}, 'id'),
     )
 def respond_to_event_invite(n_clicks: int, button_id: str):
-    print(f'Running {sys._getframe().f_code.co_name}')
     logger.debug(f'Running {sys._getframe().f_code.co_name}')
     try:
         if n_clicks:
