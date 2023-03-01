@@ -3,4 +3,7 @@ Testing/data/csv/enriched/events.csv
 utils/secrets_manager.py
 logs/*
 myvenv/*
-Testing/recent_query.cypher
+
+infra/event-app-lambdas/removed_params.json
+infra/event-app-lambdas/get_node/dependencies/*
+infra/event-app-lambdas/get_node/.aws-sam/deps/*

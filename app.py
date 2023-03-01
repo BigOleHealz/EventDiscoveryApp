@@ -1,4 +1,4 @@
-#!/home/bigolehealz/workspace/EventApp/myenv/bin/python3.8
+#!/home/ec2-user/workspace/EventApp/myvenv/bin/python3
 
 import os, traceback, sys, secrets
 from datetime import datetime as dt, timedelta
@@ -287,4 +287,4 @@ def display_page(pathname: str):
 
 
 if __name__ == "__main__":
-    app.run_server(port=8050, debug=True)
+    app.run_server('0.0.0.0', port=8051, debug=True)

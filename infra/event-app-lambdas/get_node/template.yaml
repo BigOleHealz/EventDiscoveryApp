@@ -1,0 +1,44 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  get_node
+
+  Sample SAM Template for get_node
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 3
+    MemorySize: 128
+
+Resources:
+  GetNodeFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: scripts/
+      Handler: app.lambda_handler
+      Runtime: python3.8
+      Architectures:
+        - x86_64
+      Events:
+        GetNode:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /hello
+            Method: get
+      Layers:
+        - arn:aws:lambda:us-east-1:620803767360:layer:dependencies:1
+
+Outputs:
+  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
+  # Find out more about other implicit resources you can reference within SAM
+  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
+  GetNodeApi:
+    Description: "API Gateway endpoint URL for Prod stage for Hello World function"
+    Value:  https://0kj5kbx4e7.execute-api.us-east-1.amazonaws.com/test
+  GetNodeFunction:
+    Description: "Hello World Lambda Function ARN"
+    Value: arn:aws:execute-api:us-east-1:620803767360:0kj5kbx4e7/*/GET/neo4j-query
+  GetNodeFunctionIamRole:
+    Description: "Implicit IAM Role created for Hello World function"
+    Value: arn:aws:iam::620803767360:policy/LambdaToReadAndWriteToNeo4j
