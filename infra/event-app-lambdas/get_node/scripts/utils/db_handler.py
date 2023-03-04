@@ -14,7 +14,7 @@ class Neo4jDB:
         neo4j_secrets = aws_handler.get_secret('neo4j_credentials')
         
         self.graph = Graph(neo4j_secrets['CONNECTION_STRING'],
-                           auth=(neo4j_secrets['USER'],
+                          auth=(neo4j_secrets['USER'],
                                  neo4j_secrets['PASSWORD']
                             ))
         self.logger.info("Successfully connected to Neo4j DB")

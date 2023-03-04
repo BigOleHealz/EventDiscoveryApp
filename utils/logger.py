@@ -6,7 +6,7 @@ class Logger(logging.Logger):
         super().__init__(name, level)
         
         self.setLevel(logging.DEBUG)
-        handler = logging.FileHandler(os.path.join(os.path.getcwd(), 'logs', f'{datetime.now().strftime("%Y-%m-%dT%H:%M:%S")}.log'))
+        handler = logging.FileHandler(os.path.join(os.getcwd(), 'logs', f'{datetime.now().strftime("%Y-%m-%dT%H:%M:%S")}.log'))
 
         # create formatter
         formatter = logging.Formatter("%(asctime)s [%(levelname)s] - %(module)s.%(funcName)s(%(lineno)d) - %(message)s")

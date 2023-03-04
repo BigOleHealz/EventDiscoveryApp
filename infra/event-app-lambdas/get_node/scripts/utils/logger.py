@@ -20,18 +20,13 @@ class Logger(logging.Logger):
         except ClientError as e:
             if e.response['Error']['Code'] != 'ResourceAlreadyExistsException':
                 raise Exception(f'Traceback: {traceback.format_exc()}')
-        
+
         try:
             self.cloudwatch_logs.create_log_stream(logGroupName=self.log_group_name, logStreamName=self.log_stream_name)
         except ClientError as e:
             if e.response['Error']['Code'] != 'ResourceAlreadyExistsException':
                 raise Exception(f'Traceback: {traceback.format_exc()}')
         
-        self.log_group_name = 'event_app_log_group'
-        
-        self.log_stream_name = self.timestamp
-        
-        self.logs_client = boto3.client('logs')
         self.sequence_token = None
         
         self.logger = logging.getLogger(__name__)
@@ -41,20 +36,20 @@ class Logger(logging.Logger):
         self.formatter = logging.Formatter("%(asctime)s [%(levelname)s] - %(module)s.%(funcName)s(%(lineno)d) - %(message)s")
         self.handler.setFormatter(self.formatter)
         self.logger.addHandler(self.handler)
+        
+        self.info('logger initiated')
     
     def emit(self, msg: str):
         try:
-            log_entry = self.info(msg)
-            response = self.cloudwatch_logs.put_log_events(
+            self.cloudwatch_logs.put_log_events(
                 logGroupName=self.log_group_name,
                 logStreamName=self.log_stream_name,
                 logEvents=[
                     {
                         'timestamp': int(round(time.time() * 1000)),
-                        'message': log_entry
+                        'message': msg
                     }
                 ]
             )
-            print(response)
         except Exception as e:
-            print("CloudWatchLogger.emit error: {}".format(e))
+            self.error("CloudWatchLogger.emit error: {}".format(e))
