@@ -50,4 +50,4 @@ Outputs:
     Value: arn:aws:execute-api:us-east-1:620803767360:0kj5kbx4e7/*/GET/neo4j-query
   GetNodeFunctionIamRole:
     Description: "Implicit IAM Role created for Hello World function"
-    Value: arn:aws:iam::620803767360:policy/LambdaToReadAndWriteToNeo4j
+    Value: arn:aws:iam::620803767360:policy/stonks-lambdas-GetNodeFunctionRole-TVJQW9UOTAT8

@@ -60,6 +60,7 @@ GET_ACCOUNT_NODE_BY_USERNAME = '''
                                 RETURN n;
                                 '''
 
+######## MAKE THIS BETTER WITH REGEX#################
 GET_ACCOUNT_NODE_BY_EMAIL_OR_USERNAME = '''
                                         MATCH (n:Account)
                                             WHERE (
@@ -69,6 +70,7 @@ GET_ACCOUNT_NODE_BY_EMAIL_OR_USERNAME = '''
                                             )
                                         RETURN n LIMIT 1;
                                         '''
+######## MAKE THIS BETTER WITH REGEX#################
 
 GET_BUSINESS_BY_TITLE = '''
                         MATCH (n:Business)
