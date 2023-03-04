@@ -4,6 +4,6 @@ utils/secrets_manager.py
 logs/*
 myvenv/*
 
-infra/event-app-lambdas/removed_params.json
-infra/event-app-lambdas/get_node/dependencies/*
-infra/event-app-lambdas/get_node/.aws-sam/deps/*
+infra/stonks_lambdas/removed_params.json
+infra/stonks_lambdas/get_node/dependencies/*
+infra/stonks_lambdas/get_node/.aws-sam/deps/*
