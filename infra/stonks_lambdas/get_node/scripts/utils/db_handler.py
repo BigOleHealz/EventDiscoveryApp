@@ -31,10 +31,37 @@ class Neo4jDB:
         return result
     
     
-    def get_node(self, node_id: int):
+    def get_node(self, **kwargs):
         self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
-        result = self.execute_query(queries.GET_NODE_BY_ID.format(node_id=node_id))
-        if len(result) == 0:
-            raise ValueError(f'Could not find node with id = {node_id}')
-        node = result[0]['n']
-        return node
+        try:
+            required_params = ['node_id', 'email', 'username']
+            if not any(key in kwargs for key in required_params):
+                raise ValueError(f'{sys._getframe().f_code.co_name} requires at least one of {required_params}')
+
+            if kwargs.get('node_id'):
+                node_id = kwargs['node_id']
+                result = self.execute_query(queries.GET_NODE_BY_ID.format(node_id=node_id))
+                if not result:
+                    raise ValueError(f'Could not find node with id = {node_id}')
+
+            elif kwargs.get('email'):
+                email = kwargs['email']
+                result = self.execute_query(queries.GET_ACCOUNT_NODE_BY_EMAIL.format(email=email))
+                if not result:
+                    raise ValueError(f'Could not find node with email = {email}')
+
+            elif kwargs.get('username'):
+                username = kwargs['username']
+                result = self.execute_query(queries.GET_ACCOUNT_NODE_BY_USERNAME.format(username=username))
+                if not result:
+                    raise ValueError(f'Could not find node with username = {username}')
+
+            else:
+                raise Exception(f'kwargs problem occurred in {sys._getframe().f_code.co_name}')
+
+            node = result[0]['n']
+            return node
+
+        except Exception as error:
+            self.logger.error(f"Error: {error}")
+            self.logger.error(f"Traceback: {traceback.format_exc()}")

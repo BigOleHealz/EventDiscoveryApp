@@ -21,7 +21,7 @@ latest_layer_arn=$(aws lambda publish-layer-version --layer-name dependencies --
 
 
 
-aws lambda publish-version --function-name aws lambda publish-version --function-name stonks-lambdas-GetNodeFunction-lmWHMW3mnRdZ
+# aws lambda publish-version --function-name stonks-lambdas-GetNodeFunction-lmWHMW3mnRdZ
 aws lambda update-function-configuration --function-name stonks-lambdas-GetNodeFunction-lmWHMW3mnRdZ --layers $latest_layer_arn --region us-east-1
 
 aws lambda get-function-configuration --function-name stonks-lambdas-GetNodeFunction-lmWHMW3mnRdZ --region us-east-1

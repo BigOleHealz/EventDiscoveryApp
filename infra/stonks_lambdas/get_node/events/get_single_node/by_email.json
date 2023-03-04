@@ -1,0 +1,5 @@
+{
+    "queryStringParameters" : {
+        "email": "matt@gmail.com"
+    }
+  }

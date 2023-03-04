@@ -37,7 +37,7 @@ class Logger(logging.Logger):
         self.handler.setFormatter(self.formatter)
         self.logger.addHandler(self.handler)
         
-        self.info('logger initiated')
+        self.emit('logger initiated')
     
     def emit(self, msg: str):
         try:
