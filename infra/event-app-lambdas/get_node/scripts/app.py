@@ -1,5 +1,5 @@
 import sys
-sys.path.append('/opt/dependencies')
+sys.path.append('/opt/python')
 
 
 import json, traceback
@@ -9,22 +9,22 @@ from utils.db_handler import Neo4jDB
 def lambda_handler(event: dict, context: dict):
     
     try:
-        logger = Logger(log_group_name=__name__)
+        logger = Logger(log_group_name='get_node')
         neo4j_connector = Neo4jDB(logger=logger)
-        node_id = event['node_id']
+        node_id = event['queryStringParameters']['node_id']
         node = neo4j_connector.get_node(node_id=node_id)
+        node_dict = dict(node)
         
-        
-        return {
-            "statusCode": 200,
-            "body": json.dumps({
-                "message": f'{node=}',
-            }),
+        response_object = {
+            'statusCode' : 200,
+            'headers'    : {
+                'Content-Type' : 'application/json'
+            },
+            'body' : json.dumps({"node_id" : node_id})
         }
+        
+        return response_object
 
     except Exception as error:
-        
-        return traceback.format_exc()
-        logger.emit(f'Error: {error}')
-        logger.emit(f'Traceback: {traceback.format_exc()}')
-        raise traceback.format_exc()
+        traceback_error = traceback.format_exc()
+        return traceback_error

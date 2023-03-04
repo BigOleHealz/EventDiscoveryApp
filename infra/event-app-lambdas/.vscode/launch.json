@@ -25,7 +25,7 @@
                 "logicalId": "GetNodeunction"
             },
             "api": {
-                "path": "/hello",
+                "path": "/get_node",
                 "httpMethod": "get",
                 "payload": {
                     "json": {}
