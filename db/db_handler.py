@@ -39,6 +39,8 @@ class Neo4jDB:
         self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
         if properties is None:
             properties = {}
+        if 'uuid' not in properties:
+            properties['uuid'] = str(uuid4())
         if isinstance(node_labels, str):
             node = Node(node_labels, **properties)
         elif isinstance(node_labels, list):
@@ -49,13 +51,84 @@ class Neo4jDB:
         
         return node
     
-    def get_node_by_id(self, node_id: int):
+
+    def get_node(self, **kwargs):
         self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
-        result = self.execute_query(queries.GET_NODE_BY_ID.format(node_id=node_id))
-        if len(result) == 0:
-            raise ValueError(f'Could not find node with id = {node_id}')
-        node = result[0]['n']
-        return node
+        try:
+            required_params = ['node_id', 'email', 'username', 'uuid']
+            if not any(key in kwargs for key in required_params):
+                raise ValueError(f'{sys._getframe().f_code.co_name} requires at least one of {required_params}')
+
+            if kwargs.get('node_id'):
+                node_id = kwargs['node_id']
+                result = self.execute_query(queries.GET_NODE_BY_ID.format(node_id=node_id))
+                if not result:
+                    raise ValueError(f'Could not find node with id = {node_id}')
+
+            elif kwargs.get('email'):
+                email = kwargs['email']
+                result = self.execute_query(queries.GET_ACCOUNT_NODE_BY_EMAIL.format(email=email))
+                if not result:
+                    raise ValueError(f'Could not find node with email = {email}')
+
+            elif kwargs.get('username'):
+                username = kwargs['username']
+                result = self.execute_query(queries.GET_ACCOUNT_NODE_BY_USERNAME.format(username=username))
+                if not result:
+                    raise ValueError(f'Could not find node with username = {username}')
+            
+            elif kwargs.get('uuid'):
+                uuid = kwargs['uuid']
+                result = self.execute_query(queries.GET_ACCOUNT_NODE_BY_UUID.format(uuid=uuid))
+                if not result:
+                    raise ValueError(f'Could not find node with uuid = {uuid}')
+
+            else:
+                raise Exception(f'kwargs problem occurred in {sys._getframe().f_code.co_name}')
+
+            node = result[0]['n']
+            
+            return node
+
+        except Exception as error:
+            self.logger.error(f"Error: {error}")
+            self.logger.error(f"Traceback: {traceback.format_exc()}")
+            raise error
+
+
+    def get_events_related_to_user(self, **kwargs):
+        self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
+        try:
+            required_params = ['email', 'start_ts', 'end_ts', 'latitude', 'longitude', 'radius']
+            if not all(key in kwargs for key in required_params):
+                error_msg = f'{sys._getframe().f_code.co_name} requires all params of {required_params} but only received {kwargs.keys()}'
+                self.logger.error(error_msg)
+                raise ValueError(error_msg)
+
+            events = self.execute_query(queries.GET_EVENTS_RELATED_TO_USER.format(**kwargs))
+            
+            events = [event['Event'] for event in events]
+            
+            print(f"{events=}")
+            return events
+
+        except Exception as error:
+            self.logger.error(f"Error: {error}")
+            self.logger.error(f"Traceback: {traceback.format_exc()}")
+            raise error
+
+
+
+    def __create_relationship(self, node_a: Node, relationship_label: str, node_b: Node, properties: dict=None):
+        self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
+        if properties is None:
+            properties = {}
+        if 'uuid' not in properties:
+            properties['uuid'] = str(uuid4())
+        relationship = Relationship(node_a, relationship_label, node_b)
+        relationship.update(properties)
+        self.graph.create(relationship)
+
     
     def get_account_node(self, node_id: int=None, email: str=None):
         self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
@@ -127,12 +200,11 @@ class Neo4jDB:
             return pending_event_invites
     
         
-    def get_relationship_by_uuid(self, relationship_label: str, relationship_uuid: str):
+    def get_relationship_by_uuid(self, uuid: str):
         self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
-        current_timestamp = datetime.now().strftime(datetime_format)
-        result = self.execute_query(queries.GET_RELATIONSHIP_BY_UUID.format(relationship_label=relationship_label, uuid=relationship_uuid))
+        result = self.execute_query(queries.GET_RELATIONSHIP_BY_UUID.format(uuid=uuid))
         if len(result) == 0:
-            raise ValueError(f"Could not relationship with ID: {relationship_label}")
+            raise ValueError(f"Could not relationship with {uuid=}")
         else:
             relationship = result[0]['r']
             return relationship
@@ -146,15 +218,6 @@ class Neo4jDB:
         return relationship
         
 
-    def create_relationship(self, node_a: Node, relationship_label: str, node_b: Node, properties: dict=None):
-        self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
-        if properties is None:
-            properties = {}
-        if 'UUID' not in properties:
-            properties['UUID'] = str(uuid4())
-        relationship = Relationship(node_a, relationship_label, node_b)
-        relationship.update(properties)
-        self.graph.create(relationship)
     
     def create_event_node(self, properties: dict=None):
         self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
@@ -198,20 +261,20 @@ class Neo4jDB:
         tx = self.graph.begin()
         try:
             event_node = self.create_event_node(properties=properties)
-            self.create_relationship(node_a=creator_node, relationship_label='CREATED_EVENT', node_b=event_node)
-            self.create_relationship(node_a=event_node, relationship_label='CREATED_BY', node_b=creator_node)
+            self.__create_relationship(node_a=creator_node, relationship_label='CREATED_EVENT', node_b=event_node)
+            self.__create_relationship(node_a=event_node, relationship_label='CREATED_BY', node_b=creator_node)
             
             event_type_node = self.get_event_type_node_by_event_type_id(event_type_id=properties['EventTypeID'])
-            self.create_relationship(node_a=event_type_node, relationship_label='RELATED_EVENT', node_b=event_node)
-            self.create_relationship(node_a=event_node, relationship_label='EVENT_TYPE', node_b=event_type_node)
+            self.__create_relationship(node_a=event_type_node, relationship_label='RELATED_EVENT', node_b=event_node)
+            self.__create_relationship(node_a=event_node, relationship_label='EVENT_TYPE', node_b=event_type_node)
             
             invited_date = properties.get('INVITED_DATE', datetime.now().strftime(datetime_format))
             invite_properties = {'INVITED_BY_ID' : creator_node.identity, 'INVITED_DATE': invited_date, 'STATUS' : 'PENDING'}
             
             for invitee_id in friends_invited:
-                invitee_node = self.get_node_by_id(node_id=invitee_id)
+                invitee_node = self.get_node(node_id=invitee_id)
                 invite_properties = {'INVITED_BY_ID' : creator_node.identity, 'INVITED_DATE': invited_date, 'STATUS' : 'PENDING'}
-                self.create_relationship(node_a=invitee_node, relationship_label='INVITED', node_b=event_node, properties=invite_properties)
+                self.__create_relationship(node_a=invitee_node, relationship_label='INVITED', node_b=event_node, properties=invite_properties)
             tx.commit()
             return event_node
             
@@ -228,19 +291,19 @@ class Neo4jDB:
             friends_invited = []
         tx = self.graph.begin()
         try:
-            creator_node = self.get_node_by_id(node_id=created_by_id)
+            creator_node = self.get_node(node_id=created_by_id)
             event_node = self.create_event_node(properties=properties)
-            self.create_relationship(node_a=creator_node, relationship_label='CREATED_EVENT', node_b=event_node)
-            self.create_relationship(node_a=event_node, relationship_label='CREATED_BY', node_b=creator_node)
+            self.__create_relationship(node_a=creator_node, relationship_label='CREATED_EVENT', node_b=event_node)
+            self.__create_relationship(node_a=event_node, relationship_label='CREATED_BY', node_b=creator_node)
             
             event_type_node = self.get_event_type_node_by_event_type_id(event_type_id=properties['EventTypeID'])
-            self.create_relationship(node_a=event_type_node, relationship_label='RELATED_EVENT', node_b=event_node)
-            self.create_relationship(node_a=event_node, relationship_label='EVENT_TYPE', node_b=event_type_node)
+            self.__create_relationship(node_a=event_type_node, relationship_label='RELATED_EVENT', node_b=event_node)
+            self.__create_relationship(node_a=event_node, relationship_label='EVENT_TYPE', node_b=event_type_node)
             
             invite_properties = {'INVITED_BY_ID' : created_by_id, 'INVITED_DATE': properties['EventCreatedAt'], 'STATUS' : 'PENDING'}
             for invitee_id in eval(friends_invited):
-                invitee_node = self.get_node_by_id(node_id=invitee_id)
-                self.create_relationship(node_a=invitee_node, relationship_label='INVITED', node_b=event_node, properties=invite_properties)
+                invitee_node = self.get_node(node_id=invitee_id)
+                self.__create_relationship(node_a=invitee_node, relationship_label='INVITED', node_b=event_node, properties=invite_properties)
             tx.commit()
             
         except Exception as error:
@@ -252,7 +315,7 @@ class Neo4jDB:
         self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
         ### Make this function so that it can take attendee nodes or IDs
         try:
-            self.create_relationship(node_a=attendee_node, relationship_label='ATTENDING', node_b=event_node, properties=properties)
+            self.__create_relationship(node_a=attendee_node, relationship_label='ATTENDING', node_b=event_node, properties=properties)
         except:
             self.logger.error(traceback.format_exc())
             raise Exception(f'Could not created ATTENDING relationship between person_node: {attendee_node} ->{event_node}')
@@ -260,7 +323,7 @@ class Neo4jDB:
     def delete_attending_relationship(self, attending_relationship_uuid: str):
         self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
         try:
-            relationship= self.get_relationship_by_uuid(relationship_uuid=attending_relationship_uuid)
+            relationship= self.get_relationship_by_uuid(uuid=attending_relationship_uuid)
             self.graph.delete(relationship)
         except:
             self.logger.error(traceback.format_exc())
@@ -305,11 +368,11 @@ class Neo4jDB:
         self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
         properties = {'FRIEND_REQUEST_TS' : datetime.now().strftime(datetime_format), 'STATUS' : 'PENDING'}
         if node_a and node_b:
-            self.create_relationship(node_a=node_a, relationship_label='FRIEND_REQUEST', node_b=node_b, properties=properties)
+            self.__create_relationship(node_a=node_a, relationship_label='FRIEND_REQUEST', node_b=node_b, properties=properties)
         elif email_a and email_b:
             node_a = self.get_account_node(email=email_a)
             node_b = self.get_account_node(email=email_b)
-            self.create_relationship(node_a=node_a, relationship_label='FRIEND_REQUEST', node_b=node_b, properties=properties)
+            self.__create_relationship(node_a=node_a, relationship_label='FRIEND_REQUEST', node_b=node_b, properties=properties)
         else:
             raise ValueError("create_friend_request requires both (node_a and node_b) or both (email_a and email_b)")
             
@@ -327,8 +390,8 @@ class Neo4jDB:
             relationship['RESPONSE_TIMESTAMP'] = current_timestamp
             self.graph.push(relationship)
             
-            self.create_relationship(node_a=node_a, relationship_label='FRIENDS_WITH', node_b=node_b, properties=properties)
-            self.create_relationship(node_a=node_b, relationship_label='FRIENDS_WITH', node_b=node_a, properties=properties)
+            self.__create_relationship(node_a=node_a, relationship_label='FRIENDS_WITH', node_b=node_b, properties=properties)
+            self.__create_relationship(node_a=node_b, relationship_label='FRIENDS_WITH', node_b=node_a, properties=properties)
             # return self.run_command(queries.CREATE_FRIENDSHIP.format(node_a=node_a, node_b=node_b, properties=properties))
             self.logger.info(f'Created FRIENDS_WITH relationship between {node_a["Email"]}<->{node_b["Email"]}')
             tx.commit()

@@ -14,7 +14,7 @@ sudo ./sam-installation/install
 sudo yum install git
 mkdir workspace
 cd workspace
-git clone git@github.com:BigOleHealz/EventApp.git
+git clone git@github.com:BigOleHealz/Stonks.git
 
 cd EventApp
 git checkout Develop_1.1

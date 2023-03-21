@@ -22,7 +22,7 @@
             "invokeTarget": {
                 "target": "api",
                 "templatePath": "${workspaceFolder}/get_node/template.yaml",
-                "logicalId": "GetNodeunction"
+                "logicalId": "GetNodeFunction"
             },
             "api": {
                 "path": "/get_node",

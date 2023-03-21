@@ -1,21 +1,44 @@
-import os, logging
+import logging, sys, time, traceback
 from datetime import datetime
 
+import boto3
+from botocore.exceptions import ClientError
+
+
 class Logger(logging.Logger):
-    def __init__(self, name, level=logging.NOTSET):
-        super().__init__(name, level)
+
+    def __init__(self, log_group_name: str):
+        super().__init__(name=log_group_name)
         
-        self.setLevel(logging.DEBUG)
-        handler = logging.FileHandler(os.path.join(os.getcwd(), 'logs', f'{datetime.now().strftime("%Y-%m-%dT%H:%M:%S")}.log'))
+        self.timestamp = datetime.now().strftime('%Y-%m-%dT%H-%M-%S')
+        self.log_group_name = log_group_name
+        self.log_stream_name = self.timestamp
+        
+        self.cloudwatch_logs = boto3.client('logs')
 
-        # create formatter
-        formatter = logging.Formatter("%(asctime)s [%(levelname)s] - %(module)s.%(funcName)s(%(lineno)d) - %(message)s")
+        try:
+            self.cloudwatch_logs.create_log_group(logGroupName=self.log_group_name)
+        except ClientError as e:
+            if e.response['Error']['Code'] != 'ResourceAlreadyExistsException':
+                raise Exception(f'Traceback: {traceback.format_exc()}')
 
-        # add formatter to handler
-        handler.setFormatter(formatter)
-
-        # add handler to logger
-        self.addHandler(handler)
+        try:
+            self.cloudwatch_logs.create_log_stream(logGroupName=self.log_group_name, logStreamName=self.log_stream_name)
+        except ClientError as e:
+            if e.response['Error']['Code'] != 'ResourceAlreadyExistsException':
+                raise Exception(f'Traceback: {traceback.format_exc()}')
+        
+        self.sequence_token = None
+        
+        self.logger = logging.getLogger(__name__)
+        self.logger.setLevel(logging.INFO)
+        self.handler = logging.StreamHandler(sys.stdout)
+        self.handler.setLevel(logging.INFO)
+        self.formatter = logging.Formatter("%(asctime)s [%(levelname)s] - %(module)s.%(funcName)s(%(lineno)d) - %(message)s")
+        self.handler.setFormatter(self.formatter)
+        self.logger.addHandler(self.handler)
+        
+        self.emit('logger initiated')
 
     def log(self, msg: str, level: str):
         INFO_LEVEL_STRING = 'INFO'
@@ -36,3 +59,18 @@ class Logger(logging.Logger):
             self.debug(msg)
         else:
             pass
+    
+    def emit(self, msg: str):
+        try:
+            self.cloudwatch_logs.put_log_events(
+                logGroupName=self.log_group_name,
+                logStreamName=self.log_stream_name,
+                logEvents=[
+                    {
+                        'timestamp': int(round(time.time() * 1000)),
+                        'message': msg
+                    }
+                ]
+            )
+        except Exception as e:
+            self.error("CloudWatchLogger.emit error: {}".format(e))
