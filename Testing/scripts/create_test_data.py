@@ -84,7 +84,7 @@ class CreateTestData:
                 end_ts = start_ts + timedelta(hours=random.randint(0, 23))
                 public_event_flag = random.choice(PUBLIC_EVENT_FLAG_LIST)
                 
-                event_creator_node = self.neo4j.get_node_by_id(node_id=created_by_id)
+                event_creator_node = self.neo4j.get_node(node_id=created_by_id)
                 
                 if created_by_id in person_ids:
                     friends_list = [rec['_id'] for rec in self.neo4j.execute_query(queries.GET_PERSON_FRIENDS_ID_NAME_MAPPINGS_BY_EMAIL.format(email=event_creator_node['Email']))]

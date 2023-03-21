@@ -65,7 +65,7 @@ class DataLoader:
             friend_requests = self.neo4j.get_pending_friend_requests(person_node=person_node)
             for friend_request in friend_requests:
                 record = friend_request['RELATIONSHIP']
-                self.neo4j.accept_friend_request(node_a=person_node, node_b=record.start_node, friend_request_uuid=record['UUID'])
+                self.neo4j.accept_friend_request(node_a=person_node, node_b=record.start_node, friend_request_uuid=record['uuid'])
                 
     
     def load_events_to_neo4j_db(self):
@@ -76,7 +76,7 @@ class DataLoader:
         for _, row in df.iterrows():
             properties = row[property_label_list].to_dict()
             
-            creator_node = self.neo4j.get_node_by_id(node_id=properties['CreatedByID'])
+            creator_node = self.neo4j.get_node(node_id=properties['CreatedByID'])
             self.neo4j.create_event_with_relationships(creator_node=creator_node, properties=properties, friends_invited=eval(row['InviteList']))
             
     def load_attending_relationships(self):

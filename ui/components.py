@@ -28,7 +28,7 @@ class Components:
     def friend_requests_div(friend_request_list: list):
         friend_requests = []
         for friend_request in friend_request_list:
-            uuid = friend_request["RELATIONSHIP"]["UUID"]
+            uuid = friend_request["RELATIONSHIP"]["uuid"]
 
             friend_requests.append(
                 html.Div([
@@ -66,7 +66,7 @@ class Components:
         event_invites = []
         for event_invite in event_invite_list:
             
-            uuid = event_invite["RELATIONSHIP"]["UUID"]
+            uuid = event_invite["RELATIONSHIP"]["uuid"]
             
             event_time = dt.strptime(event_invite["NOTIFICATION_DETAILS"]["StartTimestamp"], datetime_format)
             event_invite_label_string = [html.H6(f'Host: {event_invite["NOTIFICATION_DETAILS"]["Host"]}'), \

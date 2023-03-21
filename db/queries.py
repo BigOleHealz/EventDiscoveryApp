@@ -43,8 +43,14 @@ GET_EVENT_TYPE_NAMES_MAPPINGS = '''
 ###############################
 
 GET_ACCOUNT_NODE_BY_ID = '''
-                            MATCH (n:Account)
+                            MATCH (n)
                                 WHERE ID(n) = {node_id}
+                            RETURN n;
+                            '''
+
+GET_ACCOUNT_NODE_BY_UUID = '''
+                            MATCH (n)
+                                WHERE n.uuid = "{uuid}"
                             RETURN n;
                             '''
 
@@ -85,7 +91,7 @@ GET_EVENT_TYPE_BY_EVENTTYPEID = '''
 
 GET_RELATIONSHIP_BY_UUID = '''
                             MATCH ()-[r:{relationship_label}]->()
-                            WHERE r.UUID = "{uuid}"
+                            WHERE r.uuid = "{uuid}"
                             RETURN r
                             '''                                 
                                     
@@ -130,7 +136,7 @@ AUTHENTICATE_ACCOUNT_EMAIL_AND_PASSWORD = '''
 #####################################
 ######## GET BY RELATIONSHIP ########
 #####################################
-GET_EVENT_BY_PERSON_AND_TS = '''
+GET_EVENTS_RELATED_TO_USER = '''
                             MATCH (n:Person)
                             WHERE n.Email = "{email}"
                             WITH n
@@ -151,6 +157,9 @@ GET_EVENT_BY_PERSON_AND_TS = '''
                                     OR
                                     (e.StartTimestamp <= "{start_ts}" AND "{end_ts}" <= e.EndTimestamp)
                                 )
+                                AND point.distance(point(
+                                    {{ longitude: e.Lon, latitude: e.Lat }}), 
+                                    point({{ longitude: {longitude}, latitude: {latitude} }})) <= {radius} * 1000
                             WITH n, COLLECT(e) as events
                             UNWIND events as event
                             OPTIONAL MATCH (u:Person)-[r:ATTENDING]->(event)

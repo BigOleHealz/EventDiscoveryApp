@@ -46,8 +46,8 @@ def tile_layer(
     min_timestamp = (date_picked + timedelta(hours=time_range[0])).strftime(datetime_format)
     max_timestamp = (date_picked + timedelta(hours=time_range[-1])).strftime(datetime_format)
 
-    write_query_to_file(queries.GET_EVENT_BY_PERSON_AND_TS.format(email=current_user.Email, start_ts=min_timestamp, end_ts=max_timestamp))
-    events = neo4j_connector.execute_query(queries.GET_EVENT_BY_PERSON_AND_TS.format(email=current_user.Email, start_ts=min_timestamp, end_ts=max_timestamp))
+    # write_query_to_file(queries.GET_EVENTS_RELATED_TO_USER.format(email=current_user.Email, start_ts=min_timestamp, end_ts=max_timestamp))
+    events = neo4j_connector.execute_query(queries.GET_EVENTS_RELATED_TO_USER.format(email=current_user.Email, start_ts=min_timestamp, end_ts=max_timestamp))
     
     markers = []
     for event in events:
