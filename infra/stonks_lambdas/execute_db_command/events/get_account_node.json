@@ -1,0 +1,5 @@
+{
+    "body" : {
+        "command" : "MATCH (n:Account) WHERE n.Email = 'matt@gmail.com' RETURN n;"
+    }
+  }
