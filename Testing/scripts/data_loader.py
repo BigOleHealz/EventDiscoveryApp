@@ -23,27 +23,27 @@ class DataLoader:
         self.neo4j = Neo4jDB(logger=self.logger)
     
     def wipe_data(self):
-        self.logger.debug("Wiping Data")
+        self.logger.emit("Wiping Data")
         self.neo4j.run_command(queries.DELETE_ALL_NODES)
         
     def wipe_events(self):
-        self.logger.debug("Wiping Events")
+        self.logger.emit("Wiping Events")
         self.neo4j.run_command(queries.DELETE_ALL_NODES_BY_LABEL.format(label='Event'))
     
     def load_event_types_to_neo4j_db(self):
-        self.logger.debug('Loading Event Types')
+        self.logger.emit('Loading Event Types')
         df = pd.read_csv(os.path.join(self.enriched_data_folder_path, 'event_types.csv'))
         for _, row in df.iterrows():
             self.neo4j.create_event_type_node(properties=row.to_dict())
 
     def load_businesses_to_neo4j_db(self):
-        self.logger.debug('Loading Businesses')
+        self.logger.emit('Loading Businesses')
         df = pd.read_csv(os.path.join(self.enriched_data_folder_path, 'businesses.csv'))
         for _, row in df.iterrows():
             self.neo4j.create_business_node(properties=row.to_dict())
     
     def load_persons_to_neo4j_db(self):
-        self.logger.debug('Loading Persons')
+        self.logger.emit('Loading Persons')
         df = pd.read_csv(os.path.join(self.enriched_data_folder_path, 'persons.csv'))
         person_properties_list = ['FirstName','LastName','Username','Email']
         for _, row in df[person_properties_list].iterrows():
@@ -65,11 +65,11 @@ class DataLoader:
             friend_requests = self.neo4j.get_pending_friend_requests(person_node=person_node)
             for friend_request in friend_requests:
                 record = friend_request['RELATIONSHIP']
-                self.neo4j.accept_friend_request(node_a=person_node, node_b=record.start_node, friend_request_uuid=record['uuid'])
+                self.neo4j.accept_friend_request(node_a=person_node, node_b=record.start_node, friend_request_uuid=record['UUID'])
                 
     
     def load_events_to_neo4j_db(self):
-        self.logger.debug('Loading Events')
+        self.logger.emit('Loading Events')
         df = pd.read_csv(os.path.join(self.enriched_data_folder_path, 'events.csv'))
         property_label_list = ['CreatedByID', 'Lat', 'Lon', 'StartTimestamp', 'EndTimestamp', 'PublicEventFlag', 'EventTypeID', 'EventCreatedAt', 'EventName', "Host", "Address"]
         
@@ -80,7 +80,7 @@ class DataLoader:
             self.neo4j.create_event_with_relationships(creator_node=creator_node, properties=properties, friends_invited=eval(row['InviteList']))
             
     def load_attending_relationships(self):
-        self.logger.debug('Loading Attending Relationships')
+        self.logger.emit('Loading Attending Relationships')
         persons = self.neo4j.execute_query(queries.GET_ALL_NODES_BY_LABEL.format(label='Person'))
         
         invited_flags = [True, False, False]

@@ -17,24 +17,14 @@ from db import queries
 from utils.logger import Logger
 from utils.aws_handler import AWSHandler
 from utils.helper_functions import get_address_from_lat_lon, get_lat_lon_from_address
+from utils.constants import CITY_DATA, datetime_format
 
-city_data = {
-    'Philadelphia' : {
-        'lon' : {
-            'min' : -75.222864,
-            'max' : -75.141320
-        },
-        'lat' : {
-            'min' : 39.905712,
-            'max' : 39.977753
-        }
-    }
-}
+
 
 
 min_date = dt.today().date()
 max_date = min_date + timedelta(days=7)
-max_num_events = 10
+max_num_events = 50
 decimal_precision = 7
 
 PUBLIC_EVENT_FLAG_LIST = [True, False]
@@ -42,7 +32,8 @@ PUBLIC_EVENT_FLAG_LIST = [True, False]
 
 class CreateTestData:
     def __init__(self, logger: Logger=None):
-        self.__data_folder_path = os.path.join(os.getcwd(), '..', 'data')
+        self.__home_dir = os.environ['EVENT_APP_HOME']
+        self.__data_folder_path = os.path.join(self.__home_dir, 'Testing', 'data')
         self.__raw_data_folder_path = os.path.join(self.__data_folder_path, 'csv', 'raw')
         self.__enriched_data_folder_path = os.path.join(self.__data_folder_path, 'csv', 'enriched')
         
@@ -60,7 +51,7 @@ class CreateTestData:
         input_fule = os.path.join(self.__raw_data_folder_path, 'business_addresses.csv')
         df = pd.read_csv(input_fule)
 
-        lat_lng = df['Address'].apply(self.__lat_lon_from_address)
+        lat_lng = df['Address'].apply(get_lat_lon_from_address)
 
         df['Lat'] = [cell['lat'] for cell in lat_lng]
         df['Lng'] = [cell['lng'] for cell in lat_lng]
@@ -89,8 +80,8 @@ class CreateTestData:
                 if created_by_id in person_ids:
                     friends_list = [rec['_id'] for rec in self.neo4j.execute_query(queries.GET_PERSON_FRIENDS_ID_NAME_MAPPINGS_BY_EMAIL.format(email=event_creator_node['Email']))]
                     invite_list = random.sample(friends_list, random.randint(0, len(friends_list)))
-                    lat = round(random.uniform(city_data['Philadelphia']['lat']['min'], city_data['Philadelphia']['lat']['max']), decimal_precision)
-                    lon = round(random.uniform(city_data['Philadelphia']['lon']['min'], city_data['Philadelphia']['lon']['max']), decimal_precision)
+                    lat = round(random.uniform(CITY_DATA['Philadelphia']['lat']['min'], CITY_DATA['Philadelphia']['lat']['max']), decimal_precision)
+                    lon = round(random.uniform(CITY_DATA['Philadelphia']['lon']['min'], CITY_DATA['Philadelphia']['lon']['max']), decimal_precision)
                     
                     address = get_address_from_lat_lon(lat=lat, lon=lon)
                     creator_name = f"{event_creator_node.get('FirstName')} {event_creator_node.get('LastName')}"
@@ -119,9 +110,9 @@ class CreateTestData:
 
         df["EventCreatedAt"] = df.apply(lambda x: x["StartTimestamp"] - timedelta(days=random.randint(0, 7), hours=random.randint(0, 23), minutes=random.randint(0, 59)), axis=1)
 
-        df['StartTimestamp'] = df['StartTimestamp'].apply(lambda x: x.strftime('%Y-%m-%dT%H:%M:%S'))
-        df['EndTimestamp'] = df['EndTimestamp'].apply(lambda x: x.strftime('%Y-%m-%dT%H:%M:%S'))
-        df["EventCreatedAt"] = df["EventCreatedAt"].apply(lambda x: x.strftime('%Y-%m-%dT%H:%M:%S'))
+        df['StartTimestamp'] = df['StartTimestamp'].apply(lambda x: x.strftime(datetime_format))
+        df['EndTimestamp'] = df['EndTimestamp'].apply(lambda x: x.strftime(datetime_format))
+        df["EventCreatedAt"] = df["EventCreatedAt"].apply(lambda x: x.strftime(datetime_format))
         
         len_df = len(df)
         print(f'{len_df}')
@@ -133,7 +124,7 @@ class CreateTestData:
         df['EventName'] = event_name_list
         df['EventTypeID'] = df['EventTypeID'].astype(int)
         
-        df.to_csv(os.path.join(os.getcwd(), '..', 'data', 'csv', 'enriched', 'events.csv'), index=False)
+        df.to_csv(os.path.join(self.__home_dir, 'Testing', 'data', 'csv', 'enriched', 'events.csv'), index=False)
         
 
 if __name__ == '__main__':

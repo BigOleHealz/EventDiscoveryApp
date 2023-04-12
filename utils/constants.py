@@ -19,6 +19,23 @@ dict_of_locations = {
     "The Met - Philadelphia": {"lat": 39.969672, "lon": -75.160099},
 }
 
+CITY_DATA = {
+    'Philadelphia' : {
+        'Lon' : {
+            'center' : -75.165222,
+            'min' : -75.222864,
+            'max' : -75.141320
+        },
+        'Lat' : {
+            'center' : 39.952584,
+            'min' : 39.905712,
+            'max' : 39.977753
+        }
+    }
+}
+
+DEFAULT_ZOOM = 13
+
 datetime_format = '%Y-%m-%dT%H:%M:%S'
 
 ICON_SIZE = 80

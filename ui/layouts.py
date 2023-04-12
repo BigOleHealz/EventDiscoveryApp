@@ -1,16 +1,23 @@
 
 from dash import dcc, html
 import dash_bootstrap_components as dbc
+from flask_login import current_user
 
-from ui.components import Components
+from db import queries
 from db.db_handler import Neo4jDB
+from ui.components import Components
+from utils.api_handler import ApiHandler
+from utils.logger import Logger
+
 
 class LayoutHandler:
+    def __init__(self, api_handler: ApiHandler, logger: Logger):
+        self.api_handler = api_handler
+        self.logger = logger
     
     
-    @staticmethod
-    def home_page_layout(neo4j_connector: Neo4jDB):
-        components = Components(neo4j_connector=neo4j_connector)
+    def home_page_layout(self):
+        components = Components(api_handler=self.api_handler, logger=self.logger)
         return [
                 components.header,
                 html.Div([
@@ -19,7 +26,7 @@ class LayoutHandler:
                             id="right_sidebar",
                             className="sidebar-right"
                         ),
-                    components.map_content(neo4j_connector=neo4j_connector)
+                    components.map_content(api_handler=self.api_handler)
                 ]),
                 html.Div(id='coordinate-click-id')
             ]
@@ -56,9 +63,8 @@ class LayoutHandler:
                             ]
         
     
-    @staticmethod
-    def create_account_children(neo4j_connector: Neo4jDB):
-        event_type_mappings = neo4j_connector.get_event_type_mappings()
+    def create_account_children(self):
+        event_type_mappings = self.api_handler.post(endpoint='execute_db_command', params={"query" : queries.GET_PENDING_EVENT_INVITES.format(email=current_user.Email)})
         
         return [
                     html.Div(

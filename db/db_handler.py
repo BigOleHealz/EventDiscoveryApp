@@ -22,25 +22,25 @@ class Neo4jDB:
                            auth=(neo4j_secrets['USER'],
                                  neo4j_secrets['PASSWORD']
                             ))
-        self.logger.info("Successfully connected to Neo4j DB")
+        self.logger.emit("Successfully connected to Neo4j DB")
     
     def run_command(self, command: str):
-        self.logger.debug(f'Running {sys._getframe().f_code.co_name}:\n{command}')
+        self.logger.emit(f'Running {sys._getframe().f_code.co_name}:\n{command}')
         return self.graph.run(command)
     
     def execute_query(self, query: str):
-        self.logger.debug(f'Running {sys._getframe().f_code.co_name}:\n{query}')
+        self.logger.emit(f'Running {sys._getframe().f_code.co_name}:\n{query}')
         result = self.run_command(query)
-        result = [rec for rec in result]
+        result = [dict(rec) for rec in result]
         
         return result
     
     def __create_node(self, node_labels: Mapping[str, list], properties: dict=None):
-        self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
+        self.logger.emit(f'Running {sys._getframe().f_code.co_name}')
         if properties is None:
             properties = {}
-        if 'uuid' not in properties:
-            properties['uuid'] = str(uuid4())
+        if 'UUID' not in properties:
+            properties['UUID'] = str(uuid4())
         if isinstance(node_labels, str):
             node = Node(node_labels, **properties)
         elif isinstance(node_labels, list):
@@ -53,9 +53,9 @@ class Neo4jDB:
     
 
     def get_node(self, **kwargs):
-        self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
+        self.logger.emit(f'Running {sys._getframe().f_code.co_name}')
         try:
-            required_params = ['node_id', 'email', 'username', 'uuid']
+            required_params = ['node_id', 'email', 'username', 'UUID']
             if not any(key in kwargs for key in required_params):
                 raise ValueError(f'{sys._getframe().f_code.co_name} requires at least one of {required_params}')
 
@@ -77,8 +77,8 @@ class Neo4jDB:
                 if not result:
                     raise ValueError(f'Could not find node with username = {username}')
             
-            elif kwargs.get('uuid'):
-                uuid = kwargs['uuid']
+            elif kwargs.get('UUID'):
+                uuid = kwargs['UUID']
                 result = self.execute_query(queries.GET_ACCOUNT_NODE_BY_UUID.format(uuid=uuid))
                 if not result:
                     raise ValueError(f'Could not find node with uuid = {uuid}')
@@ -91,47 +91,47 @@ class Neo4jDB:
             return node
 
         except Exception as error:
-            self.logger.error(f"Error: {error}")
-            self.logger.error(f"Traceback: {traceback.format_exc()}")
+            self.logger.emit(f"Error: {error}")
+            self.logger.emit(f"Traceback: {traceback.format_exc()}")
             raise error
 
 
     def get_events_related_to_user(self, **kwargs):
-        self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
+        self.logger.emit(f'Running {sys._getframe().f_code.co_name}')
         try:
             required_params = ['email', 'start_ts', 'end_ts', 'latitude', 'longitude', 'radius']
             if not all(key in kwargs for key in required_params):
                 error_msg = f'{sys._getframe().f_code.co_name} requires all params of {required_params} but only received {kwargs.keys()}'
-                self.logger.error(error_msg)
+                self.logger.emit(error_msg)
                 raise ValueError(error_msg)
 
             events = self.execute_query(queries.GET_EVENTS_RELATED_TO_USER.format(**kwargs))
             
-            events = [event['Event'] for event in events]
+            # events = [event['Event'] for event in events]
             
             print(f"{events=}")
             return events
 
         except Exception as error:
-            self.logger.error(f"Error: {error}")
-            self.logger.error(f"Traceback: {traceback.format_exc()}")
+            self.logger.emit(f"Error: {error}")
+            self.logger.emit(f"Traceback: {traceback.format_exc()}")
             raise error
 
 
 
     def __create_relationship(self, node_a: Node, relationship_label: str, node_b: Node, properties: dict=None):
-        self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
+        self.logger.emit(f'Running {sys._getframe().f_code.co_name}')
         if properties is None:
             properties = {}
-        if 'uuid' not in properties:
-            properties['uuid'] = str(uuid4())
+        if 'UUID' not in properties:
+            properties['UUID'] = str(uuid4())
         relationship = Relationship(node_a, relationship_label, node_b)
         relationship.update(properties)
         self.graph.create(relationship)
 
     
     def get_account_node(self, node_id: int=None, email: str=None):
-        self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
+        self.logger.emit(f'Running {sys._getframe().f_code.co_name}')
         if all([arg is None for arg in [node_id, email]]):
             raise ValueError(f'{sys._getframe().f_code.co_name} requires either node_id or email arg but received None for both')
         elif node_id:
@@ -139,7 +139,7 @@ class Neo4jDB:
         elif email:
             result = self.execute_query(queries.GET_ACCOUNT_NODE_BY_EMAIL.format(email=email))
         else:
-            self.logger.error(f'Something strange goign on in {sys._getframe().f_code.co_name}')
+            self.logger.emit(f'Something strange goign on in {sys._getframe().f_code.co_name}')
         
         if len(result) == 1:
             return result[0]['n']
@@ -149,7 +149,7 @@ class Neo4jDB:
             raise Exception(f"Multiple Accounts found with email address: {email}")
 
     def get_event_type_node_by_event_type_id(self, event_type_id: int):
-        self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
+        self.logger.emit(f'Running {sys._getframe().f_code.co_name}')
         result = self.execute_query(queries.GET_EVENT_TYPE_BY_EVENTTYPEID.format(event_type_id=event_type_id))
         if len(result) == 0:
             raise ValueError(f'Could not find EventType node with EventTypeID = {event_type_id}')
@@ -157,11 +157,11 @@ class Neo4jDB:
         return node
 
     def get_event_type_mappings(self):
-        self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
+        self.logger.emit(f'Running {sys._getframe().f_code.co_name}')
         return self.execute_query(queries.GET_EVENT_TYPE_NAMES_MAPPINGS)
     
     def get_account_by_username_or_password(self, email_or_username: str):
-        self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
+        self.logger.emit(f'Running {sys._getframe().f_code.co_name}')
         result = self.execute_query(queries.GET_ACCOUNT_NODE_BY_EMAIL_OR_USERNAME.format(email_or_username=email_or_username))
         if len(result) == 0:
             return None
@@ -169,7 +169,7 @@ class Neo4jDB:
             return result[0]['n']
     
     def get_friend_request_sent_or_if_already_friends(self, node_a_id: int, node_b_id: int):
-        self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
+        self.logger.emit(f'Running {sys._getframe().f_code.co_name}')
         cursor = self.run_command(queries.DETERMINE_IF_FRIEND_REQUESTS_ALREADY_EXISTS_OR_USERS_ALREADY_FRIENDS.format(node_a_id=node_a_id, node_b_id=node_b_id))
         cursor_data = cursor.data()
         if len(cursor_data) == 0:
@@ -178,7 +178,7 @@ class Neo4jDB:
             return cursor_data[0]
     
     def get_pending_friend_requests(self, person_node: Node=None, email: str=None):
-        self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
+        self.logger.emit(f'Running {sys._getframe().f_code.co_name}')
         if person_node is None and email is None:
             raise ValueError(f"Both person_node and email are None. This function requires at least one argument.")
         else:
@@ -189,7 +189,7 @@ class Neo4jDB:
             return friend_requests
     
     def get_pending_event_invites(self, person_node: Node=None, email: str=None):
-        self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
+        self.logger.emit(f'Running {sys._getframe().f_code.co_name}')
         if person_node is None and email is None:
             raise ValueError(f"Both person_node and email are None. This function requires at least one argument.")
         else:
@@ -201,7 +201,7 @@ class Neo4jDB:
     
         
     def get_relationship_by_uuid(self, uuid: str):
-        self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
+        self.logger.emit(f'Running {sys._getframe().f_code.co_name}')
         result = self.execute_query(queries.GET_RELATIONSHIP_BY_UUID.format(uuid=uuid))
         if len(result) == 0:
             raise ValueError(f"Could not relationship with {uuid=}")
@@ -210,7 +210,7 @@ class Neo4jDB:
             return relationship
     
     def get_relationship_by_nodes_and_label(self, node_a: Node, relationship_label: str, node_b: Node):
-        self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
+        self.logger.emit(f'Running {sys._getframe().f_code.co_name}')
         relationship = self.graph.match((node_a, node_b), r_type=relationship_label).first()
         if len(relationship) == 0:
             raise ValueError(f"No relationship found between {node_a}-[:{relationship_label}]->{node_b}")
@@ -220,41 +220,41 @@ class Neo4jDB:
 
     
     def create_event_node(self, properties: dict=None):
-        self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
+        self.logger.emit(f'Running {sys._getframe().f_code.co_name}')
         node = self.__create_node(node_labels='Event', properties=properties)
         return node
     
     def create_business_node(self, properties: dict=None, password: str=None):
-        self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
+        self.logger.emit(f'Running {sys._getframe().f_code.co_name}')
         if password is None:
             password = ''
         password_hash = hash_password(input_string=password)
         properties['PasswordHash'] = password_hash
-        self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
+        self.logger.emit(f'Running {sys._getframe().f_code.co_name}')
         node = self.__create_node(node_labels=['Account', 'Business'], properties=properties)
         return node
     
     def create_event_type_node(self, properties: dict=None):
-        self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
+        self.logger.emit(f'Running {sys._getframe().f_code.co_name}')
         node = self.__create_node(node_labels='EventType', properties=properties)
         return node
     
     def create_person_node(self, properties: dict=None, password: str=None):
-        self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
+        self.logger.emit(f'Running {sys._getframe().f_code.co_name}')
         if password is None:
             password = ''
         password_hash = hash_password(input_string=password)
         properties['PasswordHash'] = password_hash
-        self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
+        self.logger.emit(f'Running {sys._getframe().f_code.co_name}')
         node = self.__create_node(node_labels=['Account', 'Person'], properties=properties)
         return node
     
     def delete_node_by_id(self, node_id: int):
-        self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
+        self.logger.emit(f'Running {sys._getframe().f_code.co_name}')
         self.run_command(queries.DELETE_NODE_BY_ID.format(node_id=node_id))
     
     def create_event_with_relationships(self, creator_node: Node=None, properties: dict=None, friends_invited: list=None):
-        self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
+        self.logger.emit(f'Running {sys._getframe().f_code.co_name}')
         event_node = None
         if friends_invited is None:
             friends_invited = []
@@ -279,13 +279,13 @@ class Neo4jDB:
             return event_node
             
         except Exception as error:
-            self.logger.error(traceback.format_exc())
+            self.logger.emit(traceback.format_exc())
             print(traceback.format_exc())
             tx.rollback()
             raise error
     
     def backload_event(self, created_by_id: int, properties: dict, friends_invited: list=None):
-        self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
+        self.logger.emit(f'Running {sys._getframe().f_code.co_name}')
         event_node = None
         if friends_invited is None:
             friends_invited = []
@@ -307,39 +307,39 @@ class Neo4jDB:
             tx.commit()
             
         except Exception as error:
-            self.logger.error(traceback.format_exc())
+            self.logger.emit(traceback.format_exc())
             tx.rollback()
             raise error
     
     def create_attending_relationship(self, attendee_node: Node, event_node: Node, properties: dict=None):
-        self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
+        self.logger.emit(f'Running {sys._getframe().f_code.co_name}')
         ### Make this function so that it can take attendee nodes or IDs
         try:
             self.__create_relationship(node_a=attendee_node, relationship_label='ATTENDING', node_b=event_node, properties=properties)
         except:
-            self.logger.error(traceback.format_exc())
+            self.logger.emit(traceback.format_exc())
             raise Exception(f'Could not created ATTENDING relationship between person_node: {attendee_node} ->{event_node}')
 
     def delete_attending_relationship(self, attending_relationship_uuid: str):
-        self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
+        self.logger.emit(f'Running {sys._getframe().f_code.co_name}')
         try:
             relationship= self.get_relationship_by_uuid(uuid=attending_relationship_uuid)
             self.graph.delete(relationship)
         except:
-            self.logger.error(traceback.format_exc())
+            self.logger.emit(traceback.format_exc())
             raise Exception(f'Could not delete ATTENDING relationship {relationship}')
 
 
     def create_attending_relationship_by_id(self, attendee_node_id: int, event_node_id: int):
-        self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
+        self.logger.emit(f'Running {sys._getframe().f_code.co_name}')
         try:
             self.run_command(queries.CREATE_ATTENDING_RELATIONSHIP_BY_NODES_IDS.format(person_id=attendee_node_id, event_id=event_node_id))
         except:
-            self.logger.error(traceback.format_exc())
+            self.logger.emit(traceback.format_exc())
             raise Exception(f'Could not create ATTENDING relationship between person_node: {attendee_node_id} ->{event_node_id}')
 
     def create_interested_in_relationship(self, account_id: int, event_type_ids: Union[int, list]):
-        self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
+        self.logger.emit(f'Running {sys._getframe().f_code.co_name}')
         if isinstance(event_type_ids, int):
             event_type_id_list = [event_type_ids]
         else:
@@ -347,25 +347,25 @@ class Neo4jDB:
         self.run_command(queries.CREATE_ACCOUNT_INTERESTED_IN_RELATIONSHIPS.format(account_id=account_id, interest_id_list=event_type_ids))
     
     def authenticate_account(self, email: str, password: str):
-        self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
+        self.logger.emit(f'Running {sys._getframe().f_code.co_name}')
         password_hash = hash_password(input_string=password)
         response = self.execute_query(queries.AUTHENTICATE_ACCOUNT_EMAIL_AND_PASSWORD.format(email=email, password_hash=password_hash))
         if len(response) == 0:
-            self.logger.info(f'No account with that email-password_hash combination:\n{email=}\n{password_hash=}')
+            self.logger.emit(f'No account with that email-password_hash combination:\n{email=}\n{password_hash=}')
             return response, 'No account with that email-password combination'
         elif len(response) == 1:
-            self.logger.info(f'Account Authenticated: {email=}')
+            self.logger.emit(f'Account Authenticated: {email=}')
             return response[0]['n'], 'Success'
         elif len(response) > 1:
-            self.logger.info(f'Multiple accounts exist with that email-password_hash combination:\n{email=}\n{password_hash=}')
+            self.logger.emit(f'Multiple accounts exist with that email-password_hash combination:\n{email=}\n{password_hash=}')
             return response, 'Multiple accounts exist with that email-password combination'
         else:
             error_string = f"len(response) is not an int: {type(len(response))=}"
-            self.logger.error(error_string)        
+            self.logger.emit(error_string)        
             raise ValueError(error_string)
     
     def create_friend_request(self, node_a: Node=None, node_b: Node=None, email_a: str=None, email_b: str=None):
-        self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
+        self.logger.emit(f'Running {sys._getframe().f_code.co_name}')
         properties = {'FRIEND_REQUEST_TS' : datetime.now().strftime(datetime_format), 'STATUS' : 'PENDING'}
         if node_a and node_b:
             self.__create_relationship(node_a=node_a, relationship_label='FRIEND_REQUEST', node_b=node_b, properties=properties)
@@ -379,7 +379,7 @@ class Neo4jDB:
         # return self.run_command(queries.CREATE_FRIEND_REQUEST.format(node_a=node_a, node_b=node_b, properties=properties))
 
     def accept_friend_request(self, node_a: int, node_b: int, friend_request_uuid: str):
-        self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
+        self.logger.emit(f'Running {sys._getframe().f_code.co_name}')
         current_timestamp = datetime.now().strftime(datetime_format)
         properties = {'FRIENDS_SINCE' : current_timestamp}
         tx = self.graph.begin()
@@ -393,26 +393,26 @@ class Neo4jDB:
             self.__create_relationship(node_a=node_a, relationship_label='FRIENDS_WITH', node_b=node_b, properties=properties)
             self.__create_relationship(node_a=node_b, relationship_label='FRIENDS_WITH', node_b=node_a, properties=properties)
             # return self.run_command(queries.CREATE_FRIENDSHIP.format(node_a=node_a, node_b=node_b, properties=properties))
-            self.logger.info(f'Created FRIENDS_WITH relationship between {node_a["Email"]}<->{node_b["Email"]}')
+            self.logger.emit(f'Created FRIENDS_WITH relationship between {node_a["Email"]}<->{node_b["Email"]}')
             tx.commit()
         except Exception as error:
-            self.logger.error(f'Could not create FRIENDS_WITH relationship between {node_a["Email"]}<->{node_b["Email"]}')
-            self.logger.error(traceback.format_exc())
+            self.logger.emit(f'Could not create FRIENDS_WITH relationship between {node_a["Email"]}<->{node_b["Email"]}')
+            self.logger.emit(traceback.format_exc())
             tx.rollback()
             raise error
     
     def decline_friend_request(self, node_a: int, node_b: int, friend_request_uuid: str):
-        self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
+        self.logger.emit(f'Running {sys._getframe().f_code.co_name}')
         relationship = self.execute_query(queries.GET_RELATIONSHIP_BY_UUID.format(relationship_label='FRIEND_REQUEST', uuid=friend_request_uuid))[0]['r']
         
         relationship['STATUS'] = 'DECLINE'
         relationship['RESPONSE_TIMESTAMP'] = datetime.now().strftime(datetime_format)
         self.graph.push(relationship)
         
-        self.logger.info(f'{node_a["Email"]} declined Friend Request from {node_b["Email"]}')
+        self.logger.emit(f'{node_a["Email"]} declined Friend Request from {node_b["Email"]}')
     
     def accept_event_invite(self, event_invite_uuid: str):
-        self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
+        self.logger.emit(f'Running {sys._getframe().f_code.co_name}')
         current_timestamp = datetime.now().strftime(datetime_format)
         tx = self.graph.begin()
         try:
@@ -426,12 +426,12 @@ class Neo4jDB:
             tx.commit()
             
         except Exception as error:
-            self.logger.error(traceback.format_exc())
+            self.logger.emit(traceback.format_exc())
             tx.rollback()
             raise error
     
     def decline_event_invite(self, event_invite_uuid: str):
-        self.logger.debug(f'Running {sys._getframe().f_code.co_name}')
+        self.logger.emit(f'Running {sys._getframe().f_code.co_name}')
         current_timestamp = datetime.now().strftime(datetime_format)
         tx = self.graph.begin()
         try:
@@ -444,7 +444,7 @@ class Neo4jDB:
             tx.commit()
             
         except Exception as error:
-            self.logger.error(traceback.format_exc())
+            self.logger.emit(traceback.format_exc())
             tx.rollback()
             raise error
         

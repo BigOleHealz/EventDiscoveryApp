@@ -43,27 +43,47 @@ GET_EVENT_TYPE_NAMES_MAPPINGS = '''
 ###############################
 
 GET_ACCOUNT_NODE_BY_ID = '''
-                            MATCH (n)
+                            MATCH (n:Account)
                                 WHERE ID(n) = {node_id}
-                            RETURN n;
+                            RETURN 
+                                n.Email as Email,
+                                n.Username as Username,
+                                n.FirstName as FirstName,
+                                n.LastName as LastName,
+                                n.UUID as UUID;
                             '''
 
 GET_ACCOUNT_NODE_BY_UUID = '''
-                            MATCH (n)
-                                WHERE n.uuid = "{uuid}"
-                            RETURN n;
+                            MATCH (n:Account)
+                                WHERE n.UUID = "{uuid}"
+                            RETURN
+                                n.Email as Email,
+                                n.Username as Username,
+                                n.FirstName as FirstName,
+                                n.LastName as LastName,
+                                n.UUID as UUID;
                             '''
 
 GET_ACCOUNT_NODE_BY_EMAIL = '''
                             MATCH (n:Account)
-                                WHERE n.Email = "{email}"
-                            RETURN n;
+                                WHERE n.Email = '{email}'
+                            RETURN
+                                n.Email as Email,
+                                n.Username as Username,
+                                n.FirstName as FirstName,
+                                n.LastName as LastName,
+                                n.UUID as UUID;
                             '''
 
 GET_ACCOUNT_NODE_BY_USERNAME = '''
                                 MATCH (n:Account)
                                     WHERE n.Username = "{username}"
-                                RETURN n;
+                                RETURN
+                                    n.Email as Email,
+                                    n.Username as Username,
+                                    n.FirstName as FirstName,
+                                    n.LastName as LastName,
+                                    n.UUID as UUID;
                                 '''
 
 GET_ACCOUNT_NODE_BY_EMAIL_OR_USERNAME = '''
@@ -91,7 +111,7 @@ GET_EVENT_TYPE_BY_EVENTTYPEID = '''
 
 GET_RELATIONSHIP_BY_UUID = '''
                             MATCH ()-[r:{relationship_label}]->()
-                            WHERE r.uuid = "{uuid}"
+                            WHERE r.UUID = "{uuid}"
                             RETURN r
                             '''                                 
                                     
@@ -118,7 +138,7 @@ GET_FRIEND_REQUEST_STATUS = '''
                             EXISTS((a)-[:FRIENDS_WITH]->(b)) AS friends_with;
                             
 MATCH (a)-[r:FRIEND_REQUEST]->(b)
-WHERE ID(a) = {node_a_id} AND ID(b) = {node_b_id}//  AND r.status = {desired_status}
+WHERE ID(a) = {node_a_id} AND ID(b) = {node_b_id}
 RETURN r.status
 
                             '''
@@ -178,6 +198,7 @@ GET_EVENTS_RELATED_TO_USER = '''
 GET_PERSON_FRIENDS_ID_NAME_MAPPINGS_BY_EMAIL = '''
                                                 MATCH (:Person {{Email: "{email}"}})-[:FRIENDS_WITH]->(n)
                                                 RETURN ID(n) as _id,
+                                                n.UUID as UUID,
                                                 n.FirstName AS FirstName,
                                                 n.LastName AS LastName;
                                                 '''
@@ -231,7 +252,7 @@ GET_PENDING_FRIEND_REQUESTS = '''
                                 WHERE p.Email = "{email}"
                                 AND
                                 r.STATUS = "PENDING"
-                            RETURN r AS RELATIONSHIP, type(r) AS NOTIFICATION_TYPE, q AS NOTIFICATION_DETAILS
+                            RETURN r AS RELATIONSHIP, type(r) AS NOTIFICATION_TYPE, q AS NOTIFICATION_DETAILS;
                             '''
 
 GET_PENDING_EVENT_INVITES = '''
@@ -242,7 +263,9 @@ GET_PENDING_EVENT_INVITES = '''
                             MATCH (p)-[r:INVITED]->(e:Event)
                             WHERE
                                 r.STATUS = "PENDING"
-                            RETURN r AS RELATIONSHIP, type(r) AS NOTIFICATION_TYPE, e AS NOTIFICATION_DETAILS
+                            WITH r, type(r) AS NOTIFICATION_TYPE, e AS NOTIFICATION_DETAILS
+                            ORDER BY r.INVITED_DATE
+                            RETURN r AS RELATIONSHIP, NOTIFICATION_TYPE, NOTIFICATION_DETAILS;
                             '''
 
 GET_NOTIFICATIONS = '''
