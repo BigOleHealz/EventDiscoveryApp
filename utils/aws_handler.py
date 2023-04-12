@@ -8,9 +8,7 @@ from utils.logger import Logger
 
 
 class AWSHandler:
-    def __init__(self, logger: Logger=None):
-        if logger is None:
-            logger = Logger(__name__)
+    def __init__(self, logger: Logger):
         self.logger = logger
         self.session = boto3.session.Session()
 
@@ -26,7 +24,7 @@ class AWSHandler:
             )
 
             secrets = json.loads(secrets['SecretString'])
-            self.logger.info(msg=f'Successfully retrieved secrets')
+            self.logger.emit(msg=f'Successfully retrieved secrets')
             
             return secrets
             
@@ -34,26 +32,17 @@ class AWSHandler:
             raise e
             
         except Exception as error:
-            self.logger.error(msg=error)
-            self.logger.error(msg=f'Traceback: {traceback.format_exc()}')
+            self.logger.emit(msg=error)
+            self.logger.emit(msg=f'Traceback: {traceback.format_exc()}')
             raise ValueError(error)
 
     def invoke_api_gateway_endpoint(self):
         try:
             client = boto3.client('apigateway')
 
-            # response = client.invoke_rest_api(
-            #     restApiId='0kj5kbx4e7',
-            #     resourceId='kznk7b',
-            #     httpMethod='GET',
-            #     pathWithQueryString='/get_node?node_id=1219',
-            #     # body='{"message": "Hello, world!"}',
-            # )
             https_response = requests.get(
                 'https://0kj5kbx4e7.execute-api.us-east-1.amazonaws.com/test/neo4j-query',
-                params={'node_id': 1219},
-                # headers={'day': calendar.day_name[datetime.date.today().weekday()]},
-                # json={'adjective': 'fabulous'}
+                params={'node_id': 1219}
             )
             
             return https_response
@@ -62,6 +51,6 @@ class AWSHandler:
             raise e
             
         except Exception as error:
-            self.logger.error(msg=error)
+            self.logger.emit(msg=error)
             raise ValueError(error)
         

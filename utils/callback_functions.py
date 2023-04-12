@@ -8,14 +8,17 @@ from dash import Input, Output, State, callback, no_update
 
 from db.db_handler import Neo4jDB
 from ui.components import Components
-from utils.helper_functions import get_address_from_lat_lon
 from ui.layouts import LayoutHandler
 from ui.map_handler import tile_layer
+from utils.api_handler import ApiHandler
 from utils.constants import CURRENTLY_ATTENDING_BUTTON_TEXT, NOT_CURRENTLY_ATTENDING_BUTTON_TEXT, datetime_format, RouteManager as routes
+from utils.helper_functions import HelperFunctions
+from utils.logger import Logger
 
 
 
-def create_event(neo4j_connector: Neo4jDB,
+def create_event(api_handler: ApiHandler,
+                logger: Logger,
                 event_name: str,
                 event_date: str,
                 starttime: int,
@@ -27,7 +30,7 @@ def create_event(neo4j_connector: Neo4jDB,
                 n_clicks: int=None
             ):
     
-    components = Components(neo4j_connector=neo4j_connector)
+    components = Components(api_handler=api_handler, logger=logger)
     
     required_args = [event_name, click_lat_lng, event_type_id]
     event_date_dt = dt.strptime(event_date, '%Y-%m-%d')

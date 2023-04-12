@@ -9,17 +9,17 @@ from flask_login import login_user, LoginManager, logout_user, current_user
 from dash import Dash, dcc, html, Input, Output, State, callback, callback_context, MATCH, no_update
 import dash_bootstrap_components as dbc
 
-from ui.layouts import LayoutHandler
-from utils.entities import Account
-from ui.components import Components
-from utils.logger import Logger
 from db.db_handler import Neo4jDB
+from ui.components import Components
+from ui.layouts import LayoutHandler
 from ui.map_handler import tile_layer
+from utils.api_handler import ApiHandler
 from utils.callback_functions import create_event, callback_attend_event, toggle_modal, toggle_add_friends_container, toggle_event_invites_container
 from utils.constants import RouteManager as routes, accept_event_invite_button_id, decline_event_invite_button_id
+from utils.entities import Account
+from utils.logger import Logger
 
-
-logger = Logger(name=__file__)
+logger = Logger(log_group_name=__file__)
 
 server = Flask(__name__)
 app = Dash(__name__,
@@ -36,6 +36,8 @@ server.config.update(SECRET_KEY=secrets.token_hex(24))
 login_manager = LoginManager()
 login_manager.init_app(server)
 login_manager.login_view = routes.login
+api_handler = ApiHandler(logger=logger)
+layout_handler = LayoutHandler(api_handler=api_handler, logger=logger)
 
 neo4j = Neo4jDB(logger=logger)
 
@@ -253,38 +255,38 @@ def display_page(pathname: str):
     if pathname == routes.login:
         
         # ###################################### TEST ######################################
-        # (account_node, auth_status) = neo4j.authenticate_account(email='nico@gmail.com', password='nico')
+        # (account_node, auth_status) = neo4j.authenticate_account(email='nathan@gmail.com', password='nathan')
         
         # if auth_status == 'Success':
         #     account = Account(account_node)
         #     login_user(account)
-        # view = LayoutHandler.home_page_layout(neo4j_connector=neo4j)
+        # view = layout_handler.home_page_layout()
         # ###################################### TEST ######################################
         
         
-        view = LayoutHandler.login_layout_children
+        view = layout_handler.login_layout_children
     elif pathname == routes.success:
         if current_user.is_authenticated:
-            view = LayoutHandler.home_page_layout(neo4j_connector=neo4j)
+            view = layout_handler.home_page_layout()
         else:
-            view = LayoutHandler.failed_layout_children
+            view = layout_handler.failed_layout_children
     elif pathname == routes.logout:
         if current_user.is_authenticated:
             logout_user()
-        view = LayoutHandler.logout_layout_children
+        view = layout_handler.logout_layout_children
     elif pathname == routes.home_page:
         if current_user.is_authenticated:
-            view = LayoutHandler.home_page_layout(neo4j_connector=neo4j)
+            view = layout_handler.home_page_layout()
         else:
-            view = LayoutHandler.login_layout_children
+            view = layout_handler.login_layout_children
     elif pathname == routes.create_account:
-        view = LayoutHandler.create_account_children(neo4j_connector=neo4j)
+        view = layout_handler.create_account_children()
     else:
-        view = LayoutHandler.login_layout_children
+        view = layout_handler.login_layout_children
     return view
 
 
 
 
 if __name__ == "__main__":
-    app.run_server('0.0.0.0', port=8051, debug=True)
+    app.run_server('0.0.0.0', port=8050, debug=True)

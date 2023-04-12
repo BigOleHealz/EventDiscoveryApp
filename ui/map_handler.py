@@ -6,10 +6,11 @@ from dash import Dash, html, dcc, Input, Output, callback
 import dash_leaflet as dl
 from flask_login import current_user
 
-from utils.helper_functions import get_scaled_dimensions
 from db.db_handler import Neo4jDB
 from db import queries
-from utils.constants import datetime_format, CURRENTLY_ATTENDING_BUTTON_TEXT, NOT_CURRENTLY_ATTENDING_BUTTON_TEXT
+from utils.api_handler import ApiHandler
+from utils.constants import datetime_format, CURRENTLY_ATTENDING_BUTTON_TEXT, NOT_CURRENTLY_ATTENDING_BUTTON_TEXT, DEFAULT_ZOOM
+from utils.helper_functions import get_scaled_dimensions, get_device_location
 
 def write_query_to_file(query: str):
     with open('Testing/recent_query.cypher', 'w') as file:
@@ -32,7 +33,8 @@ for key, val in icon_paths.items():
     icon_mappings[key]["popupAnchor"] = [width // 2, 0]
 
 def tile_layer(
-            neo4j_connector: Neo4jDB,
+            # neo4j_connector: Neo4jDB,
+            api_handler: ApiHandler,
             date_picked: str=None,
             time_range: List[int]=None,
             selected_location: Mapping[None, str]=None,
@@ -45,9 +47,26 @@ def tile_layer(
     
     min_timestamp = (date_picked + timedelta(hours=time_range[0])).strftime(datetime_format)
     max_timestamp = (date_picked + timedelta(hours=time_range[-1])).strftime(datetime_format)
+    
+    user_location = get_device_location()
+    
 
     # write_query_to_file(queries.GET_EVENTS_RELATED_TO_USER.format(email=current_user.Email, start_ts=min_timestamp, end_ts=max_timestamp))
-    events = neo4j_connector.execute_query(queries.GET_EVENTS_RELATED_TO_USER.format(email=current_user.Email, start_ts=min_timestamp, end_ts=max_timestamp))
+    # events = neo4j_connector.get_events_related_to_user(email=current_user.Email, start_ts=min_timestamp, end_ts=max_timestamp, latitude=user_location['Lat'], longitude=user_location['Lon'], radius=10)
+    events = api_handler.submit_api_request(request_type='post',
+                                            endpoint='execute_db_command',
+                                            params= {
+                                                    "query" : queries.GET_EVENTS_RELATED_TO_USER.format(
+                                                    email=current_user.Email,
+                                                    start_ts=min_timestamp,
+                                                    end_ts=max_timestamp,
+                                                    latitude=user_location['Lat'],
+                                                    longitude=user_location['Lon'],
+                                                    radius=10
+                                                )
+                                            }
+                                        )
+    
     
     markers = []
     for event in events:
@@ -111,15 +130,16 @@ def tile_layer(
 
     return [layer_control, cluster]
 
-def get_map_content(neo4j_connector: Neo4jDB):
+def get_map_content(api_handler: ApiHandler):
+    map_center_coordinates_dict = get_device_location()
     return html.Div(
                 className="eight columns div-for-charts bg-grey",
                 children=[
                     dl.Map(
                         id='map-id',
                         style={'width': '100%', 'height': '95%'},
-                        center=[39.9526, -75.1652],
-                        zoom=13,
-                        children=tile_layer(neo4j_connector=neo4j_connector)
+                        center=[map_center_coordinates_dict['Lat'], map_center_coordinates_dict['Lon']],
+                        zoom=DEFAULT_ZOOM,
+                        children=tile_layer(api_handler=api_handler)
                     )]
                 )

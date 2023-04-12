@@ -7,28 +7,38 @@ import dash_bootstrap_components as dbc
 from flask_login import current_user
 from py2neo import Node, Relationship
 
-from utils.constants import dict_of_locations, LOGO_PATH, FRIENDS_ICON_PATH, EVENT_INVITES_ICON_PATH, datetime_format, accept_event_invite_button_id, decline_event_invite_button_id, accept_friend_request_button_id, decline_friend_request_button_id
-from ui.map_handler import get_map_content
-from utils.helper_functions import format_decode_image
-from db.db_handler import Neo4jDB
 from db import queries
+from db.db_handler import Neo4jDB
+from ui.map_handler import get_map_content
+from utils.api_handler import ApiHandler
+from utils.constants import dict_of_locations, LOGO_PATH, FRIENDS_ICON_PATH, EVENT_INVITES_ICON_PATH, datetime_format, accept_event_invite_button_id, decline_event_invite_button_id, accept_friend_request_button_id, decline_friend_request_button_id
+from utils.helper_functions import format_decode_image
+from utils.logger import Logger
 
 
 class Components:
-    def __init__(self, neo4j_connector: Neo4jDB):
-        self.neo4j_connector = neo4j_connector
-        self.event_type_mappings = self.neo4j_connector.get_event_type_mappings()
+    def __init__(self, api_handler: ApiHandler, logger: Logger):
+        self.logger = logger
+        # self.neo4j_connector = neo4j_connector
+        self.api_handler = api_handler
+        # self.event_type_mappings = self.neo4j_connector.get_event_type_mappings()
         
-        self.person_friends = self.neo4j_connector.execute_query(queries.GET_PERSON_FRIENDS_ID_NAME_MAPPINGS_BY_EMAIL.format(email=current_user.Email))
-        self.friend_request_list = self.neo4j_connector.get_pending_friend_requests(email=current_user.Email)
-        self.event_invite_list = self.neo4j_connector.get_pending_event_invites(email=current_user.Email)
-
+        self.logger.emit("Initiating Components...")
+        self.event_type_mappings = self.api_handler.post(endpoint='execute_db_command', params={"query" : queries.GET_EVENT_TYPE_NAMES_MAPPINGS})
+        
+        self.logger.emit(f"event_type_mappings: {self.event_type_mappings}")
+        self.person_friends = self.api_handler.post(endpoint='execute_db_command', params={"query" : queries.GET_PERSON_FRIENDS_ID_NAME_MAPPINGS_BY_EMAIL.format(email=current_user.Email)})
+        self.logger.emit(f"person_friends: {self.person_friends}")
+        self.friend_request_list = self.api_handler.post(endpoint='execute_db_command', params={"query" : queries.GET_PENDING_FRIEND_REQUESTS.format(email=current_user.Email)})
+        self.logger.emit(f"friend_request_list: {self.friend_request_list}")
+        self.event_invite_list = self.api_handler.post(endpoint='execute_db_command', params={"query" : queries.GET_PENDING_EVENT_INVITES.format(email=current_user.Email)})
+        self.logger.emit(f"event_invite_list: {self.event_invite_list}")
     
     @staticmethod
     def friend_requests_div(friend_request_list: list):
         friend_requests = []
         for friend_request in friend_request_list:
-            uuid = friend_request["RELATIONSHIP"]["uuid"]
+            uuid = friend_request["RELATIONSHIP"]["UUID"]
 
             friend_requests.append(
                 html.Div([
@@ -65,8 +75,7 @@ class Components:
     def event_invites_div(event_invite_list: list):
         event_invites = []
         for event_invite in event_invite_list:
-            
-            uuid = event_invite["RELATIONSHIP"]["uuid"]
+            uuid = event_invite["RELATIONSHIP"]["UUID"]
             
             event_time = dt.strptime(event_invite["NOTIFICATION_DETAILS"]["StartTimestamp"], datetime_format)
             event_invite_label_string = [html.H6(f'Host: {event_invite["NOTIFICATION_DETAILS"]["Host"]}'), \
@@ -337,6 +346,5 @@ class Components:
             ]
         
     @staticmethod
-    def map_content(neo4j_connector: Neo4jDB):
-        return get_map_content(neo4j_connector=neo4j_connector)
-
+    def map_content(api_handler: ApiHandler):
+        return get_map_content(api_handler=api_handler)
