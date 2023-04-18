@@ -2,7 +2,10 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Text, View, TouchableOpacity, Animated } from 'react-native';
 import styles from './styles';
 import { GoogleMap, LoadScript } from '@react-google-maps/api';
+import { LeftSidePanel, RightSidePanel } from './container_components/SidePanels';
 
+
+console.log('Big Ol Healz');
 
 const Toolbar = ({ onLeftButtonClick, onRightButtonClick }) => (
   <View style={styles.toolbar}>
@@ -16,27 +19,6 @@ const Toolbar = ({ onLeftButtonClick, onRightButtonClick }) => (
   </View>
 );
 
-const SidePanel = ({ isVisible, side }) => {
-  const slideAnim = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    Animated.timing(slideAnim, {
-      toValue: isVisible ? 1 : 0,
-      duration: 300,
-      useNativeDriver: false,
-    }).start();
-  }, [isVisible]);
-
-  const panelPosition = side === 'left'
-    ? { left: slideAnim.interpolate({ inputRange: [0, 1], outputRange: ['-30%', '0%'] }) }
-    : { right: slideAnim.interpolate({ inputRange: [0, 1], outputRange: [isVisible ? '-30%' : '100%', '0%'] }) };
-
-  return isVisible ? (
-    <Animated.View style={[styles.sidePanel, side === 'left' ? styles.leftPanel : styles.rightPanel, panelPosition]}>
-      <Text>{side === 'left' ? 'Left Panel' : 'Right Panel'}</Text>
-    </Animated.View>
-  ) : null;
-};
 
 const Map = () => {
   const mapContainerStyle = {
@@ -49,20 +31,37 @@ const Map = () => {
     lng: -73.935242,
   };
 
+  const [center, setCenter] = useState(defaultCenter);
+
+  // const handleDragEnd = () => {
+  //   const newCenter = mapRef.current.getCenter().toJSON();
+  //   setCenter(newCenter);
+  // };
+
+  const mapRef = React.useRef();
+
+  const onLoad = (map) => {
+    mapRef.current = map;
+  };
+
   return (
     <LoadScript
       id="script-loader"
-      googleMapsApiKey="<google_maps_api_key"
+      googleMapsApiKey=""
       language="en"
     >
       <GoogleMap
         mapContainerStyle={mapContainerStyle}
         zoom={12}
-        center={defaultCenter}
+        center={center}
+        // onDragEnd={handleDragEnd}
+        draggable={true}
+        onLoad={onLoad}
       />
     </LoadScript>
   );
 };
+
 
 export default function App() {
   const [isLeftPanelVisible, setIsLeftPanelVisible] = useState(false);
@@ -83,12 +82,9 @@ export default function App() {
       <Toolbar onLeftButtonClick={handleLeftButtonClick} onRightButtonClick={handleRightButtonClick} />
       <View style={styles.fullScreen}>
         <Map />
-        <View style={styles.panelsContainer}>
-          <SidePanel isVisible={isLeftPanelVisible} side="left" />
-          <SidePanel isVisible={isRightPanelVisible} side="right" />
-        </View>
+        <LeftSidePanel isVisible={isLeftPanelVisible} />
+        <RightSidePanel isVisible={isRightPanelVisible} />
       </View>
     </View>
   );
-
 }
