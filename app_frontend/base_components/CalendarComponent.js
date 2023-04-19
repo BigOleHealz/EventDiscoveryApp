@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text } from 'react-native';
 import { Calendar } from 'react-native-calendars';
+import styles from '../styles';
 
 export const CalendarComponent = ({ onDateSelected }) => {
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().slice(0, 10));
@@ -20,7 +21,6 @@ export const CalendarComponent = ({ onDateSelected }) => {
         }}
         onDayPress={handleDateSelection}
       />
-      <Text>Selected date: {selectedDate}</Text>
     </View>
   );
 };

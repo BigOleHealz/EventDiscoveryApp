@@ -1,66 +1,9 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Text, View, TouchableOpacity, Animated } from 'react-native';
+import React, { useState } from 'react';
+import { View } from 'react-native';
 import styles from './styles';
-import { GoogleMap, LoadScript } from '@react-google-maps/api';
+import { Toolbar } from './container_components/Toolbar';
+import { Map } from './container_components/Map';
 import { LeftSidePanel, RightSidePanel } from './container_components/SidePanels';
-
-
-console.log('Big Ol Healz');
-
-const Toolbar = ({ onLeftButtonClick, onRightButtonClick }) => (
-  <View style={styles.toolbar}>
-    <TouchableOpacity style={styles.toolbarButtonLeft} onPress={onLeftButtonClick}>
-      <Text style={styles.toolbarButtonText}>Find Games</Text>
-    </TouchableOpacity>
-    <Text style={styles.toolbarTitle}>Home Screen</Text>
-    <TouchableOpacity style={styles.toolbarButtonRight} onPress={onRightButtonClick}>
-      <Text style={styles.toolbarButtonText}>Create Game</Text>
-    </TouchableOpacity>
-  </View>
-);
-
-
-const Map = () => {
-  const mapContainerStyle = {
-    height: '100%',
-    width: '100%',
-  };
-
-  const defaultCenter = {
-    lat: 40.730610,
-    lng: -73.935242,
-  };
-
-  const [center, setCenter] = useState(defaultCenter);
-
-  // const handleDragEnd = () => {
-  //   const newCenter = mapRef.current.getCenter().toJSON();
-  //   setCenter(newCenter);
-  // };
-
-  const mapRef = React.useRef();
-
-  const onLoad = (map) => {
-    mapRef.current = map;
-  };
-
-  return (
-    <LoadScript
-      id="script-loader"
-      googleMapsApiKey=""
-      language="en"
-    >
-      <GoogleMap
-        mapContainerStyle={mapContainerStyle}
-        zoom={12}
-        center={center}
-        // onDragEnd={handleDragEnd}
-        draggable={true}
-        onLoad={onLoad}
-      />
-    </LoadScript>
-  );
-};
 
 
 export default function App() {
@@ -78,7 +21,7 @@ export default function App() {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, styles.appTheme]}>
       <Toolbar onLeftButtonClick={handleLeftButtonClick} onRightButtonClick={handleRightButtonClick} />
       <View style={styles.fullScreen}>
         <Map />
