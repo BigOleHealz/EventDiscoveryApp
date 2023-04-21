@@ -2,8 +2,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Animated } from 'react-native';
 import { CalendarComponent } from '../base_components/CalendarComponent';
 import { TimeRangeSlider } from '../base_components/TimeRangeSlider';
-import { TimeSlider } from '../base_components/TimeSlider';
-import { Button } from '../base_components/Button';
 import styles from '../styles';
 
 const SidePanelContainer = ({ isVisible, side, title, children }) => {
@@ -49,31 +47,6 @@ const LeftSidePanel = (props) => {
         <TimeRangeSlider onValuesChange={handleTimeRangeValuesChange}/>
     </SidePanelContainer>
     );
-};
-
-const RightSidePanel = (props) => {
-	const { isVisible } = props;
-	const handleDateSelected = (date) => {
-		console.log('Right side panel selected date:', date);
-	  // Perform any actions needed with the selected date
-	};
-
-	const handleTimeSelected = (time) => {
-		console.log('Right side panel selected time:', time);
-	  // Perform any actions needed with the selected time
-	};
-
-	const handleSubmitButtonClick = () => {
-		console.log('Button clicked!');
-	};
-
-	return (
-		<SidePanelContainer id="right-panel" side="right" title="Create Game" isVisible={isVisible}>
-			<CalendarComponent id="right-calendar" onDateSelected={handleDateSelected} />
-			<TimeSlider onValueChange={handleTimeSelected}/>
-			<Button title="Submit" onPress={handleSubmitButtonClick} />
-		</SidePanelContainer>
-	);
 };
 
 const side_panel_styles = StyleSheet.create({
@@ -126,9 +99,6 @@ const side_panel_styles = StyleSheet.create({
 	leftPanel: {
 		left: 0,
 	},
-	rightPanel: {
-		right: 0,
-	},
 })
 
-export { LeftSidePanel, RightSidePanel };
+export { LeftSidePanel };

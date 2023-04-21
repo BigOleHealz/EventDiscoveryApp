@@ -6,7 +6,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import '../css/datePickerStyles.css'
 import styles from '../styles';
 
-export const TimeSlider = ({ onValueChange }) => {
+export const CreateGameTimeSelector = ({ onValueChange }) => {
   const [time, setTime] = useState(new Date());
 
   const handleTimeChange = (value) => {
@@ -17,7 +17,7 @@ export const TimeSlider = ({ onValueChange }) => {
   };
 
   return (
-    <View style={time_slider_styles.view}>
+    <View style={create_game_time_selector.view}>
       {Platform.OS === 'web' ? (
         <DatePicker
           selected={time}
@@ -41,9 +41,9 @@ export const TimeSlider = ({ onValueChange }) => {
             thumbTintColor="#ddd"
           />
           <View style={styles.timeSliderView}>
-            <Text style={time_slider_styles.text}>0</Text>
-            <Text style={time_slider_styles.text}>{time.toFixed(0)}</Text>
-            <Text style={time_slider_styles.text}>24</Text>
+            <Text style={create_game_time_selector.text}>0</Text>
+            <Text style={create_game_time_selector.text}>{time.toFixed(0)}</Text>
+            <Text style={create_game_time_selector.text}>24</Text>
           </View>
         </>
       )}
@@ -51,10 +51,12 @@ export const TimeSlider = ({ onValueChange }) => {
   );
 };
 
-const time_slider_styles = StyleSheet.create({
+const create_game_time_selector = StyleSheet.create({
   view: {
     padding: 20,
-    zIndex: 1000
+    zIndex: 1000,
+    width: 600,
+    height: 300,
   },
   text: {
     color: styles.appTheme.color,
