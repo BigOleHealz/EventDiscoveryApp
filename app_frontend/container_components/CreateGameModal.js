@@ -1,7 +1,7 @@
 import React from 'react';
-import { Modal, View, StyleSheet, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
+import { Modal, View, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
 import { CalendarComponent } from '../base_components/CalendarComponent';
-import { TimeSlider } from '../base_components/TimeSlider';
+import { CreateGameTimeSelector } from '../base_components/CreateGameTimeSelector';
 import { Button } from '../base_components/Button';
 import styles from '../styles';
 
@@ -42,7 +42,7 @@ const modal_styles = StyleSheet.create({
   },
 });
 
-export const CreateGameModal = ({ isVisible, onRequestClose }) => {
+export const CreateGameDateTimeModal = ({ isVisible, onRequestClose }) => {
 
 	const handleDateSelected = (date) => {
 		console.log('Create Game panel selected date:', date);
@@ -62,8 +62,18 @@ export const CreateGameModal = ({ isVisible, onRequestClose }) => {
     return (
       <ModalComponent isVisible={isVisible} onRequestClose={onRequestClose}>
         <CalendarComponent id="create-game-calendar" onDateSelected={handleDateSelected} />
-        <TimeSlider onValueChange={handleTimeSelected} />
-        <Button title="Set Date & Time" onPress={handleSubmitButtonClick} />
+        <CreateGameTimeSelector onValueChange={handleTimeSelected} />
+        <Button id="create-game-select-datetime-button" title="Set Date & Time" onPress={handleSubmitButtonClick} />
       </ModalComponent>
     );
   };
+
+
+// Add this to your CreateGameModals.js
+export const InviteFriendsModal = ({ isVisible, onRequestClose }) => {
+  return (
+    <ModalComponent isVisible={isVisible} onRequestClose={onRequestClose}>
+      <Text style={{ fontSize: 24 }}>bigolehealz</Text>
+    </ModalComponent>
+  );
+};

@@ -7,7 +7,7 @@ export const Toolbar = ({ onLeftButtonClick, onRightButtonClick }) => (
         <TouchableOpacity style={toolbar_styles.toolbarButtonLeft} onPress={onLeftButtonClick}>
             <Text style={toolbar_styles.toolbarButtonText}>Find Games</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={toolbar_styles.toolbarButtonRight} onPress={onRightButtonClick}>
+        <TouchableOpacity id="create-game-button" style={toolbar_styles.toolbarButtonRight} onPress={onRightButtonClick}>
             <Text style={toolbar_styles.toolbarButtonText}>Create Game</Text>
         </TouchableOpacity>
     </View>

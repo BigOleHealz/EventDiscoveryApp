@@ -2,15 +2,19 @@ import React, { useState, useRef, useEffect } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
 
-import { CreateGameModal } from './CreateGameModal';
+import { CreateGameDateTimeModal } from '././CreateGameModal';
 import { Button } from '../base_components/Button';
 import pinIcon from '../assets/pin.png';
 
 
-export const Map = ({ defaultCenter, pinPosition, onPinDragEnd, isRightPanelVisible }) => {
+export const Map = ({ defaultCenter, pinPosition, onPinDragEnd, isCreateMode }) => {
+
 
     const [mapCenter, setMapCenter] = useState(defaultCenter);
     const [isModalMenuVisible, setIsModalMenuVisible] = useState(false);
+    // Add this to your Map component in Map.js
+    const [isInviteFriendsModalVisible, setIsInviteFriendsModalVisible] = useState(false);
+
 
 
     const mapRef = React.useRef();
@@ -32,26 +36,26 @@ export const Map = ({ defaultCenter, pinPosition, onPinDragEnd, isRightPanelVisi
 
     return (
         <LoadScript
-            id="script-loader"
-            googleMapsApiKey=""
-            language="en">
-            <GoogleMap
-                mapContainerStyle={map_styles.mapContainerStyle}
-                zoom={15}
-                center={mapCenter}
-                onDragEnd={handlePinDragEnd}
-                draggable={true}
-                onLoad={onLoad}>
-            </GoogleMap>
-            {isRightPanelVisible && <img src={pinIcon} alt="Pin" style={map_styles.pinStyle} />}
-            {isRightPanelVisible && (
-                <Button onPress={handleBottomButtonClick} title="Open Modal" style={map_styles.bottomButtonStyle} />
-            )}
-            <CreateGameModal isVisible={isModalMenuVisible} onRequestClose={() => setIsModalMenuVisible(false)} />
-
+          id="script-loader"
+          googleMapsApiKey="AIzaSyA__qBwVyEtvJ2DU7ioABpZ4zzK6keCBjo"
+          language="en">
+          <GoogleMap
+            mapContainerStyle={map_styles.mapContainerStyle}
+            zoom={15}
+            center={mapCenter}
+            onDragEnd={handlePinDragEnd}
+            draggable={true}
+            onLoad={onLoad}>
+          </GoogleMap>
+          {isCreateMode && <img id="create-game-pin-marker" src={pinIcon} alt="Pin" style={map_styles.pinStyle} />}
+          {isCreateMode && (
+            <Button id="select-date-time-button" onPress={handleBottomButtonClick} title="Open Modal" style={map_styles.bottomButtonStyle} />
+          )}
+          <CreateGameDateTimeModal isVisible={isModalMenuVisible} onRequestClose={() => setIsModalMenuVisible(false)} />
         </LoadScript>
-    );
-};
+      );
+    };
+    
 
 
 const map_styles = StyleSheet.create({

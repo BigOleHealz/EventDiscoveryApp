@@ -8,3 +8,6 @@ Testing/recent_query.cypher
 infra/stonks_lambdas/removed_params.json
 infra/stonks_lambdas/get_node/dependencies/*
 infra/stonks_lambdas/get_node/.aws-sam/deps/*
+
+app_frontend/.env
+app_frontend/node_modules*

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, StyleSheet  } from 'react-native';
 import { Calendar, LocaleConfig } from 'react-native-calendars';
 import '../css/calendar.css'
 
@@ -8,6 +8,7 @@ export const CalendarComponent = () => {
 
   return (
     <Calendar
+      style={calendarStyles.calendar} // Apply the new style here
       onDayPress={day => {
         setSelected(day.dateString);
         console.log("Date Selected", day.dateString);
@@ -26,7 +27,14 @@ export const CalendarComponent = () => {
         textDisabledColor: '#888',
         monthTextColor: '#ddd',
       }}
-
     />
   );
 };
+
+
+const calendarStyles = StyleSheet.create({
+  calendar: {
+    width: 600,
+    height: 400, // Adjust the height as needed
+  },
+});
