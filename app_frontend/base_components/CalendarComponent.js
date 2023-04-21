@@ -1,26 +1,32 @@
 import React, { useState } from 'react';
 import { View, Text } from 'react-native';
-import { Calendar } from 'react-native-calendars';
-import styles from '../styles';
+import { Calendar, LocaleConfig } from 'react-native-calendars';
+import '../css/calendar.css'
 
-export const CalendarComponent = ({ onDateSelected }) => {
-  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().slice(0, 10));
-
-  const handleDateSelection = (day) => {
-    const date = `${day.year}-${day.month}-${day.day}`;
-    setSelectedDate(date);
-    onDateSelected(date);
-  };
+export const CalendarComponent = () => {
+  const [selected, setSelected] = useState(new Date().toISOString().slice(0, 10));
 
   return (
-    <View>
-      <Calendar
-        current={selectedDate}
-        markedDates={{
-          [selectedDate]: { selected: true, disableTouchEvent: true, selectedDotColor: 'orange' },
-        }}
-        onDayPress={handleDateSelection}
-      />
-    </View>
+    <Calendar
+      onDayPress={day => {
+        setSelected(day.dateString);
+        console.log("Date Selected", day.dateString);
+      }}
+      markedDates={{
+        [selected]: {selected: true, disableTouchEvent: true, selectedDotColor: 'orange'}
+      }}
+      theme={{
+        backgroundColor: '#222222',
+        calendarBackground: '#222222',
+        textSectionTitleColor: '#b6c1cd',
+        selectedDayBackgroundColor: '#00adf5',
+        selectedDayTextColor: '#ffffff',
+        todayTextColor: '#00adf5',
+        dayTextColor: '#ddd',
+        textDisabledColor: '#888',
+        monthTextColor: '#ddd',
+      }}
+
+    />
   );
 };
