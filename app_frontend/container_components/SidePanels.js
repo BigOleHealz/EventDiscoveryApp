@@ -52,9 +52,10 @@ const LeftSidePanel = (props) => {
 };
 
 const RightSidePanel = (props) => {
+	const { isVisible } = props;
 	const handleDateSelected = (date) => {
 		console.log('Right side panel selected date:', date);
-		// Perform any actions needed with the selected date
+	  // Perform any actions needed with the selected date
 	};
 
 	const handleTimeSelected = (time) => {
@@ -67,7 +68,7 @@ const RightSidePanel = (props) => {
 	};
 
 	return (
-		<SidePanelContainer id="right-panel" side="right" title="Create Game" {...props}>
+		<SidePanelContainer id="right-panel" side="right" title="Create Game" isVisible={isVisible}>
 			<CalendarComponent id="right-calendar" onDateSelected={handleDateSelected} />
 			<TimeSlider onValueChange={handleTimeSelected}/>
 			<Button title="Submit" onPress={handleSubmitButtonClick} />

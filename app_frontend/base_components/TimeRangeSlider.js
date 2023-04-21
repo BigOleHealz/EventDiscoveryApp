@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { View, Text } from 'react-native';
+import { StyleSheet, View, Text } from 'react-native';
 import RangeSlider from 'react-native-range-slider-expo';
+import styles from '../styles';
 
 export const TimeRangeSlider = ({ onValuesChange }) => {
     const [startTime, setStartTime] = useState(0);
@@ -37,10 +38,19 @@ export const TimeRangeSlider = ({ onValuesChange }) => {
 				initialFromValue={startTime}
 				initialToValue={endTime}
 			/>
-			<View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-				<Text>{startTime}</Text>
-				<Text>{endTime}</Text>
+			<View style={styles.timeSliderView}>
+				<Text style={time_range_slider_styles.text}>{startTime}</Text>
+				<Text style={time_range_slider_styles.text}>{endTime}</Text>
 			</View>
 		</View>
 	);
 };
+
+const time_range_slider_styles = StyleSheet.create({
+    view: {
+        padding: 20,
+    },
+    text: {
+        color: styles.appTheme.color
+    }
+});

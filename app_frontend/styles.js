@@ -10,9 +10,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   fullScreen: {
-    height: '100%',
-    width: '100%'
+    flex: 1
   },
+  timeSliderView: {
+    flexDirection: 'row',
+    justifyContent: 'space-between'
+  }
 
 });
 
