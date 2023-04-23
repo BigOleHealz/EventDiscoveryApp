@@ -2,16 +2,21 @@ import React, { useState, useRef, useEffect } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
 
-import { CreateGameDateTimeModal, InviteFriendsModal } from '././CreateGameModal';
-import { Button } from '../base_components/Button';
+import { CreateGameDateTimeModal, InviteFriendsModal } from './CreateGameModals';
+import { ButtonComponent } from '../base_components/ButtonComponent';
 import pinIcon from '../assets/pin.png';
 
 
-export const Map = ({ defaultCenter, pinPosition, onPinDragEnd, isCreateMode, setIsCreateMode }) => {
+export const Map = ({ defaultCenter, isCreateGameMode, setIsCreateGameMode, createGameFunction }) => {
 
     const [mapCenter, setMapCenter] = useState(defaultCenter);
-    const [isModalMenuVisible, setIsModalMenuVisible] = useState(false);
+    const [isCreateGameDateTimeModalVisible, setIsCreateGameDateTimeModalVisible] = useState(false);
     const [isInviteFriendsModalVisible, setIsInviteFriendsModalVisible] = useState(false);
+
+    // Handle Create Game vars
+    const [create_game_location, setCreateGameLocation] = useState(null);
+    const [create_game_date_time, setCreateGameDateTime] = useState(null);
+    const [create_game_friend_invite_list, setCreateGameFriendInviteList] = useState([]);
 
 
     const mapRef = React.useRef();
@@ -20,25 +25,30 @@ export const Map = ({ defaultCenter, pinPosition, onPinDragEnd, isCreateMode, se
         mapRef.current = map;
     };
 
-    const handlePinDragEnd = () => {
-        const newCenter = mapRef.current.getCenter().toJSON();
-        console.log('newCenter:', newCenter);
-        setMapCenter(newCenter);
-        onPinDragEnd(newCenter);
+
+    const handleCreateGameSelectLocationClick = () => {
+        setCreateGameLocation(mapRef.current.getCenter().toJSON());
+        setIsCreateGameDateTimeModalVisible(!isCreateGameDateTimeModalVisible);
     };
 
-    const handleBottomButtonClick = () => {
-        setIsModalMenuVisible(!isModalMenuVisible);
-    };
-
-    const handleCreateGameButtonClick = () => {
-        setIsModalMenuVisible(false);
+    const handleCreateGameSelectDateTimeButtonClick = (selected_datetime) => {
+        setCreateGameDateTime(selected_datetime);
+        setIsCreateGameDateTimeModalVisible(false);
         setIsInviteFriendsModalVisible(true);
     };
 
-    const handleInviteFriendsButtonClick = () => {
+    const handleInviteFriendsButtonClick = (friend_invite_list) => {
+        setCreateGameFriendInviteList(friend_invite_list);
+        // console.log("create_game_location:", create_game_location)
+        // console.log("create_game_date_time", create_game_date_time)
+        // console.log("create_game_friend_invite_list", create_game_friend_invite_list);
+
+        if (typeof createGameFunction === 'function') {
+            createGameFunction(create_game_location, create_game_date_time, create_game_friend_invite_list);
+        }
+
         setIsInviteFriendsModalVisible(false);
-        setIsCreateMode(false);
+        setIsCreateGameMode(false);
     };
 
     return (
@@ -50,24 +60,24 @@ export const Map = ({ defaultCenter, pinPosition, onPinDragEnd, isCreateMode, se
                 mapContainerStyle={map_styles.mapContainerStyle}
                 zoom={15}
                 center={mapCenter}
-                onDragEnd={handlePinDragEnd}
+                // onDragEnd={handlePinDragEnd}
                 draggable={true}
                 onLoad={onLoad}>
             </GoogleMap>
-            {isCreateMode && <img id="create-game-pin-marker" src={pinIcon} alt="Pin" style={map_styles.pinStyle} />}
-            {isCreateMode && (
-                <Button id="select-date-time-button" onPress={handleBottomButtonClick} title="Open Modal" style={map_styles.bottomButtonStyle} />
+            {isCreateGameMode && <img id="create-game-pin-marker" src={pinIcon} alt="Pin" style={map_styles.pinStyle} />}
+            {isCreateGameMode && (
+                <ButtonComponent id="create-game-datetime-button" onPress={handleCreateGameSelectLocationClick} title="Set Game Location" style={map_styles.bottomButtonStyle} />
             )}
             <CreateGameDateTimeModal
-                isVisible={isModalMenuVisible}
-                onRequestClose={() => setIsModalMenuVisible(false)}
-                onSubmitButtonClick={handleCreateGameButtonClick}
+                isVisible={isCreateGameDateTimeModalVisible}
+                onRequestClose={() => setIsCreateGameDateTimeModalVisible(false)}
+                onSubmitButtonClick={handleCreateGameSelectDateTimeButtonClick}
             />
 
             <InviteFriendsModal
                 isVisible={isInviteFriendsModalVisible}
                 onRequestClose={() => setIsInviteFriendsModalVisible(false)}
-                onButtonClick={handleInviteFriendsButtonClick}
+                onSubmitButtonClick={handleInviteFriendsButtonClick}
             />
         </LoadScript>
     );

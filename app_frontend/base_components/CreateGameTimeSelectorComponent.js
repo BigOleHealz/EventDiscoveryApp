@@ -6,7 +6,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import '../css/datePickerStyles.css'
 import styles from '../styles';
 
-export const CreateGameTimeSelector = ({ onValueChange }) => {
+export const CreateGameTimeSelectorComponent = ({ onValueChange }) => {
   const [time, setTime] = useState(new Date());
 
   const handleTimeChange = (value) => {

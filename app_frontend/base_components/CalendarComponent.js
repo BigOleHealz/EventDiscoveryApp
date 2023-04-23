@@ -3,18 +3,20 @@ import { View, Text, StyleSheet  } from 'react-native';
 import { Calendar, LocaleConfig } from 'react-native-calendars';
 import '../css/calendar.css'
 
-export const CalendarComponent = () => {
-  const [selected, setSelected] = useState(new Date().toISOString().slice(0, 10));
+export const CalendarComponent = ({ selected }) => {
+  const currentDate = new Date().toISOString().split('T')[0];
+  const [selectedDate, setSelectedDate] = useState(selected || currentDate);
+
 
   return (
     <Calendar
-      style={calendarStyles.calendar} // Apply the new style here
+      style={calendar_styles.calendar} // Apply the new style here
       onDayPress={day => {
-        setSelected(day.dateString);
+        setSelectedDate(day.dateString);
         console.log("Date Selected", day.dateString);
       }}
       markedDates={{
-        [selected]: {selected: true, disableTouchEvent: true, selectedDotColor: 'orange'}
+        [selectedDate]: {selected: true, disableTouchEvent: true, selectedDotColor: 'orange'}
       }}
       theme={{
         backgroundColor: '#222222',
@@ -32,7 +34,7 @@ export const CalendarComponent = () => {
 };
 
 
-const calendarStyles = StyleSheet.create({
+const calendar_styles = StyleSheet.create({
   calendar: {
     width: 600,
     height: 400, // Adjust the height as needed

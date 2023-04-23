@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Animated } from 'react-native';
 import { CalendarComponent } from '../base_components/CalendarComponent';
-import { TimeRangeSlider } from '../base_components/TimeRangeSlider';
+import { TimeRangeSliderComponent } from '../base_components/TimeRangeSliderComponent';
 import styles from '../styles';
 
 const SidePanelContainer = ({ isVisible, side, title, children }) => {
@@ -44,7 +44,7 @@ const LeftSidePanel = (props) => {
     return (
     <SidePanelContainer id="left-panel" side="left" title="Find Games" {...props}>
         <CalendarComponent id="left-calendar" onDateSelected={handleDateSelected} />
-        <TimeRangeSlider onValuesChange={handleTimeRangeValuesChange}/>
+        <TimeRangeSliderComponent onValuesChange={handleTimeRangeValuesChange}/>
     </SidePanelContainer>
     );
 };
