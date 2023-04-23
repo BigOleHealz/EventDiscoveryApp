@@ -32,9 +32,15 @@ export default function App() {
     <View style={[styles.container, styles.appTheme]}>
       <Toolbar onLeftButtonClick={handleLeftButtonClick} onRightButtonClick={handleRightButtonClick} />
       <View style={styles.fullScreen}>
-        <Map defaultCenter={defaultCenter} pinPosition={pinPosition} onPinDragEnd={setPinPosition} isCreateMode={isCreateMode} />
+        <Map
+          defaultCenter={defaultCenter}
+          pinPosition={pinPosition}
+          onPinDragEnd={setPinPosition}
+          isCreateMode={isCreateMode}
+          setIsCreateMode={setIsCreateMode}
+        />
         <LeftSidePanel isVisible={isLeftPanelVisible} />
       </View>
     </View>
   );
-}
+};
