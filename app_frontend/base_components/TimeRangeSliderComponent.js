@@ -3,7 +3,7 @@ import { StyleSheet, View, Text } from 'react-native';
 import RangeSlider from 'react-native-range-slider-expo';
 import styles from '../styles';
 
-export const TimeRangeSlider = ({ onValuesChange }) => {
+export const TimeRangeSliderComponent = ({ onValuesChange }) => {
     const [startTime, setStartTime] = useState(0);
     const [endTime, setEndTime] = useState(24);
 

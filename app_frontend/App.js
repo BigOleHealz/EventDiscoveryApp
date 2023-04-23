@@ -6,38 +6,47 @@ import { Map } from './container_components/Map';
 import { LeftSidePanel } from './container_components/SidePanels';
 
 export default function App() {
-  // Handle left side panel
-  const [isLeftPanelVisible, setIsLeftPanelVisible] = useState(false);
-
-  const handleLeftButtonClick = () => {
-    setIsLeftPanelVisible(!isLeftPanelVisible);
-  };
-
+  
   // Handle Map
   const defaultCenter = {
     lat: 39.9526,
     lng: -75.1652,
   };
-  // Handle Modal
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isCreateMode, setIsCreateMode] = useState(false);
-  const handleRightButtonClick = () => {
-    setIsCreateMode(!isCreateMode);
+  
+  // Handle left side panel
+  const [isLeftPanelVisible, setIsLeftPanelVisible] = useState(false);
+  const [isCreateGameMode, setIsCreateGameMode] = useState(false);
+
+  const handleFindGamesButtonClick = () => {
+    setIsCreateGameMode(false);
+    setIsLeftPanelVisible(!isLeftPanelVisible);
   };
 
-  // Handle pin drop from Create Game panel
-  const [pinPosition, setPinPosition] = useState(null);
+  // Handle Modal
+  const handleCreateGameButtonClick = () => {
+    setIsLeftPanelVisible(false);
+    setIsCreateGameMode(!isCreateGameMode);
+  };
+
+  const createGameFunction = (location, dateTime, friendInviteList) => {
+    console.log('Creating game with the following parameters:');
+    console.log('Location:', location);
+    console.log('Date & Time:', dateTime);
+    console.log('Friend Invite List:', friendInviteList);
+  
+    // Add your game creation logic here
+  };
+  
 
   return (
     <View style={[styles.container, styles.appTheme]}>
-      <Toolbar onLeftButtonClick={handleLeftButtonClick} onRightButtonClick={handleRightButtonClick} />
+      <Toolbar onLeftButtonClick={handleFindGamesButtonClick} onRightButtonClick={handleCreateGameButtonClick} />
       <View style={styles.fullScreen}>
         <Map
           defaultCenter={defaultCenter}
-          pinPosition={pinPosition}
-          onPinDragEnd={setPinPosition}
-          isCreateMode={isCreateMode}
-          setIsCreateMode={setIsCreateMode}
+          isCreateGameMode={isCreateGameMode}
+          setIsCreateGameMode={setIsCreateGameMode}
+          createGameFunction={createGameFunction}
         />
         <LeftSidePanel isVisible={isLeftPanelVisible} />
       </View>
