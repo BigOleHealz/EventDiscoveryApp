@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
+import ReactDOM from 'react-dom';
 import { View } from 'react-native';
 import styles from './styles';
 import { Toolbar } from './container_components/Toolbar';
 import { Map } from './container_components/Map';
 import { LeftSidePanel } from './container_components/SidePanels';
+import { Neo4jProviderWrapper } from './db/DBHandler';
 
 export default function App() {
-  
+
   // Handle Map
   const defaultCenter = {
     lat: 39.9526,
@@ -39,17 +41,20 @@ export default function App() {
   
 
   return (
-    <View style={[styles.container, styles.appTheme]}>
-      <Toolbar onLeftButtonClick={handleFindGamesButtonClick} onRightButtonClick={handleCreateGameButtonClick} />
-      <View style={styles.fullScreen}>
-        <Map
-          defaultCenter={defaultCenter}
-          isCreateGameMode={isCreateGameMode}
-          setIsCreateGameMode={setIsCreateGameMode}
-          createGameFunction={createGameFunction}
-        />
-        <LeftSidePanel isVisible={isLeftPanelVisible} />
+    <Neo4jProviderWrapper>
+
+      <View style={[styles.container, styles.appTheme]}>
+        <Toolbar onLeftButtonClick={handleFindGamesButtonClick} onRightButtonClick={handleCreateGameButtonClick} />
+        <View style={styles.fullScreen}>
+          <Map
+            defaultCenter={defaultCenter}
+            isCreateGameMode={isCreateGameMode}
+            setIsCreateGameMode={setIsCreateGameMode}
+            createGameFunction={createGameFunction}
+          />
+          <LeftSidePanel isVisible={isLeftPanelVisible} />
+        </View>
       </View>
-    </View>
+    </Neo4jProviderWrapper>
   );
 };
