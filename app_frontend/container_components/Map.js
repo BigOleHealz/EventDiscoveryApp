@@ -8,12 +8,14 @@ import { CreateGameDateTimeModal, InviteFriendsModal } from './CreateGameModals'
 import { ButtonComponent } from '../base_components/ButtonComponent';
 import MapMarkerWithTooltip from './MapMarkerWithTooltip';
 
-import AWSHandler from '../AWSHandler';
+import AWSHandler from '../utils/AWSHandler';
 import { CypherQueryHandler } from '../db/DBHandler';
 import { FETCH_EVENTS_FOR_MAP } from '../db/queries'
 
 import pinIcon from '../assets/pin.png';
 
+
+const awsHandler = new AWSHandler();
 
 export const Map = ({ defaultCenter, isCreateGameMode, setIsCreateGameMode, createGameFunction }) => {
 
@@ -57,7 +59,6 @@ export const Map = ({ defaultCenter, isCreateGameMode, setIsCreateGameMode, crea
     };
     useEffect(() => {
         const fetchSecrets = async () => {
-            const awsHandler = new AWSHandler();
             const secrets = await awsHandler.getSecretValue('google_maps_api_key');
             if (secrets) {
                 // Use the secrets, e.g., set the API key
