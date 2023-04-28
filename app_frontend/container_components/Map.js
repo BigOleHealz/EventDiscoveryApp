@@ -1,26 +1,32 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
-import isEqual from 'lodash.isequal';
+// import isEqual from 'lodash.isequal';
 
 
-import { CreateGameDateTimeModal, InviteFriendsModal } from './CreateGameModals';
+// import { CreateGameDateTimeModal, InviteFriendsModal } from './CreateGameModals';
 import { ButtonComponent } from '../base_components/ButtonComponent';
-import MapMarkerWithTooltip from './MapMarkerWithTooltip';
+// import MapMarkerWithTooltip from './MapMarkerWithTooltip';
 
-import AWSHandler from '../utils/AWSHandler';
-import { CypherQueryHandler } from '../db/DBHandler';
-import { FETCH_EVENTS_FOR_MAP } from '../db/queries'
+// import AWSHandler from '../utils/AWSHandler';
+// import { CypherQueryHandler } from '../db/DBHandler';
+// import { FETCH_EVENTS_FOR_MAP } from '../db/queries'
 
-import pinIcon from '../assets/pin.png';
+// import pinIcon from '../assets/pin.png';
 
 
-const awsHandler = new AWSHandler();
+// const awsHandler = new AWSHandler();
 
-export const Map = ({ defaultCenter, isCreateGameMode, setIsCreateGameMode, createGameFunction }) => {
+export const Map = ({
+    defaultCenter,
+    isCreateGameMode,
+    // setIsCreateGameMode,
+    // createGameFunction 
+}) => {
 
     const [mapCenter, setMapCenter] = useState(defaultCenter);
-    const [googleMapsApiKey, setGoogleMapsApiKey] = useState(null); // Add this state to store the API key
+    // const [googleMapsApiKey, setGoogleMapsApiKey] = useState(null); // Add this state to store the API key
+    const googleMapsApiKey = "";
 
     const [isCreateGameDateTimeModalVisible, setIsCreateGameDateTimeModalVisible] = useState(false);
     const [isInviteFriendsModalVisible, setIsInviteFriendsModalVisible] = useState(false);
@@ -35,21 +41,21 @@ export const Map = ({ defaultCenter, isCreateGameMode, setIsCreateGameMode, crea
 
 
 
-    const queryResult = CypherQueryHandler({cypher: FETCH_EVENTS_FOR_MAP});
-    console.log('queryResult:', queryResult)
-    // Update events based on the response from CypherQueryHandler
-    useEffect(() => {
-        if (queryResult) {
-          setEvents((prevEvents) => {
-            // Only update the events state if the queryResult is different from the previous state
-            if (!isEqual(queryResult, prevEvents)) {
-              return queryResult;
-            }
-            // If they are equal, return the previous state without any change
-            return prevEvents;
-          });
-        }
-      }, [queryResult]);
+    // const queryResult = CypherQueryHandler({cypher: FETCH_EVENTS_FOR_MAP});
+    // console.log('queryResult:', queryResult)
+    // // Update events based on the response from CypherQueryHandler
+    // useEffect(() => {
+    //     if (queryResult) {
+    //       setEvents((prevEvents) => {
+    //         // Only update the events state if the queryResult is different from the previous state
+    //         if (!isEqual(queryResult, prevEvents)) {
+    //           return queryResult;
+    //         }
+    //         // If they are equal, return the previous state without any change
+    //         return prevEvents;
+    //       });
+    //     }
+    //   }, [queryResult]);
 
 
     const mapRef = React.useRef();
@@ -57,17 +63,17 @@ export const Map = ({ defaultCenter, isCreateGameMode, setIsCreateGameMode, crea
     const onLoad = (map) => {
         mapRef.current = map;
     };
-    useEffect(() => {
-        const fetchSecrets = async () => {
-            const secrets = await awsHandler.getSecretValue('google_maps_api_key');
-            if (secrets) {
-                // Use the secrets, e.g., set the API key
-                setGoogleMapsApiKey(secrets.GOOGLE_MAPS_API_KEY);
-            }
-        };
+    // useEffect(() => {
+    //     const fetchSecrets = async () => {
+    //         const secrets = await awsHandler.getSecretValue('google_maps_api_key');
+    //         if (secrets) {
+    //             // Use the secrets, e.g., set the API key
+    //             setGoogleMapsApiKey(secrets.GOOGLE_MAPS_API_KEY);
+    //         }
+    //     };
     
-        fetchSecrets();
-    }, []);
+    //     fetchSecrets();
+    // }, []);
     
     // Manage map popup
     const [activePopup, setActivePopup] = useState(null);
@@ -131,7 +137,7 @@ export const Map = ({ defaultCenter, isCreateGameMode, setIsCreateGameMode, crea
                         }
                     ]
                 }}>
-            {Array.isArray(events) &&
+            {/* {Array.isArray(events) &&
               events.map((event) => (
                 <MapMarkerWithTooltip
                   key={event.UUID}
@@ -139,13 +145,13 @@ export const Map = ({ defaultCenter, isCreateGameMode, setIsCreateGameMode, crea
                   activePopup={activePopup}
                   onSetActivePopup={handleSetActivePopup}
                 />
-            ))}
+            ))} */}
             </GoogleMap>
             {isCreateGameMode && <img id="create-game-pin-marker" src={pinIcon} alt="Pin" style={map_styles.pinStyle} />}
             {isCreateGameMode && (
                 <ButtonComponent id="create-game-datetime-button" onPress={handleCreateGameSelectLocationClick} title="Set Game Location" style={map_styles.bottomButtonStyle} />
             )}
-            <CreateGameDateTimeModal
+            {/* <CreateGameDateTimeModal
                 isVisible={isCreateGameDateTimeModalVisible}
                 onRequestClose={() => setIsCreateGameDateTimeModalVisible(false)}
                 onSubmitButtonClick={handleCreateGameSelectDateTimeButtonClick}
@@ -155,7 +161,7 @@ export const Map = ({ defaultCenter, isCreateGameMode, setIsCreateGameMode, crea
                 isVisible={isInviteFriendsModalVisible}
                 onRequestClose={() => setIsInviteFriendsModalVisible(false)}
                 onSubmitButtonClick={handleInviteFriendsButtonClick}
-            />
+            /> */}
         </LoadScript>
     );
 };

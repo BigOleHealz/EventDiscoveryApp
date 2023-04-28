@@ -1,11 +1,16 @@
 import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
-import { View } from 'react-native';
+import { View, Text } from 'react-native';
 import styles from './styles';
 import { Toolbar } from './container_components/Toolbar';
 import { Map } from './container_components/Map';
-import { LeftSidePanel } from './container_components/SidePanels';
-import { Neo4jProviderWrapper } from './db/DBHandler';
+// import { LeftSidePanel } from './container_components/SidePanels';
+// import { Neo4jProviderWrapper } from './db/DBHandler';
+
+import ErrorBoundary from './utils/ErrorBoundary';
+
+
+console.log("Starting App")
 
 export default function App() {
 
@@ -41,9 +46,10 @@ export default function App() {
   
 
   return (
-    <Neo4jProviderWrapper>
+    
+  <ErrorBoundary>
 
-      <View style={[styles.container, styles.appTheme]}>
+      <View style={styles.container}>
         <Toolbar onLeftButtonClick={handleFindGamesButtonClick} onRightButtonClick={handleCreateGameButtonClick} />
         <View style={styles.fullScreen}>
           <Map
@@ -52,9 +58,9 @@ export default function App() {
             setIsCreateGameMode={setIsCreateGameMode}
             createGameFunction={createGameFunction}
           />
-          <LeftSidePanel isVisible={isLeftPanelVisible} />
+          {/* <LeftSidePanel isVisible={isLeftPanelVisible} /> */}
         </View>
       </View>
-    </Neo4jProviderWrapper>
+    </ErrorBoundary>
   );
 };
