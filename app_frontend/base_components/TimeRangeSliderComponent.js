@@ -3,21 +3,23 @@ import { StyleSheet, View, Text } from 'react-native';
 import RangeSlider from 'react-native-range-slider-expo';
 import styles from '../styles';
 
-export const TimeRangeSliderComponent = ({ startTime, endTime, onValuesChange }) => {
+export const TimeRangeSliderComponent = ({ startTime, endTime, setStartTime, setEndTime }) => {
 	const [start, setStart] = useState(startTime);
 	const [end, setEnd] = useState(endTime);
 
-	const handleStartTimeChange = (value) => {
+  const handleStartTimeChange = (value) => {
     const start_time_db_string = numberToDesiredTimeString(value);
-		console.log('StartTime Changed - Start:', start_time_db_string, 'End:', end);
-		setStart(start_time_db_string);
-	  };
+    console.log('StartTime Changed - Start:', start_time_db_string, 'End:', end);
+    setStart(start_time_db_string);
+    setStartTime(start_time_db_string); // Update the parent state
+  };
 	
-	const handleEndTimeChange = (value) => {
+  const handleEndTimeChange = (value) => {
     const end_time_db_string = numberToDesiredTimeString(value);
-		console.log('EndTime Changed - Start:', start, 'End:', end_time_db_string);
-		setEnd(end_time_db_string);
-	};
+    console.log('EndTime Changed - Start:', start, 'End:', end_time_db_string);
+    setEnd(end_time_db_string);
+    setEndTime(end_time_db_string); // Update the parent state
+  };
 
   function formatTime(time) {
     const [hour, minute, second] = time.split(':');
@@ -37,7 +39,7 @@ export const TimeRangeSliderComponent = ({ startTime, endTime, onValuesChange })
     }
     const hour = Math.floor(number);
     return `${hour.toString().padStart(2, '0')}:00:00`;
-  }
+  };
 
   function convertTimeStringToHour(time) {
     const [hour, minute, second] = time.split(':');
@@ -56,7 +58,7 @@ export const TimeRangeSliderComponent = ({ startTime, endTime, onValuesChange })
       const period = value < 12 ? 'AM' : 'PM';
       return `${hour} ${period}`;
     }
-  }
+  };
   
 
 	return (

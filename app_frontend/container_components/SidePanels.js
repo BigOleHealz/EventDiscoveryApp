@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Animated } from 'react-native';
+import React, { useRef, useEffect } from 'react';
+import { StyleSheet, Text, View, Animated } from 'react-native';
 import { CalendarComponent } from '../base_components/CalendarComponent';
 import { TimeRangeSliderComponent } from '../base_components/TimeRangeSliderComponent';
 import styles from '../styles';
@@ -34,7 +34,9 @@ const LeftSidePanel = ({
 	findGameSelectedDate,
 	setFindGameSelectedDate,
 	findGameStartTime,
-	findGameEndTime
+	setFindGameStartTime,
+	findGameEndTime,
+	setFindGameEndTime
 }) => {
 
     const handleDateSelected = (date) => {
@@ -62,9 +64,10 @@ const LeftSidePanel = ({
 			style={side_panel_styles.calendarStyle}
 		/>
         <TimeRangeSliderComponent
-			onValuesChange={handleTimeRangeValuesChange}
 			startTime={findGameStartTime} // Pass findGameStartTime
+			setStartTime={setFindGameStartTime} // Pass setFindGameStartTime
 			endTime={findGameEndTime} // Pass findGameEndTime
+			setEndTime={setFindGameEndTime} // Pass setFindGameEndTime
 		/>
     </SidePanelContainer>
     );

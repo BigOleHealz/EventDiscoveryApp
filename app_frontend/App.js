@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text } from 'react-native';
+import { View } from 'react-native';
 import { format } from 'date-fns';
 
 import styles from './styles';
@@ -28,7 +28,8 @@ export default function App() {
   const [isCreateGameMode, setIsCreateGameMode] = useState(false);
 
   const currentDateTime = new Date();
-  const [findGameStartTime, setFindGameStartTime] = useState(format(currentDateTime, 'HH:mm:ss'));
+  // const [findGameStartTime, setFindGameStartTime] = useState(format(currentDateTime, 'HH:mm:ss'));
+  const [findGameStartTime, setFindGameStartTime] = useState('00:00:00');
   const [findGameEndTime, setFindGameEndTime] = useState('23:59:59');
   const [findGameSelectedDate, setFindGameSelectedDate] = useState(format(currentDateTime, 'yyyy-MM-dd'));
 
@@ -70,19 +71,20 @@ export default function App() {
               // setIsCreateGameMode={setIsCreateGameMode}
               // createGameFunction={createGameFunction}
               findGameSelectedDate={findGameSelectedDate}
-              // findGameStartTime={findGameStartTime}
-              // findGameEndTime={findGameEndTime}
-              setFindGameSelectedDate={setFindGameSelectedDate}
+              findGameStartTime={findGameStartTime}
+              findGameEndTime={findGameEndTime}
+              // setFindGameSelectedDate={setFindGameSelectedDate}
               // setFindGameStartTime={setFindGameStartTime}
               // setFindGameEndTime={setFindGameEndTime}
-              // mapEventsFullDay={map_events_full_day}
             />
             <LeftSidePanel
               isVisible={isLeftPanelVisible}
               findGameSelectedDate={findGameSelectedDate}
               setFindGameSelectedDate={setFindGameSelectedDate}
               findGameStartTime={findGameStartTime}
+              setFindGameStartTime={setFindGameStartTime}
               findGameEndTime={findGameEndTime}
+              setFindGameEndTime={setFindGameEndTime}
             />
           </View>
         </View>
