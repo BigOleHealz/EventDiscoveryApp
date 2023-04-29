@@ -29,10 +29,17 @@ const SidePanelContainer = ({ isVisible, side, title, children }) => {
     ) : null;
 };
 
-const LeftSidePanel = (props) => {
+const LeftSidePanel = ({
+	isVisible,
+	findGameSelectedDate,
+	setFindGameSelectedDate,
+	findGameStartTime,
+	findGameEndTime
+}) => {
 
     const handleDateSelected = (date) => {
         console.log('Left side panel selected date:', date);
+		setFindGameSelectedDate(date);
         // Perform any actions needed with the selected date
     };
 
@@ -42,9 +49,23 @@ const LeftSidePanel = (props) => {
     };
     
     return (
-    <SidePanelContainer id="left-panel" side="left" title="Find Games" {...props}>
-        <CalendarComponent id="left-calendar" onDateSelected={handleDateSelected} />
-        <TimeRangeSliderComponent onValuesChange={handleTimeRangeValuesChange}/>
+    <SidePanelContainer
+		id="left-panel"
+		side="left"
+		title="Find Games" 
+		isVisible={isVisible}
+	>
+        <CalendarComponent
+			id="left-calendar"
+			selected={findGameSelectedDate} // Pass findGameSelectedDate
+			onDateSelected={handleDateSelected}
+			style={side_panel_styles.calendarStyle}
+		/>
+        <TimeRangeSliderComponent
+			onValuesChange={handleTimeRangeValuesChange}
+			startTime={findGameStartTime} // Pass findGameStartTime
+			endTime={findGameEndTime} // Pass findGameEndTime
+		/>
     </SidePanelContainer>
     );
 };
@@ -69,7 +90,6 @@ const side_panel_styles = StyleSheet.create({
 		backgroundColor: styles.appTheme.backgroundColor,
 		justifyContent: 'center',
 		alignItems: 'center',
-		// Shadow styles for elevation
 		shadowColor: '#000',
 		shadowOffset: {
 			width: 10,
@@ -99,6 +119,10 @@ const side_panel_styles = StyleSheet.create({
 	leftPanel: {
 		left: 0,
 	},
+	calendarStyle: {
+		width: '100%',
+		// margin: 10
+	}
 })
 
 export { LeftSidePanel };

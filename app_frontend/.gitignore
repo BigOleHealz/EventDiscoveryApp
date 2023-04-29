@@ -18,3 +18,4 @@ web-build/
 
 .vscode
 node_modules*
+secrets.js

@@ -3,17 +3,61 @@ import { StyleSheet, View, Text } from 'react-native';
 import RangeSlider from 'react-native-range-slider-expo';
 import styles from '../styles';
 
-export const TimeRangeSliderComponent = ({ onValuesChange }) => {
-    const [startTime, setStartTime] = useState(0);
-    const [endTime, setEndTime] = useState(24);
+export const TimeRangeSliderComponent = ({ startTime, endTime, onValuesChange }) => {
+	const [start, setStart] = useState(startTime);
+	const [end, setEnd] = useState(endTime);
 
-    const handleStartTimeChange = (value) => {
-		setStartTime(value);
-	};
-
+	const handleStartTimeChange = (value) => {
+    const start_time_db_string = numberToDesiredTimeString(value);
+		console.log('StartTime Changed - Start:', start_time_db_string, 'End:', end);
+		setStart(start_time_db_string);
+	  };
+	
 	const handleEndTimeChange = (value) => {
-		setEndTime(value);
+    const end_time_db_string = numberToDesiredTimeString(value);
+		console.log('EndTime Changed - Start:', start, 'End:', end_time_db_string);
+		setEnd(end_time_db_string);
 	};
+
+  function formatTime(time) {
+    const [hour, minute, second] = time.split(':');
+    const date = new Date();
+    date.setHours(hour, minute, second);
+    
+    if (time === '23:59:59') {
+      return '11:59 PM';
+    } else {
+      return date.toLocaleTimeString('en-US', { hour: 'numeric', hour12: true });
+    }
+  };
+
+  function numberToDesiredTimeString(number) {
+    if (number === 24) {
+      return "23:59:59";
+    }
+    const hour = Math.floor(number);
+    return `${hour.toString().padStart(2, '0')}:00:00`;
+  }
+
+  function convertTimeStringToHour(time) {
+    const [hour, minute, second] = time.split(':');
+    if (time === '23:59:59') {
+      return 24;
+    } else {
+      return parseInt(hour, 10);
+    }
+  };
+  
+  function sliderValueToFormattedTime(value) {
+    if (value === 24) {
+      return '11:59 PM';
+    } else {
+      const hour = value % 12 === 0 ? 12 : value % 12;
+      const period = value < 12 ? 'AM' : 'PM';
+      return `${hour} ${period}`;
+    }
+  }
+  
 
 	return (
 		<View>
@@ -30,17 +74,20 @@ export const TimeRangeSliderComponent = ({ onValuesChange }) => {
 				selectedColor="#2196F3"
 				unselectedColor="#ddd"
 				containerStyle={{ marginTop: 20 }}
+        handleLabel={sliderValueToFormattedTime}
 				handleLabelStyle={{ backgroundColor: 'transparent', color: '#000' }}
-				handleLabelVisible
+				handleLabelVisible={false}
 				labelStyle={{ fontSize: 16, color: '#000' }}
 				labelPrefix="Time: "
 				labelSuffix=" hrs"
-				initialFromValue={startTime}
-				initialToValue={endTime}
+        
+				initialFromValue={0}
+				initialToValue={24}
+        
 			/>
-			<View style={styles.timeSliderView}>
-				<Text style={time_range_slider_styles.text}>{startTime}</Text>
-				<Text style={time_range_slider_styles.text}>{endTime}</Text>
+      <View style={styles.timeSliderView}>
+				<Text style={time_range_slider_styles.text}>{formatTime(start)}</Text>
+				<Text style={time_range_slider_styles.text}>{formatTime(end)}</Text>
 			</View>
 		</View>
 	);

@@ -1,6 +1,8 @@
 // cypherQueries.js
+
 export const FETCH_EVENTS_FOR_MAP = `
     MATCH (n:Event)
+    WHERE "{0}" <= n.StartTimestamp <= "{1}"
     OPTIONAL MATCH (n)-[r:ATTENDING]-()
     WITH n, count(r) as AttendeeCount
     RETURN
