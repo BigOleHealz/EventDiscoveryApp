@@ -23,9 +23,9 @@ export const Map = ({
     // setIsCreateGameMode,
     // createGameFunction 
   findGameSelectedDate,
-  // findGameStartTime,
-  // findGameEndTime,
-  setFindGameSelectedDate,
+  findGameStartTime,
+  findGameEndTime,
+//   setFindGameSelectedDate,
   // setFindGameStartTime,
   // setFindGameEndTime,
 }) => {
@@ -55,6 +55,7 @@ export const Map = ({
 
     // Handle Map Events
     const [map_events_full_day, setMapEventsFullDay] = useState([]);
+    const [map_events_filtered, setMapEventsFiltered] = useState([]);
 
     const start_timestamp = `${findGameSelectedDate}T00:00:00`;
     const end_timestamp = `${findGameSelectedDate}T23:59:59`;
@@ -73,10 +74,28 @@ export const Map = ({
     
     useEffect(() => {
       if (!loading && !error && records) {
-        console.log("queryResult", records);
         setMapEventsFullDay(records);
+        setMapEventsFiltered(map_events_full_day);
       }
     }, [loading, error, records]);
+
+    // Handle Time Filter for Map Events
+    useEffect(() => {
+        const filteredEvents = map_events_full_day.filter(event => {
+          const eventTimestamp = new Date(event.StartTimestamp);
+          const startTime = new Date(`${findGameSelectedDate}T${findGameStartTime}`);
+          const endTime = new Date(`${findGameSelectedDate}T${findGameEndTime}`);
+        
+          console.log('eventTimestamp:', eventTimestamp);
+          console.log('startTime:', startTime);
+          console.log('endTime:', endTime);
+      
+          return eventTimestamp >= startTime && eventTimestamp <= endTime;
+        });
+        
+        console.log('filteredEvents', filteredEvents);
+        setMapEventsFiltered(filteredEvents);
+      }, [findGameStartTime, findGameEndTime, map_events_full_day]);
   
     
     // Manage map popup
@@ -141,8 +160,8 @@ export const Map = ({
                     }}
                 
             >
-            {Array.isArray(map_events_full_day) &&
-              map_events_full_day.map((event) => (
+            {Array.isArray(map_events_filtered) &&
+              map_events_filtered.map((event) => (
                 <MapMarkerWithTooltip
                   key={event.UUID}
                   event={event}

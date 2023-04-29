@@ -11,6 +11,7 @@ export const FETCH_EVENTS_FOR_MAP = `
         n.Host as Host,
         n.Lon as Lon,
         n.Lat as Lat,
+        n.StartTimestamp as StartTimestamp,
         n.UUID as UUID,
         AttendeeCount,
         CASE

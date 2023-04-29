@@ -13,7 +13,6 @@ const Neo4jProviderWrapper = ({ children }) => {
     const fetchSecrets = async () => {
         const secrets = await awsHandler.getSecretValue('neo4j_credentials_public');
         if (secrets) {
-          console.log('Neo4j credentials retrieved:', secrets);
             // Use the secrets, e.g., set the API key
             setNeo4jCredentials(secrets);
         }
