@@ -1,19 +1,17 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet  } from 'react-native';
-import { Calendar, LocaleConfig } from 'react-native-calendars';
-import '../css/calendar.css'
+import { Calendar } from 'react-native-calendars';
 
-export const CalendarComponent = ({ selected }) => {
+export const CalendarComponent = ({ selected, onDateSelected, style }) => {
   const currentDate = new Date().toISOString().split('T')[0];
   const [selectedDate, setSelectedDate] = useState(selected || currentDate);
 
-
   return (
     <Calendar
-      style={calendar_styles.calendar} // Apply the new style here
+      style={style} // Merge the default styles with the passed-in style
       onDayPress={day => {
         setSelectedDate(day.dateString);
-        console.log("Date Selected", day.dateString);
+        console.log('Date Selected', day.dateString);
+        onDateSelected(day.dateString); // Pass the new selected date to the parent component
       }}
       markedDates={{
         [selectedDate]: {selected: true, disableTouchEvent: true, selectedDotColor: 'orange'}
@@ -32,11 +30,3 @@ export const CalendarComponent = ({ selected }) => {
     />
   );
 };
-
-
-const calendar_styles = StyleSheet.create({
-  calendar: {
-    width: 600,
-    height: 400, // Adjust the height as needed
-  },
-});

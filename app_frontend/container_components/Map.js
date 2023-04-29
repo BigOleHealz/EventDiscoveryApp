@@ -1,79 +1,83 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
-// import isEqual from 'lodash.isequal';
 
 
 // import { CreateGameDateTimeModal, InviteFriendsModal } from './CreateGameModals';
 import { ButtonComponent } from '../base_components/ButtonComponent';
-// import MapMarkerWithTooltip from './MapMarkerWithTooltip';
+import MapMarkerWithTooltip from './MapMarkerWithTooltip';
 
-// import AWSHandler from '../utils/AWSHandler';
-// import { CypherQueryHandler } from '../db/DBHandler';
-// import { FETCH_EVENTS_FOR_MAP } from '../db/queries'
+import AWSHandler from '../utils/AWSHandler';
+import { useCypherQueryHandler, formatString } from '../db/DBHandler';
+import { useReadCypher } from 'use-neo4j'
+import { FETCH_EVENTS_FOR_MAP } from '../db/queries'
 
 // import pinIcon from '../assets/pin.png';
 
 
-// const awsHandler = new AWSHandler();
+const awsHandler = new AWSHandler();
 
 export const Map = ({
-    defaultCenter,
-    isCreateGameMode,
+  defaultCenter,
+  isCreateGameMode,
     // setIsCreateGameMode,
     // createGameFunction 
+  findGameSelectedDate,
+  // findGameStartTime,
+  // findGameEndTime,
+  setFindGameSelectedDate,
+  // setFindGameStartTime,
+  // setFindGameEndTime,
 }) => {
 
     const [mapCenter, setMapCenter] = useState(defaultCenter);
-    // const [googleMapsApiKey, setGoogleMapsApiKey] = useState(null); // Add this state to store the API key
-    const googleMapsApiKey = "";
-
-    const [isCreateGameDateTimeModalVisible, setIsCreateGameDateTimeModalVisible] = useState(false);
-    const [isInviteFriendsModalVisible, setIsInviteFriendsModalVisible] = useState(false);
-
-    // Handle Create Game vars
-    const [create_game_location, setCreateGameLocation] = useState(null);
-    const [create_game_date_time, setCreateGameDateTime] = useState(null);
-    const [create_game_friend_invite_list, setCreateGameFriendInviteList] = useState([]);
-
-    const [events, setEvents] = useState([]);
+    const [googleMapsApiKey, setGoogleMapsApiKey] = useState(null); // Add this state to store the API key
 
 
-
-
-    // const queryResult = CypherQueryHandler({cypher: FETCH_EVENTS_FOR_MAP});
-    // console.log('queryResult:', queryResult)
-    // // Update events based on the response from CypherQueryHandler
-    // useEffect(() => {
-    //     if (queryResult) {
-    //       setEvents((prevEvents) => {
-    //         // Only update the events state if the queryResult is different from the previous state
-    //         if (!isEqual(queryResult, prevEvents)) {
-    //           return queryResult;
-    //         }
-    //         // If they are equal, return the previous state without any change
-    //         return prevEvents;
-    //       });
-    //     }
-    //   }, [queryResult]);
-
-
+    // Handle Map
     const mapRef = React.useRef();
-
     const onLoad = (map) => {
+        console.log("Map onLoad")
         mapRef.current = map;
     };
-    // useEffect(() => {
-    //     const fetchSecrets = async () => {
-    //         const secrets = await awsHandler.getSecretValue('google_maps_api_key');
-    //         if (secrets) {
-    //             // Use the secrets, e.g., set the API key
-    //             setGoogleMapsApiKey(secrets.GOOGLE_MAPS_API_KEY);
-    //         }
-    //     };
+
+    useEffect(() => {
+        const fetchSecrets = async () => {
+            const secrets = await awsHandler.getSecretValue('google_maps_api_key');
+            if (secrets) {
+                // Use the secrets, e.g., set the API key
+                setGoogleMapsApiKey(secrets.GOOGLE_MAPS_API_KEY);
+            }
+        };
     
-    //     fetchSecrets();
-    // }, []);
+        fetchSecrets();
+    }, []);
+
+    // Handle Map Events
+    const [map_events_full_day, setMapEventsFullDay] = useState([]);
+
+    const start_timestamp = `${findGameSelectedDate}T00:00:00`;
+    const end_timestamp = `${findGameSelectedDate}T23:59:59`;
+
+    const {
+      loading,
+      error,
+      records,
+      run,
+    } = useCypherQueryHandler(formatString(FETCH_EVENTS_FOR_MAP, start_timestamp, end_timestamp));
+    
+    useEffect(() => {
+      console.log('findGameSelectedDate changed', findGameSelectedDate);
+      run(); // Run the query when findGameSelectedDate changes
+    }, [findGameSelectedDate]);
+    
+    useEffect(() => {
+      if (!loading && !error && records) {
+        console.log("queryResult", records);
+        setMapEventsFullDay(records);
+      }
+    }, [loading, error, records]);
+  
     
     // Manage map popup
     const [activePopup, setActivePopup] = useState(null);
@@ -84,8 +88,6 @@ export const Map = ({
           setActivePopup(uuid);
         }
       };
-      
-
 
     const handleCreateGameSelectLocationClick = () => {
         setCreateGameLocation(mapRef.current.getCenter().toJSON());
@@ -115,7 +117,7 @@ export const Map = ({
             </View>
         )
       }
-
+    
     return (
         <LoadScript
             id="script-loader"
@@ -135,17 +137,19 @@ export const Map = ({
                             elementType: 'labels',
                             stylers: [{ visibility: 'off' }],
                         }
-                    ]
-                }}>
-            {/* {Array.isArray(events) &&
-              events.map((event) => (
+                    ],
+                    }}
+                
+            >
+            {Array.isArray(map_events_full_day) &&
+              map_events_full_day.map((event) => (
                 <MapMarkerWithTooltip
                   key={event.UUID}
                   event={event}
                   activePopup={activePopup}
                   onSetActivePopup={handleSetActivePopup}
                 />
-            ))} */}
+            ))}
             </GoogleMap>
             {isCreateGameMode && <img id="create-game-pin-marker" src={pinIcon} alt="Pin" style={map_styles.pinStyle} />}
             {isCreateGameMode && (
