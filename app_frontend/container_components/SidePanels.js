@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, Animated } from 'react-native';
 import { CalendarComponent } from '../base_components/CalendarComponent';
 import { TimeRangeSliderComponent } from '../base_components/TimeRangeSliderComponent';
 import styles from '../styles';
+import { day_start_time, day_end_time } from '../utils/constants';
 
 const SidePanelContainer = ({ isVisible, side, title, children }) => {
 	const slideAnim = useRef(new Animated.Value(0)).current;
@@ -38,17 +39,15 @@ const LeftSidePanel = ({
 	findGameEndTime,
 	setFindGameEndTime
 }) => {
+	console.log("Starting LeftSidePanel component");
 
     const handleDateSelected = (date) => {
         console.log('Left side panel selected date:', date);
 		setFindGameSelectedDate(date);
-        // Perform any actions needed with the selected date
+		setFindGameStartTime(day_start_time);
+		setFindGameEndTime(day_end_time);
     };
 
-    const handleTimeRangeValuesChange = (values) => {
-        console.log('Start:', values[0], 'End:', values[1]);
-        // Perform any actions needed with the time range values
-    };
     
     return (
     <SidePanelContainer

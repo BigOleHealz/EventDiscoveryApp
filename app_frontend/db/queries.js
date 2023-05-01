@@ -21,3 +21,22 @@ export const FETCH_EVENTS_FOR_MAP = `
         END as FormattedStart
     LIMIT 5;
     `;
+
+export const CREATE_EVENT = `
+    MATCH (et:EventType {EventType: 'Basketball'})
+    CREATE (e:Event {
+        CreatedByID: $CreatedByID,
+        Address: $Address,
+        StartTimestamp: $StartTimestamp,
+        EventTypeID: et.UUID,
+        Host: $Host,
+        EventCreatedAt: $EventCreatedAt,
+        Lon: $Lon,
+        PublicEventFlag: $PublicEventFlag,
+        EndTimestamp: $EndTimestamp,
+        EventName: $EventName,
+        UUID: $UUID,
+        Lat: $Lat
+    })
+    RETURN e;
+    `;

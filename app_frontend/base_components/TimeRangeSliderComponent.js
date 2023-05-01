@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import RangeSlider from 'react-native-range-slider-expo';
 import styles from '../styles';
+import { day_end_time } from '../utils/constants';
 
 export const TimeRangeSliderComponent = ({ startTime, endTime, setStartTime, setEndTime }) => {
 	const [start, setStart] = useState(startTime);
@@ -26,7 +27,7 @@ export const TimeRangeSliderComponent = ({ startTime, endTime, setStartTime, set
     const date = new Date();
     date.setHours(hour, minute, second);
     
-    if (time === '23:59:59') {
+    if (time === day_end_time) {
       return '11:59 PM';
     } else {
       return date.toLocaleTimeString('en-US', { hour: 'numeric', hour12: true });
@@ -35,7 +36,7 @@ export const TimeRangeSliderComponent = ({ startTime, endTime, setStartTime, set
 
   function numberToDesiredTimeString(number) {
     if (number === 24) {
-      return "23:59:59";
+      return day_end_time;
     }
     const hour = Math.floor(number);
     return `${hour.toString().padStart(2, '0')}:00:00`;
@@ -43,7 +44,7 @@ export const TimeRangeSliderComponent = ({ startTime, endTime, setStartTime, set
 
   function convertTimeStringToHour(time) {
     const [hour, minute, second] = time.split(':');
-    if (time === '23:59:59') {
+    if (time === day_end_time) {
       return 24;
     } else {
       return parseInt(hour, 10);
@@ -82,10 +83,8 @@ export const TimeRangeSliderComponent = ({ startTime, endTime, setStartTime, set
 				labelStyle={{ fontSize: 16, color: '#000' }}
 				labelPrefix="Time: "
 				labelSuffix=" hrs"
-        
 				initialFromValue={0}
 				initialToValue={24}
-        
 			/>
       <View style={styles.timeSliderView}>
 				<Text style={time_range_slider_styles.text}>{formatTime(start)}</Text>

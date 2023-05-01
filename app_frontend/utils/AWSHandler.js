@@ -29,7 +29,7 @@ class AWSHandler {
       const data = await this.secretsManager.getSecretValue({ SecretId });
   
       if ('SecretString' in data) {
-        console.log("AWS Secret Retrieved")
+        console.log("AWS Secret Retrieved:", SecretId)
         return JSON.parse(data.SecretString);
       } else {
         throw new Error('No secret string found');

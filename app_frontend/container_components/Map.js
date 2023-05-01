@@ -1,71 +1,118 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text } from 'react-native';
-import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
+import { GoogleMap, LoadScript } from '@react-google-maps/api';
+import { useWriteCypher } from 'use-neo4j';
+import uuid from 'react-native-uuid';
+import { add, format } from 'date-fns';
 
 
-// import { CreateGameDateTimeModal, InviteFriendsModal } from './CreateGameModals';
+import { CreateGameDateTimeModal, InviteFriendsModal } from './CreateGameModals';
 import { ButtonComponent } from '../base_components/ButtonComponent';
 import MapMarkerWithTooltip from './MapMarkerWithTooltip';
 
+import { executeCypherQuery } from '../db/DBHandler';
 import AWSHandler from '../utils/AWSHandler';
-import { useCypherQueryHandler, formatString } from '../db/DBHandler';
-import { useReadCypher } from 'use-neo4j'
-import { FETCH_EVENTS_FOR_MAP } from '../db/queries'
+import { FETCH_EVENTS_FOR_MAP, CREATE_EVENT } from '../db/queries'
+import { day_start_time, day_end_time, date_time_format } from '../utils/constants';
+import { getAddressFromCoordinates, neo4jFormatString } from '../utils/HelperFunctions';
+import { getUserSession } from '../utils/SessionManager';
 
-// import pinIcon from '../assets/pin.png';
+import pinIcon from '../assets/pin.png';
 
-
-const awsHandler = new AWSHandler();
+const aws_handler = new AWSHandler();
 
 export const Map = ({
   defaultCenter,
   isCreateGameMode,
-    // setIsCreateGameMode,
-    // createGameFunction 
+  setIsCreateGameMode,
   findGameSelectedDate,
   findGameStartTime,
   findGameEndTime,
-//   setFindGameSelectedDate,
-  // setFindGameStartTime,
-  // setFindGameEndTime,
 }) => {
+  
+    const [userSession, setUserSession] = useState(null);
+    useEffect(() => {
+      const fetchUserSession = async () => {
+        const session = await getUserSession();
+        setUserSession(session);
+      };
+    
+      fetchUserSession();
+    }, []);
+    
 
-    const [mapCenter, setMapCenter] = useState(defaultCenter);
-    const [googleMapsApiKey, setGoogleMapsApiKey] = useState(null); // Add this state to store the API key
+    const [isCreateGameDateTimeModalVisible, setIsCreateGameDateTimeModalVisible] = useState(false);
+    const [isInviteFriendsModalVisible, setIsInviteFriendsModalVisible] = useState(false);
 
+    // Handle Create Game vars
+    const [create_game_location, setCreateGameLocation] = useState(null);
+    const [create_game_date_time, setCreateGameDateTime] = useState(null);
+    const [create_game_friend_invite_list, setCreateGameFriendInviteList] = useState([]);
+    const [runCreateEventQuery, setRunCreateEventQuery] = useState(false);
+    const { loading: createEventLoading, error: createEventError, result: createEventResult, run: runWrite } = useWriteCypher(CREATE_EVENT);
+
+    console.log("createEventResult: ", createEventResult);
+    useEffect(() => {
+      if (runCreateEventQuery) {
+    
+        const user_session = userSession;
+
+        const params = {
+          CreatedByID: user_session.UUID,
+          // Address: getAddressFromCoordinates(create_game_location.lat, create_game_location.lng, googleMapsApiKey),
+          
+          Address: "Address",
+          StartTimestamp: create_game_date_time,
+          Host: user_session.Username,
+          EventCreatedAt: format(new Date(), date_time_format),
+          Lon: create_game_location.lng,
+          PublicEventFlag: true,
+          EndTimestamp: format(add(new Date(create_game_date_time), { hours: 1 }), date_time_format),
+          EventName: 'Pickup Basketball',
+          UUID: uuid.v4(),
+          Lat: create_game_location.lat
+        };
+        console.log("params: ", params);
+    
+        runWrite(params);
+        setRunCreateEventQuery(false);
+      }
+    }, [runCreateEventQuery]);
+    
 
     // Handle Map
+    const [mapCenter, setMapCenter] = useState(defaultCenter);
+    const [googleMapsApiKey, setGoogleMapsApiKey] = useState(null); // Add this state to store the API key
+    useEffect(() => {
+      const fetchSecrets = async () => {
+          const secrets = await aws_handler.getSecretValue('google_maps_api_key');
+          if (secrets) {
+              // Use the secrets, e.g., set the API key
+              setGoogleMapsApiKey(secrets.GOOGLE_MAPS_API_KEY);
+          }
+      };
+  
+      fetchSecrets();
+    }, []);
     const mapRef = React.useRef();
     const onLoad = (map) => {
         console.log("Map onLoad")
         mapRef.current = map;
     };
 
-    useEffect(() => {
-        const fetchSecrets = async () => {
-            const secrets = await awsHandler.getSecretValue('google_maps_api_key');
-            if (secrets) {
-                // Use the secrets, e.g., set the API key
-                setGoogleMapsApiKey(secrets.GOOGLE_MAPS_API_KEY);
-            }
-        };
-    
-        fetchSecrets();
-    }, []);
-
     // Handle Map Events
     const [map_events_full_day, setMapEventsFullDay] = useState([]);
     const [map_events_filtered, setMapEventsFiltered] = useState([]);
 
-    const start_timestamp = `${findGameSelectedDate}T00:00:00`;
-    const end_timestamp = `${findGameSelectedDate}T23:59:59`;
+    const start_timestamp = `${findGameSelectedDate}T${day_start_time}`;
+    const end_timestamp = `${findGameSelectedDate}T${day_end_time}`;
 
     const {
       loading,
       error,
       records,
       run,
-    } = useCypherQueryHandler(formatString(FETCH_EVENTS_FOR_MAP, start_timestamp, end_timestamp));
+    } = executeCypherQuery(neo4jFormatString(FETCH_EVENTS_FOR_MAP, start_timestamp, end_timestamp));
     
     useEffect(() => {
       console.log('findGameSelectedDate changed', findGameSelectedDate);
@@ -75,38 +122,33 @@ export const Map = ({
     useEffect(() => {
       if (!loading && !error && records) {
         setMapEventsFullDay(records);
-        setMapEventsFiltered(map_events_full_day);
       }
     }, [loading, error, records]);
-
-    // Handle Time Filter for Map Events
+  
+    
     useEffect(() => {
-        const filteredEvents = map_events_full_day.filter(event => {
-          const eventTimestamp = new Date(event.StartTimestamp);
-          const startTime = new Date(`${findGameSelectedDate}T${findGameStartTime}`);
-          const endTime = new Date(`${findGameSelectedDate}T${findGameEndTime}`);
-        
-          console.log('eventTimestamp:', eventTimestamp);
-          console.log('startTime:', startTime);
-          console.log('endTime:', endTime);
+      const filteredEvents = map_events_full_day.filter(event => {
+        const eventTimestamp = new Date(event.StartTimestamp);
+        const startTime = new Date(`${findGameSelectedDate}T${findGameStartTime}`);
+        const endTime = new Date(`${findGameSelectedDate}T${findGameEndTime}`);
+
+        return eventTimestamp >= startTime && eventTimestamp <= endTime;
+      });
       
-          return eventTimestamp >= startTime && eventTimestamp <= endTime;
-        });
-        
-        console.log('filteredEvents', filteredEvents);
-        setMapEventsFiltered(filteredEvents);
-      }, [findGameStartTime, findGameEndTime, map_events_full_day]);
+      console.log('filteredEvents', filteredEvents);
+      setMapEventsFiltered(filteredEvents);
+    }, [findGameStartTime, findGameEndTime, map_events_full_day]);
   
     
     // Manage map popup
     const [activePopup, setActivePopup] = useState(null);
     const handleSetActivePopup = (uuid) => {
-        if (activePopup === uuid) {
-          setActivePopup(null);
-        } else {
-          setActivePopup(uuid);
-        }
-      };
+      if (activePopup === uuid) {
+        setActivePopup(null);
+      } else {
+        setActivePopup(uuid);
+      }
+    };
 
     const handleCreateGameSelectLocationClick = () => {
         setCreateGameLocation(mapRef.current.getCenter().toJSON());
@@ -121,9 +163,7 @@ export const Map = ({
 
     const handleInviteFriendsButtonClick = (friend_invite_list) => {
         setCreateGameFriendInviteList(friend_invite_list);
-        if (typeof createGameFunction === 'function') {
-            createGameFunction(create_game_location, create_game_date_time, create_game_friend_invite_list);
-        }
+        setRunCreateEventQuery(true);
 
         setIsInviteFriendsModalVisible(false);
         setIsCreateGameMode(false);
@@ -146,19 +186,15 @@ export const Map = ({
                 mapContainerStyle={map_styles.mapContainerStyle}
                 zoom={15}
                 center={mapCenter}
-                // onDragEnd={handlePinDragEnd}
                 draggable={true}
                 onLoad={onLoad}
                 options={{
-                    styles: [
-                        {
+                    styles: [{
                             featureType: 'poi',
                             elementType: 'labels',
                             stylers: [{ visibility: 'off' }],
-                        }
-                    ],
+                        }],
                     }}
-                
             >
             {Array.isArray(map_events_filtered) &&
               map_events_filtered.map((event) => (
@@ -174,17 +210,16 @@ export const Map = ({
             {isCreateGameMode && (
                 <ButtonComponent id="create-game-datetime-button" onPress={handleCreateGameSelectLocationClick} title="Set Game Location" style={map_styles.bottomButtonStyle} />
             )}
-            {/* <CreateGameDateTimeModal
+            <CreateGameDateTimeModal
                 isVisible={isCreateGameDateTimeModalVisible}
                 onRequestClose={() => setIsCreateGameDateTimeModalVisible(false)}
                 onSubmitButtonClick={handleCreateGameSelectDateTimeButtonClick}
             />
-
             <InviteFriendsModal
                 isVisible={isInviteFriendsModalVisible}
                 onRequestClose={() => setIsInviteFriendsModalVisible(false)}
                 onSubmitButtonClick={handleInviteFriendsButtonClick}
-            /> */}
+            />
         </LoadScript>
     );
 };

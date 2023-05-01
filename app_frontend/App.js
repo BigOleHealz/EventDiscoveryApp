@@ -7,15 +7,16 @@ import { Toolbar } from './container_components/Toolbar';
 import { Map } from './container_components/Map';
 import { LeftSidePanel } from './container_components/SidePanels';
 import { Neo4jProviderWrapper } from './db/DBHandler';
+import { day_start_time, day_end_time, day_format } from './utils/constants';
+import { storeUserSession } from './utils/SessionManager';
 
 import ErrorBoundary from './utils/ErrorBoundary';
 
-
-console.log("Starting App")
-
-
+  
 export default function App() {
+  console.log("Starting App")
 
+  storeUserSession();
 
   // Handle Map
   const defaultCenter = {
@@ -28,10 +29,9 @@ export default function App() {
   const [isCreateGameMode, setIsCreateGameMode] = useState(false);
 
   const currentDateTime = new Date();
-  // const [findGameStartTime, setFindGameStartTime] = useState(format(currentDateTime, 'HH:mm:ss'));
-  const [findGameStartTime, setFindGameStartTime] = useState('00:00:00');
-  const [findGameEndTime, setFindGameEndTime] = useState('23:59:59');
-  const [findGameSelectedDate, setFindGameSelectedDate] = useState(format(currentDateTime, 'yyyy-MM-dd'));
+  const [findGameStartTime, setFindGameStartTime] = useState(day_start_time);
+  const [findGameEndTime, setFindGameEndTime] = useState(day_end_time);
+  const [findGameSelectedDate, setFindGameSelectedDate] = useState(format(currentDateTime, day_format));
 
   
   const handleFindGamesButtonClick = () => {
@@ -47,15 +47,6 @@ export default function App() {
     setIsCreateGameMode(!isCreateGameMode);
   };
 
-  const createGameFunction = (location, dateTime, friendInviteList) => {
-    console.log('Creating game with the following parameters:');
-    console.log('Location:', location);
-    console.log('Date & Time:', dateTime);
-    console.log('Friend Invite List:', friendInviteList);
-  
-    // Add your game creation logic here
-  };
-
 
   return (
     
@@ -68,14 +59,10 @@ export default function App() {
             <Map
               defaultCenter={defaultCenter}
               isCreateGameMode={isCreateGameMode}
-              // setIsCreateGameMode={setIsCreateGameMode}
-              // createGameFunction={createGameFunction}
+              setIsCreateGameMode={setIsCreateGameMode}
               findGameSelectedDate={findGameSelectedDate}
               findGameStartTime={findGameStartTime}
               findGameEndTime={findGameEndTime}
-              // setFindGameSelectedDate={setFindGameSelectedDate}
-              // setFindGameStartTime={setFindGameStartTime}
-              // setFindGameEndTime={setFindGameEndTime}
             />
             <LeftSidePanel
               isVisible={isLeftPanelVisible}
