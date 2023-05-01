@@ -10,14 +10,12 @@ export const TimeRangeSliderComponent = ({ startTime, endTime, setStartTime, set
 
   const handleStartTimeChange = (value) => {
     const start_time_db_string = numberToDesiredTimeString(value);
-    console.log('StartTime Changed - Start:', start_time_db_string, 'End:', end);
     setStart(start_time_db_string);
     setStartTime(start_time_db_string); // Update the parent state
   };
 	
   const handleEndTimeChange = (value) => {
     const end_time_db_string = numberToDesiredTimeString(value);
-    console.log('EndTime Changed - Start:', start, 'End:', end_time_db_string);
     setEnd(end_time_db_string);
     setEndTime(end_time_db_string); // Update the parent state
   };
