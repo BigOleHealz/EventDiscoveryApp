@@ -4,6 +4,9 @@ import { GoogleMap, LoadScript } from '@react-google-maps/api';
 import { useWriteCypher } from 'use-neo4j';
 import uuid from 'react-native-uuid';
 import { add, format } from 'date-fns';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 import { CreateGameDateTimeModal, InviteFriendsModal } from './CreateGameModals';
 import { ButtonComponent } from '../base_components/ButtonComponent';
@@ -38,7 +41,8 @@ export const Map = ({
     
       fetchUserSession();
     }, []);
-    
+
+    const [transactionStatus, setTransactionStatus] = useState(null);
 
     const [isCreateGameDateTimeModalVisible, setIsCreateGameDateTimeModalVisible] = useState(false);
     const [isInviteFriendsModalVisible, setIsInviteFriendsModalVisible] = useState(false);
@@ -50,8 +54,11 @@ export const Map = ({
     const [runCreateEventQuery, setRunCreateEventQuery] = useState(false);
     const { loading: createEventLoading, error: createEventError, result: createEventResult, run: runWrite } = useWriteCypher(CREATE_EVENT);
 
+    const [shouldCheckTransactionStatus, setShouldCheckTransactionStatus] = useState(false);
+
+
     useEffect(() => {
-      const fetchData = async () => {
+      const createGame = async () => {
         if (runCreateEventQuery) {
           const user_session = userSession;
           const address = await getAddressFromCoordinates(create_game_location.lat, create_game_location.lng, googleMapsApiKey);
@@ -69,14 +76,34 @@ export const Map = ({
             UUID: uuid.v4(),
             Lat: create_game_location.lat
           };
-    
-          console.log("params: ", params);
           runWrite(params);
+
           setRunCreateEventQuery(false);
+          setShouldCheckTransactionStatus(true);
         }
       };
-      fetchData();
-    }, [runCreateEventQuery]);
+      createGame();
+    },  [runCreateEventQuery]);
+
+    useEffect(() => {
+      if (createEventLoading && shouldCheckTransactionStatus) {
+          setTransactionStatus('loading');
+      }  else if (createEventResult && shouldCheckTransactionStatus) {
+          setTransactionStatus('success');
+          toast.success('Transaction successful!');
+          // Reset the error state
+          if (createEventError) {
+            createEventError = null;
+          }
+          // Reset the runCreateEventQuery state
+          setRunCreateEventQuery(false);
+      } else if (createEventError && shouldCheckTransactionStatus) {
+          setTransactionStatus('error');
+          toast.error(`Error: ${createEventError.message}`);
+          // Reset the runCreateEventQuery state
+          setRunCreateEventQuery(false);
+      }
+    }, [createEventLoading, createEventError, createEventResult, shouldCheckTransactionStatus]);
     
 
     // Handle Map
@@ -161,7 +188,6 @@ export const Map = ({
     const handleInviteFriendsButtonClick = (friend_invite_list) => {
         setCreateGameFriendInviteList(friend_invite_list);
         setRunCreateEventQuery(true);
-
         setIsInviteFriendsModalVisible(false);
         setIsCreateGameMode(false);
     };
@@ -175,6 +201,7 @@ export const Map = ({
       }
     
     return (
+      <>
         <LoadScript
             id="script-loader"
             googleMapsApiKey={googleMapsApiKey}
@@ -218,6 +245,8 @@ export const Map = ({
                 onSubmitButtonClick={handleInviteFriendsButtonClick}
             />
         </LoadScript>
+      <ToastContainer />
+      </>
     );
 };
 
