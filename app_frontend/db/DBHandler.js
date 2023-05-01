@@ -23,7 +23,6 @@ const Neo4jProviderWrapper = ({ children }) => {
   }, []);
   if (neo4j_credentials) {
     try {
-      console.log(neo4j_credentials);
       const neo4j_driver = createDriver(
         neo4j_credentials.DATABASE_NAME,
         neo4j_credentials.HOST_IP,
@@ -64,7 +63,6 @@ const executeCypherQuery = ( cypher, params = {} ) => {
         });
         return recordObj;
       });
-      console.log("newTransformedRecords", newTransformedRecords);
       setTransformedRecords(newTransformedRecords);
     }
   }, [records]);
