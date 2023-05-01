@@ -1,15 +1,11 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import { executeCypherQuery } from '../db/DBHandler';
+import { GET_USER_INFO } from '../db/queries';
 
-const user = {
-    Email: "matt@gmail.com",
-    Username: "bigolehealz",
-    FirstName: "Matt",
-    LastName: "Smith",
-    UUID: "7c4f0e82-0d15-405c-b4fd-fd0a6ff5ff0e"
-  };
 
-export const storeUserSession = async () => {
+
+export const storeUserSession = async (user) => {
     try {
       await AsyncStorage.setItem('userSession', JSON.stringify(user));
       console.log('User session stored');
