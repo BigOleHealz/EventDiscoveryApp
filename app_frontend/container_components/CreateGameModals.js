@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
-import { Modal, View, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, ScrollView, FlatList, CheckBox } from 'react-native';
+import { View, StyleSheet, Text, ScrollView, CheckBox } from 'react-native';
+
+import { ButtonComponent } from '../base_components/ButtonComponent';
 import { CalendarComponent } from '../base_components/CalendarComponent';
 import { CreateGameTimeSelectorComponent } from '../base_components/CreateGameTimeSelectorComponent';
-import { ButtonComponent } from '../base_components/ButtonComponent';
 import { ModalComponent } from '../base_components/ModalComponent';
-
 import styles from '../styles';
-
 
 
 export const CreateGameDateTimeModal = ({ isVisible, onRequestClose, onSubmitButtonClick }) => {
@@ -75,27 +74,32 @@ const FriendChecklistItem = ({ name, isChecked, onValueChange }) => {
 };
 
 export const InviteFriendsModal = ({ isVisible, onRequestClose, onSubmitButtonClick }) => {
-  const friends = [
-    { uuid: '1', name: 'Alice', isChecked: false },
-    { uuid: '2', name: 'Bob', isChecked: false },
-    { uuid: '3', name: 'Charlie', isChecked: false },
-    { uuid: '4', name: 'Dave', isChecked: false },
-    { uuid: '5', name: 'Eva', isChecked: false },
+  const initialFriends = [
+    { uuid: 1, name: 'Alice', isChecked: false },
+    { uuid: 2, name: 'Bob', isChecked: false },
+    { uuid: 3, name: 'Charlie', isChecked: false },
+    { uuid: 4, name: 'Dave', isChecked: false },
+    { uuid: 5, name: 'Eva', isChecked: false },
   ];
-
+  
+  const [friends, setFriends] = React.useState(initialFriends);
   const [anyChecked, setAnyChecked] = React.useState(false);
 
   const handleValueChange = (index, newValue) => {
-    friends[index].isChecked = newValue;
-    setAnyChecked(friends.some(friend => friend.isChecked));
+    const updatedFriends = friends.map((friend, i) => {
+      if (i === index) {
+        return { ...friend, isChecked: newValue };
+      }
+      return friend;
+    });
+    setFriends(updatedFriends);
+    setAnyChecked(updatedFriends.some(friend => friend.isChecked));
   };
 
   const handleSubmitButtonClick = () => {
     const selectedFriendUUIDs = friends.filter(friend => friend.isChecked).map(friend => friend.uuid);
     console.log('Selected friends:', selectedFriendUUIDs);
-    // if (onSubmitButtonClick) {
       onSubmitButtonClick(selectedFriendUUIDs);
-    // }
   };
 
   return (
@@ -108,7 +112,7 @@ export const InviteFriendsModal = ({ isVisible, onRequestClose, onSubmitButtonCl
       <ScrollView>
         {friends.map((friend, index) => (
           <FriendChecklistItem
-            key={index}
+            key={friend.uuid}
             name={friend.name}
             isChecked={friend.isChecked}
             onValueChange={(newValue) => handleValueChange(index, newValue)}

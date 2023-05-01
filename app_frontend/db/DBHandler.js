@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Neo4jProvider, createDriver, useReadCypher } from 'use-neo4j'
+
 import AWSHandler from '../utils/AWSHandler';
 
-const awsHandler = new AWSHandler();
 
+const aws_handler = new AWSHandler();
 
 const Neo4jProviderWrapper = ({ children }) => {
   const [neo4j_credentials, setNeo4jCredentials] = useState(null);
@@ -11,7 +12,7 @@ const Neo4jProviderWrapper = ({ children }) => {
   useEffect(() => {
     console.log('Loading Neo4j credentials...');
     const fetchSecrets = async () => {
-        const secrets = await awsHandler.getSecretValue('neo4j_credentials_public');
+        const secrets = await aws_handler.getSecretValue('neo4j_credentials_public');
         if (secrets) {
             // Use the secrets, e.g., set the API key
             setNeo4jCredentials(secrets);
@@ -43,18 +44,9 @@ const Neo4jProviderWrapper = ({ children }) => {
 
   }
 };
+  
 
-
-const substituteParamsInQuery = (query, params) => {
-  return Object.keys(params).reduce((updatedQuery, key) => {
-    const value = JSON.stringify(params[key]);
-    const placeholder = new RegExp(`\\$\{${key}\\}`, 'g');
-    return updatedQuery.replace(placeholder, value);
-  }, query);
-};
-
-
-const useCypherQueryHandler = ( cypher, params = {} ) => {
+const executeCypherQuery = ( cypher, params = {} ) => {
   if (!cypher || cypher.trim() === "") {
     console.error("Empty or undefined Cypher query detected");
     return { loading: false, error: "Empty or undefined Cypher query", records: [] };
@@ -81,16 +73,52 @@ const useCypherQueryHandler = ( cypher, params = {} ) => {
     loading,
     error,
     records: transformedRecords,
-    run,
+    run
   };
 };
 
 
-function formatString(template, ...args) {
-  return template.replace(/{(\d+)}/g, function(match, number) {
-    return typeof args[number] !== 'undefined' ? args[number] : match;
-  });
+
+// const createGameFunction = async (location, dateTime, friendInviteList, run, googleMapsApiKey, user_session) => {
+//   console.log('Creating game with the following parameters:');
+//   console.log('Location:', location);
+//   console.log('Date & Time:', dateTime);
+//   console.log('Friend Invite List:', friendInviteList);
+
+//   console.log("dateTime: ", dateTime);
+//   console.log("EventCreateAt: ", format(new Date(), date_time_format));
+//   // console.log("EndTimestamp: ", format(addHours(parse(dateTime, date_time_format, new Date()), 1), date_time_format));
+
+//   try {
+//     const params = {
+//       CreatedByID: user_session.UUID,
+//       Address: getAddressFromCoordinates(location.lat, location.lng, googleMapsApiKey),
+//       StartTimestamp: dateTime,
+//       Host: user_session.Username,
+//       EventCreateAt: format(new Date(), date_time_format),
+//       Lon: location.lng,
+//       PublicEventFlag: true,
+//       EndTimestamp: format(addHours(parse(dateTime, date_time_format, new Date()), 1), date_time_format),
+//       EventName: 'Pickup Basketball',
+//       EventUUID: uuid.v4(),
+//       Lat: location.lat
+//     };
+
+//     run(params).then((result) => {
+//       console.log("result: ", result);
+//     }).catch((error) => {
+//       console.error(error);
+//     });
+//   } catch (error) {
+//     console.error(error);
+//   }
+
+//   // ... (rest of the createGame function code)
+// };
+
+
+
+export {
+  Neo4jProviderWrapper,
+  executeCypherQuery,
 }
-
-
-export { Neo4jProviderWrapper, useCypherQueryHandler, formatString };
