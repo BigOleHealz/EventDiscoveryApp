@@ -1,5 +1,25 @@
 // cypherQueries.js
 
+
+export const CREATE_EVENT = `
+    MATCH (et:EventType {EventType: 'Basketball'})
+    CREATE (e:Event {
+        CreatedByID: $CreatedByID,
+        Address: $Address,
+        StartTimestamp: $StartTimestamp,
+        EventTypeID: et.UUID,
+        Host: $Host,
+        EventCreatedAt: $EventCreatedAt,
+        Lon: $Lon,
+        PublicEventFlag: $PublicEventFlag,
+        EndTimestamp: $EndTimestamp,
+        EventName: $EventName,
+        UUID: $UUID,
+        Lat: $Lat
+    })
+    RETURN e;
+    `;
+
 export const FETCH_EVENTS_FOR_MAP = `
     MATCH (n:Event)
     WHERE "{0}" <= n.StartTimestamp <= "{1}"
@@ -21,21 +41,13 @@ export const FETCH_EVENTS_FOR_MAP = `
         END as FormattedStart;
     `;
 
-export const CREATE_EVENT = `
-    MATCH (et:EventType {EventType: 'Basketball'})
-    CREATE (e:Event {
-        CreatedByID: $CreatedByID,
-        Address: $Address,
-        StartTimestamp: $StartTimestamp,
-        EventTypeID: et.UUID,
-        Host: $Host,
-        EventCreatedAt: $EventCreatedAt,
-        Lon: $Lon,
-        PublicEventFlag: $PublicEventFlag,
-        EndTimestamp: $EndTimestamp,
-        EventName: $EventName,
-        UUID: $UUID,
-        Lat: $Lat
-    })
-    RETURN e;
+export const GET_USER_INFO = `
+    MATCH (p:Person)
+    WHERE p.Email = "matt@gmail.com"
+    RETURN
+        p.Email as Email,
+        p.Username as Username,
+        p.FirstName as FirstName,
+        p.LastName as LastName,
+        p.UUID as UUID;
     `;

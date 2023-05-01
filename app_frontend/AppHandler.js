@@ -8,10 +8,11 @@ import { Map } from './container_components/Map';
 import { LeftSidePanel } from './container_components/SidePanels';
 import { day_start_time, day_end_time, day_format } from './utils/constants';
 import { storeUserSession } from './utils/SessionManager';
+import { UserSessionManager } from './utils/UserSessionManager';
 
-storeUserSession();
 
 export function AppHandler() {
+  UserSessionManager();
   console.log("Starting App")
 
   // Handle Map
@@ -44,26 +45,28 @@ export function AppHandler() {
 
   return (
     <View style={styles.container}>
-      <Toolbar onLeftButtonClick={handleFindGamesButtonClick} onRightButtonClick={handleCreateGameButtonClick} />
-      <View style={styles.fullScreen}>
-        <Map
-          defaultCenter={defaultCenter}
-          isCreateGameMode={isCreateGameMode}
-          setIsCreateGameMode={setIsCreateGameMode}
-          findGameSelectedDate={findGameSelectedDate}
-          findGameStartTime={findGameStartTime}
-          findGameEndTime={findGameEndTime}
-        />
-        <LeftSidePanel
-          isVisible={isLeftPanelVisible}
-          findGameSelectedDate={findGameSelectedDate}
-          setFindGameSelectedDate={setFindGameSelectedDate}
-          findGameStartTime={findGameStartTime}
-          setFindGameStartTime={setFindGameStartTime}
-          findGameEndTime={findGameEndTime}
-          setFindGameEndTime={setFindGameEndTime}
-        />
-      </View>
+      
+      <UserSessionManager />
+        <Toolbar onLeftButtonClick={handleFindGamesButtonClick} onRightButtonClick={handleCreateGameButtonClick} />
+        <View style={styles.fullScreen}>
+          <Map
+            defaultCenter={defaultCenter}
+            isCreateGameMode={isCreateGameMode}
+            setIsCreateGameMode={setIsCreateGameMode}
+            findGameSelectedDate={findGameSelectedDate}
+            findGameStartTime={findGameStartTime}
+            findGameEndTime={findGameEndTime}
+          />
+          <LeftSidePanel
+            isVisible={isLeftPanelVisible}
+            findGameSelectedDate={findGameSelectedDate}
+            setFindGameSelectedDate={setFindGameSelectedDate}
+            findGameStartTime={findGameStartTime}
+            setFindGameStartTime={setFindGameStartTime}
+            findGameEndTime={findGameEndTime}
+            setFindGameEndTime={setFindGameEndTime}
+          />
+        </View>
     </View>
   );
 };
