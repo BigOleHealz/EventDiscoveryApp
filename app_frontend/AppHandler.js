@@ -7,12 +7,11 @@ import { Toolbar } from './container_components/Toolbar';
 import { Map } from './container_components/Map';
 import { LeftSidePanel } from './container_components/SidePanels';
 import { day_start_time, day_end_time, day_format } from './utils/constants';
-import { storeUserSession } from './utils/SessionManager';
-import { UserSessionManager } from './utils/UserSessionManager';
+import { RetrieveAndStoreUserSessionData } from './utils/SessionManager';
 
 
 export function AppHandler() {
-  UserSessionManager();
+  RetrieveAndStoreUserSessionData();
   console.log("Starting App")
 
   // Handle Map
@@ -45,8 +44,7 @@ export function AppHandler() {
 
   return (
     <View style={styles.container}>
-      
-      <UserSessionManager />
+      <RetrieveAndStoreUserSessionData />
         <Toolbar onLeftButtonClick={handleFindGamesButtonClick} onRightButtonClick={handleCreateGameButtonClick} />
         <View style={styles.fullScreen}>
           <Map
