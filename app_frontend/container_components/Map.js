@@ -5,7 +5,6 @@ import { useWriteCypher } from 'use-neo4j';
 import uuid from 'react-native-uuid';
 import { add, format } from 'date-fns';
 
-
 import { CreateGameDateTimeModal, InviteFriendsModal } from './CreateGameModals';
 import { ButtonComponent } from '../base_components/ButtonComponent';
 import MapMarkerWithTooltip from './MapMarkerWithTooltip';
@@ -96,7 +95,6 @@ export const Map = ({
     }, []);
     const mapRef = React.useRef();
     const onLoad = (map) => {
-        console.log("Map onLoad")
         mapRef.current = map;
     };
 
@@ -135,7 +133,6 @@ export const Map = ({
         return eventTimestamp >= startTime && eventTimestamp <= endTime;
       });
       
-      console.log('filteredEvents', filteredEvents);
       setMapEventsFiltered(filteredEvents);
     }, [findGameStartTime, findGameEndTime, map_events_full_day]);
   
