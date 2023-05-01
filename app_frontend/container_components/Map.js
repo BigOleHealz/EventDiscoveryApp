@@ -51,32 +51,32 @@ export const Map = ({
     const [runCreateEventQuery, setRunCreateEventQuery] = useState(false);
     const { loading: createEventLoading, error: createEventError, result: createEventResult, run: runWrite } = useWriteCypher(CREATE_EVENT);
 
-    console.log("createEventResult: ", createEventResult);
     useEffect(() => {
-      if (runCreateEventQuery) {
+      const fetchData = async () => {
+        if (runCreateEventQuery) {
+          const user_session = userSession;
+          const address = await getAddressFromCoordinates(create_game_location.lat, create_game_location.lng, googleMapsApiKey);
     
-        const user_session = userSession;
-
-        const params = {
-          CreatedByID: user_session.UUID,
-          // Address: getAddressFromCoordinates(create_game_location.lat, create_game_location.lng, googleMapsApiKey),
-          
-          Address: "Address",
-          StartTimestamp: create_game_date_time,
-          Host: user_session.Username,
-          EventCreatedAt: format(new Date(), date_time_format),
-          Lon: create_game_location.lng,
-          PublicEventFlag: true,
-          EndTimestamp: format(add(new Date(create_game_date_time), { hours: 1 }), date_time_format),
-          EventName: 'Pickup Basketball',
-          UUID: uuid.v4(),
-          Lat: create_game_location.lat
-        };
-        console.log("params: ", params);
+          const params = {
+            CreatedByID: user_session.UUID,
+            Address: address,
+            StartTimestamp: create_game_date_time,
+            Host: user_session.Username,
+            EventCreatedAt: format(new Date(), date_time_format),
+            Lon: create_game_location.lng,
+            PublicEventFlag: true,
+            EndTimestamp: format(add(new Date(create_game_date_time), { hours: 1 }), date_time_format),
+            EventName: 'Pickup Basketball',
+            UUID: uuid.v4(),
+            Lat: create_game_location.lat
+          };
     
-        runWrite(params);
-        setRunCreateEventQuery(false);
-      }
+          console.log("params: ", params);
+          runWrite(params);
+          setRunCreateEventQuery(false);
+        }
+      };
+      fetchData();
     }, [runCreateEventQuery]);
     
 
