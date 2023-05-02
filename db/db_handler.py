@@ -155,6 +155,14 @@ class Neo4jDB:
             raise ValueError(f'Could not find EventType node with EventTypeID = {event_type_id}')
         node = result[0]['n']
         return node
+    
+    def get_event_type_node_by_event_type_uuid(self, event_type_uuid: str):
+        self.logger.emit(f'Running {sys._getframe().f_code.co_name}')
+        result = self.execute_query(queries.GET_EVENT_TYPE_BY_EVENTTYPEUUID.format(event_type_uuid=event_type_uuid))
+        if len(result) == 0:
+            raise ValueError(f'Could not find EventType node with UUID = {event_type_uuid}')
+        node = result[0]['n']
+        return node
 
     def get_event_type_mappings(self):
         self.logger.emit(f'Running {sys._getframe().f_code.co_name}')
@@ -211,11 +219,15 @@ class Neo4jDB:
     
     def get_relationship_by_nodes_and_label(self, node_a: Node, relationship_label: str, node_b: Node):
         self.logger.emit(f'Running {sys._getframe().f_code.co_name}')
-        relationship = self.graph.match((node_a, node_b), r_type=relationship_label).first()
-        if len(relationship) == 0:
-            raise ValueError(f"No relationship found between {node_a}-[:{relationship_label}]->{node_b}")
         
-        return relationship
+        try:        
+            relationship = self.graph.match((node_a, node_b), r_type=relationship_label).first()
+            if len(relationship) == 0:
+                raise ValueError(f"No relationship found between {node_a}-[:{relationship_label}]->{node_b}")
+            
+            return relationship
+        except Exception as e:
+            pass
         
 
     
@@ -264,16 +276,16 @@ class Neo4jDB:
             self.__create_relationship(node_a=creator_node, relationship_label='CREATED_EVENT', node_b=event_node)
             self.__create_relationship(node_a=event_node, relationship_label='CREATED_BY', node_b=creator_node)
             
-            event_type_node = self.get_event_type_node_by_event_type_id(event_type_id=properties['EventTypeID'])
+            event_type_node = self.get_event_type_node_by_event_type_uuid(event_type_uuid=properties['EventTypeUUID'])
             self.__create_relationship(node_a=event_type_node, relationship_label='RELATED_EVENT', node_b=event_node)
             self.__create_relationship(node_a=event_node, relationship_label='EVENT_TYPE', node_b=event_type_node)
             
-            invited_date = properties.get('INVITED_DATE', datetime.now().strftime(datetime_format))
-            invite_properties = {'INVITED_BY_ID' : creator_node.identity, 'INVITED_DATE': invited_date, 'STATUS' : 'PENDING'}
+            invited_timestamp = properties.get('INVITED_TIMESTAMP', datetime.now().strftime(datetime_format))
+            invite_properties = {'INVITED_BY_UUID' : creator_node['UUID'], 'INVITED_TIMESTAMP': invited_timestamp, 'STATUS' : 'PENDING'}
             
-            for invitee_id in friends_invited:
-                invitee_node = self.get_node(node_id=invitee_id)
-                invite_properties = {'INVITED_BY_ID' : creator_node.identity, 'INVITED_DATE': invited_date, 'STATUS' : 'PENDING'}
+            for invitee_uuid in friends_invited:
+                invitee_node = self.get_node(UUID=invitee_uuid)
+                invite_properties = {'INVITED_BY_UUID' : creator_node['UUID'], 'INVITED_TIMESTAMP': invited_timestamp, 'STATUS' : 'PENDING'}
                 self.__create_relationship(node_a=invitee_node, relationship_label='INVITED', node_b=event_node, properties=invite_properties)
             tx.commit()
             return event_node
@@ -300,7 +312,7 @@ class Neo4jDB:
             self.__create_relationship(node_a=event_type_node, relationship_label='RELATED_EVENT', node_b=event_node)
             self.__create_relationship(node_a=event_node, relationship_label='EVENT_TYPE', node_b=event_type_node)
             
-            invite_properties = {'INVITED_BY_ID' : created_by_id, 'INVITED_DATE': properties['EventCreatedAt'], 'STATUS' : 'PENDING'}
+            invite_properties = {'INVITED_BY_ID' : created_by_id, 'INVITED_TIMESTAMP': properties['EventCreatedAt'], 'STATUS' : 'PENDING'}
             for invitee_id in eval(friends_invited):
                 invitee_node = self.get_node(node_id=invitee_id)
                 self.__create_relationship(node_a=invitee_node, relationship_label='INVITED', node_b=event_node, properties=invite_properties)
@@ -344,7 +356,7 @@ class Neo4jDB:
             event_type_id_list = [event_type_ids]
         else:
             event_type_id_list = event_type_ids
-        self.run_command(queries.CREATE_ACCOUNT_INTERESTED_IN_RELATIONSHIPS.format(account_id=account_id, interest_id_list=event_type_ids))
+        self.run_command(queries.CREATE_ACCOUNT_INTERESTED_IN_RELATIONSHIPS.format(account_id=account_id, interest_id_list=event_type_id_list))
     
     def authenticate_account(self, email: str, password: str):
         self.logger.emit(f'Running {sys._getframe().f_code.co_name}')
@@ -376,8 +388,6 @@ class Neo4jDB:
         else:
             raise ValueError("create_friend_request requires both (node_a and node_b) or both (email_a and email_b)")
             
-        # return self.run_command(queries.CREATE_FRIEND_REQUEST.format(node_a=node_a, node_b=node_b, properties=properties))
-
     def accept_friend_request(self, node_a: int, node_b: int, friend_request_uuid: str):
         self.logger.emit(f'Running {sys._getframe().f_code.co_name}')
         current_timestamp = datetime.now().strftime(datetime_format)
@@ -416,13 +426,13 @@ class Neo4jDB:
         current_timestamp = datetime.now().strftime(datetime_format)
         tx = self.graph.begin()
         try:
-            relationship = self.get_relationship_by_uuid(relationship_label='INVITED', relationship_uuid=event_invite_uuid)
+            relationship = self.get_relationship_by_uuid(uuid=event_invite_uuid)
             relationship['STATUS'] = 'ACCEPTED'
             relationship['RESPONSE_TIMESTAMP'] = current_timestamp
             self.graph.push(relationship)
             
-            properties = {'RESPONSE_TIMESTAMP' : current_timestamp}
-            self.create_attending_relationship(attendee_node=relationship.start_node, event_node=relationship.end_node)
+            properties = {'ACCEPTED_TIMESTAMP' : current_timestamp}
+            self.create_attending_relationship(attendee_node=relationship.start_node, event_node=relationship.end_node, properties=properties)
             tx.commit()
             
         except Exception as error:
@@ -435,12 +445,11 @@ class Neo4jDB:
         current_timestamp = datetime.now().strftime(datetime_format)
         tx = self.graph.begin()
         try:
-            relationship = self.get_relationship_by_uuid(relationship_label='INVITED', relationship_uuid=event_invite_uuid)
+            relationship = self.get_relationship_by_uuid(uuid=event_invite_uuid)
             relationship['STATUS'] = 'DECLINED'
             relationship['RESPONSE_TIMESTAMP'] = current_timestamp
             self.graph.push(relationship)
             
-            self.get_relationship_by_nodes_and_label(node_a=relationship.start_node, relationship_label='ATTENDING', node_b=relationship.end_node)
             tx.commit()
             
         except Exception as error:

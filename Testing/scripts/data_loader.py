@@ -1,4 +1,5 @@
 import os, sys, random
+from uuid import uuid4
 
 import pandas as pd
 
@@ -17,7 +18,7 @@ from utils.helper_functions import hash_password
 
 class DataLoader:
     def __init__(self):
-        self.data_folder_path = os.path.join(os.environ['EVENT_APP_HOME'], 'Testing', 'data')
+        self.data_folder_path = os.path.join(os.environ['STONKS_APP_HOME'], 'Testing', 'data')
         self.enriched_data_folder_path = os.path.join(self.data_folder_path, 'csv', 'enriched')
         self.logger = Logger(__name__)
         self.neo4j = Neo4jDB(logger=self.logger)
@@ -33,19 +34,22 @@ class DataLoader:
     def load_event_types_to_neo4j_db(self):
         self.logger.emit('Loading Event Types')
         df = pd.read_csv(os.path.join(self.enriched_data_folder_path, 'event_types.csv'))
+        df['UUID'] = df['UUID'].apply(lambda x: str(uuid4()) if pd.isna(x) else x)
         for _, row in df.iterrows():
             self.neo4j.create_event_type_node(properties=row.to_dict())
 
     def load_businesses_to_neo4j_db(self):
         self.logger.emit('Loading Businesses')
         df = pd.read_csv(os.path.join(self.enriched_data_folder_path, 'businesses.csv'))
+        df['UUID'] = df['UUID'].apply(lambda x: str(uuid4()) if pd.isna(x) else x)
         for _, row in df.iterrows():
             self.neo4j.create_business_node(properties=row.to_dict())
     
     def load_persons_to_neo4j_db(self):
         self.logger.emit('Loading Persons')
         df = pd.read_csv(os.path.join(self.enriched_data_folder_path, 'persons.csv'))
-        person_properties_list = ['FirstName','LastName','Username','Email']
+        df['UUID'] = df['UUID'].apply(lambda x: str(uuid4()) if pd.isna(x) else x)
+        person_properties_list = ['FirstName','LastName','Username','Email', 'UUID']
         for _, row in df[person_properties_list].iterrows():
             self.neo4j.create_person_node(properties=row.to_dict(), password=row['Email'].split('@')[0])
             
@@ -71,12 +75,14 @@ class DataLoader:
     def load_events_to_neo4j_db(self):
         self.logger.emit('Loading Events')
         df = pd.read_csv(os.path.join(self.enriched_data_folder_path, 'events.csv'))
-        property_label_list = ['CreatedByID', 'Lat', 'Lon', 'StartTimestamp', 'EndTimestamp', 'PublicEventFlag', 'EventTypeID', 'EventCreatedAt', 'EventName', "Host", "Address"]
+
+        property_label_list = ['CreatedByUUID', 'Lat', 'Lon', 'StartTimestamp', 'EndTimestamp', 'PublicEventFlag', 'EventTypeUUID', 'EventCreatedAt', 'EventName', "Host", "Address"]
+        df['UUID'] = df.apply(lambda x: str(uuid4()))
         
         for _, row in df.iterrows():
             properties = row[property_label_list].to_dict()
             
-            creator_node = self.neo4j.get_node(node_id=properties['CreatedByID'])
+            creator_node = self.neo4j.get_node(UUID=properties['CreatedByUUID'])
             self.neo4j.create_event_with_relationships(creator_node=creator_node, properties=properties, friends_invited=eval(row['InviteList']))
             
     def load_attending_relationships(self):
@@ -91,8 +97,14 @@ class DataLoader:
 
             for event_rec in invited_events:
                 event_node = event_rec['e']
-                if random.choice(invited_flags) is True:
-                    self.neo4j.create_attending_relationship(attendee_node=person_node, event_node=event_node)
+                invite_relationship = self.neo4j.get_relationship_by_nodes_and_label(node_a=person_node, relationship_label='INVITED', node_b=event_node)
+                if invite_relationship:
+                    if random.choice(invited_flags) is True:
+                        
+                        self.neo4j.accept_event_invite(event_invite_uuid=invite_relationship['UUID'])
+                    else:
+                        if random.choice([False, True]):
+                            self.neo4j.decline_event_invite(event_invite_uuid=invite_relationship['UUID'])
 
 
 if __name__ == '__main__':
