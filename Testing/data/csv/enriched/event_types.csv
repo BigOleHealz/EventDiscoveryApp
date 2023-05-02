@@ -1,8 +1,9 @@
-EventTypeID,EventType
-1,Golf
-2,Music
-3,Sports
-4,Bars
-5,Professional
-6,Crypto
-7,Food
+EventTypeID,EventType,UUID
+1,Golf,
+2,Music,
+3,Basketball,
+4,Bars,
+5,Professional,
+6,Crypto,
+7,Food,
+8,Dummy Event Type,f85a0fb0-d54f-4a9d-8d5f-8cf6066215e9

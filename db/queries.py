@@ -24,16 +24,16 @@ GET_ALL_NODES_BY_LABEL = 'MATCH (n:{label}) RETURN n;'
 
 
 ##### GET ALL NODE IDS BY LABEL #####
-GET_ALL_NODE_IDS = 'MATCH (n) RETURN ID(n) AS _id;'
+GET_ALL_NODE_IDS = 'MATCH (n) RETURN n.UUID as UUID;'
 
-GET_ALL_NODE_IDS_BY_LABEL = 'MATCH (n:{label}) RETURN ID(n) AS _id;'
+GET_ALL_NODE_UUIDS_BY_LABEL = 'MATCH (n:{label}) RETURN n.UUID AS UUID;'
 
 ##### GET ALL NODES BY TYPE AS LIST #####
 
 GET_EVENT_TYPE_NAMES_MAPPINGS = '''
                                 MATCH (n:EventType)
                                 RETURN
-                                    ID(n) AS _id,
+                                    n.UUID as UUID,
                                     n.EventType AS EventType;
                                 '''
 
@@ -46,45 +46,49 @@ GET_ACCOUNT_NODE_BY_ID = '''
                             MATCH (n:Account)
                                 WHERE ID(n) = {node_id}
                             RETURN 
-                                n.Email as Email,
-                                n.Username as Username,
-                                n.FirstName as FirstName,
-                                n.LastName as LastName,
-                                n.UUID as UUID;
+                                n;
                             '''
+                                # n.Email as Email,
+                                # n.Username as Username,
+                                # n.FirstName as FirstName,
+                                # n.LastName as LastName,
+                                # n.UUID as UUID;
 
 GET_ACCOUNT_NODE_BY_UUID = '''
                             MATCH (n:Account)
                                 WHERE n.UUID = "{uuid}"
                             RETURN
-                                n.Email as Email,
-                                n.Username as Username,
-                                n.FirstName as FirstName,
-                                n.LastName as LastName,
-                                n.UUID as UUID;
+                                n;
                             '''
+                                # n.Email as Email,
+                                # n.Username as Username,
+                                # n.FirstName as FirstName,
+                                # n.LastName as LastName,
+                                # n.UUID as UUID;
 
 GET_ACCOUNT_NODE_BY_EMAIL = '''
                             MATCH (n:Account)
                                 WHERE n.Email = '{email}'
                             RETURN
-                                n.Email as Email,
-                                n.Username as Username,
-                                n.FirstName as FirstName,
-                                n.LastName as LastName,
-                                n.UUID as UUID;
+                                n
                             '''
+                                # n.Email as Email,
+                                # n.Username as Username,
+                                # n.FirstName as FirstName,
+                                # n.LastName as LastName,
+                                # n.UUID as UUID;
 
 GET_ACCOUNT_NODE_BY_USERNAME = '''
                                 MATCH (n:Account)
                                     WHERE n.Username = "{username}"
                                 RETURN
-                                    n.Email as Email,
-                                    n.Username as Username,
-                                    n.FirstName as FirstName,
-                                    n.LastName as LastName,
-                                    n.UUID as UUID;
+                                    n;
                                 '''
+                                    # n.Email as Email,
+                                    # n.Username as Username,
+                                    # n.FirstName as FirstName,
+                                    # n.LastName as LastName,
+                                    # n.UUID as UUID;
 
 GET_ACCOUNT_NODE_BY_EMAIL_OR_USERNAME = '''
                                         MATCH (n:Account)
@@ -108,12 +112,25 @@ GET_EVENT_TYPE_BY_EVENTTYPEID = '''
                         RETURN n;
                         '''
 
+GET_EVENT_TYPE_BY_EVENTTYPEUUID = '''
+                        MATCH (n:EventType)
+                            WHERE n.UUID = "{event_type_uuid}"
+                        RETURN n;
+                        '''
+
 
 GET_RELATIONSHIP_BY_UUID = '''
-                            MATCH ()-[r:{relationship_label}]->()
+                            MATCH ()-[r]->()
                             WHERE r.UUID = "{uuid}"
                             RETURN r
-                            '''                                 
+                            '''
+
+GET_RELATIONSHIP_UUID_BETWEEN_NODES = '''
+                                MATCH (node_a {UUID: "{node_a_uuid}"})-[r:{label}]->(node_b {UUID: "{node_b_uuid}"})
+                                RETURN r.UUID;
+
+
+                                '''                 
                                     
 DETERMINE_IF_FRIEND_REQUESTS_ALREADY_EXISTS_OR_USERS_ALREADY_FRIENDS = '''
                                                                         MATCH (a), (b)
@@ -195,7 +212,7 @@ GET_EVENTS_RELATED_TO_USER = '''
                             '''
 
 
-GET_PERSON_FRIENDS_ID_NAME_MAPPINGS_BY_EMAIL = '''
+GET_PERSON_FRIENDS_UUID_NAME_MAPPINGS_BY_EMAIL = '''
                                                 MATCH (:Person {{Email: "{email}"}})-[:FRIENDS_WITH]->(n)
                                                 RETURN ID(n) as _id,
                                                 n.UUID as UUID,
