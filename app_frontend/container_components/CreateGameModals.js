@@ -5,6 +5,8 @@ import { ButtonComponent } from '../base_components/ButtonComponent';
 import { CalendarComponent } from '../base_components/CalendarComponent';
 import { CreateGameTimeSelectorComponent } from '../base_components/CreateGameTimeSelectorComponent';
 import { ModalComponent } from '../base_components/ModalComponent';
+
+import { getUserSession } from '../utils/SessionManager';
 import styles from '../styles';
 
 
@@ -50,37 +52,31 @@ export const CreateGameDateTimeModal = ({ isVisible, onRequestClose, onSubmitBut
         id="create-game-select-datetime-button"
         title="Set Date & Time"
         onPress={handleSubmitButtonClick}
-        style={create_game_datetime_styles.buttonStyle}
+        style={modalStyles.buttonStyle}
       />
     </ModalComponent>
   );
 };
 
 
-const create_game_datetime_styles = StyleSheet.create({
-  buttonStyle: {
-    marginBottom: 20,
-  },
-});
 
 
 const FriendChecklistItem = ({ name, isChecked, onValueChange }) => {
   return (
-    <View style={create_game_invite_friends_checklist_styles.itemContainer}>
+    <View style={modalStyles.itemContainer}>
       <CheckBox value={isChecked} onValueChange={onValueChange} />
-      <Text style={create_game_invite_friends_checklist_styles.itemText}>{name}</Text>
+      <Text style={modalStyles.itemText}>{name}</Text>
     </View>
   );
 };
 
-export const InviteFriendsModal = ({ isVisible, onRequestClose, onSubmitButtonClick }) => {
-  const initialFriends = [
-    { uuid: 1, name: 'Alice', isChecked: false },
-    { uuid: 2, name: 'Bob', isChecked: false },
-    { uuid: 3, name: 'Charlie', isChecked: false },
-    { uuid: 4, name: 'Dave', isChecked: false },
-    { uuid: 5, name: 'Eva', isChecked: false },
-  ];
+export const InviteFriendsModal = ({ isVisible, friendList, onRequestClose, onSubmitButtonClick }) => {
+  const initialFriends = friendList.map(friend => {
+    return {
+      ...friend,
+      isChecked: false
+    };
+  });
   
   const [friends, setFriends] = React.useState(initialFriends);
   const [anyChecked, setAnyChecked] = React.useState(false);
@@ -97,7 +93,7 @@ export const InviteFriendsModal = ({ isVisible, onRequestClose, onSubmitButtonCl
   };
 
   const handleSubmitButtonClick = () => {
-    const selectedFriendUUIDs = friends.filter(friend => friend.isChecked).map(friend => friend.uuid);
+    const selectedFriendUUIDs = friends.filter(friend => friend.isChecked).map(friend => friend.friendUUID);
     console.log('Selected friends:', selectedFriendUUIDs);
       onSubmitButtonClick(selectedFriendUUIDs);
   };
@@ -108,12 +104,12 @@ export const InviteFriendsModal = ({ isVisible, onRequestClose, onSubmitButtonCl
       isVisible={isVisible}
       onRequestClose={onRequestClose}
     >
-      <Text style={create_game_invite_friends_checklist_styles.titleText}>Invite Friends</Text>
+      <Text style={modalStyles.titleText}>Invite Friends</Text>
       <ScrollView>
         {friends.map((friend, index) => (
           <FriendChecklistItem
-            key={friend.uuid}
-            name={friend.name}
+            key={friend.friendUUID}
+            name={friend.friendUsername}
             isChecked={friend.isChecked}
             onValueChange={(newValue) => handleValueChange(index, newValue)}
           />
@@ -123,13 +119,13 @@ export const InviteFriendsModal = ({ isVisible, onRequestClose, onSubmitButtonCl
         id="create-game-invite-friends-button"
         title={anyChecked ? "Send Invites & Create Game" : "Skip & Create Game"}
         onPress={handleSubmitButtonClick}
-        style={create_game_invite_friends_checklist_styles.buttonStyle}
+        style={modalStyles.buttonStyle}
       />
     </ModalComponent>
   );
 };
 
-const create_game_invite_friends_checklist_styles = StyleSheet.create({
+const modalStyles = StyleSheet.create({
   itemContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -152,5 +148,6 @@ const create_game_invite_friends_checklist_styles = StyleSheet.create({
   },
   buttonStyle: {
     marginBottom: 20,
+    backgroundColor: '#2196F3'
   },
 });

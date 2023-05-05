@@ -43,7 +43,19 @@ const Neo4jProviderWrapper = ({ children }) => {
 
   }
 };
-  
+
+function recordToObject(object) {
+  const obj = {};
+  for (let i = 0; i < object.keys.length; i++) {
+    obj[object.keys[i]] = object._fields[i];
+  }
+  return obj;
+}
+
+const recordsAsObjects = (objects) => {
+  return objects.map(object => recordToObject(object))
+};
+
 
 const executeCypherQuery = ( cypher, params = {} ) => {
   if (!cypher || cypher.trim() === "") {
@@ -119,4 +131,5 @@ const executeCypherQuery = ( cypher, params = {} ) => {
 export {
   Neo4jProviderWrapper,
   executeCypherQuery,
+  recordsAsObjects
 }

@@ -24,23 +24,22 @@ import pinIcon from '../assets/pin.png';
 const aws_handler = new AWSHandler();
 
 export const Map = ({
-  defaultCenter,
   isCreateGameMode,
   setIsCreateGameMode,
   findGameSelectedDate,
   findGameStartTime,
   findGameEndTime,
+  userSession
 }) => {
+
+    // Handle Map
+    const defaultCenter = {
+      lat: 39.9526,
+      lng: -75.1652,
+    };
   
-    const [userSession, setUserSession] = useState(null);
-    useEffect(() => {
-      const fetchUserSession = async () => {
-        const session = await getUserSession();
-        setUserSession(session);
-      };
+
     
-      fetchUserSession();
-    }, []);
 
     const [transactionStatus, setTransactionStatus] = useState(null);
 
@@ -74,8 +73,10 @@ export const Map = ({
             EndTimestamp: format(add(new Date(create_game_date_time), { hours: 1 }), date_time_format),
             EventName: 'Pickup Basketball',
             UUID: uuid.v4(),
-            Lat: create_game_location.lat
+            Lat: create_game_location.lat,
+            FriendInviteList: create_game_friend_invite_list
           };
+          console.log('params', params);
           runWrite(params);
 
           setRunCreateEventQuery(false);
@@ -91,17 +92,14 @@ export const Map = ({
       }  else if (createEventResult && shouldCheckTransactionStatus) {
           setTransactionStatus('success');
           toast.success('Transaction successful!');
-          // Reset the error state
           if (createEventError) {
             createEventError = null;
           }
-          // Reset the runCreateEventQuery state
-          setRunCreateEventQuery(false);
+          setShouldCheckTransactionStatus(false);
       } else if (createEventError && shouldCheckTransactionStatus) {
           setTransactionStatus('error');
           toast.error(`Error: ${createEventError.message}`);
-          // Reset the runCreateEventQuery state
-          setRunCreateEventQuery(false);
+          setShouldCheckTransactionStatus(false);
       }
     }, [createEventLoading, createEventError, createEventResult, shouldCheckTransactionStatus]);
     
@@ -142,7 +140,7 @@ export const Map = ({
     useEffect(() => {
       console.log('findGameSelectedDate changed', findGameSelectedDate);
       run(); // Run the query when findGameSelectedDate changes
-    }, [findGameSelectedDate]);
+    }, [findGameSelectedDate, shouldCheckTransactionStatus === false]);
     
     useEffect(() => {
       if (!loading && !error && records) {
@@ -161,7 +159,7 @@ export const Map = ({
       });
       
       setMapEventsFiltered(filteredEvents);
-    }, [findGameStartTime, findGameEndTime, map_events_full_day]);
+    }, [findGameStartTime, findGameEndTime]);
   
     
     // Manage map popup
@@ -241,6 +239,7 @@ export const Map = ({
             />
             <InviteFriendsModal
                 isVisible={isInviteFriendsModalVisible}
+                friendList={userSession.Friends}
                 onRequestClose={() => setIsInviteFriendsModalVisible(false)}
                 onSubmitButtonClick={handleInviteFriendsButtonClick}
             />
