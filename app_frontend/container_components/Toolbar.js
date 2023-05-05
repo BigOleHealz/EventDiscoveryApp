@@ -9,7 +9,7 @@ import { ButtonComponent } from '../base_components/ButtonComponent';
 import friendsIcon from '../assets/friends-icon.png';
 import notificationsIcon from '../assets/notifications-icon.png';
 import { recordsAsObjects } from '../db/DBHandler';
-import { GET_FRIEND_REQUESTS, GET_EVENT_INVITES, RESPOND_TO_EVENT_INVITE } from '../db/queries';
+import { GET_FRIEND_REQUESTS, GET_EVENT_INVITES, RESPOND_TO_EVENT_INVITE, RESPOND_TO_FRIEND_REQUEST } from '../db/queries';
 import { getUserSession } from '../utils/SessionManager';
 import styles from '../styles';
 
@@ -35,18 +35,66 @@ export const Toolbar = ({
   const [event_invite_uuid, setEventInviteUUID] = useState(null);
   const [eventInviteResponseTransactionStatus, setEventInviteResponseTransactionStatus] = useState(false);
 
+  
+  const [runRespondToFriendRequestQuery, setRunRespondToFriendRequestQuery] = useState(false);
+  const [friend_request_response, setFriendRequestResponse] = useState(null);
+  const [friend_request_uuid, setFriendRequestUUID] = useState(null);
+  const [friendRequestResponseTransactionStatus, setFriendRequestResponseTransactionStatus] = useState(false);
+
 
   const {loading: loading_friend_requests, error: error_friend_requests, records: records_friend_requests, run: run_fetch_friend_requests} = useReadCypher(GET_FRIEND_REQUESTS);
   const {loading: loading_event_invites, error: error_event_invites, records: records_event_invites, run: run_fetch_event_invites} = useReadCypher(GET_EVENT_INVITES);
   const {loading: loading_event_invite_response, error: error_event_invite_response, records: records_event_invite_response, run: run_event_invite_response} = useWriteCypher(RESPOND_TO_EVENT_INVITE);
+  const {loading: loading_friend_request_response, error: error_friend_request_response, records: records_friend_request_response, run: run_friend_request_response} = useWriteCypher(RESPOND_TO_FRIEND_REQUEST);
 
-  const respondToEventInvite = (response, inviteUUID) => {
-    console.log("respondToEventInvite: ", response, inviteUUID);
-    setEventInviteResponse(response);
-    setEventInviteUUID(inviteUUID);
-    setRunRespondToEventInviteQuery(true);
+
+
+  const respondToFriendRequest = (response, requestUUID) => {
+    console.log("respondToFriendRequest: ", response, requestUUID);
+    setFriendRequestResponse(response);
+    setFriendRequestUUID(requestUUID);
+    setRunRespondToFriendRequestQuery(true);
   };
 
+  useEffect(() => {
+    const response_to_friend_request = async () => {
+      if (runRespondToFriendRequestQuery) {
+  
+        const params = {
+          RESPONSE: friend_request_response,
+          UUID: friend_request_uuid
+        };
+        console.log('params', params);
+        run_friend_request_response(params);
+
+        setRunRespondToFriendRequestQuery(false);
+        setFriendRequestResponseTransactionStatus(true);
+      }
+    };
+    response_to_friend_request();
+  },  [runRespondToFriendRequestQuery]);
+
+  useEffect(() => {
+    if (loading_friend_request_response && friendRequestResponseTransactionStatus) {
+        setFriendRequestResponseTransactionStatus('loading');
+    }  else if (records_friend_request_response && friendRequestResponseTransactionStatus) {
+        setFriendRequestResponseTransactionStatus('success');
+        toast.success('Response Sent Successfully!');
+        if (error_friend_request_response) {
+          error_friend_request_response = null;
+        }
+        setFriendRequests(friend_requests => friend_requests.filter(request => request.FriendRequestUUID !== friend_request_uuid));
+        setFriendRequestResponse(null);
+        setFriendRequestUUID(null);
+        setFriendRequestResponseTransactionStatus(false);
+    } else if (error_friend_request_response && friendRequestResponseTransactionStatus) {
+        setFriendRequestResponseTransactionStatus('error');
+        toast.error(`Error: ${error_friend_request_response.message}`);
+        setFriendRequestResponse(null);
+        setFriendRequestUUID(null);
+        setFriendRequestResponseTransactionStatus(false);
+    }
+  }, [loading_friend_request_response, error_friend_request_response, records_friend_request_response, friendRequestResponseTransactionStatus]);
 
   
 
@@ -81,6 +129,13 @@ export const Toolbar = ({
     get_event_invites();
   }, [userSession]);
 
+
+  const respondToEventInvite = (response, inviteUUID) => {
+    console.log("respondToEventInvite: ", response, inviteUUID);
+    setEventInviteResponse(response);
+    setEventInviteUUID(inviteUUID);
+    setRunRespondToEventInviteQuery(true);
+  };
   useEffect(() => {
     const response_to_event_invite = async () => {
       if (runRespondToEventInviteQuery) {
@@ -89,7 +144,7 @@ export const Toolbar = ({
           RESPONSE: event_invite_response,
           UUID: event_invite_uuid
         };
-        console.log('params', params);
+        console.log('response_to_event_invite params', params);
         run_event_invite_response(params);
 
         setRunRespondToEventInviteQuery(false);
@@ -124,6 +179,7 @@ export const Toolbar = ({
       console.log("error: ", error_event_invites);
     }
   }, [loading_event_invites, error_event_invites, records_event_invites]);
+
 
   useEffect(() => {
     if (loading_event_invite_response && eventInviteResponseTransactionStatus) {
@@ -200,16 +256,12 @@ export const Toolbar = ({
         data={friend_requests}
         renderItem={({ item }) => renderListItem({
           view: <Text style={toolbar_styles.listItemText}>{item.Username}</Text>,
-          onAcceptButtonClick: () => {
-            run_accept_event_invite({ InviteRelationshipUUID: item.InviteRelationshipUUID });
-          },
-          onDeclineButtonClick: () => {
-            run_decline_event_invite({ InviteRelationshipUUID: item.InviteRelationshipUUID });
-          }
+          onAcceptButtonClick: () => respondToFriendRequest('ACCEPTED', item.FriendRequestUUID),
+          onDeclineButtonClick: () => respondToFriendRequest('DECLINED', item.FriendRequestUUID),
   
         })}
   
-        keyExtractor={(item) => item.RequesterUUID}
+        keyExtractor={(item) => item.FriendRequestUUID}
         contentContainerStyle={{ padding: 10 }}
       />
     </ScrollView>
