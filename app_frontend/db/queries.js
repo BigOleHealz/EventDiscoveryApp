@@ -65,9 +65,9 @@ export const GET_USER_INFO = `
 
 // OPTIMIZE
 export const CREATE_FRIEND_REQUEST_RELATIONSHIP = `
-    MATCH (a:Person {Email: ""}), (b:Person {Email: ""})
-    OPTIONAL MATCH (a)-[pending_a_to_b:FRIEND_REQUEST_SENT {STATUS: "PENDING"}]->(b)
-    OPTIONAL MATCH (b)-[pending_b_to_a:FRIEND_REQUEST_SENT {STATUS: "PENDING"}]->(a)
+    MATCH (a:Person {Email: "nico@gmail.com"}), (b:Person {Email: "matt@gmail.com"})
+    OPTIONAL MATCH (a)-[pending_a_to_b:FRIEND_REQUEST {STATUS: "PENDING"}]->(b)
+    OPTIONAL MATCH (b)-[pending_b_to_a:FRIEND_REQUEST {STATUS: "PENDING"}]->(a)
     OPTIONAL MATCH (a)-[friends_a_to_b:FRIENDS_WITH]->(b)
     WITH a, b, pending_a_to_b, pending_b_to_a, friends_a_to_b,
         CASE
@@ -82,12 +82,12 @@ export const CREATE_FRIEND_REQUEST_RELATIONSHIP = `
         END as error
     WITH a, b, error
     WHERE error IS NULL
-    CREATE (a)-[r:FRIEND_REQUEST_SENT {FRIEND_REQUEST_TIMESTAMP: apoc.date.format(apoc.date.currentTimestamp(), "ms", "yyyy-MM-dd'T'HH:mm:ss"), STATUS: "PENDING", UUID: apoc.create.uuid()}]->(b)
+    CREATE (a)-[r:FRIEND_REQUEST {FRIEND_REQUEST_TIMESTAMP: apoc.date.format(apoc.date.currentTimestamp(), "ms", "yyyy-MM-dd'T'HH:mm:ss"), STATUS: "PENDING", UUID: apoc.create.uuid()}]->(b)
     RETURN {TRANSACTION_STATUS: "SUCCESS", MESSAGE: "Friend request sent", UUID: r.UUID} as result
     UNION ALL
-    MATCH (a:Person {Email: ""}), (b:Person {Email: ""})
-    OPTIONAL MATCH (a)-[pending_a_to_b:FRIEND_REQUEST_SENT {STATUS: "PENDING"}]->(b)
-    OPTIONAL MATCH (b)-[pending_b_to_a:FRIEND_REQUEST_SENT {STATUS: "PENDING"}]->(a)
+    MATCH (a:Person {Email: "nico@gmail.com"}), (b:Person {Email: "matt@gmail.com"})
+    OPTIONAL MATCH (a)-[pending_a_to_b:FRIEND_REQUEST {STATUS: "PENDING"}]->(b)
+    OPTIONAL MATCH (b)-[pending_b_to_a:FRIEND_REQUEST {STATUS: "PENDING"}]->(a)
     OPTIONAL MATCH (a)-[friends_a_to_b:FRIENDS_WITH]->(b)
     WITH a, b, pending_a_to_b, pending_b_to_a, friends_a_to_b,
         CASE
@@ -107,7 +107,7 @@ export const CREATE_FRIEND_REQUEST_RELATIONSHIP = `
 
 
 export const GET_FRIEND_REQUESTS = `
-    MATCH (a)-[r:FRIEND_REQUEST_SENT {STATUS: "PENDING"}]->(b {UUID: $UUID})
+    MATCH (a)-[r:FRIEND_REQUEST {STATUS: "PENDING"}]->(b {UUID: $UUID})
     RETURN 
         a.FirstName as FirstName,
         a.LastName as LastName,
@@ -151,6 +151,20 @@ export const RESPOND_TO_EVENT_INVITE = `
     WITH invitee, event, r, CURRENT_DATETIME, $RESPONSE = "ACCEPTED" AS shouldCreateAttendingRelationship
     FOREACH (_ IN CASE WHEN shouldCreateAttendingRelationship THEN [1] ELSE [] END |
         MERGE (invitee)-[:ATTENDING {UUID: apoc.create.uuid(), ACCEPTED_TIMESTAMP: CURRENT_DATETIME}]->(event)
+    )
+    RETURN r;
+    `;
+
+export const RESPOND_TO_FRIEND_REQUEST = `
+    WITH apoc.date.format(apoc.date.currentTimestamp(), "ms", "yyyy-MM-dd'T'HH:mm:ss") AS CURRENT_DATETIME
+    MATCH (friend_request_sender:Person)-[r]-(friend_request_receiver:Person)
+    WHERE r.UUID = $UUID
+    SET
+        r.STATUS = $RESPONSE,
+        r.RESPONSE_TIMESTAMP = CURRENT_DATETIME
+    WITH friend_request_sender, friend_request_receiver, r, CURRENT_DATETIME, $RESPONSE = "ACCEPTED" AS shouldCreateFriendsWithRelationship
+    FOREACH (_ IN CASE WHEN shouldCreateFriendsWithRelationship THEN [1] ELSE [] END |
+        MERGE (friend_request_sender)-[:FRIENDS_WITH {UUID: apoc.create.uuid(), FRIENDS_SINCE_TIMESTAMP: CURRENT_DATETIME}]->(friend_request_receiver)
     )
     RETURN r;
     `;
