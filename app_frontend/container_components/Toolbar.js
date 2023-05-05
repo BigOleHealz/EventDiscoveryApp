@@ -32,48 +32,21 @@ export const Toolbar = ({
 
   const [runRespondToEventInviteQuery, setRunRespondToEventInviteQuery] = useState(false);
   const [event_invite_response, setEventInviteResponse] = useState(null);
-  const [shouldCheckEventInviteResponseTransactionStatus, setShouldCheckEventInviteResponseTransactionStatus] = useState(false);
+  const [event_invite_uuid, setEventInviteUUID] = useState(null);
+  const [eventInviteResponseTransactionStatus, setEventInviteResponseTransactionStatus] = useState(false);
 
 
   const {loading: loading_friend_requests, error: error_friend_requests, records: records_friend_requests, run: run_fetch_friend_requests} = useReadCypher(GET_FRIEND_REQUESTS);
   const {loading: loading_event_invites, error: error_event_invites, records: records_event_invites, run: run_fetch_event_invites} = useReadCypher(GET_EVENT_INVITES);
   const {loading: loading_event_invite_response, error: error_event_invite_response, records: records_event_invite_response, run: run_event_invite_response} = useWriteCypher(RESPOND_TO_EVENT_INVITE);
 
-  // const respondToEventInvite = async (response, inviteUUID) => {
-  //   if (runRespondToEventInviteQuery) {
-  //     const params = { RESPONSE: event_invite_response, UUID: inviteUUID };
-  //     console.log("params: ", params);
-  //     setShouldCheckEventInviteResponseTransactionStatus(true);
-  //     await run_event_invite_response(params);
-  //   }
-  // };
-  const handleEventInviteResponseClick = (response, inviteUUID) => {
-    // setCreateGameLocation(mapRef.current.getCenter().toJSON());
-    // setIsCreateGameDateTimeModalVisible(!isCreateGameDateTimeModalVisible);
-};
+  const respondToEventInvite = (response, inviteUUID) => {
+    console.log("respondToEventInvite: ", response, inviteUUID);
+    setEventInviteResponse(response);
+    setEventInviteUUID(inviteUUID);
+    setRunRespondToEventInviteQuery(true);
+  };
 
-  useEffect(() => {
-    handleEventInviteResponseClick();
-  },  [runRespondToEventInviteQuery]);
-
-  useEffect(() => {
-    if (shouldCheckEventInviteResponseTransactionStatus) {
-      if (loading_event_invite_response) {
-        toast.info("Processing your response...");
-      } else if (error_event_invite_response) {
-        toast.error(`Error responding to invite: ${error_event_invite_response.message}`);
-        setShouldCheckEventInviteResponseTransactionStatus(false);
-      } else if (records_event_invite_response) {
-        console.log("records_event_invite_response: ", records_event_invite_response);
-        toast.success("Response Sent!");
-        setShouldCheckEventInviteResponseTransactionStatus(false);
-      } else {
-        toast.error("Something went wrong. Please try again.");
-        setShouldCheckEventInviteResponseTransactionStatus(false);
-      }
-    }
-  }, [loading_event_invite_response, error_event_invite_response, records_event_invite_response, shouldCheckEventInviteResponseTransactionStatus]);
-  
 
   
 
@@ -107,6 +80,26 @@ export const Toolbar = ({
     get_friend_requests();
     get_event_invites();
   }, [userSession]);
+
+  useEffect(() => {
+    const response_to_event_invite = async () => {
+      if (runRespondToEventInviteQuery) {
+  
+        const params = {
+          RESPONSE: event_invite_response,
+          UUID: event_invite_uuid
+        };
+        console.log('params', params);
+        run_event_invite_response(params);
+
+        setRunRespondToEventInviteQuery(false);
+        setEventInviteResponseTransactionStatus(true);
+      }
+    };
+    response_to_event_invite();
+  },  [runRespondToEventInviteQuery]);
+
+
   
   useEffect(() => {
     if (!loading_friend_requests && !error_friend_requests && records_friend_requests) {
@@ -128,13 +121,33 @@ export const Toolbar = ({
     } else if (loading_event_invites) {
       console.log("Loading Event Invites...");
     } else if (error_event_invites) {
-      // console.log("error: ", error_event_invites);
-      
-      console.log("error");
+      console.log("error: ", error_event_invites);
     }
   }, [loading_event_invites, error_event_invites, records_event_invites]);
 
+  useEffect(() => {
+    if (loading_event_invite_response && eventInviteResponseTransactionStatus) {
+        setEventInviteResponseTransactionStatus('loading');
+    }  else if (records_event_invite_response && eventInviteResponseTransactionStatus) {
+        setEventInviteResponseTransactionStatus('success');
+        toast.success('Response Sent Successfully!');
+        if (error_event_invite_response) {
+          error_event_invite_response = null;
+        }
+        setEventInvites(event_invites => event_invites.filter(invite => invite.InviteRelationshipUUID !== event_invite_uuid));
+        setEventInviteResponse(null);
+        setEventInviteUUID(null);
+        setEventInviteResponseTransactionStatus(false);
+    } else if (error_event_invite_response && eventInviteResponseTransactionStatus) {
+        setEventInviteResponseTransactionStatus('error');
+        toast.error(`Error: ${error_event_invite_response.message}`);
+        setEventInviteResponse(null);
+        setEventInviteUUID(null);
+        setEventInviteResponseTransactionStatus(false);
+    }
+  }, [loading_event_invite_response, error_event_invite_response, records_event_invite_response, eventInviteResponseTransactionStatus]);
   
+
 
 
   const renderListItem = ({ view, onAcceptButtonClick, onDeclineButtonClick }) => (
@@ -145,27 +158,6 @@ export const Toolbar = ({
         <ButtonComponent title="Decline" onPress={onDeclineButtonClick} style={[toolbar_styles.acceptDeclineButton, toolbar_styles.declineButton]} />
       </View>
     </View>
-  );
-  
-  const friendRequestView = (maxHeight) => (
-    <ScrollView contentContainerStyle={{ flexGrow: 1 }} style={{ maxHeight }}>
-      <FlatList
-        data={friend_requests}
-        renderItem={({ item }) => renderListItem({
-          view: <Text style={toolbar_styles.listItemText}>{item.Username}</Text>,
-          onAcceptButtonClick: () => {
-            run_accept_event_invite({ InviteRelationshipUUID: item.InviteRelationshipUUID });
-          },
-          onDeclineButtonClick: () => {
-            run_decline_event_invite({ InviteRelationshipUUID: item.InviteRelationshipUUID });
-          }
-  
-        })}
-  
-        keyExtractor={(item) => item.RequesterUUID}
-        contentContainerStyle={{ padding: 10 }}
-      />
-    </ScrollView>
   );
 
   const eventInvitesView = (maxHeight) => (
@@ -200,6 +192,28 @@ export const Toolbar = ({
     </ScrollView>
   );
 
+
+  
+  const friendRequestView = (maxHeight) => (
+    <ScrollView contentContainerStyle={{ flexGrow: 1 }} style={{ maxHeight }}>
+      <FlatList
+        data={friend_requests}
+        renderItem={({ item }) => renderListItem({
+          view: <Text style={toolbar_styles.listItemText}>{item.Username}</Text>,
+          onAcceptButtonClick: () => {
+            run_accept_event_invite({ InviteRelationshipUUID: item.InviteRelationshipUUID });
+          },
+          onDeclineButtonClick: () => {
+            run_decline_event_invite({ InviteRelationshipUUID: item.InviteRelationshipUUID });
+          }
+  
+        })}
+  
+        keyExtractor={(item) => item.RequesterUUID}
+        contentContainerStyle={{ padding: 10 }}
+      />
+    </ScrollView>
+  );
 
   
   return (
