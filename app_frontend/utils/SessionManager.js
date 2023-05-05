@@ -12,7 +12,6 @@ export const RetrieveAndStoreUserSessionData = () => {
       if (!loading && !error && records.length > 0) {
       
         const user = records[0];
-        console.log("User session retrieved: ", user);
         storeUserSession(user);
       }
     }, [loading, error, records]);
@@ -33,7 +32,6 @@ export const storeUserSession = async (user) => {
 export const getUserSession = async () => {
     try {
         const userSession = await AsyncStorage.getItem('userSession');
-        console.log("User session retrieved: ", userSession);
         return userSession ? JSON.parse(userSession) : null;
     } catch (error) {
         console.error('Error retrieving user session:', error);

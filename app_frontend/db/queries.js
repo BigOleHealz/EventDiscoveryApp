@@ -26,7 +26,7 @@ export const CREATE_EVENT = `
 
 export const FETCH_EVENTS_FOR_MAP = `
     MATCH (n:Event)
-    WHERE "{0}" <= n.StartTimestamp <= "{1}"
+    WHERE $start_timestamp <= n.StartTimestamp <= $end_timestamp
     OPTIONAL MATCH (n)-[r:ATTENDING]-()
     WITH n, count(r) as AttendeeCount
     RETURN
@@ -168,6 +168,15 @@ export const RESPOND_TO_FRIEND_REQUEST = `
     )
     RETURN r;
     `;
+
+export const CREATE_ATTEND_EVENT_RELATIONSHIP = `
+    MATCH (p:Person {UUID: $ATTENDEE_UUID}), (e:Event {UUID: $EventUUID})
+    MERGE (p)-[r:ATTENDING]->(e)
+    ON CREATE SET r.UUID = apoc.create.uuid(),
+                r.ACCEPTED_TIMESTAMP = apoc.date.format(apoc.date.currentTimestamp(), "ms", "yyyy-MM-dd'T'HH:mm:ss")
+    RETURN r;
+
+    `
 
 export const DELETE_RELATIONSHIP_BY_UUID = `
     MATCH ()-[r]-()
