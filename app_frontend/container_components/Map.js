@@ -41,20 +41,26 @@ export const Map = ({
 
     
 
-    const [transactionStatus, setTransactionStatus] = useState(null);
-
     const [isCreateGameDateTimeModalVisible, setIsCreateGameDateTimeModalVisible] = useState(false);
     const [isInviteFriendsModalVisible, setIsInviteFriendsModalVisible] = useState(false);
 
     // Handle Create Game vars
     const [create_game_location, setCreateGameLocation] = useState(null);
     const [create_game_date_time, setCreateGameDateTime] = useState(null);
-    const [create_game_friend_invite_list, setCreateGameFriendInviteList] = useState([]);
     const [runCreateEventQuery, setRunCreateEventQuery] = useState(false);
+    const [transactionStatus, setTransactionStatus] = useState(false);
+
+
+
+
+    const [create_game_friend_invite_list, setCreateGameFriendInviteList] = useState([]);
     const { loading: createEventLoading, error: createEventError, result: createEventResult, run: runWrite } = useWriteCypher(CREATE_EVENT);
 
-    const [shouldCheckTransactionStatus, setShouldCheckTransactionStatus] = useState(false);
-
+    const resetCreateGameDetails = () => {
+      setCreateGameLocation(null);
+      setCreateGameDateTime(null);
+      setCreateGameFriendInviteList(null);
+    };
 
     useEffect(() => {
       const createGame = async () => {
@@ -80,28 +86,30 @@ export const Map = ({
           runWrite(params);
 
           setRunCreateEventQuery(false);
-          setShouldCheckTransactionStatus(true);
+          setTransactionStatus(true);
         }
       };
       createGame();
     },  [runCreateEventQuery]);
 
     useEffect(() => {
-      if (createEventLoading && shouldCheckTransactionStatus) {
+      if (createEventLoading && transactionStatus) {
           setTransactionStatus('loading');
-      }  else if (createEventResult && shouldCheckTransactionStatus) {
+      }  else if (createEventResult && transactionStatus) {
           setTransactionStatus('success');
           toast.success('Transaction successful!');
           if (createEventError) {
             createEventError = null;
           }
-          setShouldCheckTransactionStatus(false);
-      } else if (createEventError && shouldCheckTransactionStatus) {
+          resetCreateGameDetails();
+          setTransactionStatus(false);
+      } else if (createEventError && transactionStatus) {
           setTransactionStatus('error');
           toast.error(`Error: ${createEventError.message}`);
-          setShouldCheckTransactionStatus(false);
+          resetCreateGameDetails();
+          setTransactionStatus(false);
       }
-    }, [createEventLoading, createEventError, createEventResult, shouldCheckTransactionStatus]);
+    }, [createEventLoading, createEventError, createEventResult, transactionStatus]);
     
 
     // Handle Map
@@ -140,7 +148,7 @@ export const Map = ({
     useEffect(() => {
       console.log('findGameSelectedDate changed', findGameSelectedDate);
       run(); // Run the query when findGameSelectedDate changes
-    }, [findGameSelectedDate, shouldCheckTransactionStatus === false]);
+    }, [findGameSelectedDate, transactionStatus=== false]);
     
     useEffect(() => {
       if (!loading && !error && records) {
