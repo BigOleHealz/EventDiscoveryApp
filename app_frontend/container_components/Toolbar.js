@@ -1,13 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { TouchableOpacity, Text, StyleSheet, View, FlatList, ScrollView, Dimensions } from 'react-native';
-import { useReadCypher } from 'use-neo4j';
+import { useReadCypher, useWriteCypher } from 'use-neo4j';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 import { TopPanel } from './Panels';
 import { ButtonComponent } from '../base_components/ButtonComponent';
 import friendsIcon from '../assets/friends-icon.png';
 import notificationsIcon from '../assets/notifications-icon.png';
 import { recordsAsObjects } from '../db/DBHandler';
-import { GET_FRIEND_REQUESTS, GET_EVENT_INVITES, ACCEPT_EVENT_INVITE, DECLINE_EVENT_INVITE } from '../db/queries';
+import { GET_FRIEND_REQUESTS, GET_EVENT_INVITES, RESPOND_TO_EVENT_INVITE } from '../db/queries';
 import { getUserSession } from '../utils/SessionManager';
 import styles from '../styles';
 
@@ -28,8 +30,53 @@ export const Toolbar = ({
   const [friend_requests, setFriendRequests] = useState([]);
   const [event_invites, setEventInvites] = useState([]);
 
+  const [runRespondToEventInviteQuery, setRunRespondToEventInviteQuery] = useState(false);
+  const [event_invite_response, setEventInviteResponse] = useState(null);
+  const [shouldCheckEventInviteResponseTransactionStatus, setShouldCheckEventInviteResponseTransactionStatus] = useState(false);
+
+
   const {loading: loading_friend_requests, error: error_friend_requests, records: records_friend_requests, run: run_fetch_friend_requests} = useReadCypher(GET_FRIEND_REQUESTS);
   const {loading: loading_event_invites, error: error_event_invites, records: records_event_invites, run: run_fetch_event_invites} = useReadCypher(GET_EVENT_INVITES);
+  const {loading: loading_event_invite_response, error: error_event_invite_response, records: records_event_invite_response, run: run_event_invite_response} = useWriteCypher(RESPOND_TO_EVENT_INVITE);
+
+  // const respondToEventInvite = async (response, inviteUUID) => {
+  //   if (runRespondToEventInviteQuery) {
+  //     const params = { RESPONSE: event_invite_response, UUID: inviteUUID };
+  //     console.log("params: ", params);
+  //     setShouldCheckEventInviteResponseTransactionStatus(true);
+  //     await run_event_invite_response(params);
+  //   }
+  // };
+  const handleEventInviteResponseClick = (response, inviteUUID) => {
+    // setCreateGameLocation(mapRef.current.getCenter().toJSON());
+    // setIsCreateGameDateTimeModalVisible(!isCreateGameDateTimeModalVisible);
+};
+
+  useEffect(() => {
+    handleEventInviteResponseClick();
+  },  [runRespondToEventInviteQuery]);
+
+  useEffect(() => {
+    if (shouldCheckEventInviteResponseTransactionStatus) {
+      if (loading_event_invite_response) {
+        toast.info("Processing your response...");
+      } else if (error_event_invite_response) {
+        toast.error(`Error responding to invite: ${error_event_invite_response.message}`);
+        setShouldCheckEventInviteResponseTransactionStatus(false);
+      } else if (records_event_invite_response) {
+        console.log("records_event_invite_response: ", records_event_invite_response);
+        toast.success("Response Sent!");
+        setShouldCheckEventInviteResponseTransactionStatus(false);
+      } else {
+        toast.error("Something went wrong. Please try again.");
+        setShouldCheckEventInviteResponseTransactionStatus(false);
+      }
+    }
+  }, [loading_event_invite_response, error_event_invite_response, records_event_invite_response, shouldCheckEventInviteResponseTransactionStatus]);
+  
+
+  
+
 
 
   useEffect(() => {
@@ -67,9 +114,9 @@ export const Toolbar = ({
       setFriendRequests(friendRequestObjectList);
       console.log("Friend Requests: ", friendRequestObjectList);
     } else if (loading_friend_requests) {
-      console.log("Loading...");
+      console.log("Loading Friend Requests...");
     } else if (error_friend_requests) {
-      console.log("error: ", error_friend_requests);
+      console.log("error: loading friend requests still loading");
     }
   }, [loading_friend_requests, error_friend_requests, records_friend_requests]);
 
@@ -79,30 +126,15 @@ export const Toolbar = ({
       setEventInvites(eventInvitestObjectList);
       console.log("Event Invites: ", eventInvitestObjectList);
     } else if (loading_event_invites) {
-      console.log("Loading...");
+      console.log("Loading Event Invites...");
     } else if (error_event_invites) {
-      console.log("error: ", error_event_invites);
+      // console.log("error: ", error_event_invites);
+      
+      console.log("error");
     }
   }, [loading_event_invites, error_event_invites, records_event_invites]);
 
-
-  const dummyNotificationList = (
-    <View style={{ padding: 10 }}>
-      {Array.from({ length: 10 }).map((_, index) => (
-        <View
-          key={`dummy-item-${index}`}
-          style={{
-            backgroundColor: 'lightgray',
-            borderRadius: 5,
-            padding: 10,
-            marginBottom: 10,
-          }}
-        >
-          <Text style={{ fontSize: 16 }}>{`Dummy Item ${index + 1}`}</Text>
-        </View>
-      ))}
-    </View>
-  );
+  
 
 
   const renderListItem = ({ view, onAcceptButtonClick, onDeclineButtonClick }) => (
@@ -115,16 +147,19 @@ export const Toolbar = ({
     </View>
   );
   
-
-  
   const friendRequestView = (maxHeight) => (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }} style={{ maxHeight }}>
       <FlatList
         data={friend_requests}
         renderItem={({ item }) => renderListItem({
           view: <Text style={toolbar_styles.listItemText}>{item.Username}</Text>,
-          onAcceptButtonClick: () => console.log('Accepted Request:', item.RequesterUUID),
-          onDeclineButtonClick: () => console.log('Declined Request:', item.RequesterUUID)
+          onAcceptButtonClick: () => {
+            run_accept_event_invite({ InviteRelationshipUUID: item.InviteRelationshipUUID });
+          },
+          onDeclineButtonClick: () => {
+            run_decline_event_invite({ InviteRelationshipUUID: item.InviteRelationshipUUID });
+          }
+  
         })}
   
         keyExtractor={(item) => item.RequesterUUID}
@@ -154,8 +189,9 @@ export const Toolbar = ({
                     </tr>
                   </tbody>
                 </table>,
-          onAcceptButtonClick: () => console.log('Accepted Invite:', item.InviteRelationshipUUID),
-          onDeclineButtonClick: () => console.log('Declined Invite:', item.InviteRelationshipUUID)
+              onAcceptButtonClick: () => respondToEventInvite('ACCEPTED', item.InviteRelationshipUUID),
+              onDeclineButtonClick: () => respondToEventInvite('DECLINED', item.InviteRelationshipUUID)
+
         })}
   
         keyExtractor={(item) => item.InviteRelationshipUUID}
@@ -165,6 +201,7 @@ export const Toolbar = ({
   );
 
 
+  
   return (
     <>
       <TopPanel

@@ -139,6 +139,17 @@ export const GET_EVENT_INVITES = `
 
     `;
 
+
+
+export const RESPOND_TO_EVENT_INVITE = `
+    MATCH ()-[r]-()
+    WHERE r.UUID = $UUID
+    SET
+        r.STATUS = $RESPONSE,
+        r.RESPONSE_TIMESTAMP = apoc.date.format(apoc.date.currentTimestamp(), "ms", "yyyy-MM-dd'T'HH:mm:ss")
+    RETURN r;
+    `;
+
 export const ACCEPT_EVENT_INVITE = `
     MATCH ()-[r]-()
     WHERE r.UUID = $UUID
