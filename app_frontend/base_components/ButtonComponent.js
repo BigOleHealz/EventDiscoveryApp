@@ -1,17 +1,22 @@
 import React from 'react';
-import { TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { TouchableOpacity, Text, StyleSheet, Image } from 'react-native';
+import styles from '../styles';
 
-export const ButtonComponent = ({ title, onPress, style }) => {
+export const ButtonComponent = ({ title, onPress, style, icon }) => {
     return (
-        <TouchableOpacity style={[styles.button, style]} onPress={onPress}>
-            <Text style={styles.buttonText}>{title}</Text>
+        <TouchableOpacity style={[buttonStyles.button, style]} onPress={onPress}>
+            {icon ? (
+                <Image source={icon} style={buttonStyles.icon} />
+            ) : (
+                <Text style={buttonStyles.buttonText}>{title}</Text>
+            )}
         </TouchableOpacity>
     );
 };
 
-const styles = StyleSheet.create({
+const buttonStyles = StyleSheet.create({
     button: {
-        backgroundColor: '#2196F3',
+        backgroundColor: styles.appTheme.backgroundColor,
         padding: 10,
         borderRadius: 4,
         alignItems: 'center',
@@ -21,5 +26,10 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 20,
         fontWeight: 'bold',
+    },
+    icon: {
+        height: 30,
+        width: 30,
+        resizeMode: 'contain',
     },
 });
