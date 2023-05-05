@@ -142,31 +142,18 @@ export const GET_EVENT_INVITES = `
 
 
 export const RESPOND_TO_EVENT_INVITE = `
-    MATCH ()-[r]-()
+    WITH apoc.date.format(apoc.date.currentTimestamp(), "ms", "yyyy-MM-dd'T'HH:mm:ss") AS CURRENT_DATETIME
+    MATCH (invitee:Account)-[r]-(event:Event)
     WHERE r.UUID = $UUID
     SET
         r.STATUS = $RESPONSE,
-        r.RESPONSE_TIMESTAMP = apoc.date.format(apoc.date.currentTimestamp(), "ms", "yyyy-MM-dd'T'HH:mm:ss")
+        r.RESPONSE_TIMESTAMP = CURRENT_DATETIME
+    WITH invitee, event, r, CURRENT_DATETIME, $RESPONSE = "ACCEPTED" AS shouldCreateAttendingRelationship
+    FOREACH (_ IN CASE WHEN shouldCreateAttendingRelationship THEN [1] ELSE [] END |
+        MERGE (invitee)-[:ATTENDING {UUID: apoc.create.uuid(), ACCEPTED_TIMESTAMP: CURRENT_DATETIME}]->(event)
+    )
     RETURN r;
     `;
-
-export const ACCEPT_EVENT_INVITE = `
-    MATCH ()-[r]-()
-    WHERE r.UUID = $UUID
-    SET
-        r.STATUS = 'ACCEPTED',
-        r.RESPONSE_TIMESTAMP = apoc.date.format(apoc.date.currentTimestamp(), "ms", "yyyy-MM-dd'T'HH:mm:ss")
-    RETURN r;
-    `;
-
-export const DECLINE_EVENT_INVITE = `
-    MATCH ()-[r]-()
-    WHERE r.UUID = $UUID
-    SET
-        r.STATUS = 'DECLINED',
-        r.RESPONSE_TIMESTAMP = apoc.date.format(apoc.date.currentTimestamp(), "ms", "yyyy-MM-dd'T'HH:mm:ss")
-    RETURN r;
-    ;`;
 
 export const DELETE_RELATIONSHIP_BY_UUID = `
     MATCH ()-[r]-()
