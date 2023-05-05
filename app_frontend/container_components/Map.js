@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import { GoogleMap, LoadScript } from '@react-google-maps/api';
-import { useWriteCypher } from 'use-neo4j';
+import { useReadCypher, useWriteCypher } from 'use-neo4j';
 import uuid from 'react-native-uuid';
 import { add, format } from 'date-fns';
 import { ToastContainer, toast } from 'react-toastify';
@@ -12,12 +12,12 @@ import { CreateGameDateTimeModal, InviteFriendsModal } from './CreateGameModals'
 import { ButtonComponent } from '../base_components/ButtonComponent';
 import MapMarkerWithTooltip from './MapMarkerWithTooltip';
 
-import { executeCypherQuery } from '../db/DBHandler';
+import { recordsAsObjects } from '../db/DBHandler';
 import AWSHandler from '../utils/AWSHandler';
-import { FETCH_EVENTS_FOR_MAP, CREATE_EVENT } from '../db/queries'
+import { FETCH_EVENTS_FOR_MAP, CREATE_EVENT, CREATE_ATTEND_EVENT_RELATIONSHIP } from '../db/queries'
 import { day_start_time, day_end_time, date_time_format } from '../utils/constants';
-import { getAddressFromCoordinates, neo4jFormatString } from '../utils/HelperFunctions';
-import { getUserSession } from '../utils/SessionManager';
+import { getAddressFromCoordinates } from '../utils/HelperFunctions';
+import { useJoinGame } from '../hooks/JoinGameHook';
 
 import pinIcon from '../assets/pin.png';
 
@@ -38,8 +38,7 @@ export const Map = ({
       lng: -75.1652,
     };
   
-
-    
+    const { joinGame } = useJoinGame(userSession);
 
     const [isCreateGameDateTimeModalVisible, setIsCreateGameDateTimeModalVisible] = useState(false);
     const [isInviteFriendsModalVisible, setIsInviteFriendsModalVisible] = useState(false);
@@ -50,11 +49,9 @@ export const Map = ({
     const [runCreateEventQuery, setRunCreateEventQuery] = useState(false);
     const [transactionStatus, setTransactionStatus] = useState(false);
 
-
-
-
     const [create_game_friend_invite_list, setCreateGameFriendInviteList] = useState([]);
     const { loading: createEventLoading, error: createEventError, result: createEventResult, run: runWrite } = useWriteCypher(CREATE_EVENT);
+
 
     const resetCreateGameDetails = () => {
       setCreateGameLocation(null);
@@ -143,16 +140,24 @@ export const Map = ({
       error,
       records,
       run,
-    } = executeCypherQuery(neo4jFormatString(FETCH_EVENTS_FOR_MAP, start_timestamp, end_timestamp));
+    } = useReadCypher(FETCH_EVENTS_FOR_MAP);
+    // , start_timestamp, end_timestamp
     
     useEffect(() => {
       console.log('findGameSelectedDate changed', findGameSelectedDate);
-      run(); // Run the query when findGameSelectedDate changes
+      const params = {
+        start_timestamp: start_timestamp,
+        end_timestamp: end_timestamp
+      }
+      run(params); // Run the query when findGameSelectedDate changes
     }, [findGameSelectedDate, transactionStatus=== false]);
     
     useEffect(() => {
       if (!loading && !error && records) {
-        setMapEventsFullDay(records);
+        const mapEventsObjectList = recordsAsObjects(records)
+        console.log('records_fetch_events_for_map:', mapEventsObjectList);
+        setMapEventsFullDay(mapEventsObjectList);
+
       }
     }, [loading, error, records]);
   
@@ -167,7 +172,7 @@ export const Map = ({
       });
       
       setMapEventsFiltered(filteredEvents);
-    }, [findGameStartTime, findGameEndTime]);
+    }, [findGameStartTime, findGameEndTime, map_events_full_day]);
   
     
     // Manage map popup
@@ -197,6 +202,12 @@ export const Map = ({
         setIsInviteFriendsModalVisible(false);
         setIsCreateGameMode(false);
     };
+
+    const handleJoinGameButtonClick = (uuid) => {
+      console.log("handleJoinGameButtonClick", uuid);
+      joinGame(uuid);
+    };
+    
 
     if (!googleMapsApiKey) {
         return (
@@ -233,6 +244,7 @@ export const Map = ({
                   event={event}
                   activePopup={activePopup}
                   onSetActivePopup={handleSetActivePopup}
+                  onJoinGameButtonClick={handleJoinGameButtonClick}
                 />
             ))}
             </GoogleMap>

@@ -103,8 +103,8 @@ export const InviteFriendsModal = ({ isVisible, friendList, onRequestClose, onSu
       id="create-game-invite-friend-modal"
       isVisible={isVisible}
       onRequestClose={onRequestClose}
+      title="Invite Friends"
     >
-      <Text style={modalStyles.titleText}>Invite Friends</Text>
       <ScrollView>
         {friends.map((friend, index) => (
           <FriendChecklistItem

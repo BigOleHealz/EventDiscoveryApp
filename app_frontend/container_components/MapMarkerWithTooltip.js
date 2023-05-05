@@ -4,7 +4,7 @@ import { ButtonComponent } from '../base_components/ButtonComponent';
 import '../css/custom-infowindow.css';
 import styles from '../styles';
 
-const MapMarkerWithTooltip = ({ event, activePopup, onSetActivePopup }) => {
+const MapMarkerWithTooltip = ({ event, activePopup, onSetActivePopup, onJoinGameButtonClick }) => {
 
   const [showTooltip, setShowTooltip] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
@@ -29,10 +29,10 @@ const MapMarkerWithTooltip = ({ event, activePopup, onSetActivePopup }) => {
     onSetActivePopup(event.UUID);
   };
 
-  const handleJoinGameButtonClick = (uuid) => {
-    console.log('Join Game Button Clicked:', uuid);
+  const handleJoinGameButtonClick = () => {
+    onJoinGameButtonClick(event.UUID);
   };
-  
+
   const renderInfoContent = () => {
     return (
       <>
@@ -83,7 +83,7 @@ const MapMarkerWithTooltip = ({ event, activePopup, onSetActivePopup }) => {
                   <ButtonComponent
                     onPress={() => handleJoinGameButtonClick(event.UUID)}
                     title="Join Game"
-                    style={styles.buttonStyle}
+                    style={tooltipStyles.buttonStyle}
                   />
               </div>
 
@@ -124,6 +124,9 @@ const tooltipStyles = {
   value: {
     padding: '2px 0',
   },
+  buttonStyle: {
+    backgroundColor: '#2196F3'
+  }
 };
 
 
