@@ -1,3 +1,4 @@
+import React, { createContext, useContext } from 'react';
 import { SecretsManager } from '@aws-sdk/client-secrets-manager';
 
 import { region, aws_access_key_id, aws_secret_access_key } from '../secrets';
@@ -39,7 +40,22 @@ class AWSHandler {
       return null;
     }
   }
-};  
+};
 
+const AWSHandlerContext = createContext(null);
 
-export default AWSHandler;
+const useAWSHandler = () => {
+  return useContext(AWSHandlerContext);
+};
+
+const AWSHandlerProviderWrapper = ({ children }) => {
+  const awsHandler = new AWSHandler();
+
+  return (
+    <AWSHandlerContext.Provider value={awsHandler}>
+      {children}
+    </AWSHandlerContext.Provider>
+  );
+};
+
+export { AWSHandlerProviderWrapper, useAWSHandler, AWSHandlerContext};

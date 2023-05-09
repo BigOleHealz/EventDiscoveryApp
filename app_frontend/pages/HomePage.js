@@ -12,21 +12,7 @@ import { LeftSidePanel } from '../container_components/Panels';
 
 export function HomePage({
   userSession,
-//   handleFindGamesButtonClick,
-//   handleCreateGameButtonClick,
-//   isEventInvitesPanelVisible,
-//   handleEventInvitesButtonClick,
-//   isFriendRequestsPanelVisible,
-//   handleFriendRequestsButtonClick,
-//   isLeftPanelVisible,
-//   isCreateGameMode,
-//   setIsCreateGameMode,
-//   findGameSelectedDate,
-//   findGameStartTime,
-//   findGameEndTime,
-//   setFindGameSelectedDate,
-//   setFindGameStartTime,
-//   setFindGameEndTime,
+  awsHandler,
 }) {
 
       // Handle left side panel
@@ -90,6 +76,7 @@ export function HomePage({
           findGameStartTime={findGameStartTime}
           findGameEndTime={findGameEndTime}
           userSession={userSession}
+          awsHandler={awsHandler}
         />
         <LeftSidePanel
           isVisible={isLeftPanelVisible}

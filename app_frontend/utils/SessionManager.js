@@ -6,18 +6,23 @@ import { executeCypherQuery } from '../db/DBHandler';
 import { GET_USER_INFO } from '../db/queries';
 
 export const RetrieveAndStoreUserSessionData = () => {
-    const { loading, error, records, run } = executeCypherQuery(GET_USER_INFO);
-  
-    useEffect(() => {
-      if (!loading && !error && records.length > 0) {
-      
-        const user = records[0];
-        storeUserSession(user);
-      }
-    }, [loading, error, records]);
-  
-    return null;
-  };
+  const { loading, error, records, run } = executeCypherQuery(GET_USER_INFO);
+
+  useEffect(() => {
+    if (!loading && !error && records.length > 0) {
+      const user = records[0];
+      storeUserSession(user);
+    } else if (error) {
+      console.error('Error retrieving user session data:', error);
+      // Handle error (e.g., show an error message)
+    } else if (loading) {
+      console.log('Retrieving user session data...');
+      // Handle loading state (e.g., show a loading spinner)
+    }
+  }, [loading, error, records]);
+
+  return null;
+};
 
 export const storeUserSession = async (user) => {
     try {
