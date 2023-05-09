@@ -6,43 +6,51 @@ import AWSHandler from '../utils/AWSHandler';
 
 const aws_handler = new AWSHandler();
 
-const Neo4jProviderWrapper = ({ children }) => {
+const Neo4jProviderWrapper = ({ children, onDriverLoaded }) => {
   const [neo4j_credentials, setNeo4jCredentials] = useState(null);
+  const [neo4j_driver, setNeo4jDriver] = useState(null);
 
   useEffect(() => {
     console.log('Loading Neo4j credentials...');
     const fetchSecrets = async () => {
-        const secrets = await aws_handler.getSecretValue('neo4j_credentials_public');
-        if (secrets) {
-            // Use the secrets, e.g., set the API key
-            setNeo4jCredentials(secrets);
-        }
+      const secrets = await aws_handler.getSecretValue('neo4j_credentials_public');
+      if (secrets) {
+        // Use the secrets, e.g., set the API key
+        setNeo4jCredentials(secrets);
+      }
     };
 
     fetchSecrets();
   }, []);
-  if (neo4j_credentials) {
-    try {
-      const neo4j_driver = createDriver(
-        neo4j_credentials.DATABASE_NAME,
-        neo4j_credentials.HOST_IP,
-        parseInt(neo4j_credentials.PORT, 10),
-        neo4j_credentials.USER,
-        neo4j_credentials.PASSWORD
-      );
-      return <Neo4jProvider driver={neo4j_driver}>{children}</Neo4jProvider>;
-    } catch (error) {
-      console.error('Error creating Neo4j driver:', error);
-    }
-  } else {
-    return (
-      <div>
-        <p>Error: Neo4j credentials not available.</p>
-      </div>
-    );
 
+  useEffect(() => {
+    if (neo4j_credentials) {
+      console.log('neo4j_credentials loaded', neo4j_credentials);
+      try {
+        const driver = createDriver(
+          neo4j_credentials.DATABASE_NAME,
+          neo4j_credentials.HOST_IP,
+          parseInt(neo4j_credentials.PORT, 10),
+          neo4j_credentials.USER,
+          neo4j_credentials.PASSWORD
+        );
+        setNeo4jDriver(driver);
+        onDriverLoaded(true);
+      } catch (error) {
+        console.error('Error creating Neo4j driver:', error);
+      }
+    }
+  }, [neo4j_credentials, onDriverLoaded]);
+
+  if (!neo4j_driver) {
+    console.log('!isDriverLoaded');
+    return null;
+  } else {
+    console.log('Driver loaded');
+    return <Neo4jProvider driver={neo4j_driver}>{children}</Neo4jProvider>;
   }
 };
+
 
 function recordToObject(object) {
   const obj = {};
