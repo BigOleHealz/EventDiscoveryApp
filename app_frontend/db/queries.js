@@ -46,6 +46,23 @@ export const FETCH_EVENTS_FOR_MAP = `
     `;
     // apoc.date.format(datetime(n.StartTimestamp).epochMillis, "ms", "HH:mm") as FormattedStart;
 
+export const GET_USER_LOGIN_INFO = `
+    MATCH (account:Account)-[:FRIENDS_WITH]->(friend:Account)
+    WHERE account.Email = $email AND account.PasswordHash = $hashed_password
+    RETURN
+        account.Email as Email,
+        account.Username as Username,
+        account.FirstName as FirstName,
+        account.LastName as LastName,
+        account.UUID as UUID,
+        collect({
+            friendUUID: friend.UUID,
+            friendFirstName: friend.FirstName,
+            friendLastName: friend.LastName,
+            friendUsername: friend.Username
+        }) as Friends;
+    `;
+
 export const GET_USER_INFO = `
     MATCH (p:Person)-[:FRIENDS_WITH]->(friend:Person)
     WHERE p.Email = "matt@gmail.com"

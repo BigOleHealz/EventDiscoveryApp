@@ -1,19 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Neo4jProvider, createDriver, useReadCypher } from 'use-neo4j'
 
-import AWSHandler from '../utils/AWSHandler';
 
-
-const aws_handler = new AWSHandler();
-
-const Neo4jProviderWrapper = ({ children, onDriverLoaded }) => {
+const Neo4jProviderWrapper = ({ children, onDriverLoaded, awsHandler  }) => {
   const [neo4j_credentials, setNeo4jCredentials] = useState(null);
   const [neo4j_driver, setNeo4jDriver] = useState(null);
 
   useEffect(() => {
     console.log('Loading Neo4j credentials...');
     const fetchSecrets = async () => {
-      const secrets = await aws_handler.getSecretValue('neo4j_credentials_public');
+      const secrets = await awsHandler.getSecretValue('neo4j_credentials_public');
       if (secrets) {
         // Use the secrets, e.g., set the API key
         setNeo4jCredentials(secrets);
@@ -25,7 +21,7 @@ const Neo4jProviderWrapper = ({ children, onDriverLoaded }) => {
 
   useEffect(() => {
     if (neo4j_credentials) {
-      console.log('neo4j_credentials loaded', neo4j_credentials);
+      console.log('neo4j_credentials loaded');
       try {
         const driver = createDriver(
           neo4j_credentials.DATABASE_NAME,
@@ -65,12 +61,13 @@ const recordsAsObjects = (objects) => {
 };
 
 
-const executeCypherQuery = ( cypher, params = {} ) => {
+const executeCypherQuery = (cypher, params = {}) => {
   if (!cypher || cypher.trim() === "") {
     console.error("Empty or undefined Cypher query detected");
     return { loading: false, error: "Empty or undefined Cypher query", records: [] };
   }
-  const { loading, error, records, run } = useReadCypher(cypher);
+
+  const { loading, error, records, run } = useReadCypher(cypher, params);
   const [transformedRecords, setTransformedRecords] = useState([]);
 
   useEffect(() => {
@@ -91,10 +88,9 @@ const executeCypherQuery = ( cypher, params = {} ) => {
     loading,
     error,
     records: transformedRecords,
-    run
+    run,
   };
 };
-
 
 
 // const createGameFunction = async (location, dateTime, friendInviteList, run, googleMapsApiKey, user_session) => {
@@ -133,7 +129,6 @@ const executeCypherQuery = ( cypher, params = {} ) => {
 
 //   // ... (rest of the createGame function code)
 // };
-
 
 
 export {

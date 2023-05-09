@@ -13,15 +13,12 @@ import { ButtonComponent } from '../base_components/ButtonComponent';
 import MapMarkerWithTooltip from './MapMarkerWithTooltip';
 
 import { recordsAsObjects } from '../db/DBHandler';
-import AWSHandler from '../utils/AWSHandler';
-import { FETCH_EVENTS_FOR_MAP, CREATE_EVENT, CREATE_ATTEND_EVENT_RELATIONSHIP } from '../db/queries'
+import { FETCH_EVENTS_FOR_MAP, CREATE_EVENT } from '../db/queries'
 import { day_start_time, day_end_time, date_time_format } from '../utils/constants';
 import { getAddressFromCoordinates } from '../utils/HelperFunctions';
 import { useJoinGame } from '../hooks/JoinGameHook';
-
 import pinIcon from '../assets/pin.png';
 
-const aws_handler = new AWSHandler();
 
 export const Map = ({
   isCreateGameMode,
@@ -29,6 +26,7 @@ export const Map = ({
   findGameSelectedDate,
   findGameStartTime,
   findGameEndTime,
+  awsHandler,
   userSession
 }) => {
 
@@ -108,13 +106,12 @@ export const Map = ({
       }
     }, [createEventLoading, createEventError, createEventResult, transactionStatus]);
     
-
     // Handle Map
     const [mapCenter, setMapCenter] = useState(defaultCenter);
     const [googleMapsApiKey, setGoogleMapsApiKey] = useState(null); // Add this state to store the API key
     useEffect(() => {
       const fetchSecrets = async () => {
-          const secrets = await aws_handler.getSecretValue('google_maps_api_key');
+          const secrets = await awsHandler.getSecretValue('google_maps_api_key');
           if (secrets) {
               // Use the secrets, e.g., set the API key
               setGoogleMapsApiKey(secrets.GOOGLE_MAPS_API_KEY);
@@ -141,8 +138,7 @@ export const Map = ({
       records,
       run,
     } = useReadCypher(FETCH_EVENTS_FOR_MAP);
-    // , start_timestamp, end_timestamp
-    
+
     useEffect(() => {
       console.log('findGameSelectedDate changed', findGameSelectedDate);
       const params = {
