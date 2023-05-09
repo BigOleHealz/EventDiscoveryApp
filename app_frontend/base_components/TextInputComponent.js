@@ -3,17 +3,13 @@ import React, { useRef, useState } from 'react';
 import {
   TextInput,
   View,
-  Text,
   StyleSheet,
   Animated,
-  TouchableOpacity,
 } from 'react-native';
 import styles from '../styles';
 
-export const TextInputComponent = ({ placeholder, style, ...props }) => {
-//   const combinedStyles = StyleSheet.flatten([textInputStyles.input, style]);
+export const TextInputComponent = ({ placeholder, style, value, onChangeText, ...props }) => {
   const [isFocused, setIsFocused] = useState(false);
-  const [value, setValue] = useState('');
 
   const animatedFocus = useRef(new Animated.Value(value ? 1 : 0)).current;
 
@@ -33,6 +29,8 @@ export const TextInputComponent = ({ placeholder, style, ...props }) => {
   const inputLabelStyle = {
     position: 'absolute',
     left: 8,
+    backgroundColor: styles.appTheme.backgroundColor, // Set background color to match the container
+    paddingHorizontal: 4, // Add padding to create a background around the text
     top: animatedFocus.interpolate({
       inputRange: [0, 1],
       outputRange: [12, isFocused || value ? -8 : 12],
@@ -45,8 +43,6 @@ export const TextInputComponent = ({ placeholder, style, ...props }) => {
       inputRange: [0, 1],
       outputRange: ['gray', '#2196F3'],
     }),
-    backgroundColor: 'rgba(0, 0, 0, 0)', // Set background color to transparent
-    paddingHorizontal: 0, // Added padding to avoid cutting off the label text
   };
   
 
@@ -58,7 +54,7 @@ export const TextInputComponent = ({ placeholder, style, ...props }) => {
         onFocus={handleFocus}
         onBlur={handleBlur}
         value={value}
-        onChangeText={setValue}
+        onChangeText={onChangeText}
         {...props}
       />
     </View>
@@ -70,8 +66,8 @@ const textInputStyles = StyleSheet.create({
     width: '100%',
     borderWidth: 1,
     borderRadius: 4,
-    // paddingHorizontal: 8,
-    // paddingVertical: 4,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
     padding: 0,
     marginBottom: 16,
   },
@@ -79,6 +75,8 @@ const textInputStyles = StyleSheet.create({
     fontSize: 16,
     height: 40,
     color: styles.appTheme.color,
+    borderColor: 'rgba(0, 0, 0, 0)', // Set border color to transparent to avoid overlapping
+    outlineWidth: 0, // Remove outline 
   },
 });
 

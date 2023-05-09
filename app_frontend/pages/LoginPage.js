@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet } from 'react-native';
 import { Link } from 'react-router-native';
 
@@ -9,13 +9,24 @@ import { TextInputComponent } from '../base_components/TextInputComponent';
 import styles from '../styles';
 
 export function LoginPage() {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
     return (
       <View style={[loginPageStyles.container, styles.appTheme]} TestID="LoginFullPageContainer">
         <View style={styles.authContainer} TestID="LoginComponentsContainer">
           <TextComponent style={styles.h1}>Login</TextComponent>
-          <TextInputComponent placeholder="Enter Email or Username" />
+          <TextInputComponent
+            placeholder="Enter Email or Username"
+            value={email}
+            onChangeText={setEmail}
+          />
           
-          <TextInputComponent placeholder="Enter Password" secureTextEntry={true}/>
+          <TextInputComponent
+            placeholder="Enter Password"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry={true}
+          />
           <ButtonComponent
               title="Login"
               onPress={() => console.log('Login pressed')}
