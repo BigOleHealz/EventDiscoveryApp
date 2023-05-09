@@ -1,4 +1,4 @@
-
+import CryptoJS from 'crypto-js';
 
 export async function getAddressFromCoordinates(latitude, longitude, apiKey) {
   try {
@@ -25,3 +25,8 @@ export function neo4jFormatString(template, ...args) {
     return typeof args[number] !== 'undefined' ? args[number] : match;
   })
 };
+
+export function hashPassword(inputString) {
+  const hashed = CryptoJS.SHA256(inputString);
+  return hashed.toString(CryptoJS.enc.Hex);
+}
