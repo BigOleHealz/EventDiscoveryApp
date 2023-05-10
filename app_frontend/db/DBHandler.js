@@ -93,43 +93,6 @@ const executeCypherQuery = (cypher, params = {}) => {
 };
 
 
-// const createGameFunction = async (location, dateTime, friendInviteList, run, googleMapsApiKey, user_session) => {
-//   console.log('Creating game with the following parameters:');
-//   console.log('Location:', location);
-//   console.log('Date & Time:', dateTime);
-//   console.log('Friend Invite List:', friendInviteList);
-
-//   console.log("dateTime: ", dateTime);
-//   console.log("EventCreateAt: ", format(new Date(), date_time_format));
-//   // console.log("EndTimestamp: ", format(addHours(parse(dateTime, date_time_format, new Date()), 1), date_time_format));
-
-//   try {
-//     const params = {
-//       CreatedByID: user_session.UUID,
-//       Address: getAddressFromCoordinates(location.lat, location.lng, googleMapsApiKey),
-//       StartTimestamp: dateTime,
-//       Host: user_session.Username,
-//       EventCreateAt: format(new Date(), date_time_format),
-//       Lon: location.lng,
-//       PublicEventFlag: true,
-//       EndTimestamp: format(addHours(parse(dateTime, date_time_format, new Date()), 1), date_time_format),
-//       EventName: 'Pickup Basketball',
-//       EventUUID: uuid.v4(),
-//       Lat: location.lat
-//     };
-
-//     run(params).then((result) => {
-//       console.log("result: ", result);
-//     }).catch((error) => {
-//       console.error(error);
-//     });
-//   } catch (error) {
-//     console.error(error);
-//   }
-
-//   // ... (rest of the createGame function code)
-// };
-
 
 export {
   Neo4jProviderWrapper,

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { NativeRouter as Route, Routes, useNavigate } from 'react-router-native';
+import { Route, Routes, useNavigate } from 'react-router-native';
 
 
 import { LoginPage } from './pages/LoginPage';
@@ -31,7 +31,7 @@ export function AppHandler({ awsHandler }) {
     <Routes>
       <Route
         path="/"
-        element={userSession && <HomePage userSession={userSession} awsHandler={awsHandler} />} />
+        element={<HomePage userSession={userSession} awsHandler={awsHandler} />} />
       <Route path="/login" element={<LoginPage setUserSession={setUserSession}/>} />
       <Route path="/create-account" element={<CreateAccountPage />} />
     </Routes>
