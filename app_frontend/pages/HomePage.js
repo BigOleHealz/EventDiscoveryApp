@@ -15,6 +15,10 @@ export function HomePage({
   awsHandler,
 }) {
 
+  if (!userSession) {
+    return null;
+  }
+
       // Handle left side panel
   const [isLeftPanelVisible, setIsLeftPanelVisible] = useState(false);
   const [isCreateGameMode, setIsCreateGameMode] = useState(false);
