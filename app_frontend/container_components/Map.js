@@ -111,11 +111,11 @@ export const Map = ({
     const [googleMapsApiKey, setGoogleMapsApiKey] = useState(null); // Add this state to store the API key
     useEffect(() => {
       const fetchSecrets = async () => {
-          const secrets = await awsHandler.getSecretValue('google_maps_api_key');
-          if (secrets) {
-              // Use the secrets, e.g., set the API key
-              setGoogleMapsApiKey(secrets.GOOGLE_MAPS_API_KEY);
-          }
+        const secrets = await awsHandler.getSecretValue('google_maps_api_key');
+        if (secrets) {
+            // Use the secrets, e.g., set the API key
+            setGoogleMapsApiKey(secrets.GOOGLE_MAPS_API_KEY);
+        }
       };
   
       fetchSecrets();

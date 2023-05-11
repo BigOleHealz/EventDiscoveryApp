@@ -1,5 +1,15 @@
 // cypherQueries.js
 
+export const CREATE_PERSON_NODE = `
+    CREATE (n:Account:Person { 
+        FirstName: $first_name, 
+        LastName: $last_name,
+        Username: $user_name,
+        Email: $email,
+        PasswordHash: $hashed_password,
+        UUID: apoc.create.uuid() 
+    });
+    `;
 
 export const CREATE_EVENT = `
     MATCH (et:EventType {EventType: 'Basketball'})

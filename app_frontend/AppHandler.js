@@ -33,7 +33,7 @@ export function AppHandler({ awsHandler }) {
         path="/"
         element={<HomePage userSession={userSession} awsHandler={awsHandler} />} />
       <Route path="/login" element={<LoginPage setUserSession={setUserSession}/>} />
-      <Route path="/create-account" element={<CreateAccountPage />} />
+      <Route path="/create-account" element={<CreateAccountPage awsHandler={awsHandler}/>} />
     </Routes>
   );
 };

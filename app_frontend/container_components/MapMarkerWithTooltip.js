@@ -115,7 +115,7 @@ const tooltipStyles = {
     fontWeight: 'bold',
   },
   label: {
-    width: '20%',
+    width: '30%',
     fontWeight: '600',
     marginRight: '4px',
     padding: '2px 10px 2px 0',

@@ -1,5 +1,6 @@
 import React, { createContext, useContext } from 'react';
 import { SecretsManager } from '@aws-sdk/client-secrets-manager';
+import { SESClient, SendEmailCommand } from '@aws-sdk/client-ses';
 
 import { region, aws_access_key_id, aws_secret_access_key } from '../secrets';
 
@@ -22,6 +23,7 @@ class AWSHandler {
 
 
     this.secretsManager = new SecretsManager(this.awsConfig);
+    this.sesClient = new SESClient(this.awsConfig);
   }
 
   async getSecretValue(SecretId) {
@@ -38,6 +40,33 @@ class AWSHandler {
     } catch (error) {
       console.error('Error fetching secret:', error);
       return null;
+    }
+  }
+
+  async sendVerificationEmail(email, token) {
+    const params = {
+      Destination: {
+        ToAddresses: [email],
+      },
+      Message: {
+        Body: {
+          Html: {
+            Charset: 'UTF-8',
+            Data: `Please click the following link to verify your email address: 
+                   <a href="https://your-website.com/verify?token=${token}">Verify Email Address</a>`,
+          },
+        },
+        Subject: { Data: 'Verify your email address', Charset: 'UTF-8' },
+      },
+      Source: 'your-email@your-domain.com',
+    };
+
+    try {
+      const command = new SendEmailCommand(params);
+      const response = await this.sesClient.send(command);
+      console.log('Email sent:', response);
+    } catch (error) {
+      console.error('Error sending email:', error);
     }
   }
 };
