@@ -3,8 +3,6 @@ import { View, Text, StyleSheet } from 'react-native';
 import { Link } from 'react-router-native';
 import { ToastContainer, toast } from 'react-toastify';
 
-
-
 import { ButtonComponent } from '../base_components/ButtonComponent';
 import { TextComponent } from '../base_components/TextComponent';
 import { TextInputComponent } from '../base_components/TextInputComponent';
@@ -46,7 +44,6 @@ export function LoginPage({ setUserSession }) {
       if (login_status.STATUS === 'ERROR') {
         toast.error(`Error: ${login_status.RESPONSE}`);
         console.log(login_status.RESPONSE);
-        reset_login_transaction_status();
       } else if (login_status.STATUS === 'SUCCESS') {
         if (login_status.RESPONSE.RECORD_COUNT === 0) {
           toast.error(`Error: No account exists with that email & password combination.`);
@@ -57,8 +54,8 @@ export function LoginPage({ setUserSession }) {
           storeUserSession(user);
           setUserSession(user);
           toast.success('Login Successful!');
+          resetLoginInfo();
         }
-        resetLoginInfo();
         reset_login_transaction_status();
       }
     }, [login_status]);
