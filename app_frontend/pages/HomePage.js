@@ -1,6 +1,6 @@
 // HomePage.js
 
-import React, { useState }from 'react';
+import React, { useState } from 'react';
 import { View } from 'react-native';
 import { format } from 'date-fns';
 
@@ -12,14 +12,13 @@ import { LeftSidePanel } from '../container_components/Panels';
 
 export function HomePage({
   userSession,
-  awsHandler,
 }) {
 
   if (!userSession) {
     return null;
   }
 
-      // Handle left side panel
+  // Handle left side panel
   const [isLeftPanelVisible, setIsLeftPanelVisible] = useState(false);
   const [isCreateGameMode, setIsCreateGameMode] = useState(false);
   const [isEventInvitesPanelVisible, setIsEventInvitesPanelVisible] = useState(false);
@@ -80,7 +79,7 @@ export function HomePage({
           findGameStartTime={findGameStartTime}
           findGameEndTime={findGameEndTime}
           userSession={userSession}
-          awsHandler={awsHandler}
+        // awsHandler={awsHandler}
         />
         <LeftSidePanel
           isVisible={isLeftPanelVisible}

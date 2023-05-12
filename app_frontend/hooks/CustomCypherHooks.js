@@ -19,8 +19,6 @@ export const useCustomCypherRead = (query) => {
 
 	useEffect(() => {
 		const run_query = async () => {
-			console.log("runQuery: ", runQuery);
-			console.log("params: ", params);
 			if (runQuery && params) {
 				run(params);
 				setRunQuery(false);
@@ -44,7 +42,7 @@ export const useCustomCypherRead = (query) => {
 				console.error('Error executing useCustomCypherRead:', error);
 				setTransactionStatus({ STATUS: 'ERROR', RESPONSE: error.message });
 				setTransactionRunning(false);
-			}  else {
+			} else {
 				console.log('Something else happened');
 				setTransactionRunning(false);
 			}
@@ -106,7 +104,7 @@ export const useCustomCypherWrite = (query) => {
 				console.error('Error executing useCustomCypherWrite:', error);
 				setTransactionStatus({ STATUS: 'ERROR', RESPONSE: error.message });
 				setTransactionRunning(false);
-			}  else {
+			} else {
 				console.log('Something else happened');
 				setTransactionRunning(false);
 			}
@@ -114,9 +112,8 @@ export const useCustomCypherWrite = (query) => {
 	}, [loading, error, records, transactionRunning]);
 
 	const executeQuery = (new_params) => {
-			console.log("useCustomCypherRead params: ", new_params);
-			setParams(new_params);
-			setRunCommand(true);
+		setParams(new_params);
+		setRunCommand(true);
 	};
 
 	return { transactionStatus, executeQuery, resetTransactionStatus };
@@ -132,7 +129,7 @@ function recordToObject(object) {
 	}
 	return obj;
 }
-  
+
 
 const recordsAsObjects = (objects) => {
 	return objects.map(object => recordToObject(object))
