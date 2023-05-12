@@ -27,10 +27,20 @@ export const CREATE_EVENT = `
         UUID: $UUID,
         Lat: $Lat
     })
-    WITH e, $FriendInviteList AS friendInviteList
+     RETURN e.UUID as UUID;
+    `;
+// WITH e, $FriendInviteList AS friendInviteList
+// UNWIND friendInviteList AS friendUUID
+// MATCH (friend:Person {UUID: friendUUID})
+// CREATE (friend)-[:INVITED {INVITED_TIMESTAMP: $EventCreatedAt, INVITED_BY_UUID: $CreatedByID, STATUS: "PENDING", UUID: apoc.create.uuid()}]->(e)
+
+export const INVITE_FRIENDS_TO_EVENT = `
+    
+    MATCH (e:Event {UUID: $event_uuid})
+    WITH e, $friend_invite_list AS friendInviteList
     UNWIND friendInviteList AS friendUUID
     MATCH (friend:Person {UUID: friendUUID})
-    CREATE (friend)-[:INVITED {INVITED_TIMESTAMP: $EventCreatedAt, INVITED_BY_UUID: $CreatedByID, STATUS: "PENDING", UUID: apoc.create.uuid()}]->(e)
+    CREATE (friend)-[:INVITED {INVITED_TIMESTAMP: apoc.date.format(apoc.date.currentTimestamp(), "ms", "yyyy-MM-dd'T'HH:mm:ss"), INVITED_BY_UUID: $inviter_uuid, STATUS: "PENDING", UUID: apoc.create.uuid()}]->(e)
     RETURN e;
     `;
 
@@ -54,7 +64,7 @@ export const FETCH_EVENTS_FOR_MAP = `
             ELSE toString(CASE WHEN datetime(n.StartTimestamp).hour = 12 THEN 12 ELSE (datetime(n.StartTimestamp).hour - 12) % 12 END) + ":" + (CASE WHEN datetime(n.StartTimestamp).minute < 10 THEN "0" ELSE "" END) + toString(datetime(n.StartTimestamp).minute) + " PM"
         END as FormattedStart;
     `;
-    // apoc.date.format(datetime(n.StartTimestamp).epochMillis, "ms", "HH:mm") as FormattedStart;
+// apoc.date.format(datetime(n.StartTimestamp).epochMillis, "ms", "HH:mm") as FormattedStart;
 
 export const GET_USER_LOGIN_INFO = `
     MATCH (account:Account)-[:FRIENDS_WITH]->(friend:Account)
@@ -197,7 +207,7 @@ export const RESPOND_TO_FRIEND_REQUEST = `
     `;
 
 export const CREATE_ATTEND_EVENT_RELATIONSHIP = `
-    MATCH (p:Person {UUID: $ATTENDEE_UUID}), (e:Event {UUID: $EventUUID})
+    MATCH (p:Person {UUID: $attendee_uuid}), (e:Event {UUID: $event_uuid})
     MERGE (p)-[r:ATTENDING]->(e)
     ON CREATE SET r.UUID = apoc.create.uuid(),
                 r.ACCEPTED_TIMESTAMP = apoc.date.format(apoc.date.currentTimestamp(), "ms", "yyyy-MM-dd'T'HH:mm:ss")

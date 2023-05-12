@@ -94,6 +94,7 @@ export const useCustomCypherWrite = (query) => {
 	useEffect(() => {
 		if (transactionRunning) {
 			if (records) {
+				console.log('useCustomCypherWrite: SUCCESS!');
 				const transformed_records = recordsAsObjects(records);
 				setTransactionStatus({ STATUS: 'SUCCESS', RESPONSE: { RECORDS: transformed_records, RECORD_COUNT: transformed_records.length } });
 				setTransactionRunning(false);
