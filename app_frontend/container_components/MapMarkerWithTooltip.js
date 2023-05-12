@@ -1,10 +1,10 @@
-import React, { useState, useEffect  } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Marker, InfoWindow } from '@react-google-maps/api';
 import { ButtonComponent } from '../base_components/ButtonComponent';
 import '../css/custom-infowindow.css';
 import styles from '../styles';
 
-const MapMarkerWithTooltip = ({ event, activePopup, onSetActivePopup, onJoinGameButtonClick }) => {
+const MapMarkerWithTooltip = ({ event, activePopup, onSetActivePopup, userSession, onJoinGameButtonClick, setEventUUID, setIsInviteFriendsToEventModalVisible }) => {
 
   const [showTooltip, setShowTooltip] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
@@ -29,8 +29,11 @@ const MapMarkerWithTooltip = ({ event, activePopup, onSetActivePopup, onJoinGame
     onSetActivePopup(event.UUID);
   };
 
-  const handleJoinGameButtonClick = () => {
-    onJoinGameButtonClick(event.UUID);
+  const handleJoinGameButtonClick = (eventUUID) => {
+    console.log("handleJoinGameButtonClick", eventUUID);
+    onJoinGameButtonClick({ attendee_uuid: userSession.UUID, event_uuid: eventUUID });
+    setEventUUID(eventUUID);
+    // setIsInviteFriendsToEventModalVisible(true);
   };
 
   const renderInfoContent = () => {
@@ -55,7 +58,6 @@ const MapMarkerWithTooltip = ({ event, activePopup, onSetActivePopup, onJoinGame
     );
   };
 
-  
 
   return (
     <Marker
@@ -66,12 +68,12 @@ const MapMarkerWithTooltip = ({ event, activePopup, onSetActivePopup, onJoinGame
     >
       {showTooltip && (
         <InfoWindow>
-        <div className="gm-style-iw">
-          <div style={tooltipStyles.container}>
-            {renderInfoContent()}
+          <div className="gm-style-iw">
+            <div style={tooltipStyles.container}>
+              {renderInfoContent()}
 
+            </div>
           </div>
-        </div>
         </InfoWindow>
       )}
       {activePopup === event.UUID && (
@@ -80,11 +82,11 @@ const MapMarkerWithTooltip = ({ event, activePopup, onSetActivePopup, onJoinGame
             <div style={tooltipStyles.container}>
               {renderInfoContent()}
               <div>
-                  <ButtonComponent
-                    onPress={() => handleJoinGameButtonClick(event.UUID)}
-                    title="Join Game"
-                    style={tooltipStyles.buttonStyle}
-                  />
+                <ButtonComponent
+                  onPress={() => handleJoinGameButtonClick(event.UUID)}
+                  title="Join Game"
+                  style={tooltipStyles.buttonStyle}
+                />
               </div>
 
             </div>

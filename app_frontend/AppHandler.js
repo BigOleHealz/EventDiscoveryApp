@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Route, Routes, useNavigate } from 'react-router-native';
 
-
 import { LoginPage } from './pages/LoginPage';
 import { HomePage } from './pages/HomePage';
 import { CreateAccountPage } from './pages/CreateAccountPage';
+import { getUserSession } from './utils/SessionManager';
 
 
 
@@ -12,6 +12,14 @@ export function AppHandler() {
   const [userSession, setUserSession] = useState(null);
   const [redirectRoute, setRedirectRoute] = useState(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    (async () => {
+      const session = await getUserSession();
+      setUserSession(session);
+    })();
+  }, []);
+
 
   useEffect(() => {
 

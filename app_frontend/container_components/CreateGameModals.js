@@ -70,14 +70,14 @@ const FriendChecklistItem = ({ name, isChecked, onValueChange }) => {
   );
 };
 
-export const InviteFriendsModal = ({ isVisible, friendList, onRequestClose, onSubmitButtonClick }) => {
+export const CreateGameInviteFriendsModal = ({ isVisible, friendList, onRequestClose, onSubmitButtonClick }) => {
   const initialFriends = friendList.map(friend => {
     return {
       ...friend,
       isChecked: false
     };
   });
-  
+
   const [friends, setFriends] = React.useState(initialFriends);
   const [anyChecked, setAnyChecked] = React.useState(false);
 
@@ -95,7 +95,62 @@ export const InviteFriendsModal = ({ isVisible, friendList, onRequestClose, onSu
   const handleSubmitButtonClick = () => {
     const selectedFriendUUIDs = friends.filter(friend => friend.isChecked).map(friend => friend.friendUUID);
     console.log('Selected friends:', selectedFriendUUIDs);
-      onSubmitButtonClick(selectedFriendUUIDs);
+    onSubmitButtonClick(selectedFriendUUIDs);
+  };
+
+  return (
+    <ModalComponent
+      id="create-game-invite-friend-modal"
+      isVisible={isVisible}
+      onRequestClose={onRequestClose}
+      title="Invite Friends"
+    >
+      <ScrollView>
+        {friends.map((friend, index) => (
+          <FriendChecklistItem
+            key={friend.friendUUID}
+            name={friend.friendUsername}
+            isChecked={friend.isChecked}
+            onValueChange={(newValue) => handleValueChange(index, newValue)}
+          />
+        ))}
+      </ScrollView>
+      <ButtonComponent
+        id="create-game-invite-friends-button"
+        title={anyChecked ? "Send Invites & Create Game" : "Skip & Create Game"}
+        onPress={handleSubmitButtonClick}
+        style={modalStyles.buttonStyle}
+      />
+    </ModalComponent>
+  );
+};
+
+export const InviteFriendsToEventModal = ({ isVisible, friendList, onRequestClose, onSubmitButtonClick }) => {
+  const initialFriends = friendList.map(friend => {
+    return {
+      ...friend,
+      isChecked: false
+    };
+  });
+
+  const [friends, setFriends] = React.useState(initialFriends);
+  const [anyChecked, setAnyChecked] = React.useState(false);
+
+  const handleValueChange = (index, newValue) => {
+    const updatedFriends = friends.map((friend, i) => {
+      if (i === index) {
+        return { ...friend, isChecked: newValue };
+      }
+      return friend;
+    });
+    setFriends(updatedFriends);
+    setAnyChecked(updatedFriends.some(friend => friend.isChecked));
+  };
+
+  const handleSubmitButtonClick = () => {
+    const selectedFriendUUIDs = friends.filter(friend => friend.isChecked).map(friend => friend.friendUUID);
+    console.log('Selected friends:', selectedFriendUUIDs);
+    onSubmitButtonClick(selectedFriendUUIDs);
   };
 
   return (
