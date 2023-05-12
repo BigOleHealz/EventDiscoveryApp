@@ -1,18 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { Neo4jProvider, createDriver, useReadCypher } from 'use-neo4j'
+import { getSecretValue } from '../utils/AWSHandler';
 
-
-const Neo4jProviderWrapper = ({ children, onDriverLoaded, awsHandler  }) => {
+const Neo4jProviderWrapper = ({ children, onDriverLoaded }) => {
   const [neo4j_credentials, setNeo4jCredentials] = useState(null);
   const [neo4j_driver, setNeo4jDriver] = useState(null);
+
 
   useEffect(() => {
     console.log('Loading Neo4j credentials...');
     const fetchSecrets = async () => {
-      const secrets = await awsHandler.getSecretValue('neo4j_credentials_public');
+      const secrets = await getSecretValue('neo4j_credentials_public');
       if (secrets) {
         // Use the secrets, e.g., set the API key
-        setNeo4jCredentials(secrets);
+        const parsed_secrets = JSON.parse(secrets);
+        setNeo4jCredentials(parsed_secrets);
       }
     };
 

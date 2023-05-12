@@ -4,6 +4,9 @@ COPY package*.json ./
 RUN apt update
 RUN apt install -y lsof -y --no-install-recommends -o APT::Install-Suggests="false" -o APT::Install-Recommends="false"
 
+# RUN apt-get update && apt-get install -y python3-pip
+# RUN pip3 install awscli
+
 
 RUN npm ci
 # RUN npm install -g expo-cli
