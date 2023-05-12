@@ -8,7 +8,7 @@ import { CreateAccountPage } from './pages/CreateAccountPage';
 
 
 
-export function AppHandler({ awsHandler }) {
+export function AppHandler() {
   const [userSession, setUserSession] = useState(null);
   const [redirectRoute, setRedirectRoute] = useState(null);
   const navigate = useNavigate();
@@ -31,9 +31,9 @@ export function AppHandler({ awsHandler }) {
     <Routes>
       <Route
         path="/"
-        element={<HomePage userSession={userSession} awsHandler={awsHandler} />} />
-      <Route path="/login" element={<LoginPage setUserSession={setUserSession}/>} />
-      <Route path="/create-account" element={<CreateAccountPage awsHandler={awsHandler}/>} />
+        element={<HomePage userSession={userSession} />} />
+      <Route path="/login" element={<LoginPage setUserSession={setUserSession} />} />
+      <Route path="/create-account" element={<CreateAccountPage />} />
     </Routes>
   );
 };
