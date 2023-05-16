@@ -7,44 +7,44 @@ import styles from '../styles';
 import { day_start_time, day_end_time } from '../utils/constants';
 
 
-const PanelContainer = ({ isVisible, position, title, type, children }) => {
+const PanelContainer = ({ isVisible, position, title, type, children, style }) => {
 	const slideAnim = useRef(new Animated.Value(0)).current;
-  
+
 	useEffect(() => {
-	  Animated.timing(slideAnim, {
-		toValue: isVisible ? 1 : 0,
-		duration: 300,
-		useNativeDriver: false,
-	  }).start();
+		Animated.timing(slideAnim, {
+			toValue: isVisible ? 1 : 0,
+			duration: 300,
+			useNativeDriver: false,
+		}).start();
 	}, [isVisible]);
-  
+
 	const panelStyle = type === 'top' ? panel_styles.topPanel : panel_styles.sidePanel;
 	const panelPosition = type === 'top'
-	  ? { top: slideAnim.interpolate({ inputRange: [0, 1], outputRange: position }) }
-	  : { left: slideAnim.interpolate({ inputRange: [0, 1], outputRange: position }) };
-  
+		? { top: slideAnim.interpolate({ inputRange: [0, 1], outputRange: position }) }
+		: { left: slideAnim.interpolate({ inputRange: [0, 1], outputRange: position }) };
+
 	return isVisible ? (
-	  <Animated.View style={[panelStyle, panelPosition]}>
-		<View style={panel_styles.sidePanelContentContainerStyle}>
-		  <Text style={panel_styles.sidePanelTitleStyle}>{title}</Text>
-		  {children}
-		</View>
-	  </Animated.View>
+		<Animated.View style={[panelStyle, panelPosition, style]}>
+			<View style={panel_styles.sidePanelContentContainerStyle}>
+				<Text style={panel_styles.sidePanelTitleStyle}>{title}</Text>
+				{children}
+			</View>
+		</Animated.View>
 	) : null;
-  };
-  
+};
+
 
 const TopPanel = ({ isVisible, position, title, children }) => {
-
 	return (
 		<PanelContainer
-		type="top"
-		position={position}
-		title={title}
-		isVisible={isVisible}
+			type="top"
+			position={position}
+			title={title}
+			isVisible={isVisible}
+			style={panel_styles.topPanel}
 		>
 			{children}
-		</PanelContainer>
+		</PanelContainer >
 	);
 };
 
@@ -57,40 +57,40 @@ const LeftSidePanel = ({
 	setFindGameStartTime,
 	findGameEndTime,
 	setFindGameEndTime,
-  }) => {
+}) => {
 	console.log("Starting LeftSidePanel component");
-  
+
 	const handleDateSelected = (date) => {
-	  console.log('Left side panel selected date:', date);
-	  setFindGameSelectedDate(date);
-	  setFindGameStartTime(day_start_time);
-	  setFindGameEndTime(day_end_time);
+		console.log('Left side panel selected date:', date);
+		setFindGameSelectedDate(date);
+		setFindGameStartTime(day_start_time);
+		setFindGameEndTime(day_end_time);
 	};
-  
+
 	return (
-	  <PanelContainer
-		testID="left-side-panel"
-		type="left"
-		position={["-30%", "0%"]}
-		title="Find Games"
-		isVisible={isVisible}
-	  >
-		<CalendarComponent
-		  id="left-calendar"
-		  selected={findGameSelectedDate}
-		  onDateSelected={handleDateSelected}
-		  style={panel_styles.calendarStyle}
-		/>
-		<TimeRangeSliderComponent
-		  startTime={findGameStartTime}
-		  setStartTime={setFindGameStartTime}
-		  endTime={findGameEndTime}
-		  setEndTime={setFindGameEndTime}
-		/>
-	  </PanelContainer>
+		<PanelContainer
+			testID="left-side-panel"
+			type="left"
+			position={["-30%", "0%"]}
+			title="Find Games"
+			isVisible={isVisible}
+		>
+			<CalendarComponent
+				id="left-calendar"
+				selected={findGameSelectedDate}
+				onDateSelected={handleDateSelected}
+				style={panel_styles.calendarStyle}
+			/>
+			<TimeRangeSliderComponent
+				startTime={findGameStartTime}
+				setStartTime={setFindGameStartTime}
+				endTime={findGameEndTime}
+				setEndTime={setFindGameEndTime}
+			/>
+		</PanelContainer>
 	);
-  };
-  
+};
+
 
 const panel_styles = StyleSheet.create({
 	panelsContainer: {
@@ -146,23 +146,24 @@ const panel_styles = StyleSheet.create({
 	},
 	topPanel: {
 		position: 'absolute',
-		left: 0,
-		right: 0,
+		left: '20%', // Add this
+		right: '20%', // Add this
 		backgroundColor: styles.appTheme.backgroundColor,
 		justifyContent: 'center',
 		alignItems: 'center',
 		shadowColor: '#000',
 		shadowOffset: {
-		  width: 10,
-		  height: 10,
+			width: 10,
+			height: 10,
 		},
+		width: '60%',
 		shadowOpacity: 0.25,
 		shadowRadius: 10,
 		elevation: 5,
 		zIndex: 10,
 		overflow: 'hidden',
 	},
-	
+
 })
 
 export { LeftSidePanel, TopPanel };

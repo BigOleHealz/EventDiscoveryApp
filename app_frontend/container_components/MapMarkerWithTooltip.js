@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { View } from 'react-native';
 import { Marker, InfoWindow } from '@react-google-maps/api';
 import { ButtonComponent } from '../base_components/ButtonComponent';
 import '../css/custom-infowindow.css';
@@ -33,13 +34,12 @@ const MapMarkerWithTooltip = ({ event, activePopup, onSetActivePopup, userSessio
     console.log("handleJoinGameButtonClick", eventUUID);
     onJoinGameButtonClick({ attendee_uuid: userSession.UUID, event_uuid: eventUUID });
     setEventUUID(eventUUID);
-    // setIsInviteFriendsToEventModalVisible(true);
   };
 
   const renderInfoContent = () => {
     return (
       <>
-        <div style={tooltipStyles.container}>
+        <View style={tooltipStyles.container}>
           <div style={tooltipStyles.address}>{event.Address}</div>
           <table style={tooltipStyles.table}>
             <tbody>
@@ -53,7 +53,7 @@ const MapMarkerWithTooltip = ({ event, activePopup, onSetActivePopup, userSessio
               </tr>
             </tbody>
           </table>
-        </div>
+        </View>
       </>
     );
   };
@@ -68,28 +68,24 @@ const MapMarkerWithTooltip = ({ event, activePopup, onSetActivePopup, userSessio
     >
       {showTooltip && (
         <InfoWindow>
-          <div className="gm-style-iw">
-            <div style={tooltipStyles.container}>
-              {renderInfoContent()}
+          <View style={tooltipStyles.container}>
+            {renderInfoContent()}
 
-            </div>
-          </div>
+          </View>
         </InfoWindow>
       )}
       {activePopup === event.UUID && (
         <InfoWindow onCloseClick={handleMarkerClick}>
-          <div className="gm-style-iw">
-            <div style={tooltipStyles.container}>
-              {renderInfoContent()}
-              <div>
-                <ButtonComponent
-                  onPress={() => handleJoinGameButtonClick(event.UUID)}
-                  title="Join Game"
-                  style={tooltipStyles.buttonStyle}
-                />
-              </div>
-
+          <div style={tooltipStyles.container}>
+            {renderInfoContent()}
+            <div>
+              <ButtonComponent
+                onPress={() => handleJoinGameButtonClick(event.UUID)}
+                title="Join Game"
+                style={tooltipStyles.buttonStyle}
+              />
             </div>
+
           </div>
         </InfoWindow>
       )}
@@ -104,9 +100,9 @@ const tooltipStyles = {
     flexDirection: 'column',
     backgroundColor: '#222', // Dark background color
     color: '#fff', // Light text color
-    padding: '8px', // Add padding for better appearance
+    padding: 0, // Add padding for better appearance
     borderRadius: '4px', // Add border radius for a smoother look
-    margin: '0px',
+    margin: 0,
   },
   table: {
     margin: 10,

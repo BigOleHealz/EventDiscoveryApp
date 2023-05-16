@@ -12,6 +12,7 @@ import { LeftSidePanel } from '../container_components/Panels';
 
 export function HomePage({
   userSession,
+  setUserSession
 }) {
 
   if (!userSession) {
@@ -79,7 +80,7 @@ export function HomePage({
           findGameStartTime={findGameStartTime}
           findGameEndTime={findGameEndTime}
           userSession={userSession}
-        // awsHandler={awsHandler}
+          setUserSession={setUserSession}
         />
         <LeftSidePanel
           isVisible={isLeftPanelVisible}

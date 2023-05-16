@@ -63,6 +63,10 @@ const styles = StyleSheet.create({
     width: '100%',
     fontSize: 12,
     margin: 6,
+  },
+  hyperlinkText: {
+    color: '#2196F3',
+    textDecorationLine: 'underline'
   }
 
 });
