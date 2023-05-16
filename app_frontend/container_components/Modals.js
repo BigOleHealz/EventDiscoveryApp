@@ -1,20 +1,78 @@
-import React, { useState } from 'react';
+import { add, format } from 'date-fns';
+import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, Text, ScrollView, CheckBox } from 'react-native';
+import { toast } from 'react-toastify';
 
 import { ButtonComponent } from '../base_components/ButtonComponent';
 import { CalendarComponent } from '../base_components/CalendarComponent';
 import { CreateGameTimeSelectorComponent } from '../base_components/CreateGameTimeSelectorComponent';
 import { ModalComponent } from '../base_components/ModalComponent';
+import { CREATE_EVENT, INVITE_FRIENDS_TO_EVENT } from '../db/queries'
+import { useCustomCypherWrite } from '../hooks/CustomCypherHooks';
 
-import { getUserSession } from '../utils/SessionManager';
+import { date_time_format } from '../utils/constants';
+import { getAddressFromCoordinates } from '../utils/HelperFunctions';
 import styles from '../styles';
 
 
-export const CreateGameDateTimeModal = ({ isVisible, onRequestClose, onSubmitButtonClick }) => {
+export const CreateGameDateTimeModal = ({
+  isVisible,
+  onRequestClose,
+  location,
+  googleMapsApiKey,
+  setIsCreateGameDateTimeModalVisible,
+  setIsInviteFriendsToEventModalVisible,
+  resetCreateGameDetails,
+  setIsCreateGameMode,
+  userSession,
+  setEventUUID
+}) => {
   const current_date = new Date().toISOString();
   const current_date_split = current_date.split('T')
   const [date_selected, setDateSelected] = useState(current_date_split[0]);
   const [time_selected, setTimeSelected] = useState(current_date_split[1].slice(0, 8));
+
+  const {
+    transactionStatus: create_event_status,
+    executeQuery: run_create_event,
+    resetTransactionStatus: reset_create_event_transaction_status
+  } = useCustomCypherWrite(CREATE_EVENT);
+
+  useEffect(() => {
+    if (create_event_status.STATUS === 'ERROR') {
+      toast.error(`Error Creating Event: ${create_event_status.RESPONSE}`);
+      console.log(create_event_status.RESPONSE);
+      setIsCreateGameMode(false);
+    } else if (create_event_status.STATUS === 'SUCCESS') {
+      console.log("create_event_status.RESPONSE: ", create_event_status.RESPONSE);
+      setEventUUID(create_event_status.RESPONSE.RECORDS[0].UUID);
+      toast.success("You Created an Event!");
+      reset_create_event_transaction_status();
+      resetCreateGameDetails();
+      setIsInviteFriendsToEventModalVisible(true);
+      setIsCreateGameMode(false);
+    }
+  }, [create_event_status]);
+
+  const createEvent = async () => {
+    const address = await getAddressFromCoordinates(location.lat, location.lng, googleMapsApiKey);
+    const create_game_date_time = new Date(`${date_selected}T${time_selected}`);
+
+    const params = {
+      CreatedByID: userSession.UUID,
+      Address: address,
+      StartTimestamp: format(create_game_date_time, date_time_format),
+      Host: userSession.Username,
+      EventCreatedAt: format(new Date(), date_time_format),
+      Lon: location.lng,
+      PublicEventFlag: true,
+      EndTimestamp: format(add(new Date(create_game_date_time), { hours: 1 }), date_time_format),
+      EventName: 'Pickup Basketball',
+      Lat: location.lat
+    };
+    console.log
+    run_create_event(params);
+  }
 
   const handleDateSelected = (date) => {
     console.log('Create Game panel selected date:', date);
@@ -28,9 +86,9 @@ export const CreateGameDateTimeModal = ({ isVisible, onRequestClose, onSubmitBut
   };
 
   const handleSubmitButtonClick = () => {
-    const selected_datetime = `${date_selected}T${time_selected}`
-    console.log('DateTime Selected: ', selected_datetime);
-    onSubmitButtonClick(selected_datetime);
+    createEvent();
+    setIsCreateGameDateTimeModalVisible(false);
+    setIsInviteFriendsToEventModalVisible(true);
   };
 
   return (
@@ -70,7 +128,37 @@ const FriendChecklistItem = ({ name, isChecked, onValueChange }) => {
   );
 };
 
-export const CreateGameInviteFriendsModal = ({ isVisible, friendList, onRequestClose, onSubmitButtonClick }) => {
+export const InviteFriendsToEventModal = ({
+  isVisible,
+  setIsInviteFriendsToEventModalVisible,
+  friendList,
+  eventUUID,
+  setEventUUID,
+  onRequestClose,
+  userSession
+}) => {
+
+  const {
+    transactionStatus: invite_friends_status,
+    executeQuery: run_invite_friends,
+    resetTransactionStatus: reset_invite_friends_transaction_status
+  } = useCustomCypherWrite(INVITE_FRIENDS_TO_EVENT);
+
+  useEffect(() => {
+    if (invite_friends_status.STATUS === 'ERROR') {
+      toast.error(`Error Sending Event Invites: ${invite_friends_status.RESPONSE}`);
+      console.log(invite_friends_status.RESPONSE);
+      reset_invite_friends_transaction_status();
+      setIsInviteFriendsToEventModalVisible(false);
+      setEventUUID(null);
+    } else if (invite_friends_status.STATUS === 'SUCCESS') {
+      toast.success("Event Invites Sent!");
+      reset_invite_friends_transaction_status();
+      setIsInviteFriendsToEventModalVisible(false);
+      setEventUUID(null);
+    }
+  }, [invite_friends_status]);
+
   const initialFriends = friendList.map(friend => {
     return {
       ...friend,
@@ -95,62 +183,11 @@ export const CreateGameInviteFriendsModal = ({ isVisible, friendList, onRequestC
   const handleSubmitButtonClick = () => {
     const selectedFriendUUIDs = friends.filter(friend => friend.isChecked).map(friend => friend.friendUUID);
     console.log('Selected friends:', selectedFriendUUIDs);
-    onSubmitButtonClick(selectedFriendUUIDs);
-  };
-
-  return (
-    <ModalComponent
-      id="create-game-invite-friend-modal"
-      isVisible={isVisible}
-      onRequestClose={onRequestClose}
-      title="Invite Friends"
-    >
-      <ScrollView>
-        {friends.map((friend, index) => (
-          <FriendChecklistItem
-            key={friend.friendUUID}
-            name={friend.friendUsername}
-            isChecked={friend.isChecked}
-            onValueChange={(newValue) => handleValueChange(index, newValue)}
-          />
-        ))}
-      </ScrollView>
-      <ButtonComponent
-        id="create-game-invite-friends-button"
-        title={anyChecked ? "Send Invites & Create Game" : "Skip & Create Game"}
-        onPress={handleSubmitButtonClick}
-        style={modalStyles.buttonStyle}
-      />
-    </ModalComponent>
-  );
-};
-
-export const InviteFriendsToEventModal = ({ isVisible, friendList, onRequestClose, onSubmitButtonClick }) => {
-  const initialFriends = friendList.map(friend => {
-    return {
-      ...friend,
-      isChecked: false
-    };
-  });
-
-  const [friends, setFriends] = React.useState(initialFriends);
-  const [anyChecked, setAnyChecked] = React.useState(false);
-
-  const handleValueChange = (index, newValue) => {
-    const updatedFriends = friends.map((friend, i) => {
-      if (i === index) {
-        return { ...friend, isChecked: newValue };
-      }
-      return friend;
-    });
-    setFriends(updatedFriends);
-    setAnyChecked(updatedFriends.some(friend => friend.isChecked));
-  };
-
-  const handleSubmitButtonClick = () => {
-    const selectedFriendUUIDs = friends.filter(friend => friend.isChecked).map(friend => friend.friendUUID);
-    console.log('Selected friends:', selectedFriendUUIDs);
-    onSubmitButtonClick(selectedFriendUUIDs);
+    run_invite_friends({
+      event_uuid: eventUUID,
+      friend_invite_list: selectedFriendUUIDs,
+      inviter_uuid: userSession.UUID
+    })
   };
 
   return (

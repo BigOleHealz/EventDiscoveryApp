@@ -24,7 +24,7 @@ export const CREATE_EVENT = `
         PublicEventFlag: $PublicEventFlag,
         EndTimestamp: $EndTimestamp,
         EventName: $EventName,
-        UUID: $UUID,
+        UUID: apoc.create.uuid(),
         Lat: $Lat
     })
      RETURN e.UUID as UUID;
@@ -40,7 +40,7 @@ export const INVITE_FRIENDS_TO_EVENT = `
     WITH e, $friend_invite_list AS friendInviteList
     UNWIND friendInviteList AS friendUUID
     MATCH (friend:Person {UUID: friendUUID})
-    CREATE (friend)-[:INVITED {INVITED_TIMESTAMP: apoc.date.format(apoc.date.currentTimestamp(), "ms", "yyyy-MM-dd'T'HH:mm:ss"), INVITED_BY_UUID: $inviter_uuid, STATUS: "PENDING", UUID: apoc.create.uuid()}]->(e)
+    MERGE (friend)-[:INVITED {INVITED_TIMESTAMP: apoc.date.format(apoc.date.currentTimestamp(), "ms", "yyyy-MM-dd'T'HH:mm:ss"), INVITED_BY_UUID: $inviter_uuid, STATUS: "PENDING", UUID: apoc.create.uuid()}]->(e)
     RETURN e;
     `;
 

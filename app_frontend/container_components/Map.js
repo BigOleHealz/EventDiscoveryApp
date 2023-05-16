@@ -2,13 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import { GoogleMap, LoadScript } from '@react-google-maps/api';
 import { useReadCypher, useWriteCypher } from 'use-neo4j';
-import uuid from 'react-native-uuid';
 import { add, format } from 'date-fns';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 
-import { CreateGameDateTimeModal, CreateGameInviteFriendsModal, InviteFriendsToEventModal } from './CreateGameModals';
+import {
+  CreateGameDateTimeModal,
+  InviteFriendsToEventModal
+} from './Modals';
 import { ButtonComponent } from '../base_components/ButtonComponent';
 import MapMarkerWithTooltip from './MapMarkerWithTooltip';
 
@@ -18,6 +20,7 @@ import { useCustomCypherWrite } from '../hooks/CustomCypherHooks';
 import { getSecretValue } from '../utils/AWSHandler';
 import { day_start_time, day_end_time, date_time_format } from '../utils/constants';
 import { getAddressFromCoordinates } from '../utils/HelperFunctions';
+import { removeUserSession } from '../utils/SessionManager';
 import pinIcon from '../assets/pin.png';
 
 
@@ -27,8 +30,8 @@ export const Map = ({
   findGameSelectedDate,
   findGameStartTime,
   findGameEndTime,
-  // awsHandler,
-  userSession
+  userSession,
+  setUserSession
 }) => {
 
   // Handle Map
@@ -41,15 +44,13 @@ export const Map = ({
 
 
   const [isCreateGameDateTimeModalVisible, setIsCreateGameDateTimeModalVisible] = useState(false);
-  const [isCreateGameInviteFriendsModalVisible, setIsCreateGameInviteFriendsModalVisible] = useState(false);
-  const [isInviteFriendsToEventModalVisible, setIsInviteFriendsToEventModalVisible] = useState(false);
+  const [isCreateGameInviteFriendsModalVisible, setIsInviteFriendsToEventModalVisible] = useState(false);
 
   // Handle Create Game vars
   const [create_game_location, setCreateGameLocation] = useState(null);
-  const [create_game_date_time, setCreateGameDateTime] = useState(null);
+  // const [create_game_date_time, setCreateGameDateTime] = useState(null);
   const [transactionStatus, setTransactionStatus] = useState(false);
 
-  const [create_game_friend_invite_list, setCreateGameFriendInviteList] = useState([]);
 
   // Attend Event
   const {
@@ -71,74 +72,13 @@ export const Map = ({
 
 
   // Create Event
-  const {
-    transactionStatus: create_event_status,
-    executeQuery: run_create_event,
-    resetTransactionStatus: reset_create_event_transaction_status
-  } = useCustomCypherWrite(CREATE_EVENT);
 
-  useEffect(() => {
-    if (create_event_status.STATUS === 'ERROR') {
-      toast.error(`Error Creating Event: ${create_event_status.RESPONSE}`);
-      console.log(create_event_status.RESPONSE);
-    } else if (create_event_status.STATUS === 'SUCCESS') {
-      setEventUUID(create_event_status.RESPONSE[0].UUID);
-      toast.success("You Created an Event!");
-      reset_create_event_transaction_status();
-      resetCreateGameDetails();
-      setIsInviteFriendsToEventModalVisible(true);
-    }
-  }, [create_event_status]);
 
 
 
   const resetCreateGameDetails = () => {
     setCreateGameLocation(null);
-    setCreateGameDateTime(null);
-    setCreateGameFriendInviteList(null);
   };
-
-  const createEvent = async () => {
-    const address = await getAddressFromCoordinates(create_game_location.lat, create_game_location.lng, googleMapsApiKey);
-    const params = {
-      CreatedByID: userSession.UUID,
-      Address: address,
-      StartTimestamp: create_game_date_time,
-      Host: userSession.Username,
-      EventCreatedAt: format(new Date(), date_time_format),
-      Lon: create_game_location.lng,
-      PublicEventFlag: true,
-      EndTimestamp: format(add(new Date(create_game_date_time), { hours: 1 }), date_time_format),
-      EventName: 'Pickup Basketball',
-      UUID: uuid.v4(),
-      Lat: create_game_location.lat
-    };
-    run_create_event(params);
-  }
-
-  // Create Event
-  const {
-    transactionStatus: invite_friends_status,
-    executeQuery: run_invite_friends,
-    resetTransactionStatus: reset_invite_friends_transaction_status
-  } = useCustomCypherWrite(INVITE_FRIENDS_TO_EVENT);
-
-  useEffect(() => {
-    if (invite_friends_status.STATUS === 'ERROR') {
-      toast.error(`Error Sending Event Invites: ${invite_friends_status.RESPONSE}`);
-      console.log(invite_friends_status.RESPONSE);
-      reset_invite_friends_transaction_status();
-      setIsInviteFriendsToEventModalVisible(false);
-      setEventUUID(null);
-    } else if (invite_friends_status.STATUS === 'SUCCESS') {
-      toast.success("Event Invites Sent!");
-      reset_invite_friends_transaction_status();
-      setIsInviteFriendsToEventModalVisible(false);
-      setEventUUID(null);
-    }
-  }, [invite_friends_status]);
-
-
 
 
   // Handle Map
@@ -221,29 +161,12 @@ export const Map = ({
     setIsCreateGameDateTimeModalVisible(!isCreateGameDateTimeModalVisible);
   };
 
-  const handleCreateGameSelectDateTimeButtonClick = (selected_datetime) => {
-    setCreateGameDateTime(selected_datetime);
-    setIsCreateGameDateTimeModalVisible(false);
-    createEvent();
-    setIsCreateGameInviteFriendsModalVisible(true);
-  };
 
-  const handleInviteFriendsButtonClick = (friend_invite_list) => {
-    setCreateGameFriendInviteList(friend_invite_list);
-    setIsCreateGameInviteFriendsModalVisible(false);
-    run_invite_friends(
-      {
-        event_uuid: event_uuid,
-        friend_invite_list: friend_invite_list,
-        inviter_uuid: userSession.UUID
-      }
-    );
-    setIsCreateGameMode(false);
-  };
 
-  const handleJoinGameButtonClick = (uuid) => {
-    console.log("handleJoinGameButtonClick", uuid);
-    run_attend_event(uuid);
+
+  const logoutUser = () => {
+    removeUserSession();
+    setUserSession(null);
   };
 
 
@@ -296,22 +219,30 @@ export const Map = ({
         <CreateGameDateTimeModal
           isVisible={isCreateGameDateTimeModalVisible}
           onRequestClose={() => setIsCreateGameDateTimeModalVisible(false)}
-          onSubmitButtonClick={handleCreateGameSelectDateTimeButtonClick}
+          location={create_game_location}
+          googleMapsApiKey={googleMapsApiKey}
+          userSession={userSession}
+          setEventUUID={setEventUUID}
+          setIsCreateGameDateTimeModalVisible={setIsCreateGameDateTimeModalVisible}
+          setIsInviteFriendsToEventModalVisible={setIsInviteFriendsToEventModalVisible}
+          resetCreateGameDetails={resetCreateGameDetails}
+          setIsCreateGameMode={setIsCreateGameMode}
         />
-        <CreateGameInviteFriendsModal
-          isVisible={isCreateGameInviteFriendsModalVisible}
-          friendList={userSession.Friends}
-          onRequestClose={() => setIsCreateGameInviteFriendsModalVisible(false)}
-          onSubmitButtonClick={handleInviteFriendsButtonClick}
-        />
-
         <InviteFriendsToEventModal
-          isVisible={isInviteFriendsToEventModalVisible}
+          isVisible={isCreateGameInviteFriendsModalVisible}
+          setIsInviteFriendsToEventModalVisible={setIsInviteFriendsToEventModalVisible}
           friendList={userSession.Friends}
+          eventUUID={event_uuid}
+          setEventUUID={setEventUUID}
           onRequestClose={() => setIsInviteFriendsToEventModalVisible(false)}
-          onSubmitButtonClick={handleInviteFriendsButtonClick}
+          userSession={userSession}
         />
       </LoadScript>
+      <ButtonComponent
+        title="Logout"
+        onPress={() => logoutUser()}
+        style={map_styles.logoutButtonStyle}
+      />
       <ToastContainer />
     </>
   );
@@ -340,4 +271,10 @@ const map_styles = StyleSheet.create({
     borderRadius: 4,
     alignItems: 'center',
   },
+  logoutButtonStyle: {
+    position: 'absolute',
+    bottom: 20,
+    left: 20,
+    width: '20%',
+  }
 });
