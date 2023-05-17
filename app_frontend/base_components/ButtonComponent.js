@@ -18,7 +18,7 @@ const buttonStyles = StyleSheet.create({
     button: {
         backgroundColor: styles.appTheme.backgroundColor,
         padding: 10,
-        borderRadius: 4,
+        borderRadius: 8,
         alignItems: 'center',
         justifyContent: 'center',
     },

@@ -8,7 +8,7 @@ import styles from '../styles';
 import { day_start_time, day_end_time, day_format } from '../utils/constants';
 import { Toolbar } from '../container_components/Toolbar';
 import { Map } from '../container_components/Map';
-import { LeftSidePanel } from '../container_components/Panels';
+import { LeftSidePanel } from '../container_components/LeftSidePanel';
 
 export function HomePage({
   userSession,
@@ -71,6 +71,7 @@ export function HomePage({
         onEventInvitesButtonClick={handleEventInvitesButtonClick}
         isFriendRequestsPanelVisible={isFriendRequestsPanelVisible}
         onFriendRequestsButtonClick={handleFriendRequestsButtonClick}
+        userSession={userSession}
       />
       <View style={styles.fullScreen}>
         <Map

@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import { GoogleMap, LoadScript } from '@react-google-maps/api';
-import { useReadCypher, useWriteCypher } from 'use-neo4j';
-import { add, format } from 'date-fns';
+import { useReadCypher } from 'use-neo4j';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -15,11 +14,10 @@ import { ButtonComponent } from '../base_components/ButtonComponent';
 import MapMarkerWithTooltip from './MapMarkerWithTooltip';
 
 import { recordsAsObjects } from '../db/DBHandler';
-import { FETCH_EVENTS_FOR_MAP, CREATE_EVENT, CREATE_ATTEND_EVENT_RELATIONSHIP, INVITE_FRIENDS_TO_EVENT } from '../db/queries'
+import { FETCH_EVENTS_FOR_MAP, CREATE_ATTEND_EVENT_RELATIONSHIP } from '../db/queries'
 import { useCustomCypherWrite } from '../hooks/CustomCypherHooks';
 import { getSecretValue } from '../utils/AWSHandler';
-import { day_start_time, day_end_time, date_time_format } from '../utils/constants';
-import { getAddressFromCoordinates } from '../utils/HelperFunctions';
+import { day_start_time, day_end_time } from '../utils/constants';
 import { removeUserSession } from '../utils/SessionManager';
 import pinIcon from '../assets/pin.png';
 
@@ -63,6 +61,7 @@ export const Map = ({
     if (attend_event_status.STATUS === 'ERROR') {
       toast.error(`Error Creating Account: ${attend_event_status.RESPONSE}`);
       console.log(attend_event_status.RESPONSE);
+      reset_attend_event_transaction_status();
     } else if (attend_event_status.STATUS === 'SUCCESS') {
       toast.success("You RSVP'd to this event!");
       reset_attend_event_transaction_status();
@@ -117,6 +116,7 @@ export const Map = ({
   useEffect(() => {
     console.log('findGameSelectedDate changed', findGameSelectedDate);
     const params = {
+      account_uuid: userSession.UUID,
       start_timestamp: start_timestamp,
       end_timestamp: end_timestamp
     }
@@ -160,8 +160,6 @@ export const Map = ({
     setCreateGameLocation(mapRef.current.getCenter().toJSON());
     setIsCreateGameDateTimeModalVisible(!isCreateGameDateTimeModalVisible);
   };
-
-
 
 
   const logoutUser = () => {

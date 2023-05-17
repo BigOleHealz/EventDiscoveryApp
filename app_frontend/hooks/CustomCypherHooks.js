@@ -1,8 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { useReadCypher, useWriteCypher } from 'use-neo4j'
 
 
 export const useCustomCypherRead = (query) => {
+
+	const isFirstRender = useRef(true);
 
 	const transaction_idle = { STATUS: 'IDLE', RESPONSE: null };
 
@@ -18,16 +20,22 @@ export const useCustomCypherRead = (query) => {
 	};
 
 	useEffect(() => {
+		if (!params) {
+			return;
+		}
+
 		const run_query = async () => {
-			if (runQuery && params) {
-				run(params);
-				setRunQuery(false);
-				// setTransactionStatus({ STATUS: 'PENDING', RESPONSE: null });
-				setTransactionRunning(true);
+			try {
+				const result = await run(params);
+				const transformed_records = recordsAsObjects(result.records);
+				setTransactionStatus({ STATUS: 'SUCCESS', RESPONSE: { RECORDS: transformed_records, RECORD_COUNT: transformed_records.length } });
+			} catch (error) {
+				console.error('Error executing useCustomCypherRead');
+				setTransactionStatus({ STATUS: 'ERROR', RESPONSE: error.message });
 			}
 		};
 		run_query();
-	}, [runQuery, params]);
+	}, [params]);
 
 	useEffect(() => {
 		if (transactionRunning) {
@@ -39,7 +47,7 @@ export const useCustomCypherRead = (query) => {
 				console.log('useCustomCypherRead loading...');
 				setTransactionStatus({ STATUS: 'PENDING', RESPONSE: null });
 			} else if (error) {
-				console.error('Error executing useCustomCypherRead:', error);
+				console.error('Error executing useCustomCypherRead');
 				setTransactionStatus({ STATUS: 'ERROR', RESPONSE: error.message });
 				setTransactionRunning(false);
 			} else {
@@ -50,16 +58,11 @@ export const useCustomCypherRead = (query) => {
 	}, [loading, error, records, transactionRunning]);
 
 	const executeQuery = (new_params) => {
-		console.log("useCustomCypherRead params: ", new_params);
 		setParams(new_params);
-		setRunQuery(true);
 	};
 
 	return { transactionStatus, executeQuery, resetTransactionStatus };
 };
-
-
-
 
 
 export const useCustomCypherWrite = (query) => {
@@ -79,12 +82,9 @@ export const useCustomCypherWrite = (query) => {
 
 	useEffect(() => {
 		const run_query = async () => {
-			console.log("runCommand: ", runCommand);
-			console.log("params: ", params);
 			if (runCommand && params) {
 				run(params);
 				setRunCommand(false);
-				// setTransactionStatus({ STATUS: 'PENDING', RESPONSE: null });
 				setTransactionRunning(true);
 			}
 		};
@@ -94,7 +94,6 @@ export const useCustomCypherWrite = (query) => {
 	useEffect(() => {
 		if (transactionRunning) {
 			if (records) {
-				console.log('useCustomCypherWrite: SUCCESS!');
 				const transformed_records = recordsAsObjects(records);
 				setTransactionStatus({ STATUS: 'SUCCESS', RESPONSE: { RECORDS: transformed_records, RECORD_COUNT: transformed_records.length } });
 				setTransactionRunning(false);
@@ -102,7 +101,7 @@ export const useCustomCypherWrite = (query) => {
 				console.log('useCustomCypherWrite loading...');
 				setTransactionStatus({ STATUS: 'PENDING', RESPONSE: null });
 			} else if (error) {
-				console.error('Error executing useCustomCypherWrite:', error);
+				console.error('Error executing useCustomCypherWrite');
 				setTransactionStatus({ STATUS: 'ERROR', RESPONSE: error.message });
 				setTransactionRunning(false);
 			} else {
