@@ -44,7 +44,6 @@ export const TextInputComponent = ({ placeholder, style, value, onChangeText, ..
       outputRange: ['gray', '#2196F3'],
     }),
   };
-  
 
   return (
     <View style={[textInputStyles.container, { borderColor }, style]}>
@@ -65,11 +64,11 @@ const textInputStyles = StyleSheet.create({
   container: {
     width: '100%',
     borderWidth: 1,
-    borderRadius: 4,
+    borderRadius: 8,
     paddingHorizontal: 20,
     paddingVertical: 10,
     padding: 0,
-    marginBottom: 16,
+    marginBottom: 8,
   },
   input: {
     fontSize: 16,
@@ -79,4 +78,3 @@ const textInputStyles = StyleSheet.create({
     outlineWidth: 0, // Remove outline 
   },
 });
-

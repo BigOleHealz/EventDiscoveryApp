@@ -55,8 +55,7 @@ const create_game_time_selector = StyleSheet.create({
   view: {
     padding: 20,
     zIndex: 1000,
-    width: 600,
-    height: 300,
+    width: '100%',
   },
   text: {
     color: styles.appTheme.color,

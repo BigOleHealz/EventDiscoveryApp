@@ -7,8 +7,8 @@ import { ButtonComponent } from '../base_components/ButtonComponent';
 import { CalendarComponent } from '../base_components/CalendarComponent';
 import { CreateGameTimeSelectorComponent } from '../base_components/CreateGameTimeSelectorComponent';
 import { ModalComponent } from '../base_components/ModalComponent';
-import { CREATE_EVENT, INVITE_FRIENDS_TO_EVENT } from '../db/queries'
-import { useCustomCypherWrite } from '../hooks/CustomCypherHooks';
+import { CREATE_ACCOUNT_INTEREST_RELATIONSHIPS, CREATE_EVENT, GET_EVENT_TYPES, INVITE_FRIENDS_TO_EVENT } from '../db/queries'
+import { useCustomCypherRead, useCustomCypherWrite } from '../hooks/CustomCypherHooks';
 
 import { date_time_format } from '../utils/constants';
 import { getAddressFromCoordinates } from '../utils/HelperFunctions';
@@ -118,16 +118,6 @@ export const CreateGameDateTimeModal = ({
 
 
 
-
-const FriendChecklistItem = ({ name, isChecked, onValueChange }) => {
-  return (
-    <View style={modalStyles.itemContainer}>
-      <CheckBox value={isChecked} onValueChange={onValueChange} />
-      <Text style={modalStyles.itemText}>{name}</Text>
-    </View>
-  );
-};
-
 export const InviteFriendsToEventModal = ({
   isVisible,
   setIsInviteFriendsToEventModalVisible,
@@ -190,6 +180,15 @@ export const InviteFriendsToEventModal = ({
     })
   };
 
+  const FriendChecklistItem = ({ name, isChecked, onValueChange }) => {
+    return (
+      <View style={modalStyles.itemContainer}>
+        <CheckBox value={isChecked} onValueChange={onValueChange} />
+        <Text style={modalStyles.itemText}>{name}</Text>
+      </View>
+    );
+  };
+
   return (
     <ModalComponent
       id="create-game-invite-friend-modal"
@@ -216,6 +215,124 @@ export const InviteFriendsToEventModal = ({
     </ModalComponent>
   );
 };
+
+export const SelectInterestsModal = ({
+  isVisible,
+  setSelectInterestsModalVisible,
+  onRequestClose,
+  accountUUID,
+  onSubmitButtonClick
+}) => {
+
+  const [event_types, setEventTypes] = useState([]);
+
+  const {
+    transactionStatus: get_event_types_status,
+    executeQuery: run_get_event_types,
+    resetTransactionStatus: reset_get_event_types_transaction_status
+  } = useCustomCypherRead(GET_EVENT_TYPES);
+
+  useEffect(() => {
+    if (isVisible) {
+      run_get_event_types({});
+    }
+
+  }, [isVisible]);
+
+
+  useEffect(() => {
+    // Query for event types when the modal becomes visible
+    if (get_event_types_status.STATUS === 'ERROR') {
+      toast.error(`Error Getting Event Types: ${get_event_types_status.RESPONSE}`);
+      console.error(get_event_types_status.RESPONSE);
+      reset_get_event_types_transaction_status();
+    } else if (get_event_types_status.STATUS === 'SUCCESS') {
+      console.log("Get Event Types Response:", get_event_types_status.RESPONSE)
+      const eventTypeList = get_event_types_status.RESPONSE.RECORDS.map(eventType => {
+        return {
+          ...eventType,
+          isChecked: false
+        };
+      });
+
+      setEventTypes(eventTypeList);
+      reset_get_event_types_transaction_status();
+    }
+  }, [get_event_types_status]);
+
+  const handleValueChange = (index, newValue) => {
+    const updatedEventTypes = event_types.map((eventType, i) => {
+      if (i === index) {
+        return { ...eventType, isChecked: newValue };
+      }
+      return eventType;
+    });
+    setEventTypes(updatedEventTypes);
+  };
+
+  const {
+    transactionStatus: create_account_interest_relationships_status,
+    executeQuery: run_create_account_interest_relationships,
+    resetTransactionStatus: reset_create_account_interest_relationships_transaction_status
+  } = useCustomCypherWrite(CREATE_ACCOUNT_INTEREST_RELATIONSHIPS);
+
+  const handleSubmitButtonClick = () => {
+    const selectedEventTypeUUIDs = event_types.filter(eventType => eventType.isChecked).map(eventType => eventType.UUID);
+    run_create_account_interest_relationships({
+      account_uuid: accountUUID,
+      event_type_uuid_list: selectedEventTypeUUIDs
+    });
+  };
+
+  useEffect(() => {
+    if (create_account_interest_relationships_status.STATUS === 'ERROR') {
+      toast.error(`Error Creating Interests: ${create_account_interest_relationships_status.RESPONSE}`);
+      console.error(create_account_interest_relationships_status.RESPONSE);
+      reset_create_account_interest_relationships_transaction_status();
+    } else if (create_account_interest_relationships_status.STATUS === 'SUCCESS') {
+      console.log("Create Interests Response:", create_account_interest_relationships_status.RESPONSE)
+      toast.success(`Interests Set Successfully!`);
+      reset_create_account_interest_relationships_transaction_status();
+      onSubmitButtonClick();
+    }
+  }, [create_account_interest_relationships_status]);
+
+  const EventTypeChecklistItem = ({ name, isChecked, onValueChange }) => {
+    return (
+      <View style={modalStyles.itemContainer}>
+        <CheckBox value={isChecked} onValueChange={onValueChange} />
+        <Text style={modalStyles.itemText}>{name}</Text>
+      </View>
+    );
+  };
+
+  return (
+    <ModalComponent
+      TestID="select-interests-modal"
+      isVisible={isVisible}
+      onRequestClose={onRequestClose}
+      title="What Type of Events Do You Like?"
+    >
+      <ScrollView>
+        {event_types.map((eventType, index) => (
+          <EventTypeChecklistItem
+            key={eventType.UUID}
+            name={eventType.EventType}
+            isChecked={eventType.isChecked}
+            onValueChange={(newValue) => handleValueChange(index, newValue)}
+          />
+        ))}
+      </ScrollView>
+      <ButtonComponent
+        id="select-interests-button"
+        title="Select Interests"
+        onPress={handleSubmitButtonClick}
+        style={modalStyles.buttonStyle}
+      />
+    </ModalComponent>
+  );
+};
+
 
 const modalStyles = StyleSheet.create({
   itemContainer: {

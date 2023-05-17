@@ -1,18 +1,21 @@
-import { Modal, View, StyleSheet, TouchableWithoutFeedback, Text } from 'react-native';
+import { Modal, View, StyleSheet, TouchableWithoutFeedback } from 'react-native';
 import styles from '../styles';
+
+import { TextComponent } from '../base_components/TextComponent';
 
 export const ModalComponent = ({ isVisible, onRequestClose, title, children }) => {
   return (
     <Modal visible={isVisible} onRequestClose={onRequestClose} animationType="slide" transparent>
       <TouchableWithoutFeedback onPressOut={onRequestClose}>
-        <View style={modal_component_styles.backdrop}>
+        <View TestID="modal-backdrop" style={modal_component_styles.backdrop}>
           <View
+            TestID="modal-container"
             onStartShouldSetResponder={() => true}
             style={modal_component_styles.modalContainer}
           >
             {title && (
-              <View style={modal_component_styles.titleContainer}>
-                <Text style={modal_component_styles.title}>{title}</Text>
+              <View TestID="modal-title-container" style={modal_component_styles.titleContainer}>
+                <TextComponent>{title}</TextComponent>
               </View>
             )}
             {children}

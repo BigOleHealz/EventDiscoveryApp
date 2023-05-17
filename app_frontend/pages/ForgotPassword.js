@@ -23,6 +23,32 @@ export function ForgotPassword() {
 		console.log("Email: " + email);
 	};
 
+	// const handleSubmit = async () => {
+	// 	try {
+	// 		const response = await fetch('https://your-api-url.com/forgot-password', {
+	// 			method: 'POST',
+	// 			headers: {
+	// 				'Content-Type': 'application/json',
+	// 			},
+	// 			body: JSON.stringify({
+	// 				email: email,
+	// 			}),
+	// 		});
+
+	// 		if (response.ok) {
+	// 			// If the email was sent successfully, inform the user.
+	// 			toast.success('Password reset link has been sent to your email.');
+	// 		} else {
+	// 			// If there was an error, inform the user.
+	// 			toast.error('Error sending password reset email. Please try again.');
+	// 		}
+	// 	} catch (error) {
+	// 		console.error('Error:', error);
+	// 		toast.error('Error sending password reset email. Please try again.');
+	// 	}
+	// };
+
+
 	return (
 		<>
 			<View style={[forgotPasswordPageStyles.container, styles.appTheme]} TestID="ForgotPasswordFullPageContainer">

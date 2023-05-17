@@ -1,27 +1,29 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { Link, useNavigate } from 'react-router-native';
 import { ToastContainer, toast } from 'react-toastify';
-// import { send } from 'emailjs-com';
-
-// import { useAWSHandler } from 'path-to-AWSHandler-file';
 
 
 import { ButtonComponent } from '../base_components/ButtonComponent';
 import { TextComponent } from '../base_components/TextComponent';
 import { TextInputComponent } from '../base_components/TextInputComponent';
+import { SelectInterestsModal } from '../container_components/Modals';
 import { CREATE_PERSON_NODE } from '../db/queries';
 import { useCustomCypherWrite } from '../hooks/CustomCypherHooks';
 import { hashPassword } from '../utils/HelperFunctions'
 import styles from '../styles';
+import { is } from 'date-fns/locale';
 
-export function CreateAccountPage({ awsHandler}) {
+export function CreateAccountPage({ awsHandler }) {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [userName, setUserName] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+
+  const [selectInterestsModalVisible, setSelectInterestsModalVisible] = useState(true);
+  const [accountCreatedUUID, setAccountCreatedUUID] = useState(null);
 
   const navigate = useNavigate();
 
@@ -32,7 +34,7 @@ export function CreateAccountPage({ awsHandler}) {
     resetTransactionStatus: reset_create_account_transaction_status
   } = useCustomCypherWrite(CREATE_PERSON_NODE);
 
-  
+
   const resetCreateAccountInfo = () => {
     setFirstName('');
     setLastName('');
@@ -59,9 +61,9 @@ export function CreateAccountPage({ awsHandler}) {
   };
 
   const handlePasswordChange = (newPassword) => {
-      setPassword(newPassword);
+    setPassword(newPassword);
   };
-  
+
   const handleConfirmPasswordChange = (newConfirmPassword) => {
     setConfirmPassword(newConfirmPassword);
   };
@@ -72,7 +74,7 @@ export function CreateAccountPage({ awsHandler}) {
       toast.error('All fields must be filled!');
       return;
     }
-  
+
     // Check if passwords match
     if (password !== confirmPassword) {
       toast.error('Passwords do not match!');
@@ -85,8 +87,8 @@ export function CreateAccountPage({ awsHandler}) {
         first_name: firstName,
         last_name: lastName,
         user_name: userName,
-        email : email,
-        hashed_password : hashed_password
+        email: email,
+        hashed_password: hashed_password
       }
     );
   };
@@ -96,17 +98,24 @@ export function CreateAccountPage({ awsHandler}) {
       toast.error(`Error Creating Account: ${create_account_status.RESPONSE}`);
       console.log(create_account_status.RESPONSE);
     } else if (create_account_status.STATUS === 'SUCCESS') {
+      setAccountCreatedUUID(create_account_status.RESPONSE.RECORDS[0].UUID);
+
       toast.success('Account Created Successfully!');
       resetCreateAccountInfo();
       reset_create_account_transaction_status();
-      navigate('/login')
+      setSelectInterestsModalVisible(true);
     }
   }, [create_account_status]);
+
+  const handleSelectInterestsModalSubmit = () => {
+    setSelectInterestsModalVisible(false);
+    navigate('/login');
+  }
 
 
   return (
     <>
-      <ToastContainer/>
+      <ToastContainer />
       <View style={[createAccountStyles.container, styles.appTheme]} TestID="CreateAccountFullPageContainer">
         <View style={styles.authContainer} TestID="CreateAccountComponentsContainer">
           <TextComponent style={styles.h1}>Create Account</TextComponent>
@@ -138,7 +147,6 @@ export function CreateAccountPage({ awsHandler}) {
             onChangeText={handlePasswordChange}
             value={password}
           />
-          
           <TextInputComponent
             secureTextEntry={true}
             placeholder="Re-Enter Password"
@@ -157,12 +165,20 @@ export function CreateAccountPage({ awsHandler}) {
             </Link>
           </View>
         </View>
+        {accountCreatedUUID &&
+          <SelectInterestsModal
+            isVisible={selectInterestsModalVisible}
+            onRequestClose={() => setSelectInterestsModalVisible(false)}
+            setSelectInterestsModalVisible={setSelectInterestsModalVisible}
+            accountUUID={accountCreatedUUID}
+            onSubmitButtonClick={handleSelectInterestsModalSubmit}
+          />
+        }
       </View>
     </>
-
   );
 }
-  
+
 
 const createAccountStyles = StyleSheet.create({
   container: {
