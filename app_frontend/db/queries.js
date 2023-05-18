@@ -33,9 +33,25 @@ export const CREATE_EVENT = `
         EndTimestamp: $EndTimestamp,
         EventName: $EventName,
         UUID: apoc.create.uuid(),
-        Lat: $Lat
+        Lat: $Lat,
+		EventDescription: "Pickup Basketball Game",
+		EventTypeUUID: "3498fe08-5bbd-4a2d-b044-b10de51a5bfc"
     })
-     RETURN e.UUID as UUID;
+    RETURN
+		e.CreatedByID as CreatedByID,
+		e.Address as Address,
+		e.StartTimestamp as StartTimestamp,
+		e.EventTypeID as EventTypeIDUUID,
+		e.Host as Host,
+		e.EventCreatedAt as EventCreatedAt,
+		e.Lon as Lon,
+		e.PublicEventFlag as PublicEventFlag,
+		e.EndTimestamp as EndTimestamp,
+		e.EventName as EventName,
+		e.UUID as UUID,
+		e.Lat as Lat,
+		e.EventDescription as EventDescription,
+		e.EventTypeUUID;
     `;
 
 export const GET_EVENT_TYPES = `
