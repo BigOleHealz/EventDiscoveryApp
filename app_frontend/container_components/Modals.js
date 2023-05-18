@@ -25,7 +25,8 @@ export const CreateGameDateTimeModal = ({
   resetCreateGameDetails,
   setIsCreateGameMode,
   userSession,
-  setEventUUID
+  setEventUUID,
+  // setEventCreated
 }) => {
   const current_date = new Date().toISOString();
   const current_date_split = current_date.split('T')
@@ -45,7 +46,9 @@ export const CreateGameDateTimeModal = ({
       setIsCreateGameMode(false);
     } else if (create_event_status.STATUS === 'SUCCESS') {
       console.log("create_event_status.RESPONSE: ", create_event_status.RESPONSE);
-      setEventUUID(create_event_status.RESPONSE.RECORDS[0].UUID);
+      const event = create_event_status.RESPONSE.RECORDS[0];
+      setEventUUID(event.UUID);
+      // setEventCreated(true);
       toast.success("You Created an Event!");
       reset_create_event_transaction_status();
       resetCreateGameDetails();
@@ -70,7 +73,7 @@ export const CreateGameDateTimeModal = ({
       EventName: 'Pickup Basketball',
       Lat: location.lat
     };
-    console.log
+    console.log('Create Game params:', params);
     run_create_event(params);
   }
 
@@ -115,8 +118,6 @@ export const CreateGameDateTimeModal = ({
     </ModalComponent>
   );
 };
-
-
 
 export const InviteFriendsToEventModal = ({
   isVisible,

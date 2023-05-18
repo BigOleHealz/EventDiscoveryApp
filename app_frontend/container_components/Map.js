@@ -39,6 +39,7 @@ export const Map = ({
   };
 
   const [event_uuid, setEventUUID] = useState(null);
+  const [event_created, setEventCreated] = useState(false);
 
 
   const [isCreateGameDateTimeModalVisible, setIsCreateGameDateTimeModalVisible] = useState(false);
@@ -46,7 +47,6 @@ export const Map = ({
 
   // Handle Create Game vars
   const [create_game_location, setCreateGameLocation] = useState(null);
-  // const [create_game_date_time, setCreateGameDateTime] = useState(null);
   const [transactionStatus, setTransactionStatus] = useState(false);
 
 
@@ -68,9 +68,6 @@ export const Map = ({
       setIsInviteFriendsToEventModalVisible(true);
     }
   }, [attend_event_status]);
-
-
-  // Create Event
 
 
 
@@ -120,8 +117,9 @@ export const Map = ({
       start_timestamp: start_timestamp,
       end_timestamp: end_timestamp
     }
+    console.log('params:', params);
     run(params); // Run the query when findGameSelectedDate changes
-  }, [findGameSelectedDate, transactionStatus === false]);
+  }, [findGameSelectedDate, event_uuid, transactionStatus === false]);
 
   useEffect(() => {
     if (!loading && !error && records) {
