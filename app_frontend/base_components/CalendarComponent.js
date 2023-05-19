@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Calendar } from 'react-native-calendars';
+import styles from '../styles';
 
 export const CalendarComponent = ({ selected, onDateSelected, style }) => {
   const currentDate = new Date().toISOString().split('T')[0];
@@ -10,13 +11,17 @@ export const CalendarComponent = ({ selected, onDateSelected, style }) => {
     <View style={calendar_styles.view}>
       <Calendar
         style={style} // Merge the default styles with the passed-in style
-        onDayPress={day => {
+        onDayPress={(day) => {
           setSelectedDate(day.dateString);
           console.log('Date Selected', day.dateString);
           onDateSelected(day.dateString); // Pass the new selected date to the parent component
         }}
         markedDates={{
-          [selectedDate]: { selected: true, disableTouchEvent: true, selectedDotColor: 'orange' }
+          [selectedDate]: {
+            selected: true,
+            disableTouchEvent: true,
+            selectedDotColor: 'orange',
+          },
         }}
         theme={calendar_styles.theme}
       />
@@ -26,7 +31,7 @@ export const CalendarComponent = ({ selected, onDateSelected, style }) => {
 
 const calendar_styles = StyleSheet.create({
   view: {
-    padding: 10,
+    padding: styles.appTheme.padding,
     width: '100%',
   },
   theme: {
@@ -39,5 +44,5 @@ const calendar_styles = StyleSheet.create({
     dayTextColor: '#ddd',
     textDisabledColor: '#888',
     monthTextColor: '#ddd',
-  }
+  },
 });

@@ -36,7 +36,7 @@ export const LeftSidePanel = ({
       style={panel_styles.sidePanel}
     >
       <CalendarComponent
-        id="left-calendar"
+        testID="left-calendar"
         selected={findGameSelectedDate}
         onDateSelected={handleDateSelected}
       />
@@ -75,10 +75,5 @@ const panel_styles = StyleSheet.create({
     alignItems: 'stretch',
     padding: 10,
     width: '100%',
-  },
-
-  leftPanel: {
-    left: 0,
-    zIndex: 10,
   },
 });
