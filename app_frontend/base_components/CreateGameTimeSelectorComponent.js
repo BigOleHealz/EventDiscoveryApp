@@ -3,7 +3,7 @@ import { StyleSheet, View, Text, Platform } from 'react-native';
 import { Slider } from 'react-native-elements';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import '../css/datePickerStyles.css'
+import '../css/datePickerStyles.css';
 import styles from '../styles';
 
 export const CreateGameTimeSelectorComponent = ({ onValueChange }) => {
@@ -42,7 +42,9 @@ export const CreateGameTimeSelectorComponent = ({ onValueChange }) => {
           />
           <View style={styles.timeSliderView}>
             <Text style={create_game_time_selector.text}>0</Text>
-            <Text style={create_game_time_selector.text}>{time.toFixed(0)}</Text>
+            <Text style={create_game_time_selector.text}>
+              {time.toFixed(0)}
+            </Text>
             <Text style={create_game_time_selector.text}>24</Text>
           </View>
         </>
@@ -53,7 +55,7 @@ export const CreateGameTimeSelectorComponent = ({ onValueChange }) => {
 
 const create_game_time_selector = StyleSheet.create({
   view: {
-    padding: 20,
+    padding: styles.appTheme.padding,
     zIndex: 1000,
     width: '100%',
   },

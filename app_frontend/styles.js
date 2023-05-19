@@ -1,27 +1,56 @@
 import { StyleSheet } from 'react-native';
 
+const defaultBackgroundColor = '#333333';
+const defaultFontColor = '#ffffff';
+const defaultPadding = 10;
+const defaultMargin = 10;
+const defaultBorderRadius = 8;
+
 const styles = StyleSheet.create({
   appTheme: {
-    backgroundColor: '#333',
-    color: '#ddd'
+    backgroundColor: defaultBackgroundColor,
+    color: defaultFontColor,
+    padding: defaultPadding,
+    margin: defaultMargin,
+    borderRadius: defaultBorderRadius,
   },
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    padding: defaultPadding,
+    backgroundColor: defaultBackgroundColor,
   },
   fullScreen: {
-    flex: 1
+    flex: 1,
   },
   timeSliderView: {
     flexDirection: 'row',
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
+  },
+  text_component: {
+    color: defaultFontColor,
   },
   buttons: {
+    standardButton: {
+      paddingLeft: defaultPadding,
+      paddingRight: defaultPadding,
+      paddingTop: 5,
+      paddingBottom: 5,
+      borderRadius: defaultBorderRadius,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
     menu_button_styles: {
       backgroundColor: '#2196F3',
-      width: '100%',
-      margin: 16
-    }
+      height: 50,
+    },
+    clear_button_styles: {
+      backgroundColor: defaultBackgroundColor,
+    },
+    button_text: {
+      color: defaultFontColor,
+      fontSize: 20,
+      fontWeight: 'bold',
+    },
   },
   authContainer: {
     width: '60%',
@@ -66,9 +95,8 @@ const styles = StyleSheet.create({
   },
   hyperlinkText: {
     color: '#2196F3',
-    textDecorationLine: 'underline'
-  }
-
+    textDecorationLine: 'underline',
+  },
 });
 
 export default styles;

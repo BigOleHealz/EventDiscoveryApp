@@ -5,22 +5,20 @@ import { useReadCypher } from 'use-neo4j';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-
-import {
-  CreateGameDateTimeModal,
-  InviteFriendsToEventModal
-} from './Modals';
+import { CreateGameDateTimeModal, InviteFriendsToEventModal } from './Modals';
 import { ButtonComponent } from '../base_components/ButtonComponent';
 import MapMarkerWithTooltip from './MapMarkerWithTooltip';
 
 import { recordsAsObjects } from '../db/DBHandler';
-import { FETCH_EVENTS_FOR_MAP, CREATE_ATTEND_EVENT_RELATIONSHIP } from '../db/queries'
+import {
+  FETCH_EVENTS_FOR_MAP,
+  CREATE_ATTEND_EVENT_RELATIONSHIP,
+} from '../db/queries';
 import { useCustomCypherWrite } from '../hooks/CustomCypherHooks';
 import { getSecretValue } from '../utils/AWSHandler';
 import { day_start_time, day_end_time } from '../utils/constants';
 import { removeUserSession } from '../utils/SessionManager';
 import pinIcon from '../assets/pin.png';
-
 
 export const Map = ({
   isCreateGameMode,
@@ -29,9 +27,8 @@ export const Map = ({
   findGameStartTime,
   findGameEndTime,
   userSession,
-  setUserSession
+  setUserSession,
 }) => {
-
   // Handle Map
   const defaultCenter = {
     lat: 39.9526,
@@ -41,20 +38,24 @@ export const Map = ({
   const [event_uuid, setEventUUID] = useState(null);
   const [event_created, setEventCreated] = useState(false);
 
-
-  const [isCreateGameDateTimeModalVisible, setIsCreateGameDateTimeModalVisible] = useState(false);
-  const [isCreateGameInviteFriendsModalVisible, setIsInviteFriendsToEventModalVisible] = useState(false);
+  const [
+    isCreateGameDateTimeModalVisible,
+    setIsCreateGameDateTimeModalVisible,
+  ] = useState(false);
+  const [
+    isCreateGameInviteFriendsModalVisible,
+    setIsInviteFriendsToEventModalVisible,
+  ] = useState(false);
 
   // Handle Create Game vars
   const [create_game_location, setCreateGameLocation] = useState(null);
   const [transactionStatus, setTransactionStatus] = useState(false);
 
-
   // Attend Event
   const {
     transactionStatus: attend_event_status,
     executeQuery: run_attend_event,
-    resetTransactionStatus: reset_attend_event_transaction_status
+    resetTransactionStatus: reset_attend_event_transaction_status,
   } = useCustomCypherWrite(CREATE_ATTEND_EVENT_RELATIONSHIP);
 
   useEffect(() => {
@@ -69,13 +70,9 @@ export const Map = ({
     }
   }, [attend_event_status]);
 
-
-
-
   const resetCreateGameDetails = () => {
     setCreateGameLocation(null);
   };
-
 
   // Handle Map
   const [mapCenter, setMapCenter] = useState(defaultCenter);
@@ -103,38 +100,33 @@ export const Map = ({
   const start_timestamp = `${findGameSelectedDate}T${day_start_time}`;
   const end_timestamp = `${findGameSelectedDate}T${day_end_time}`;
 
-  const {
-    loading,
-    error,
-    records,
-    run,
-  } = useReadCypher(FETCH_EVENTS_FOR_MAP);
+  const { loading, error, records, run } = useReadCypher(FETCH_EVENTS_FOR_MAP);
 
   useEffect(() => {
     console.log('findGameSelectedDate changed', findGameSelectedDate);
     const params = {
       account_uuid: userSession.UUID,
       start_timestamp: start_timestamp,
-      end_timestamp: end_timestamp
-    }
+      end_timestamp: end_timestamp,
+    };
     console.log('params:', params);
     run(params); // Run the query when findGameSelectedDate changes
   }, [findGameSelectedDate, event_uuid, transactionStatus === false]);
 
   useEffect(() => {
     if (!loading && !error && records) {
-      const mapEventsObjectList = recordsAsObjects(records)
+      const mapEventsObjectList = recordsAsObjects(records);
       console.log('records_fetch_events_for_map:', mapEventsObjectList);
       setMapEventsFullDay(mapEventsObjectList);
-
     }
   }, [loading, error, records]);
 
-
   useEffect(() => {
-    const filteredEvents = map_events_full_day.filter(event => {
+    const filteredEvents = map_events_full_day.filter((event) => {
       const eventTimestamp = new Date(event.StartTimestamp);
-      const startTime = new Date(`${findGameSelectedDate}T${findGameStartTime}`);
+      const startTime = new Date(
+        `${findGameSelectedDate}T${findGameStartTime}`
+      );
       const endTime = new Date(`${findGameSelectedDate}T${findGameEndTime}`);
 
       return eventTimestamp >= startTime && eventTimestamp <= endTime;
@@ -142,7 +134,6 @@ export const Map = ({
 
     setMapEventsFiltered(filteredEvents);
   }, [findGameStartTime, findGameEndTime, map_events_full_day]);
-
 
   // Manage map popup
   const [activePopup, setActivePopup] = useState(null);
@@ -159,19 +150,17 @@ export const Map = ({
     setIsCreateGameDateTimeModalVisible(!isCreateGameDateTimeModalVisible);
   };
 
-
   const logoutUser = () => {
     removeUserSession();
     setUserSession(null);
   };
-
 
   if (!googleMapsApiKey) {
     return (
       <View>
         <Text>Loading...</Text>
       </View>
-    )
+    );
   }
 
   return (
@@ -179,7 +168,8 @@ export const Map = ({
       <LoadScript
         id="script-loader"
         googleMapsApiKey={googleMapsApiKey}
-        language="en">
+        language="en"
+      >
         <GoogleMap
           mapContainerStyle={map_styles.mapContainerStyle}
           zoom={15}
@@ -187,11 +177,13 @@ export const Map = ({
           draggable={true}
           onLoad={onLoad}
           options={{
-            styles: [{
-              featureType: 'poi',
-              elementType: 'labels',
-              stylers: [{ visibility: 'off' }],
-            }],
+            styles: [
+              {
+                featureType: 'poi',
+                elementType: 'labels',
+                stylers: [{ visibility: 'off' }],
+              },
+            ],
           }}
         >
           {Array.isArray(map_events_filtered) &&
@@ -204,13 +196,27 @@ export const Map = ({
                 userSession={userSession}
                 onJoinGameButtonClick={run_attend_event}
                 setEventUUID={setEventUUID}
-                setIsInviteFriendsToEventModalVisible={setIsInviteFriendsToEventModalVisible}
+                setIsInviteFriendsToEventModalVisible={
+                  setIsInviteFriendsToEventModalVisible
+                }
               />
             ))}
         </GoogleMap>
-        {isCreateGameMode && <img id="create-game-pin-marker" src={pinIcon} alt="Pin" style={map_styles.pinStyle} />}
         {isCreateGameMode && (
-          <ButtonComponent id="create-game-datetime-button" onPress={handleCreateGameSelectLocationClick} title="Set Game Location" style={map_styles.bottomButtonStyle} />
+          <img
+            id="create-game-pin-marker"
+            src={pinIcon}
+            alt="Pin"
+            style={map_styles.pinStyle}
+          />
+        )}
+        {isCreateGameMode && (
+          <ButtonComponent
+            id="create-game-datetime-button"
+            onPress={handleCreateGameSelectLocationClick}
+            title="Set Game Location"
+            style={map_styles.bottomButtonStyle}
+          />
         )}
         <CreateGameDateTimeModal
           isVisible={isCreateGameDateTimeModalVisible}
@@ -219,14 +225,20 @@ export const Map = ({
           googleMapsApiKey={googleMapsApiKey}
           userSession={userSession}
           setEventUUID={setEventUUID}
-          setIsCreateGameDateTimeModalVisible={setIsCreateGameDateTimeModalVisible}
-          setIsInviteFriendsToEventModalVisible={setIsInviteFriendsToEventModalVisible}
+          setIsCreateGameDateTimeModalVisible={
+            setIsCreateGameDateTimeModalVisible
+          }
+          setIsInviteFriendsToEventModalVisible={
+            setIsInviteFriendsToEventModalVisible
+          }
           resetCreateGameDetails={resetCreateGameDetails}
           setIsCreateGameMode={setIsCreateGameMode}
         />
         <InviteFriendsToEventModal
           isVisible={isCreateGameInviteFriendsModalVisible}
-          setIsInviteFriendsToEventModalVisible={setIsInviteFriendsToEventModalVisible}
+          setIsInviteFriendsToEventModalVisible={
+            setIsInviteFriendsToEventModalVisible
+          }
           friendList={userSession.Friends}
           eventUUID={event_uuid}
           setEventUUID={setEventUUID}
@@ -244,7 +256,7 @@ export const Map = ({
   );
 };
 
-
+const buttonHeight = 50;
 const map_styles = StyleSheet.create({
   mapContainerStyle: {
     flex: 1,
@@ -260,17 +272,22 @@ const map_styles = StyleSheet.create({
     position: 'absolute',
     bottom: 20,
     left: '50%',
-    height: 50,
+    height: buttonHeight,
     width: '30%',
     transform: 'translateX(-50%)',
     backgroundColor: '#2196F3',
-    borderRadius: 4,
+    borderRadius: 8,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   logoutButtonStyle: {
     position: 'absolute',
     bottom: 20,
     left: 20,
     width: '20%',
-  }
+    height: buttonHeight,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 });

@@ -7,13 +7,20 @@ import { ButtonComponent } from '../base_components/ButtonComponent';
 import { CalendarComponent } from '../base_components/CalendarComponent';
 import { CreateGameTimeSelectorComponent } from '../base_components/CreateGameTimeSelectorComponent';
 import { ModalComponent } from '../base_components/ModalComponent';
-import { CREATE_ACCOUNT_INTEREST_RELATIONSHIPS, CREATE_EVENT, GET_EVENT_TYPES, INVITE_FRIENDS_TO_EVENT } from '../db/queries'
-import { useCustomCypherRead, useCustomCypherWrite } from '../hooks/CustomCypherHooks';
+import {
+  CREATE_ACCOUNT_INTEREST_RELATIONSHIPS,
+  CREATE_EVENT,
+  GET_EVENT_TYPES,
+  INVITE_FRIENDS_TO_EVENT,
+} from '../db/queries';
+import {
+  useCustomCypherRead,
+  useCustomCypherWrite,
+} from '../hooks/CustomCypherHooks';
 
 import { date_time_format } from '../utils/constants';
 import { getAddressFromCoordinates } from '../utils/HelperFunctions';
 import styles from '../styles';
-
 
 export const CreateGameDateTimeModal = ({
   isVisible,
@@ -29,14 +36,16 @@ export const CreateGameDateTimeModal = ({
   // setEventCreated
 }) => {
   const current_date = new Date().toISOString();
-  const current_date_split = current_date.split('T')
+  const current_date_split = current_date.split('T');
   const [date_selected, setDateSelected] = useState(current_date_split[0]);
-  const [time_selected, setTimeSelected] = useState(current_date_split[1].slice(0, 8));
+  const [time_selected, setTimeSelected] = useState(
+    current_date_split[1].slice(0, 8)
+  );
 
   const {
     transactionStatus: create_event_status,
     executeQuery: run_create_event,
-    resetTransactionStatus: reset_create_event_transaction_status
+    resetTransactionStatus: reset_create_event_transaction_status,
   } = useCustomCypherWrite(CREATE_EVENT);
 
   useEffect(() => {
@@ -45,11 +54,14 @@ export const CreateGameDateTimeModal = ({
       console.log(create_event_status.RESPONSE);
       setIsCreateGameMode(false);
     } else if (create_event_status.STATUS === 'SUCCESS') {
-      console.log("create_event_status.RESPONSE: ", create_event_status.RESPONSE);
+      console.log(
+        'create_event_status.RESPONSE: ',
+        create_event_status.RESPONSE
+      );
       const event = create_event_status.RESPONSE.RECORDS[0];
       setEventUUID(event.UUID);
       // setEventCreated(true);
-      toast.success("You Created an Event!");
+      toast.success('You Created an Event!');
       reset_create_event_transaction_status();
       resetCreateGameDetails();
       setIsInviteFriendsToEventModalVisible(true);
@@ -58,7 +70,11 @@ export const CreateGameDateTimeModal = ({
   }, [create_event_status]);
 
   const createEvent = async () => {
-    const address = await getAddressFromCoordinates(location.lat, location.lng, googleMapsApiKey);
+    const address = await getAddressFromCoordinates(
+      location.lat,
+      location.lng,
+      googleMapsApiKey
+    );
     const create_game_date_time = new Date(`${date_selected}T${time_selected}`);
 
     const params = {
@@ -69,13 +85,16 @@ export const CreateGameDateTimeModal = ({
       EventCreatedAt: format(new Date(), date_time_format),
       Lon: location.lng,
       PublicEventFlag: true,
-      EndTimestamp: format(add(new Date(create_game_date_time), { hours: 1 }), date_time_format),
+      EndTimestamp: format(
+        add(new Date(create_game_date_time), { hours: 1 }),
+        date_time_format
+      ),
       EventName: 'Pickup Basketball',
-      Lat: location.lat
+      Lat: location.lat,
     };
     console.log('Create Game params:', params);
     run_create_event(params);
-  }
+  };
 
   const handleDateSelected = (date) => {
     console.log('Create Game panel selected date:', date);
@@ -100,21 +119,25 @@ export const CreateGameDateTimeModal = ({
       isVisible={isVisible}
       onRequestClose={onRequestClose}
       title="Select Date & Time"
+      menuButton={
+        <ButtonComponent
+          id="create-game-select-datetime-button"
+          title="Set Date & Time"
+          onPress={handleSubmitButtonClick}
+          style={styles.buttons.menu_button_styles}
+        />
+      }
     >
-      <CalendarComponent
-        id="create-game-date-selector"
-        onDateSelected={handleDateSelected}
-      />
-      <CreateGameTimeSelectorComponent
-        id="create-game-time-selector"
-        onValueChange={handleTimeSelected}
-      />
-      <ButtonComponent
-        id="create-game-select-datetime-button"
-        title="Set Date & Time"
-        onPress={handleSubmitButtonClick}
-        style={modalStyles.buttonStyle}
-      />
+      <View>
+        <CalendarComponent
+          id="create-game-date-selector"
+          onDateSelected={handleDateSelected}
+        />
+        <CreateGameTimeSelectorComponent
+          id="create-game-time-selector"
+          onValueChange={handleTimeSelected}
+        />
+      </View>
     </ModalComponent>
   );
 };
@@ -126,34 +149,35 @@ export const InviteFriendsToEventModal = ({
   eventUUID,
   setEventUUID,
   onRequestClose,
-  userSession
+  userSession,
 }) => {
-
   const {
     transactionStatus: invite_friends_status,
     executeQuery: run_invite_friends,
-    resetTransactionStatus: reset_invite_friends_transaction_status
+    resetTransactionStatus: reset_invite_friends_transaction_status,
   } = useCustomCypherWrite(INVITE_FRIENDS_TO_EVENT);
 
   useEffect(() => {
     if (invite_friends_status.STATUS === 'ERROR') {
-      toast.error(`Error Sending Event Invites: ${invite_friends_status.RESPONSE}`);
+      toast.error(
+        `Error Sending Event Invites: ${invite_friends_status.RESPONSE}`
+      );
       console.log(invite_friends_status.RESPONSE);
       reset_invite_friends_transaction_status();
       setIsInviteFriendsToEventModalVisible(false);
       setEventUUID(null);
     } else if (invite_friends_status.STATUS === 'SUCCESS') {
-      toast.success("Event Invites Sent!");
+      toast.success('Event Invites Sent!');
       reset_invite_friends_transaction_status();
       setIsInviteFriendsToEventModalVisible(false);
       setEventUUID(null);
     }
   }, [invite_friends_status]);
 
-  const initialFriends = friendList.map(friend => {
+  const initialFriends = friendList.map((friend) => {
     return {
       ...friend,
-      isChecked: false
+      isChecked: false,
     };
   });
 
@@ -168,17 +192,19 @@ export const InviteFriendsToEventModal = ({
       return friend;
     });
     setFriends(updatedFriends);
-    setAnyChecked(updatedFriends.some(friend => friend.isChecked));
+    setAnyChecked(updatedFriends.some((friend) => friend.isChecked));
   };
 
   const handleSubmitButtonClick = () => {
-    const selectedFriendUUIDs = friends.filter(friend => friend.isChecked).map(friend => friend.friendUUID);
+    const selectedFriendUUIDs = friends
+      .filter((friend) => friend.isChecked)
+      .map((friend) => friend.friendUUID);
     console.log('Selected friends:', selectedFriendUUIDs);
     run_invite_friends({
       event_uuid: eventUUID,
       friend_invite_list: selectedFriendUUIDs,
-      inviter_uuid: userSession.UUID
-    })
+      inviter_uuid: userSession.UUID,
+    });
   };
 
   const FriendChecklistItem = ({ name, isChecked, onValueChange }) => {
@@ -196,8 +222,18 @@ export const InviteFriendsToEventModal = ({
       isVisible={isVisible}
       onRequestClose={onRequestClose}
       title="Invite Friends"
+      menuButton={
+        <ButtonComponent
+          id="create-game-invite-friends-button"
+          title={
+            anyChecked ? 'Send Invites & Create Game' : 'Skip & Create Game'
+          }
+          onPress={handleSubmitButtonClick}
+          style={modalStyles.buttonStyle}
+        />
+      }
     >
-      <ScrollView>
+      <ScrollView style={modalStyles.scrollView}>
         {friends.map((friend, index) => (
           <FriendChecklistItem
             key={friend.friendUUID}
@@ -207,12 +243,6 @@ export const InviteFriendsToEventModal = ({
           />
         ))}
       </ScrollView>
-      <ButtonComponent
-        id="create-game-invite-friends-button"
-        title={anyChecked ? "Send Invites & Create Game" : "Skip & Create Game"}
-        onPress={handleSubmitButtonClick}
-        style={modalStyles.buttonStyle}
-      />
     </ModalComponent>
   );
 };
@@ -222,39 +252,40 @@ export const SelectInterestsModal = ({
   setSelectInterestsModalVisible,
   onRequestClose,
   accountUUID,
-  onSubmitButtonClick
+  onSubmitButtonClick,
 }) => {
-
   const [event_types, setEventTypes] = useState([]);
 
   const {
     transactionStatus: get_event_types_status,
     executeQuery: run_get_event_types,
-    resetTransactionStatus: reset_get_event_types_transaction_status
+    resetTransactionStatus: reset_get_event_types_transaction_status,
   } = useCustomCypherRead(GET_EVENT_TYPES);
 
   useEffect(() => {
     if (isVisible) {
       run_get_event_types({});
     }
-
   }, [isVisible]);
-
 
   useEffect(() => {
     // Query for event types when the modal becomes visible
     if (get_event_types_status.STATUS === 'ERROR') {
-      toast.error(`Error Getting Event Types: ${get_event_types_status.RESPONSE}`);
+      toast.error(
+        `Error Getting Event Types: ${get_event_types_status.RESPONSE}`
+      );
       console.error(get_event_types_status.RESPONSE);
       reset_get_event_types_transaction_status();
     } else if (get_event_types_status.STATUS === 'SUCCESS') {
-      console.log("Get Event Types Response:", get_event_types_status.RESPONSE)
-      const eventTypeList = get_event_types_status.RESPONSE.RECORDS.map(eventType => {
-        return {
-          ...eventType,
-          isChecked: false
-        };
-      });
+      console.log('Get Event Types Response:', get_event_types_status.RESPONSE);
+      const eventTypeList = get_event_types_status.RESPONSE.RECORDS.map(
+        (eventType) => {
+          return {
+            ...eventType,
+            isChecked: false,
+          };
+        }
+      );
 
       setEventTypes(eventTypeList);
       reset_get_event_types_transaction_status();
@@ -274,24 +305,34 @@ export const SelectInterestsModal = ({
   const {
     transactionStatus: create_account_interest_relationships_status,
     executeQuery: run_create_account_interest_relationships,
-    resetTransactionStatus: reset_create_account_interest_relationships_transaction_status
+    resetTransactionStatus:
+      reset_create_account_interest_relationships_transaction_status,
   } = useCustomCypherWrite(CREATE_ACCOUNT_INTEREST_RELATIONSHIPS);
 
   const handleSubmitButtonClick = () => {
-    const selectedEventTypeUUIDs = event_types.filter(eventType => eventType.isChecked).map(eventType => eventType.UUID);
+    const selectedEventTypeUUIDs = event_types
+      .filter((eventType) => eventType.isChecked)
+      .map((eventType) => eventType.UUID);
     run_create_account_interest_relationships({
       account_uuid: accountUUID,
-      event_type_uuid_list: selectedEventTypeUUIDs
+      event_type_uuid_list: selectedEventTypeUUIDs,
     });
   };
 
   useEffect(() => {
     if (create_account_interest_relationships_status.STATUS === 'ERROR') {
-      toast.error(`Error Creating Interests: ${create_account_interest_relationships_status.RESPONSE}`);
+      toast.error(
+        `Error Creating Interests: ${create_account_interest_relationships_status.RESPONSE}`
+      );
       console.error(create_account_interest_relationships_status.RESPONSE);
       reset_create_account_interest_relationships_transaction_status();
-    } else if (create_account_interest_relationships_status.STATUS === 'SUCCESS') {
-      console.log("Create Interests Response:", create_account_interest_relationships_status.RESPONSE)
+    } else if (
+      create_account_interest_relationships_status.STATUS === 'SUCCESS'
+    ) {
+      console.log(
+        'Create Interests Response:',
+        create_account_interest_relationships_status.RESPONSE
+      );
       toast.success(`Interests Set Successfully!`);
       reset_create_account_interest_relationships_transaction_status();
       onSubmitButtonClick();
@@ -324,40 +365,29 @@ export const SelectInterestsModal = ({
           />
         ))}
       </ScrollView>
-      <ButtonComponent
-        id="select-interests-button"
-        title="Select Interests"
-        onPress={handleSubmitButtonClick}
-        style={modalStyles.buttonStyle}
-      />
     </ModalComponent>
   );
 };
-
 
 const modalStyles = StyleSheet.create({
   itemContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginTop: 10,
     marginBottom: 10,
-  },
-  titleText: {
-    margin: 20,
-    fontSize: 36,
-    color: styles.appTheme.color,
   },
   itemText: {
     marginLeft: 10,
     fontSize: 16,
     color: styles.appTheme.color,
   },
-  titleText: {
-    fontSize: 24,
-    marginBottom: 20,
-    color: styles.appTheme.color,
-  },
   buttonStyle: {
     marginBottom: 20,
-    backgroundColor: '#2196F3'
+    backgroundColor: '#2196F3',
+  },
+  scrollView: {
+    flex: 1,
+    marginLeft: 20,
+    marginRight: 20,
   },
 });
