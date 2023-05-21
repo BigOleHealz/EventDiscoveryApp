@@ -19,6 +19,7 @@
     "date-fns": "^2.29.3",
     "emailjs-com": "^3.2.0",
     "expo": "~48.0.15",
+    "moment-timezone": "^0.5.43",
     "neo4j-driver": "^5.7.0",
     "react": "18.2.0",
     "react-datepicker": "^4.11.0",

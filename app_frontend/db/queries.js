@@ -71,13 +71,16 @@ export const INVITE_FRIENDS_TO_EVENT = `
     RETURN e;
     `;
 
+// MATCH (account:Account {UUID: $account_uuid})-[:INTERESTED_IN]->(eventType:EventType)
+// WITH collect(eventType.UUID) as interestedEventTypeUUIDs
+// AND event.EventTypeUUID IN interestedEventTypeUUIDs
 export const FETCH_EVENTS_FOR_MAP = `
-    MATCH (account:Account {UUID: $account_uuid})-[:INTERESTED_IN]->(eventType:EventType)
-    WITH collect(eventType.UUID) as interestedEventTypeUUIDs
     MATCH (event:Event)
-    WHERE $start_timestamp <= event.StartTimestamp <= $end_timestamp AND event.EventTypeUUID IN interestedEventTypeUUIDs
+    WHERE $start_timestamp <= event.StartTimestamp <= $end_timestamp
     OPTIONAL MATCH (event)-[r:ATTENDING]-()
     WITH event, count(r) as AttendeeCount
+    MATCH (eventType:EventType)-[:RELATED_EVENT]->(event)
+    
     RETURN
         event.Address as Address,
         event.CreatedByID as CreatedByID,
@@ -85,9 +88,11 @@ export const FETCH_EVENTS_FOR_MAP = `
         event.Lon as Lon,
         event.Lat as Lat,
         event.StartTimestamp as StartTimestamp,
+        event.EndTimestamp as EndTimestamp,
+        event.EventName as EventName,
         event.UUID as UUID,
-        AttendeeCount,
-        apoc.date.format(datetime(event.StartTimestamp).epochMillis, "ms", "hh:mm a") as FormattedStart;
+        eventType.EventType as EventType,
+        AttendeeCount;
     `;
 // apoc.date.format(datetime(n.StartTimestamp).epochMillis, "ms", "HH:mm") as FormattedStart;
 
@@ -187,8 +192,7 @@ export const CREATE_FRIEND_REQUEST_RELATIONSHIP = `
     WHERE error IS NULL
     CREATE (a)-[r:FRIEND_REQUEST_SENT {FRIEND_REQUEST_TIMESTAMP: apoc.date.format(apoc.date.currentTimestamp(), "ms", "yyyy-MM-dd'T'HH:mm:ss"), STATUS: "PENDING", UUID: apoc.create.uuid()}]->(b)
     RETURN {STATUS: "SUCCESS", RESPONSE: "Friend request sent", UUID: r.UUID} as result
-    `
-
+    `;
 
 export const GET_FRIEND_REQUESTS = `
     MATCH (a)-[r:FRIEND_REQUEST {STATUS: "PENDING"}]->(b {UUID: $invitee_uuid})
@@ -223,8 +227,6 @@ export const GET_EVENT_INVITES = `
 
     `;
 // e.StartTimestamp as StartTimestamp,
-
-
 
 export const RESPOND_TO_EVENT_INVITE = `
     WITH $response as RESPONSE, apoc.date.format(apoc.date.currentTimestamp(), "ms", "yyyy-MM-dd'T'HH:mm:ss") AS CURRENT_DATETIME
@@ -261,7 +263,7 @@ export const CREATE_ATTEND_EVENT_RELATIONSHIP = `
                 r.ACCEPTED_TIMESTAMP = apoc.date.format(apoc.date.currentTimestamp(), "ms", "yyyy-MM-dd'T'HH:mm:ss")
     RETURN r;
 
-    `
+    `;
 
 export const DELETE_RELATIONSHIP_BY_UUID = `
     MATCH ()-[r]-()

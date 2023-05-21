@@ -1,4 +1,7 @@
 import CryptoJS from 'crypto-js';
+import moment from 'moment-timezone';
+
+
 
 export async function getAddressFromCoordinates(latitude, longitude, apiKey) {
   try {
@@ -21,7 +24,7 @@ export async function getAddressFromCoordinates(latitude, longitude, apiKey) {
 };
 
 export function neo4jFormatString(template, ...args) {
-  return template.replace(/{(\d+)}/g, function(match, number) {
+  return template.replace(/{(\d+)}/g, function (match, number) {
     return typeof args[number] !== 'undefined' ? args[number] : match;
   })
 };
@@ -29,4 +32,9 @@ export function neo4jFormatString(template, ...args) {
 export function hashPassword(inputString) {
   const hashed = CryptoJS.SHA256(inputString);
   return hashed.toString(CryptoJS.enc.Hex);
+}
+
+export const convertUTCDateToLocalDate = (date) => {
+  const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  return moment.utc(date).tz(userTimezone).format();
 }

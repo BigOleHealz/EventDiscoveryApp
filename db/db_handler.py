@@ -35,6 +35,14 @@ class Neo4jDB:
         
         return result
     
+    def execute_query_with_params(self, query: str, params: dict):
+        self.logger.emit(f'Running {sys._getframe().f_code.co_name}:\n{query}')
+        tx = self.graph.begin()
+        result = tx.run(query, params=params)
+        tx.commit()
+        result = [dict(rec) for rec in result]
+        return result
+    
     def __create_node(self, node_labels: Mapping[str, list], properties: dict=None):
         self.logger.emit(f'Running {sys._getframe().f_code.co_name}')
         if properties is None:

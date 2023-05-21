@@ -68,3 +68,14 @@ sudo amazon-linux-extras install python3.8
 alias venv='source $EVENT_APP_HOME/myvenv/bin/activate'
 alias cdm='cd $EVENT_APP_HOME'
 alias kp3="pkill -f 'python3*' & pkill -f '/usr/bin/python3*'"
+
+
+sudo yum install unzip -y
+cd /tmp
+wget https://chromedriver.storage.googleapis.com/{VERSION}/chromedriver_linux64.zip
+unzip chromedriver_linux64.zip
+sudo mv chromedriver /usr/bin/chromedriver
+sudo chmod +x /usr/bin/chromedriver
+wget https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.rpm
+sudo yum install -y ./google-chrome-stable_current_*.rpm
+
