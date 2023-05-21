@@ -311,6 +311,25 @@ GET_NOTIFICATIONS = '''
 #####################
 ###### CREATES ######
 #####################
+CREATE_EVENT_IF_NOT_EXISTS=r'''
+    MERGE (e:Event {Source: $params.Source, SourceEventID: $params.SourceEventID})
+    ON CREATE SET e += $params
+    WITH e
+    MATCH (et:EventType {UUID: $params.EventTypeUUID})
+    MERGE (et)-[:RELATED_EVENT]->(e)
+    RETURN e.UUID as EventUUID;
+
+'''
+
+MERGE_EVENT_TYPE_NODE = r'''
+    WITH $params.event_type as event_type
+    MERGE (et:EventType {EventType: event_type})
+    ON CREATE SET
+        et.UUID = apoc.create.uuid(),
+        et.EventType = event_type
+    RETURN et.UUID as EventTypeUUID;
+'''
+
 CREATE_EVENT_WITH_RELATIONSHIPS = '''MERGE (event:Event {properties})
                                     MERGE (event_type:EventType {{EventTypeID:{event_type_id}}})
                                     CREATE (event)-[:EVENT_IS_TYPE]->(event_type)

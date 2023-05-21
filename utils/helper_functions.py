@@ -30,6 +30,31 @@ class HelperFunctions:
         address = resp_json_payload['results'][0]['formatted_address']
             
         return address
+    
+    def get_geodata_from_venue_name(self, venue_name):
+        try:
+            params = {
+                'address': f'{venue_name}', 
+                'sensor': 'false', 
+                'region': 'us',
+                'key': self.google_maps_api_key
+            }
+            
+            req = requests.get('https://maps.googleapis.com/maps/api/geocode/json', params=params)
+            res = req.json()
+
+            # Use the first result
+            result = res['results'][0]
+
+            geodata = dict()
+            geodata['address'] = result['formatted_address']
+            geodata['latitude'] = result['geometry']['location']['lat']
+            geodata['longitude'] = result['geometry']['location']['lng']
+
+            return geodata
+        except Exception as e:
+            print(f"Error getting geodata from venue name: {e}")
+            traceback.print_exc()
 
 
 def format_decode_image(path: str):

@@ -305,8 +305,7 @@ export const SelectInterestsModal = ({
   const {
     transactionStatus: create_account_interest_relationships_status,
     executeQuery: run_create_account_interest_relationships,
-    resetTransactionStatus:
-      reset_create_account_interest_relationships_transaction_status,
+    resetTransactionStatus: reset_create_account_interest_relationships_transaction_status,
   } = useCustomCypherWrite(CREATE_ACCOUNT_INTEREST_RELATIONSHIPS);
 
   const handleSubmitButtonClick = () => {
@@ -354,6 +353,14 @@ export const SelectInterestsModal = ({
       isVisible={isVisible}
       onRequestClose={onRequestClose}
       title="What Type of Events Do You Like?"
+      menuButton={
+        <ButtonComponent
+          id="select-interests-submit-button"
+          title="Submit"
+          onPress={handleSubmitButtonClick}
+          style={modalStyles.buttonStyle}
+        />
+      }
     >
       <ScrollView>
         {event_types.map((eventType, index) => (

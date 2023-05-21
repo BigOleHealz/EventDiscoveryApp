@@ -17,6 +17,8 @@ import {
 import { useCustomCypherWrite } from '../hooks/CustomCypherHooks';
 import { getSecretValue } from '../utils/AWSHandler';
 import { day_start_time, day_end_time } from '../utils/constants';
+import { convertUTCDateToLocalDate } from '../utils/HelperFunctions';
+
 import { removeUserSession } from '../utils/SessionManager';
 import pinIcon from '../assets/pin.png';
 
@@ -97,8 +99,8 @@ export const Map = ({
   const [map_events_full_day, setMapEventsFullDay] = useState([]);
   const [map_events_filtered, setMapEventsFiltered] = useState([]);
 
-  const start_timestamp = `${findGameSelectedDate}T${day_start_time}`;
-  const end_timestamp = `${findGameSelectedDate}T${day_end_time}`;
+  const start_timestamp = convertUTCDateToLocalDate(new Date(`${findGameSelectedDate}T${day_start_time}`));
+  const end_timestamp = convertUTCDateToLocalDate(new Date(`${findGameSelectedDate}T${day_end_time}`));
 
   const { loading, error, records, run } = useReadCypher(FETCH_EVENTS_FOR_MAP);
 

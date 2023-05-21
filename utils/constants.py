@@ -62,6 +62,11 @@ decline_event_invite_button_id = 'decline-notification-button'
 accept_friend_request_button_id = 'accept-friend-request-button'
 decline_friend_request_button_id = 'decline-friend-request-button'
 
+
+facebook_location_ids = {
+    "philadelphia" : 101881036520836,
+}
+
 class RouteManager:
     login = '/login'
     home_page = '/home_page'
