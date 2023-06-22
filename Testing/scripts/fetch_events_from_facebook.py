@@ -148,48 +148,24 @@ class FacebookEventDataHandler:
                     # return when the number of '{' and '}' match
                     return substring[: i + 1]
 
-    def __get_event_categories(self, text):
-        # Define the pattern to match in the script tag's content
-        pattern = re.compile(
-            r'({"__bbox":.*"event_category_list":.*"sequence_number":0}})'
-        )
 
-        # Search for the pattern
-        match = pattern.search(text)
-        if match:
-            # Extract the JSON string
-            json_string = match.group(1)
-
-            # Load the JSON string into a Python dict
-            json_data = json.loads(json_string)
-
-            # Extract the event_category_list
-            event_category_list = json_data["__bbox"]["result"]["data"]["viewer"][
-                "event_category_list"
-            ]
-            return event_category_list
-        else:
-            return []
-
-    def __parse_timestamp_to_utc_date(self, event_data: dict, location_data: dict):
-        start_timestamp = event_data["start_timestamp"]
+    def __parse_timestamp_to_utc_date(self, start_timestamp: int, end_timestamp: int, location_data: dict):
+        # start_timestamp = event_data["start_timestamp"]
         timezone_str = self.helper_functions.get_timezone_from_lat_lon_timestamp(lat=location_data["latitude"], lon=location_data["longitude"], timestamp=start_timestamp)
         tz = pytz.timezone(timezone_str)
         
         # Parse the timestamp
         start_timestamp_utc = datetime.fromtimestamp(start_timestamp)
-        start_timestamp_local = start_timestamp_utc.astimezone(tz)
 
-        end_timestamp_raw = event_data.get("end_timestamp")
-
-        if end_timestamp_raw:
-            import pdb; pdb.set_trace()
-        else:
+        if end_timestamp == 0:
+            start_timestamp_local = start_timestamp_utc.astimezone(tz)
             end_timestamp_local = start_timestamp_local.replace(hour=23, minute=59, second=59)
             end_timestamp_utc = end_timestamp_local.astimezone(pytz.UTC)
+        else:
+            end_timestamp_utc = datetime.fromtimestamp(end_timestamp)
 
-            start_timestamp_utc_str = start_timestamp_utc.strftime(DATETIME_FORMAT)
-            end_timestamp_utc_str = end_timestamp_utc.strftime(DATETIME_FORMAT)
+        start_timestamp_utc_str = start_timestamp_utc.strftime(DATETIME_FORMAT)
+        end_timestamp_utc_str = end_timestamp_utc.strftime(DATETIME_FORMAT)
 
         return start_timestamp_utc_str, end_timestamp_utc_str
         
@@ -210,7 +186,6 @@ class FacebookEventDataHandler:
 
     def process_events(self, file_location, file_date):
         source_dir = os.path.join(self.__facebook_eventpages_dir, file_location, file_date)
-
         success_dir = os.path.join(self.__facebook_event_data_json_dir, file_location, file_date, "success")
         error_dir = os.path.join(self.__facebook_event_data_json_dir, file_location, file_date, "error")
 
@@ -231,6 +206,16 @@ class FacebookEventDataHandler:
 
             event_description = self.__get_event_description(document)
 
+            match = re.search(r'{"__bbox":{"complete":(true|false),"result":{"label":"PublicEventCometAboutOneColumn_event\$defer\$EventCometLineupsCardMeta_event","path":\["event"\],"data":{"tz_display_name":"\w+","viewer_in_event_tz":(true|false),"start_timestamp":\d+,"end_timestamp":\d+},"extensions":{"is_final":(true|false)}},"sequence_number":\d+}}', document)
+            if match:
+                span = match.span()
+                timestamps_text = document[span[0]:span[-1]]
+                timestamps_dict = json.loads(timestamps_text)
+                start_timestamp = timestamps_dict["__bbox"]["result"]["data"]["start_timestamp"]
+                end_timestamp = timestamps_dict["__bbox"]["result"]["data"]["end_timestamp"]
+            else:
+                continue
+
             tree = html.fromstring(document)
 
             script_tags = tree.xpath("//script")
@@ -247,9 +232,9 @@ class FacebookEventDataHandler:
                         event_data = json.loads(self.__find_bbox_value(script.text))["result"]["data"]["event"]
 
                         event_data_json.append(event_data)
-                        start_time, end_time = self.__parse_timestamp_to_utc_date(event_data=event_data, location_data=location_data)
+                        start_time, end_time = self.__parse_timestamp_to_utc_date(start_timestamp=start_timestamp, end_timestamp=end_timestamp, location_data=location_data)
 
-                        if (datetime.strptime(end_time, "%Y-%m-%dT%H:%M:%S") < file_date_dt):
+                        if (datetime.strptime(end_time, DATETIME_FORMAT) < file_date_dt):
                             continue
 
                         venue = event_data["event_place"]["name"]
@@ -312,31 +297,6 @@ class FacebookEventDataHandler:
             with open(output_file_full_path, "w", encoding='utf-8') as f:
                 f.write(content)
 
-    def fetch_homepage_by_location_and_date(self, location: int, event_date: str):
-        location_id = facebook_location_ids[location]
-
-        self.driver.get(
-            self.__facebook_events_homepage_url.format(
-                location_id=location_id, event_date=event_date
-            )
-        )
-        content = self.driver.page_source
-
-        filename = f"{event_date}_{location}.html"
-        filename_full_path = os.path.join(self.__facebook_homepages_dir, filename)
-        with open(filename_full_path, "w") as f:
-            f.write(content)
-
-    def fetch_homepages_in_date_range(self, start_date: str, end_date: str):
-        start_date_dt = datetime.strptime(start_date, "%Y-%m-%d")
-        end_date_dt = datetime.strptime(end_date, "%Y-%m-%d")
-
-        for key in facebook_location_ids.keys():
-            for date in date_range(start_date_dt, end_date_dt, freq="d"):
-                date_str = date.strftime("%Y-%m-%d")
-                self.fetch_homepage_by_location_and_date(
-                    location=key, event_date=date_str
-                )
 
     def run(self):
         homepages = os.listdir(self.__facebook_homepages_dir)
@@ -357,3 +317,54 @@ if __name__ == "__main__":
     handler = FacebookEventDataHandler()
     # handler.fetch_homepages_in_date_range(start_date='2023-05-22', end_date='2023-05-24')
     handler.run()
+
+
+
+    # def fetch_homepage_by_location_and_date(self, location: int, event_date: str):
+    #     location_id = facebook_location_ids[location]
+
+    #     self.driver.get(
+    #         self.__facebook_events_homepage_url.format(
+    #             location_id=location_id, event_date=event_date
+    #         )
+    #     )
+    #     content = self.driver.page_source
+
+    #     filename = f"{event_date}_{location}.html"
+    #     filename_full_path = os.path.join(self.__facebook_homepages_dir, filename)
+    #     with open(filename_full_path, "w") as f:
+    #         f.write(content)
+
+    # def fetch_homepages_in_date_range(self, start_date: str, end_date: str):
+    #     start_date_dt = datetime.strptime(start_date, "%Y-%m-%d")
+    #     end_date_dt = datetime.strptime(end_date, "%Y-%m-%d")
+
+    #     for key in facebook_location_ids.keys():
+    #         for date in date_range(start_date_dt, end_date_dt, freq="d"):
+    #             date_str = date.strftime("%Y-%m-%d")
+    #             self.fetch_homepage_by_location_and_date(
+    #                 location=key, event_date=date_str
+    #             )
+
+    # def __get_event_categories(self, text):
+    #     # Define the pattern to match in the script tag's content
+    #     pattern = re.compile(
+    #         r'({"__bbox":.*"event_category_list":.*"sequence_number":0}})'
+    #     )
+
+    #     # Search for the pattern
+    #     match = pattern.search(text)
+    #     if match:
+    #         # Extract the JSON string
+    #         json_string = match.group(1)
+
+    #         # Load the JSON string into a Python dict
+    #         json_data = json.loads(json_string)
+
+    #         # Extract the event_category_list
+    #         event_category_list = json_data["__bbox"]["result"]["data"]["viewer"][
+    #             "event_category_list"
+    #         ]
+    #         return event_category_list
+    #     else:
+    #         return []
