@@ -38,6 +38,8 @@ DEFAULT_ZOOM = 13
 
 datetime_format = '%Y-%m-%dT%H:%M:%S'
 
+DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S'
+
 ICON_SIZE = 80
 
 CURRENTLY_ATTENDING_BUTTON_TEXT = "Unattend"
