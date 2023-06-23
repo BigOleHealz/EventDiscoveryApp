@@ -18,13 +18,19 @@ parent = os.path.dirname(current)
 home = os.path.dirname(parent)
 sys.path.append(home)
 
+from db.db_handler import Neo4jDB
+from db import queries
 from utils.logger import Logger
 from utils.helper_functions import HelperFunctions
+from utils.logger import Logger
 from utils.constants import facebook_location_ids, DATETIME_FORMAT
 
 
 class FacebookEventDataHandler:
     def __init__(self):
+        self.logger = Logger(__name__)
+        self.neo4j = Neo4jDB(logger=self.logger)
+    
         self.OPEN_AI_API_KEY = os.environ.get("OPEN_AI_API_KEY")
         self.tzinfos = {"EDT": tzoffset("EDT", -4 * 3600)}
         # if not self.OPEN_AI_API_KEY:
@@ -38,9 +44,8 @@ class FacebookEventDataHandler:
         self.helper_functions = HelperFunctions(logger=self.logger)
         openai.api_key = self.helper_functions.get_open_ai_api_key()
 
-        self.__facebook_events_dir = os.path.join(
-            os.environ["STONKS_APP_HOME"], "Testing", "data", "facebook_events"
-        )
+        self.__facebook_events_dir = os.getcwd()
+        
         self.__facebook_homepages_dir = os.path.join(
             self.__facebook_events_dir, "homepages"
         )
@@ -69,7 +74,6 @@ class FacebookEventDataHandler:
                 except Exception as e:
                     print(f"Failed to delete {file_path}. Reason: {e}")
         else:
-            # Create the directory
             os.makedirs(directory_path)
 
     def __get_event_description(self, text):
@@ -128,7 +132,6 @@ class FacebookEventDataHandler:
 
                 return {"address": full_address, "latitude": latitute, "longitude": longitude}
 
-
         return None
 
     def __find_bbox_value(self, s):
@@ -148,9 +151,7 @@ class FacebookEventDataHandler:
                     # return when the number of '{' and '}' match
                     return substring[: i + 1]
 
-
     def __parse_timestamp_to_utc_date(self, start_timestamp: int, end_timestamp: int, location_data: dict):
-        # start_timestamp = event_data["start_timestamp"]
         timezone_str = self.helper_functions.get_timezone_from_lat_lon_timestamp(lat=location_data["latitude"], lon=location_data["longitude"], timestamp=start_timestamp)
         tz = pytz.timezone(timezone_str)
         
@@ -169,20 +170,27 @@ class FacebookEventDataHandler:
 
         return start_timestamp_utc_str, end_timestamp_utc_str
         
+    
+    def categorize_event(self, event_data: dict, choices: list):
+        prompt = f'''respond to the following prompt with the format `{{"MATCHED": (true|false), "CONFIDENCE_LEVEL":<confidence_level>,
+                    "EVENT_TYPE_NAME":"<EventType>"}}`: `categorize this event based on the following data {event_data}
+                    from the following list of already-existing event types: {choices}. also generate a confidence level
+                    for your match that ranges between 0 and 1. if your confidence-level is 0.75 or higher, 
+                    return your answer in the following format: {{"MATCHED": true, "CONFIDENCE_LEVEL":<confidence_level>,
+                    "EVENT_TYPE_NAME":"<EventType>"}}. if the confidence-level is below 0.75, propose a new category name
+                    for the EventType and return your answer in the following format: {{"MATCHED": false,
+                    "CONFIDENCE_LEVEL":<confidence_level>, "EVENT_TYPE_NAME":"<EventType>"}}. make sure that your proposed
+                    category name is general enough to apply to other events, rather than just this one.`'''
 
-    def __categorize_event(self, event_data):
-        event_data_json = json.dumps(event_data)
-        prompt = f"respond to the following prompt with one word: `categorize this event type: '{event_data_json}'`"
-
-        response = openai.Completion.create(
-            engine="text-davinci-002", prompt=prompt, temperature=0.5, max_tokens=10
-        )
+        response = openai.Completion.create(engine="text-davinci-002", prompt=prompt, temperature=0.5, max_tokens=100)
 
         response_text = response.choices[0].text.strip()
-        response_text_capitalized = response_text[0].upper() + response_text[1:]
-        if response_text_capitalized == "Event":
-            response_text_capitalized = "Generic"
-        return response_text_capitalized
+        response_json = json.loads(response_text)
+        response_json['EVENT_TYPE_NAME'] = response_json['EVENT_TYPE_NAME'][0].upper() + response_json['EVENT_TYPE_NAME'][1:]
+        response_json['EVENT_TYPE_NAME'] = response_json['EVENT_TYPE_NAME'].replace(" Event", "")
+        if response_json['EVENT_TYPE_NAME'] == "Event":
+            response_json['EVENT_TYPE_NAME'] = "Generic"
+        return response_json
 
     def process_events(self, file_location, file_date):
         source_dir = os.path.join(self.__facebook_eventpages_dir, file_location, file_date)
@@ -194,8 +202,11 @@ class FacebookEventDataHandler:
         self.__prepare_directory(success_dir)
         self.__prepare_directory(error_dir)
 
-        event_data_json = []
+        event_type_mappings = self.neo4j.execute_query(query=queries.GET_EVENT_TYPE_NAMES_MAPPINGS)
+        event_type_list = [event_type["EventType"] for event_type in event_type_mappings]
+        
 
+        event_data_json = []
         for filename in os.listdir(source_dir):
             filename_ext_split = os.path.splitext(filename)[0]
 
@@ -255,7 +266,9 @@ class FacebookEventDataHandler:
                                 "EventName": event_data["name"],
                                 "EventDescription": event_description
                             }
-                            relevant_event_data["EventType"] = self.__categorize_event(relevant_event_data)
+                            categorization_response = self.categorize_event(relevant_event_data, choices=event_type_list)
+                            print(f"categorization_response: {categorization_response}")
+                            relevant_event_data["EventType"] = categorization_response['EVENT_TYPE_NAME']
                             
                         except Exception as error:
                             print(f"Error: {error}")
@@ -288,10 +301,10 @@ class FacebookEventDataHandler:
         elements = document.xpath(xpath_expr)
         hrefs = [element.get("href") for element in elements]
 
-        for i, link in enumerate(hrefs):
+        for i, link in enumerate(hrefs[140:]):
             self.driver.get(link)
             content = self.driver.page_source
-
+            
             output_file_full_path = os.path.join(event_page_sub_dir_full_path, f"event_{i}.html")
 
             with open(output_file_full_path, "w", encoding='utf-8') as f:
@@ -309,7 +322,7 @@ class FacebookEventDataHandler:
             file_date = file_split[0]
             file_location = file_split[1]
 
-            # self.fetch_event_page_data(full_file_path, file_location, file_date)
+            self.fetch_event_page_data(full_file_path, file_location, file_date)
             self.process_events(file_location, file_date)
 
 
