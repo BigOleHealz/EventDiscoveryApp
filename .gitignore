@@ -11,3 +11,6 @@ infra/stonks_lambdas/get_node/.aws-sam/deps/*
 
 app_frontend/.env
 app_frontend/node_modules*
+data_fetcher/*/homepages*
+data_fetcher/*/event_data_json*
+data_fetcher/*/eventpages*

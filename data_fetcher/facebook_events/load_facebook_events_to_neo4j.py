@@ -1,5 +1,5 @@
 #! /usr/bin/python3.8
-import os, sys, json
+import os, sys, json, traceback
 from uuid import uuid4
 
 current = os.path.dirname(os.path.realpath(__file__))
@@ -14,7 +14,8 @@ from utils.logger import Logger
 
 class FacebookDataLoader:
     def __init__(self):
-        self.facebook_events_dir = os.path.join(os.environ["STONKS_APP_HOME"], "Testing", "data", "facebook_events", "event_data_json")
+        self.facebook_events_dir = os.getcwd()
+        self.event_data_json_folder = os.path.join(self.facebook_events_dir, "event_data_json")
         self.logger = Logger(__name__)
         self.neo4j = Neo4jDB(logger=self.logger)
 
@@ -40,17 +41,26 @@ class FacebookDataLoader:
         )
 
     def run(self):
-        location_folders = os.listdir(self.facebook_events_dir)
+        location_folders = os.listdir(self.event_data_json_folder)
         for location_folder in location_folders:
-            date_folders = os.listdir(
-                os.path.join(self.facebook_events_dir, location_folder)
-            )
+
+            location_folder_full_path = os.path.join(self.event_data_json_folder, location_folder)
+            date_folders = os.listdir(location_folder_full_path)
+            
             for date_folder in date_folders:
                 print("Loading events for location: {}, date: {}".format(location_folder, date_folder))
-                for event_file in os.listdir(
-                    os.path.join(self.facebook_events_dir, location_folder, date_folder, "success")):
+                success_folder_full_path = os.path.join(location_folder_full_path, date_folder, "success")
+                for event_file in os.listdir(success_folder_full_path):
                     print("Loading event: {}".format(event_file))
-                    self.__load_event(os.path.join(self.facebook_events_dir, location_folder, date_folder, "success", event_file))
+
+                    try:
+                        self.__load_event(os.path.join(success_folder_full_path, event_file))
+                    except Exception as e:
+                        print("Error loading event: {}".format(event_file))
+                        print(e)
+                        print(traceback.format_exc())
+                        continue
+
                 print("Done loading events for location: {}, date: {}".format(location_folder, date_folder))
 
 
