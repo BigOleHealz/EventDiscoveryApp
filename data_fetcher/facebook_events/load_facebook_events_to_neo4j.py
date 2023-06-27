@@ -23,19 +23,6 @@ class FacebookDataLoader:
         with open(event_file_path, "r") as f:
             event_data = json.load(f)
         
-        params = {
-            "uuid": str(uuid4()),
-            "event_type": event_data["EventType"]
-        }
-        event_type_uuid = self.neo4j.execute_query_with_params(
-            query=queries.MERGE_EVENT_TYPE_NODE,
-            params=params,
-        )[0]["EventTypeUUID"]
-
-        event_data["UUID"] = str(uuid4())
-        del event_data["EventType"]
-        event_data["EventTypeUUID"] = event_type_uuid
-
         self.neo4j.execute_query_with_params(
             query=queries.CREATE_EVENT_IF_NOT_EXISTS, params=event_data
         )

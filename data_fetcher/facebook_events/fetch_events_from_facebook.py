@@ -301,7 +301,7 @@ class FacebookEventDataHandler:
         elements = document.xpath(xpath_expr)
         hrefs = [element.get("href") for element in elements]
 
-        for i, link in enumerate(hrefs[140:]):
+        for i, link in enumerate(hrefs):
             self.driver.get(link)
             content = self.driver.page_source
             

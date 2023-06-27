@@ -11,8 +11,7 @@ const styles = StyleSheet.create({
     backgroundColor: defaultBackgroundColor,
     color: defaultFontColor,
     padding: defaultPadding,
-    margin: defaultMargin,
-    borderRadius: defaultBorderRadius,
+    // borderRadius: defaultBorderRadius,
   },
   container: {
     flex: 1,

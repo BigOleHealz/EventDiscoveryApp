@@ -6,6 +6,8 @@ import { toast } from 'react-toastify';
 import { ButtonComponent } from '../base_components/ButtonComponent';
 import { CalendarComponent } from '../base_components/CalendarComponent';
 import { CreateGameTimeSelectorComponent } from '../base_components/CreateGameTimeSelectorComponent';
+import { EventTypeScrollView } from '../composite_components/SelectInterestsScrollview';
+
 import { ModalComponent } from '../base_components/ModalComponent';
 import {
   CREATE_ACCOUNT_INTEREST_RELATIONSHIPS,
@@ -254,53 +256,8 @@ export const SelectInterestsModal = ({
   accountUUID,
   onSubmitButtonClick,
 }) => {
-  const [event_types, setEventTypes] = useState([]);
 
-  const {
-    transactionStatus: get_event_types_status,
-    executeQuery: run_get_event_types,
-    resetTransactionStatus: reset_get_event_types_transaction_status,
-  } = useCustomCypherRead(GET_EVENT_TYPES);
-
-  useEffect(() => {
-    if (isVisible) {
-      run_get_event_types({});
-    }
-  }, [isVisible]);
-
-  useEffect(() => {
-    // Query for event types when the modal becomes visible
-    if (get_event_types_status.STATUS === 'ERROR') {
-      toast.error(
-        `Error Getting Event Types: ${get_event_types_status.RESPONSE}`
-      );
-      console.error(get_event_types_status.RESPONSE);
-      reset_get_event_types_transaction_status();
-    } else if (get_event_types_status.STATUS === 'SUCCESS') {
-      console.log('Get Event Types Response:', get_event_types_status.RESPONSE);
-      const eventTypeList = get_event_types_status.RESPONSE.RECORDS.map(
-        (eventType) => {
-          return {
-            ...eventType,
-            isChecked: false,
-          };
-        }
-      );
-
-      setEventTypes(eventTypeList);
-      reset_get_event_types_transaction_status();
-    }
-  }, [get_event_types_status]);
-
-  const handleValueChange = (index, newValue) => {
-    const updatedEventTypes = event_types.map((eventType, i) => {
-      if (i === index) {
-        return { ...eventType, isChecked: newValue };
-      }
-      return eventType;
-    });
-    setEventTypes(updatedEventTypes);
-  };
+  const [event_types_selected, setEventTypesSelected] = useState([]);
 
   const {
     transactionStatus: create_account_interest_relationships_status,
@@ -338,14 +295,14 @@ export const SelectInterestsModal = ({
     }
   }, [create_account_interest_relationships_status]);
 
-  const EventTypeChecklistItem = ({ name, isChecked, onValueChange }) => {
-    return (
-      <View style={modalStyles.itemContainer}>
-        <CheckBox value={isChecked} onValueChange={onValueChange} />
-        <Text style={modalStyles.itemText}>{name}</Text>
-      </View>
-    );
-  };
+  // const EventTypeChecklistItem = ({ name, isChecked, onValueChange }) => {
+  //   return (
+  //     <View style={modalStyles.itemContainer}>
+  //       <CheckBox value={isChecked} onValueChange={onValueChange} />
+  //       <Text style={modalStyles.itemText}>{name}</Text>
+  //     </View>
+  //   );
+  // };
 
   return (
     <ModalComponent
@@ -362,16 +319,7 @@ export const SelectInterestsModal = ({
         />
       }
     >
-      <ScrollView>
-        {event_types.map((eventType, index) => (
-          <EventTypeChecklistItem
-            key={eventType.UUID}
-            name={eventType.EventType}
-            isChecked={eventType.isChecked}
-            onValueChange={(newValue) => handleValueChange(index, newValue)}
-          />
-        ))}
-      </ScrollView>
+      <EventTypeScrollView setEventTypesSelected={setEventTypesSelected} />
     </ModalComponent>
   );
 };
@@ -393,7 +341,8 @@ const modalStyles = StyleSheet.create({
     backgroundColor: '#2196F3',
   },
   scrollView: {
-    flex: 1,
+    // flex: 1,
+    // maxHeight: 200,
     marginLeft: 20,
     marginRight: 20,
   },

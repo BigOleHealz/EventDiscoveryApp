@@ -12,10 +12,10 @@ from db import queries
 from utils.logger import Logger
 
 
-class FacebookDataLoader:
+class EventBriteDataLoader:
     def __init__(self):
-        self.facebook_events_dir = os.getcwd()
-        self.event_data_json_folder = os.path.join(self.facebook_events_dir, "event_data_json")
+        self.eventbrite_events_dir = os.getcwd()
+        self.event_data_json_folder = os.path.join(self.eventbrite_events_dir, "event_data_json")
         self.logger = Logger(__name__)
         self.neo4j = Neo4jDB(logger=self.logger)
 
@@ -23,22 +23,30 @@ class FacebookDataLoader:
         with open(event_file_path, "r") as f:
             event_data = json.load(f)
         
-        params = {
-            "uuid": str(uuid4()),
-            "event_type": event_data["EventType"]
-        }
-        event_type_uuid = self.neo4j.execute_query_with_params(
-            query=queries.MERGE_EVENT_TYPE_NODE,
-            params=params,
-        )[0]["EventTypeUUID"]
-
-        event_data["UUID"] = str(uuid4())
-        del event_data["EventType"]
-        event_data["EventTypeUUID"] = event_type_uuid
-
-        self.neo4j.execute_query_with_params(
-            query=queries.CREATE_EVENT_IF_NOT_EXISTS, params=event_data
+        event_query_response = self.neo4j.execute_query_with_params(
+            query=queries.CHECK_IF_EVENT_EXISTS, params=event_data
         )
+        if len(event_query_response) == 0:
+            self.neo4j.execute_query_with_params(
+                query=queries.CREATE_EVENT_IF_NOT_EXISTS, params=event_data
+            )
+        
+        # params = {
+        #     "uuid": str(uuid4()),
+        #     "event_type": event_data["EventType"]
+        # }
+        # event_type_uuid = self.neo4j.execute_query_with_params(
+        #     query=queries.MERGE_EVENT_TYPE_NODE,
+        #     params=params,
+        # )[0]["EventTypeUUID"]
+
+        # event_data["UUID"] = str(uuid4())
+        # del event_data["EventType"]
+        # event_data["EventTypeUUID"] = event_type_uuid
+
+        # self.neo4j.execute_query_with_params(
+        #     query=queries.CREATE_EVENT_IF_NOT_EXISTS, params=event_data
+        # )
 
     def run(self):
         location_folders = os.listdir(self.event_data_json_folder)
@@ -49,20 +57,24 @@ class FacebookDataLoader:
             
             for date_folder in date_folders:
                 print("Loading events for location: {}, date: {}".format(location_folder, date_folder))
-                success_folder_full_path = os.path.join(location_folder_full_path, date_folder, "success")
-                for event_file in os.listdir(success_folder_full_path):
-                    print("Loading event: {}".format(event_file))
 
-                    try:
-                        self.__load_event(os.path.join(success_folder_full_path, event_file))
-                    except Exception as e:
-                        print("Error loading event: {}".format(event_file))
-                        print(e)
-                        print(traceback.format_exc())
-                        continue
+                full_path_location_date = os.path.join(location_folder_full_path, date_folder)
+                for page_no in os.listdir(full_path_location_date):
+
+                    success_matched_folder_full_path = os.path.join(location_folder_full_path, date_folder, page_no, "success", "matched")
+                    for event_file in os.listdir(success_matched_folder_full_path):
+                        print("Loading event: {}".format(event_file))
+
+                        try:
+                            self.__load_event(os.path.join(success_matched_folder_full_path, event_file))
+                        except Exception as e:
+                            print("Error loading event: {}".format(event_file))
+                            print(e)
+                            print(traceback.format_exc())
+                            continue
 
                 print("Done loading events for location: {}, date: {}".format(location_folder, date_folder))
 
 
 if __name__ == "__main__":
-    FacebookDataLoader().run()
+    EventBriteDataLoader().run()
