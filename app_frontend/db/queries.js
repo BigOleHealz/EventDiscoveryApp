@@ -55,11 +55,13 @@ export const CREATE_EVENT = `
     `;
 
 export const GET_EVENT_TYPES = `
-    MATCH (et:EventType)
-    WHERE et.EventType <> 'Dummy Event Type'
-    RETURN
-        et.UUID AS UUID,
-        et.EventType AS EventType;
+        MATCH (et:EventType)
+        WHERE et.EventType <> 'Dummy Event Type'
+        RETURN
+            et.UUID AS UUID,
+            et.EventType AS EventType,
+            EXISTS(((:Person {UUID: $params.UUID})-[:INTERESTED_IN]->(et))) AS InterestedIn
+        ORDER BY et.EventType ASC;
     `;
 
 export const INVITE_FRIENDS_TO_EVENT = `

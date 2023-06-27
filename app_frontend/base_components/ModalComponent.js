@@ -31,17 +31,17 @@ export const ModalComponent = ({
             style={modal_component_styles.modalContainer}
           >
             <View
-              TestID="modal-title-container"
+              TestID="view-modal-title"
               style={modal_component_styles.titleContainer}
             >
               <TextComponent style={modal_component_styles.title}>
                 {title}
               </TextComponent>
             </View>
-            <View style={modal_component_styles.contentContainer}>
+            <View TestID="view-modal-childen" style={modal_component_styles.contentContainer}>
               {children}
             </View>
-            <View style={modal_component_styles.submit_button_container}>
+            <View TestID="view-submit-button" style={modal_component_styles.submit_button_container}>
               {menuButton}
             </View>
           </View>
@@ -61,11 +61,12 @@ const modal_component_styles = StyleSheet.create({
   modalContainer: {
     height: '80%',
     width: '40%',
-    flexDirection: 'column',
+    flexDirection: 'column',  // make sure the flex direction is column
     justifyContent: 'space-between',
     alignItems: 'center',
     backgroundColor: styles.appTheme.backgroundColor,
     borderRadius: 10,
+		overflow: 'hidden'
   },
   titleContainer: {
     borderBottomWidth: 1,
@@ -91,6 +92,8 @@ const modal_component_styles = StyleSheet.create({
     justifyContent: 'center',
   },
   contentContainer: {
+    flex: 1, 
     width: '100%',
-  },
+  }
+
 });

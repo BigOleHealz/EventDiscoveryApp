@@ -4,6 +4,7 @@ import { StyleSheet } from 'react-native';
 import { CalendarComponent } from '../base_components/CalendarComponent';
 import { TimeRangeSliderComponent } from '../base_components/TimeRangeSliderComponent';
 import { PanelComponent } from '../base_components/PanelComponent';
+import { EventTypeScrollView } from '../composite_components/SelectInterestsScrollview';
 import { day_start_time, day_end_time } from '../utils/constants';
 
 import styles from '../styles';
@@ -46,6 +47,7 @@ export const LeftSidePanel = ({
         endTime={findGameEndTime}
         setEndTime={setFindGameEndTime}
       />
+    <EventTypeScrollView />
     </PanelComponent>
   );
 };

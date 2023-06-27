@@ -14,7 +14,7 @@ export const FriendRequestsPanel = ({ isVisible, toolbarHeight, userSession }) =
 	const maxTopPanelHeight = Dimensions.get('window').height * 0.8;
 
 	//////////////////////////////////////////////////////////////////////////////////////////
-	// Load Event Invites Logic
+	// Load Friend Requests Logic
 	//////////////////////////////////////////////////////////////////////////////////////////
 	const [friend_requests, setFriendRequests] = useState([]);
 
@@ -59,8 +59,8 @@ export const FriendRequestsPanel = ({ isVisible, toolbarHeight, userSession }) =
 
 	useEffect(() => {
 		if (respond_to_friend_request_status.STATUS === 'ERROR') {
-			toast.error(`Error Responding to Event Invite: ${respond_to_friend_request_status.RESPONSE}`);
-			console.log(`Error Responding to Event Invite: ${respond_to_friend_request_status.RESPONSE}`);
+			toast.error(`Error Responding to Friend Request: ${respond_to_friend_request_status.RESPONSE}`);
+			console.log(`Error Responding to Friend Request: ${respond_to_friend_request_status.RESPONSE}`);
 			reset_respond_to_friend_request_transaction_status();
 		} else if (respond_to_friend_request_status.STATUS === 'SUCCESS') {
 			toast.success(`Response Sent Successfully!`);
@@ -122,7 +122,7 @@ export const FriendRequestsPanel = ({ isVisible, toolbarHeight, userSession }) =
 		<TopPanel
 			isVisible={isVisible}
 			toolbarHeight={toolbarHeight}
-			title="Event Invites"
+			title="Friend Requests"
 		>
 			<View style={friend_requests_panel.sendFriendRequestView}>
 				<TextInputComponent

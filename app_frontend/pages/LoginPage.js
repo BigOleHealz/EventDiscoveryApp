@@ -107,7 +107,8 @@ const loginPageStyles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 16,
+    // paddingHorizontal: 16,
+    padding: 0,
     backgroundColor: styles.appTheme.backgroundColor,
   },
   title: {
