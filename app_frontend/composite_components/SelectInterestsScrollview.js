@@ -10,27 +10,23 @@ import {
 } from '../hooks/CustomCypherHooks';
 import styles from '../styles';
 
-// EventTypeScrollView.js
 export const EventTypeScrollView = ({ setEventTypesSelected, userSession }) => {
-    console.log('Starting EventTypeScrollView component');
-    if (userSession) {
-        console.log('userSession.UUID:', userSession.UUID);
-    } else {
-        console.log('userSession is undefined');
-    }
 
 
     const [event_types, setEventTypes] = useState([]);
     const [first_run, setFirstRun] = useState(true);
 
     const handleValueChange = (index, newValue) => {
+        console.log('handleValueChange:', index, newValue);
         const updatedEventTypes = event_types.map((eventType, i) => {
           if (i === index) {
             return { ...eventType, isChecked: newValue };
           }
           return eventType;
         });
+        setEventTypes(updatedEventTypes);
         setEventTypesSelected(updatedEventTypes);
+        console.log('updatedEventTypes:', updatedEventTypes);
     };
     
 
@@ -40,42 +36,51 @@ export const EventTypeScrollView = ({ setEventTypesSelected, userSession }) => {
         resetTransactionStatus: reset_get_event_types_transaction_status,
       } = useCustomCypherRead(GET_EVENT_TYPES);
     
-      useEffect(() => {
-        if (first_run) {
-            if (userSession) {
-                run_get_event_types({ "UUID": userSession.UUID });
-            } else {
-                console.log('Cannot run_get_event_types because userSession is undefined');
-            }
+    useEffect(() => {
+        if (first_run ) {
+            run_get_event_types({});
         }
     }, [first_run]);
-    
-    
-      useEffect(() => {
-        console.log('get_event_types_status:', get_event_types_status)
-        // Query for event types when the modal becomes visible
-        if (get_event_types_status.STATUS === 'ERROR') {
-          toast.error(`Error Getting Event Types: ${get_event_types_status.RESPONSE}`);
-          console.error(get_event_types_status.RESPONSE);
-          reset_get_event_types_transaction_status();
-          setFirstRun(false);
-        } else if (get_event_types_status.STATUS === 'SUCCESS') {
-          console.log('Get Event Types Response:', get_event_types_status.RESPONSE);
-          const eventTypeList = get_event_types_status.RESPONSE.RECORDS.map(
+
+    useEffect(() => {
+      console.log('get_event_types_status:', get_event_types_status)
+      // Query for event types when the modal becomes visible
+      if (get_event_types_status.STATUS === 'ERROR') {
+        toast.error(`Error Getting Event Types: ${get_event_types_status.RESPONSE}`);
+        console.error(get_event_types_status.RESPONSE);
+        reset_get_event_types_transaction_status();
+        setFirstRun(false);
+      } else if (get_event_types_status.STATUS === 'SUCCESS') {
+        console.log('Get Event Types Response:', get_event_types_status.RESPONSE);
+        let eventTypeList;
+        if (userSession && userSession.Interests) {
+          eventTypeList = get_event_types_status.RESPONSE.RECORDS.map(
+              (eventType) => {
+                  return {
+                      ...eventType,
+                      isChecked: userSession.Interests.includes(eventType.UUID)
+                  };
+              }
+          );
+        } else {
+          eventTypeList = get_event_types_status.RESPONSE.RECORDS.map(
             (eventType) => {
-              return {
-                ...eventType,
-                isChecked: false,
-              };
+                return {
+                    ...eventType,
+                    isChecked: false
+                };
             }
           );
-    
-          setEventTypes(eventTypeList);
-          reset_get_event_types_transaction_status();
-          setFirstRun(false);
-          console.log('event_types:', event_types)
         }
-      }, [get_event_types_status]);
+        setEventTypes(eventTypeList);
+        // }
+        reset_get_event_types_transaction_status();
+        setFirstRun(false);
+        console.log('event_types:', event_types)
+        } else {
+          console.log('Something else happened')
+        }
+    }, [get_event_types_status]);
 
 
   const EventTypeChecklistItem = ({ name, isChecked, onValueChange }) => {
@@ -118,8 +123,6 @@ const modalStyles = StyleSheet.create({
     backgroundColor: '#2196F3',
   },
   scrollView: {
-    // flex: 1,
-    // maxHeight: 200,
     marginLeft: 20,
     marginRight: 20,
   },
