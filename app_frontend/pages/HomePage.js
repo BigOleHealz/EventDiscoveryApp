@@ -19,6 +19,8 @@ export function HomePage({
     return null;
   }
 
+  const [event_types_selected, setEventTypesSelected] = useState(userSession.Interests);
+
   // Handle left side panel
   const [isLeftPanelVisible, setIsLeftPanelVisible] = useState(false);
   const [isCreateGameMode, setIsCreateGameMode] = useState(false);
@@ -82,6 +84,7 @@ export function HomePage({
           findGameEndTime={findGameEndTime}
           userSession={userSession}
           setUserSession={setUserSession}
+          eventTypesSelected={event_types_selected}
         />
         <LeftSidePanel
           isVisible={isLeftPanelVisible}
@@ -91,7 +94,8 @@ export function HomePage({
           setFindGameStartTime={setFindGameStartTime}
           findGameEndTime={findGameEndTime}
           setFindGameEndTime={setFindGameEndTime}
-          userSession={userSession}
+          eventTypesSelected={event_types_selected}
+          setEventTypesSelected={setEventTypesSelected}
         />
       </View>
     </View>
