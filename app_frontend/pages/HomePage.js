@@ -91,6 +91,7 @@ export function HomePage({
           setFindGameStartTime={setFindGameStartTime}
           findGameEndTime={findGameEndTime}
           setFindGameEndTime={setFindGameEndTime}
+          userSession={userSession}
         />
       </View>
     </View>

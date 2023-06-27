@@ -114,9 +114,9 @@ class EventbriteDataHandler:
         print("Downloading homepages")
         homepages_output_directory = os.path.join(self.eventbrite_homepages_dir, city, start_date)
         # self.__prepare_directory(homepages_output_directory)
-        os.makedirs(os.path.dirname(homepages_output_directory), exist_ok=True)
+        os.makedirs(homepages_output_directory, exist_ok=True)
 
-        for page_no in [2]:
+        for page_no in range(1,6):
             try:
                 url = self.eventbrite_homepage_preformatted.format(state=state, city=city, page_no=page_no, start_date=start_date, end_date=end_date)
 
@@ -267,7 +267,6 @@ class EventbriteDataHandler:
 
     def run(self):
         try:
-            # homepages = os.listdir(self.eventbrite_homepages_dir)
             todays_date = datetime.now().strftime("%Y-%m-%d")
             state = "pa"
             city = "philadelphia"
@@ -281,5 +280,4 @@ class EventbriteDataHandler:
 
 if __name__ == "__main__":
     handler = EventbriteDataHandler()
-    # handler.fetch_homepages_in_date_range(start_date='2023-05-22', end_date='2023-05-24')
     handler.run()

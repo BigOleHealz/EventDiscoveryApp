@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { StyleSheet } from 'react-native';
 
 import { CalendarComponent } from '../base_components/CalendarComponent';
@@ -17,8 +17,10 @@ export const LeftSidePanel = ({
   setFindGameStartTime,
   findGameEndTime,
   setFindGameEndTime,
+  userSession
 }) => {
   console.log('Starting LeftSidePanel component');
+  const [event_types_selected, setEventTypesSelected] = useState([]);
 
   const handleDateSelected = (date) => {
     console.log('Left side panel selected date:', date);
@@ -47,7 +49,10 @@ export const LeftSidePanel = ({
         endTime={findGameEndTime}
         setEndTime={setFindGameEndTime}
       />
-    <EventTypeScrollView />
+      <EventTypeScrollView
+        setEventTypesSelected={setEventTypesSelected}
+        userSession={userSession}
+      />
     </PanelComponent>
   );
 };
