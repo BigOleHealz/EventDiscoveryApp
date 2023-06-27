@@ -30,6 +30,7 @@ export const Map = ({
   findGameEndTime,
   userSession,
   setUserSession,
+  eventTypesSelected
 }) => {
   // Handle Map
   const defaultCenter = {
@@ -112,7 +113,7 @@ export const Map = ({
       end_timestamp: end_timestamp,
     };
     console.log('params:', params);
-    run(params); // Run the query when findGameSelectedDate changes
+    run(params);
   }, [findGameSelectedDate, event_uuid, transactionStatus === false]);
 
   useEffect(() => {
@@ -126,18 +127,20 @@ export const Map = ({
   useEffect(() => {
     const filteredEvents = map_events_full_day.filter((event) => {
       const eventTimestamp = new Date(event.StartTimestamp);
-      const startTime = new Date(
-        `${findGameSelectedDate}T${findGameStartTime}`
-      );
+      const startTime = new Date(`${findGameSelectedDate}T${findGameStartTime}`);
       const endTime = new Date(`${findGameSelectedDate}T${findGameEndTime}`);
-
-      return eventTimestamp >= startTime && eventTimestamp <= endTime;
+  
+      return (
+        eventTimestamp >= startTime &&
+        eventTimestamp <= endTime &&
+        eventTypesSelected.includes(event.EventTypeUUID)
+      );
     });
-
+  
     setMapEventsFiltered(filteredEvents);
-  }, [findGameStartTime, findGameEndTime, map_events_full_day]);
+  }, [findGameStartTime, findGameEndTime, map_events_full_day, eventTypesSelected]);
+  
 
-  // Manage map popup
   const [activePopup, setActivePopup] = useState(null);
   const handleSetActivePopup = (uuid) => {
     if (activePopup === uuid) {

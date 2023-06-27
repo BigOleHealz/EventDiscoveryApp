@@ -6,19 +6,15 @@ import { toast } from 'react-toastify';
 import { ButtonComponent } from '../base_components/ButtonComponent';
 import { CalendarComponent } from '../base_components/CalendarComponent';
 import { CreateGameTimeSelectorComponent } from '../base_components/CreateGameTimeSelectorComponent';
-import { EventTypeScrollView } from '../composite_components/SelectInterestsScrollview';
+import { SelectInterestsScrollView } from '../composite_components/SelectInterestsScrollview';
 
 import { ModalComponent } from '../base_components/ModalComponent';
 import {
   CREATE_ACCOUNT_INTEREST_RELATIONSHIPS,
   CREATE_EVENT,
-  GET_EVENT_TYPES,
   INVITE_FRIENDS_TO_EVENT,
 } from '../db/queries';
-import {
-  useCustomCypherRead,
-  useCustomCypherWrite,
-} from '../hooks/CustomCypherHooks';
+import { useCustomCypherWrite } from '../hooks/CustomCypherHooks';
 
 import { date_time_format } from '../utils/constants';
 import { getAddressFromCoordinates } from '../utils/HelperFunctions';
@@ -34,8 +30,7 @@ export const CreateGameDateTimeModal = ({
   resetCreateGameDetails,
   setIsCreateGameMode,
   userSession,
-  setEventUUID,
-  // setEventCreated
+  setEventUUID
 }) => {
   const current_date = new Date().toISOString();
   const current_date_split = current_date.split('T');
@@ -62,7 +57,6 @@ export const CreateGameDateTimeModal = ({
       );
       const event = create_event_status.RESPONSE.RECORDS[0];
       setEventUUID(event.UUID);
-      // setEventCreated(true);
       toast.success('You Created an Event!');
       reset_create_event_transaction_status();
       resetCreateGameDetails();
@@ -295,14 +289,6 @@ export const SelectInterestsModal = ({
     }
   }, [create_account_interest_relationships_status]);
 
-  // const EventTypeChecklistItem = ({ name, isChecked, onValueChange }) => {
-  //   return (
-  //     <View style={modalStyles.itemContainer}>
-  //       <CheckBox value={isChecked} onValueChange={onValueChange} />
-  //       <Text style={modalStyles.itemText}>{name}</Text>
-  //     </View>
-  //   );
-  // };
 
   return (
     <ModalComponent
@@ -319,7 +305,7 @@ export const SelectInterestsModal = ({
         />
       }
     >
-      <EventTypeScrollView setEventTypesSelected={setEventTypesSelected} />
+      <SelectInterestsScrollView setEventTypesSelected={setEventTypesSelected} />
     </ModalComponent>
   );
 };
@@ -341,8 +327,6 @@ const modalStyles = StyleSheet.create({
     backgroundColor: '#2196F3',
   },
   scrollView: {
-    // flex: 1,
-    // maxHeight: 200,
     marginLeft: 20,
     marginRight: 20,
   },

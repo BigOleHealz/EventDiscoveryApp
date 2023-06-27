@@ -1,16 +1,12 @@
-
 import React, { useEffect, useState } from 'react';
 import { ScrollView, View, CheckBox, Text, StyleSheet } from 'react-native';
 import { toast } from 'react-toastify';
 
 import { GET_EVENT_TYPES } from '../db/queries';
-import {
-    useCustomCypherRead,
-    useCustomCypherWrite,
-} from '../hooks/CustomCypherHooks';
+import { useCustomCypherRead } from '../hooks/CustomCypherHooks';
 import styles from '../styles';
 
-export const EventTypeScrollView = ({ setEventTypesSelected, userSession }) => {
+export const SelectInterestsScrollView = ({ eventTypesSelected, setEventTypesSelected }) => {
 
 
     const [event_types, setEventTypes] = useState([]);
@@ -25,10 +21,10 @@ export const EventTypeScrollView = ({ setEventTypesSelected, userSession }) => {
           return eventType;
         });
         setEventTypes(updatedEventTypes);
-        setEventTypesSelected(updatedEventTypes);
+        let checkedUUIDs = updatedEventTypes.filter(item => item.isChecked).map(item => item.UUID);
+        setEventTypesSelected(checkedUUIDs);
         console.log('updatedEventTypes:', updatedEventTypes);
     };
-    
 
     const {
         transactionStatus: get_event_types_status,
@@ -43,22 +39,19 @@ export const EventTypeScrollView = ({ setEventTypesSelected, userSession }) => {
     }, [first_run]);
 
     useEffect(() => {
-      console.log('get_event_types_status:', get_event_types_status)
-      // Query for event types when the modal becomes visible
       if (get_event_types_status.STATUS === 'ERROR') {
         toast.error(`Error Getting Event Types: ${get_event_types_status.RESPONSE}`);
         console.error(get_event_types_status.RESPONSE);
         reset_get_event_types_transaction_status();
         setFirstRun(false);
       } else if (get_event_types_status.STATUS === 'SUCCESS') {
-        console.log('Get Event Types Response:', get_event_types_status.RESPONSE);
         let eventTypeList;
-        if (userSession && userSession.Interests) {
+        if (eventTypesSelected) {
           eventTypeList = get_event_types_status.RESPONSE.RECORDS.map(
               (eventType) => {
                   return {
                       ...eventType,
-                      isChecked: userSession.Interests.includes(eventType.UUID)
+                      isChecked: eventTypesSelected.includes(eventType.UUID)
                   };
               }
           );
@@ -73,15 +66,12 @@ export const EventTypeScrollView = ({ setEventTypesSelected, userSession }) => {
           );
         }
         setEventTypes(eventTypeList);
-        // }
         reset_get_event_types_transaction_status();
         setFirstRun(false);
-        console.log('event_types:', event_types)
         } else {
           console.log('Something else happened')
         }
     }, [get_event_types_status]);
-
 
   const EventTypeChecklistItem = ({ name, isChecked, onValueChange }) => {
     return (

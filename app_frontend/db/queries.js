@@ -92,6 +92,7 @@ export const FETCH_EVENTS_FOR_MAP = `
         event.EndTimestamp as EndTimestamp,
         event.EventName as EventName,
         event.UUID as UUID,
+        event.EventTypeUUID as EventTypeUUID,
         eventType.EventType as EventType,
         AttendeeCount;
     `;
@@ -130,48 +131,6 @@ export const GET_USER_INFO = `
             friendUsername: friend.Username
         }) as Friends;
     `;
-
-// OPTIMIZE
-// export const CREATE_FRIEND_REQUEST_RELATIONSHIP = `
-//     MATCH (a:Person {Email: $sender_email}), (b:Person {Email: $recipient_email})
-//     OPTIONAL MATCH (a)-[pending_a_to_b:FRIEND_REQUEST {STATUS: "PENDING"}]->(b)
-//     OPTIONAL MATCH (b)-[pending_b_to_a:FRIEND_REQUEST {STATUS: "PENDING"}]->(a)
-//     OPTIONAL MATCH (a)-[friends_a_to_b:FRIENDS_WITH]->(b)
-//     WITH a, b, pending_a_to_b, pending_b_to_a, friends_a_to_b,
-//         CASE
-//             WHEN pending_a_to_b IS NOT NULL THEN
-//                 {STATUS: "ERROR", MESSAGE: "You have already sent a friend request to this person", UUID: pending_a_to_b.UUID}
-//             WHEN pending_b_to_a IS NOT NULL THEN
-//                 {STATUS: "ERROR", MESSAGE: "This person has already sent you a friend request", UUID: pending_b_to_a.UUID}
-//             WHEN friends_a_to_b IS NOT NULL THEN
-//                 {STATUS: "ERROR", MESSAGE: "You are already friends with this person"}
-//             ELSE
-//                 NULL
-//         END as error
-//     WITH a, b, error
-//     WHERE error IS NULL
-//     CREATE (a)-[r:FRIEND_REQUEST {FRIEND_REQUEST_TIMESTAMP: apoc.date.format(apoc.date.currentTimestamp(), "ms", "yyyy-MM-dd'T'HH:mm:ss"), STATUS: "PENDING", UUID: apoc.create.uuid()}]->(b)
-//     RETURN {STATUS: "SUCCESS", MESSAGE: "Friend request sent", UUID: r.UUID} as result
-//     UNION ALL
-//     MATCH (a:Person {Email: $sender_email}), (b:Person {Email: $recipient_email})
-//     OPTIONAL MATCH (a)-[pending_a_to_b:FRIEND_REQUEST {STATUS: "PENDING"}]->(b)
-//     OPTIONAL MATCH (b)-[pending_b_to_a:FRIEND_REQUEST {STATUS: "PENDING"}]->(a)
-//     OPTIONAL MATCH (a)-[friends_a_to_b:FRIENDS_WITH]->(b)
-//     WITH a, b, pending_a_to_b, pending_b_to_a, friends_a_to_b,
-//         CASE
-//             WHEN pending_a_to_b IS NOT NULL THEN
-//                 {STATUS: "ERROR", MESSAGE: "You have already sent a friend request to this person", UUID: pending_a_to_b.UUID}
-//             WHEN pending_b_to_a IS NOT NULL THEN
-//                 {STATUS: "ERROR", MESSAGE: "This person has already sent you a friend request", UUID: pending_b_to_a.UUID}
-//             WHEN friends_a_to_b IS NOT NULL THEN
-//                 {STATUS: "ERROR", MESSAGE: "You are already friends with this person"}
-//             ELSE
-//                 NULL
-//         END as error
-//     WHERE error IS NOT NULL
-//     RETURN error as result;
-
-//     `;
 
 export const CREATE_FRIEND_REQUEST_RELATIONSHIP = `
     MATCH (a:Person {UUID: $sender_email}), (b:Person {UUID: $recipient_email})
