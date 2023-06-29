@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, ScrollView, FlatList, Dimensions } from 'react-native';
 import { toast } from 'react-toastify';
+import moment from 'moment';
 
 import { ButtonComponent } from '../base_components/ButtonComponent';
+import { convertUTCDateToLocalDate } from '../utils/HelperFunctions';
 import { TopPanel } from '../composite_components/TopPanels';
 import { GET_EVENT_INVITES, RESPOND_TO_EVENT_INVITE } from '../db/queries';
 import { useCustomCypherRead, useCustomCypherWrite } from '../hooks/CustomCypherHooks';
+import styles from '../styles';
 
 export const EventInvitesPanel = ({ isVisible, toolbarHeight, userSession }) => {
 
@@ -97,17 +100,35 @@ export const EventInvitesPanel = ({ isVisible, toolbarHeight, userSession }) => 
 						view: <table style={event_invites_panel.table}>
 							<tbody>
 								<tr>
+									<td style={event_invites_panel.label}>Title:</td>
+									<td style={event_invites_panel.value}>{item.EventName}</td>
+								</tr>
+								<tr>
 									<td style={event_invites_panel.label}>Address:</td>
 									<td style={event_invites_panel.value}>{item.Address}</td>
 								</tr>
 								<tr>
 									<td style={event_invites_panel.label}>Starts At:</td>
-									<td style={event_invites_panel.value}>{item.FormattedStart}</td>
+									<td style={event_invites_panel.value}>{moment(convertUTCDateToLocalDate(item.StartTimestamp)).format('hh:mm a')}</td>
 								</tr>
 								<tr>
-									<td style={event_invites_panel.label}>Players:</td>
-									<td style={event_invites_panel.value}>{item.AttendeeCount.toNumber()}</td>
+									<td style={event_invites_panel.label}>Ends At:</td>
+									<td style={event_invites_panel.value}>{moment(convertUTCDateToLocalDate(item.EndTimestamp)).format('hh:mm a')}</td>
 								</tr>
+								<tr>
+									<td style={event_invites_panel.label}>Event Type:</td>
+									<td style={event_invites_panel.value}>{item.EventType}</td>
+								</tr>
+								{item.EventURL && (
+								<tr>
+									<td style={event_invites_panel.label}>Event URL:</td>
+									<td style={event_invites_panel.value}>
+									<a href={item.EventURL} target="_blank" rel="noopener noreferrer" style={styles.hyperlinkText}>
+										{item.EventURL}
+									</a>
+									</td>
+								</tr>
+								)}
 							</tbody>
 						</table>,
 						onAcceptButtonClick: () => respondToEventInvite('ACCEPTED', item.InviteRelationshipUUID),
@@ -129,13 +150,13 @@ const event_invites_panel = StyleSheet.create({
 		width: '100%',
 	},
 	acceptDeclineButtonView: {
-		flexDirection: 'row',
+		flexDirection: 'column',
 		justifyContent: 'space-between',
 		alignItems: 'center',
 		height: '100%',
 	},
 	acceptDeclineButton: {
-		marginHorizontal: 5,
+		margin: 5,
 	},
 	acceptButton: {
 		backgroundColor: 'green',

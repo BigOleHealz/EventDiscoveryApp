@@ -6,6 +6,8 @@ const defaultPadding = 10;
 const defaultMargin = 10;
 const defaultBorderRadius = 8;
 
+const brightBlueColor = '#2196F3'
+
 const styles = StyleSheet.create({
   appTheme: {
     backgroundColor: defaultBackgroundColor,
@@ -39,7 +41,7 @@ const styles = StyleSheet.create({
       justifyContent: 'center',
     },
     menu_button_styles: {
-      backgroundColor: '#2196F3',
+      backgroundColor: brightBlueColor,
       height: 50,
     },
     clear_button_styles: {
@@ -93,7 +95,7 @@ const styles = StyleSheet.create({
     margin: 6,
   },
   hyperlinkText: {
-    color: '#2196F3',
+    color: brightBlueColor,
     textDecorationLine: 'underline',
   },
 });

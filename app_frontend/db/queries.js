@@ -25,7 +25,6 @@ export const CREATE_EVENT = `
         CreatedByID: $CreatedByID,
         Address: $Address,
         StartTimestamp: $StartTimestamp,
-        EventTypeID: et.UUID,
         Host: $Host,
         EventCreatedAt: $EventCreatedAt,
         Lon: $Lon,
@@ -92,6 +91,7 @@ export const FETCH_EVENTS_FOR_MAP = `
         event.EndTimestamp as EndTimestamp,
         event.EventName as EventName,
         event.UUID as UUID,
+        event.EventURL as EventURL,
         event.EventTypeUUID as EventTypeUUID,
         eventType.EventType as EventType,
         AttendeeCount;
@@ -179,13 +179,17 @@ export const GET_EVENT_INVITES = `
         e.Address as Address,
         e.EventName as EventName,
         e.Host as Host,
-        apoc.date.format(datetime(e.StartTimestamp).epochMillis, "ms", "hh:mm a") as FormattedStart,
+        e.EventType as EventType,
+        e.StartTimestamp as StartTimestamp,
         e.EndTimestamp as EndTimestamp,
+        e.EventURL as EventURL,
         e.UUID as EventNodeUUID,
         AttendeeCount
     ORDER BY r.INVITED_TIMESTAMP;
 
     `;
+        // apoc.date.format(datetime(e.StartTimestamp).epochMillis, "ms", "hh:mm a") as FormattedStart,
+        // apoc.date.format(datetime(e.EndTimestamp).epochMillis, "ms", "hh:mm a") as FormattedEnd,
 // e.StartTimestamp as StartTimestamp,
 
 export const RESPOND_TO_EVENT_INVITE = `

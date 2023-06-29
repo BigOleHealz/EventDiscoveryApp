@@ -71,12 +71,16 @@ const MapMarkerWithTooltip = ({
               <td style={tooltipStyles.label}>Event Type:</td>
               <td style={tooltipStyles.value}>{event.EventType}</td>
             </tr>
-            {/* <tr>
-              <td style={tooltipStyles.label}>Players:</td>
-              <td style={tooltipStyles.value}>
-                {event.AttendeeCount.toNumber()}
-              </td>
-            </tr> */}
+            {event.EventURL && (
+              <tr>
+                <td style={tooltipStyles.label}>Event URL:</td>
+                <td style={tooltipStyles.value}>
+                  <a href={event.EventURL} target="_blank" rel="noopener noreferrer" style={styles.hyperlinkText}>
+                    {event.EventURL}
+                  </a>
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </View>
