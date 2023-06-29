@@ -24,5 +24,8 @@ EventTypeID,EventType,UUID
 23,Games,
 24,Self-Improvement,
 25,Cooking Class,
+26,Trivia,
+27,Yoga,
+28,Dancing
 70,Dummy Event Type,f85a0fb0-d54f-4a9d-8d5f-8cf6066215e9
 
