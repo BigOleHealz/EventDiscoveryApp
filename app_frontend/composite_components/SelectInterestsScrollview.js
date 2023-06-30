@@ -6,24 +6,50 @@ import { GET_EVENT_TYPES } from '../db/queries';
 import { useCustomCypherRead } from '../hooks/CustomCypherHooks';
 import styles from '../styles';
 
-export const SelectInterestsScrollView = ({ eventTypesSelected, setEventTypesSelected }) => {
-
-
+export const SelectInterestsScrollView = ({
+  eventTypesSelected=[],
+  setEventTypesSelected,
+  singleSelect = false
+}) => {
     const [event_types, setEventTypes] = useState([]);
     const [first_run, setFirstRun] = useState(true);
 
     const handleValueChange = (index, newValue) => {
         console.log('handleValueChange:', index, newValue);
-        const updatedEventTypes = event_types.map((eventType, i) => {
-          if (i === index) {
-            return { ...eventType, isChecked: newValue };
+        if(singleSelect && newValue) {
+          let uncheckedEventTypes = event_types.map((eventType) => {
+            return { ...eventType, isChecked: false };
+          });
+      
+          let updatedEventTypes = uncheckedEventTypes.map((eventType, i) => {
+            if (i === index) {
+              return { ...eventType, isChecked: true };
+            }
+            return eventType;
+          });
+          
+          setEventTypes(updatedEventTypes);
+
+          const event_type_object = {
+            "EventTypeUUID": updatedEventTypes[index].UUID,
+            "EventType": updatedEventTypes[index].EventType
           }
-          return eventType;
-        });
-        setEventTypes(updatedEventTypes);
-        let checkedUUIDs = updatedEventTypes.filter(item => item.isChecked).map(item => item.UUID);
-        setEventTypesSelected(checkedUUIDs);
-        console.log('updatedEventTypes:', updatedEventTypes);
+          console.log('event_type_object:', event_type_object)
+          setEventTypesSelected(event_type_object)
+        } else {
+          // else follow the previous logic
+          const updatedEventTypes = event_types.map((eventType, i) => {
+            if (i === index) {
+              return { ...eventType, isChecked: newValue };
+            }
+            return eventType;
+          });
+      
+          setEventTypes(updatedEventTypes);
+          let checkedUUIDs = updatedEventTypes.filter(item => item.isChecked).map(item => item.UUID);
+          setEventTypesSelected(checkedUUIDs);
+          console.log('updatedEventTypes:', updatedEventTypes);
+        }
     };
 
     const {

@@ -20,35 +20,50 @@ export const CREATE_ACCOUNT_INTEREST_RELATIONSHIPS = `
     `;
 
 export const CREATE_EVENT = `
-    MATCH (et:EventType {EventType: 'Basketball'})
+    WITH apoc.date.format(apoc.date.currentTimestamp(), "ms", "yyyy-MM-dd'T'HH:mm:ss", "UTC") AS CURRENT_DATETIME
     CREATE (e:Event {
-        CreatedByID: $CreatedByID,
+        CreatedByUUID: $CreatedByUUID,
+        Lat: $Lat,
+        Lon: $Lon,
         Address: $Address,
         StartTimestamp: $StartTimestamp,
-        Host: $Host,
-        EventCreatedAt: $EventCreatedAt,
-        Lon: $Lon,
-        PublicEventFlag: $PublicEventFlag,
         EndTimestamp: $EndTimestamp,
+		EventTypeUUID: $EventTypeUUID,
+        EventType: $EventType,
+        Host: $Host,
+        EventCreatedAt: CURRENT_DATETIME,
+        PublicEventFlag: $PublicEventFlag,
         EventName: $EventName,
-        UUID: apoc.create.uuid(),
-        Lat: $Lat,
-		EventDescription: "Pickup Basketball Game",
-		EventTypeUUID: "3498fe08-5bbd-4a2d-b044-b10de51a5bfc"
+        UUID: $UUID,
+		EventDescription: $EventDescription,
+        Source: "Evently",
+        SourceEventID: $UUID
     })
+    WITH e, CURRENT_DATETIME
+        MERGE (et:EventType {UUID: $EventTypeUUID})
+        CREATE (et)-[:RELATED_EVENT {UUID: apoc.create.uuid()}]->(e)
+
+        MERGE (a:Account {UUID: $CreatedByUUID})
+        CREATE (a)-[:CREATED_EVENT {UUID: apoc.create.uuid()}]->(e)
+
+        FOREACH (InviteeUUID in $InvitedFriends |
+        MERGE (p:Person {UUID: InviteeUUID})
+        CREATE (p)-[:INVITED {INVITED_BY_UUID: $CreatedByUUID, INVITED_TIMESTAMP: CURRENT_DATETIME, STATUS: 'PENDING', UUID: apoc.create.uuid()}]->(e)
+    )
     RETURN
-		e.CreatedByID as CreatedByID,
+		e.CreatedByUUID as CreatedByUUID,
+		e.Lat as Lat,
+		e.Lon as Lon,
 		e.Address as Address,
 		e.StartTimestamp as StartTimestamp,
-		e.EventTypeID as EventTypeIDUUID,
+		e.EndTimestamp as EndTimestamp,
+		e.EventTypeUUID as EventTypeUUID,
+        e.EventType as EventType,
 		e.Host as Host,
 		e.EventCreatedAt as EventCreatedAt,
-		e.Lon as Lon,
 		e.PublicEventFlag as PublicEventFlag,
-		e.EndTimestamp as EndTimestamp,
 		e.EventName as EventName,
 		e.UUID as UUID,
-		e.Lat as Lat,
 		e.EventDescription as EventDescription,
 		e.EventTypeUUID;
     `;
@@ -67,6 +82,8 @@ export const INVITE_FRIENDS_TO_EVENT = `
     WITH e, $friend_invite_list AS friendInviteList
     UNWIND friendInviteList AS friendUUID
     MATCH (friend:Person {UUID: friendUUID})
+    WHERE NOT EXISTS((friend)-[:INVITED {INVITED_BY_UUID: $inviter_uuid, STATUS: "PENDING"}]->(e)) 
+    AND NOT EXISTS((friend)-[:INVITED {INVITED_BY_UUID: $inviter_uuid, STATUS: "ACCEPTED"}]->(e)) 
     MERGE (friend)-[:INVITED {INVITED_TIMESTAMP: apoc.date.format(apoc.date.currentTimestamp(), "ms", "yyyy-MM-dd'T'HH:mm:ss"), INVITED_BY_UUID: $inviter_uuid, STATUS: "PENDING", UUID: apoc.create.uuid()}]->(e)
     RETURN e;
     `;
@@ -83,7 +100,7 @@ export const FETCH_EVENTS_FOR_MAP = `
     
     RETURN
         event.Address as Address,
-        event.CreatedByID as CreatedByID,
+        event.CreatedByUUID as CreatedByUUID,
         event.Host as Host,
         event.Lon as Lon,
         event.Lat as Lat,

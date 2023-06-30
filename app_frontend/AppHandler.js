@@ -7,8 +7,8 @@ import { LoginPage } from './pages/LoginPage';
 import { HomePage } from './pages/HomePage';
 import { CreateAccountPage } from './pages/CreateAccountPage';
 
+import { UserSessionContext } from './utils/Contexts';
 import { getUserSession } from './utils/SessionManager';
-
 
 
 export function AppHandler() {
@@ -41,14 +41,16 @@ export function AppHandler() {
   return (
     <>
       <ToastContainer />
-      <Routes>
-        <Route
-          path="/"
-          element={<HomePage userSession={userSession} setUserSession={setUserSession} />} />
-        <Route path="/login" element={<LoginPage setUserSession={setUserSession} />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/create-account" element={<CreateAccountPage />} />
-      </Routes>
+        <UserSessionContext.Provider value={{ userSession, setUserSession }}>
+          <Routes>
+            <Route
+              path="/"
+              element={<HomePage/>}/>
+            <Route path="/login" element={<LoginPage/>}/>
+            <Route path="/forgot-password" element={<ForgotPassword/>}/>
+            <Route path="/create-account" element={<CreateAccountPage/>}/>
+          </Routes>
+        </UserSessionContext.Provider>
     </>
   );
 };

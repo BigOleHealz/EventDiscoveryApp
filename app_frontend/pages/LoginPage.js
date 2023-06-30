@@ -8,11 +8,14 @@ import { TextComponent } from '../base_components/TextComponent';
 import { TextInputComponent } from '../base_components/TextInputComponent';
 import { GET_USER_LOGIN_INFO } from '../db/queries';
 import { useCustomCypherRead } from '../hooks/CustomCypherHooks';
+import { UserSessionContext } from '../utils/Contexts';
 import { hashPassword } from '../utils/HelperFunctions'
 import { storeUserSession } from '../utils/SessionManager';
 import styles from '../styles';
 
-export function LoginPage({ setUserSession }) {
+export function LoginPage() {
+	const { userSession, setUserSession } = React.useContext(UserSessionContext);
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -51,6 +54,7 @@ export function LoginPage({ setUserSession }) {
         toast.error(`Multiple accounts with taht email & password combination exist`);
       } else {
         const user = login_status.RESPONSE.RECORDS[0];
+        user.TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
         storeUserSession(user);
         setUserSession(user);
         toast.success('Login Successful!');

@@ -68,7 +68,7 @@ const textInputStyles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 10,
     padding: 0,
-    marginBottom: 8,
+    margin: 10
   },
   input: {
     fontSize: 16,

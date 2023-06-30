@@ -7,6 +7,7 @@ import notificationsIcon from '../assets/notifications-icon.png';
 import { ButtonComponent } from '../base_components/ButtonComponent';
 import { EventInvitesPanel } from './EventInvitesPanel';
 import { FriendRequestsPanel } from './FriendRequestsPanel';
+import { UserSessionContext } from '../utils/Contexts';
 import styles from '../styles';
 
 export const Toolbar = ({
@@ -16,7 +17,6 @@ export const Toolbar = ({
   onEventInvitesButtonClick,
   isFriendRequestsPanelVisible,
   onFriendRequestsButtonClick,
-  userSession,
 }) => {
 
   const [toolbarHeight, setToolbarHeight] = useState(0);
@@ -26,12 +26,10 @@ export const Toolbar = ({
       <EventInvitesPanel
         isVisible={isEventInvitesPanelVisible}
         toolbarHeight={toolbarHeight}
-        userSession={userSession}
       />
       <FriendRequestsPanel
         isVisible={isFriendRequestsPanelVisible}
         toolbarHeight={toolbarHeight}
-        userSession={userSession}
       />
       <View
         testID="toolbar"
