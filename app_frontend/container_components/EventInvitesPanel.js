@@ -8,11 +8,16 @@ import { convertUTCDateToLocalDate } from '../utils/HelperFunctions';
 import { TopPanel } from '../composite_components/TopPanels';
 import { GET_EVENT_INVITES, RESPOND_TO_EVENT_INVITE } from '../db/queries';
 import { useCustomCypherRead, useCustomCypherWrite } from '../hooks/CustomCypherHooks';
+import { UserSessionContext } from '../utils/Contexts';
 import styles from '../styles';
 
-export const EventInvitesPanel = ({ isVisible, toolbarHeight, userSession }) => {
+export const EventInvitesPanel = ({
+	isVisible,
+	toolbarHeight,
+}) => {
 
 	const maxTopPanelHeight = Dimensions.get('window').height * 0.8;
+	const { userSession, setUserSession } = React.useContext(UserSessionContext);
 
 	//////////////////////////////////////////////////////////////////////////////////////////
 	// Load Event Invites Logic

@@ -15,11 +15,11 @@ export async function getAddressFromCoordinates(latitude, longitude, apiKey) {
       return address;
     } else {
       console.error('Geocoding API error:', data.error_message);
-      return null;
+      return '';
     }
   } catch (error) {
     console.error('Error fetching address:', error);
-    return null;
+    return '';
   }
 };
 

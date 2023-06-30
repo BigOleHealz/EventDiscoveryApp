@@ -7,11 +7,16 @@ import { TextInputComponent } from '../base_components/TextInputComponent';
 import { TopPanel } from '../composite_components/TopPanels';
 import { CREATE_FRIEND_REQUEST_RELATIONSHIP, GET_FRIEND_REQUESTS, RESPOND_TO_FRIEND_REQUEST } from '../db/queries';
 import { useCustomCypherRead, useCustomCypherWrite } from '../hooks/CustomCypherHooks';
+import { UserSessionContext } from '../utils/Contexts';
 import styles from '../styles.js'
 
-export const FriendRequestsPanel = ({ isVisible, toolbarHeight, userSession }) => {
+export const FriendRequestsPanel = ({
+	isVisible,
+	toolbarHeight,
+}) => {
 
 	const maxTopPanelHeight = Dimensions.get('window').height * 0.8;
+	const { userSession, setUserSession } = React.useContext(UserSessionContext);
 
 	//////////////////////////////////////////////////////////////////////////////////////////
 	// Load Friend Requests Logic

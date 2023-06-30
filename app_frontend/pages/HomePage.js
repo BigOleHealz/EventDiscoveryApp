@@ -6,14 +6,14 @@ import { format } from 'date-fns';
 
 import styles from '../styles';
 import { day_start_time, day_end_time, day_format } from '../utils/constants';
+import { UserSessionContext } from '../utils/Contexts';
 import { Toolbar } from '../container_components/Toolbar';
 import { Map } from '../container_components/Map';
 import { LeftSidePanel } from '../container_components/LeftSidePanel';
 
-export function HomePage({
-  userSession,
-  setUserSession
-}) {
+export function HomePage() {
+
+  const { userSession, setUserSession } = React.useContext(UserSessionContext);
 
   if (!userSession) {
     return null;
@@ -73,7 +73,7 @@ export function HomePage({
         onEventInvitesButtonClick={handleEventInvitesButtonClick}
         isFriendRequestsPanelVisible={isFriendRequestsPanelVisible}
         onFriendRequestsButtonClick={handleFriendRequestsButtonClick}
-        userSession={userSession}
+        // userSession={userSession}
       />
       <View style={styles.fullScreen}>
         <Map
@@ -82,8 +82,6 @@ export function HomePage({
           findGameSelectedDate={findGameSelectedDate}
           findGameStartTime={findGameStartTime}
           findGameEndTime={findGameEndTime}
-          userSession={userSession}
-          setUserSession={setUserSession}
           eventTypesSelected={event_types_selected}
         />
         <LeftSidePanel

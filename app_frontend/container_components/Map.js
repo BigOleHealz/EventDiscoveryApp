@@ -5,10 +5,11 @@ import { useReadCypher } from 'use-neo4j';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-import { CreateGameDateTimeModal, InviteFriendsToEventModal } from './Modals';
+import { CreateGameDateTimeModal, SelectEventTypeModal, InviteFriendsToEventModal, CreateEventDetailsModal } from './Modals';
 import { ButtonComponent } from '../base_components/ButtonComponent';
 import MapMarkerWithTooltip from './MapMarkerWithTooltip';
 
+import { CreateGameContext } from '../utils/Contexts';
 import { recordsAsObjects } from '../db/DBHandler';
 import {
   FETCH_EVENTS_FOR_MAP,
@@ -16,8 +17,9 @@ import {
 } from '../db/queries';
 import { useCustomCypherWrite } from '../hooks/CustomCypherHooks';
 import { getSecretValue } from '../utils/AWSHandler';
+import { UserSessionContext } from '../utils/Contexts';
 import { day_start_time, day_end_time } from '../utils/constants';
-import { convertUTCDateToLocalDate } from '../utils/HelperFunctions';
+import { getAddressFromCoordinates, convertUTCDateToLocalDate } from '../utils/HelperFunctions';
 
 import { removeUserSession } from '../utils/SessionManager';
 import pinIcon from '../assets/pin.png';
@@ -28,10 +30,9 @@ export const Map = ({
   findGameSelectedDate,
   findGameStartTime,
   findGameEndTime,
-  userSession,
-  setUserSession,
   eventTypesSelected
 }) => {
+	const { userSession, setUserSession } = React.useContext(UserSessionContext);
   // Handle Map
   const defaultCenter = {
     lat: 39.9526,
@@ -39,22 +40,16 @@ export const Map = ({
   };
 
   const [event_uuid, setEventUUID] = useState(null);
-  const [event_created, setEventCreated] = useState(false);
+  const [createGameData, setCreateGameData] = useState({});
 
-  const [
-    isCreateGameDateTimeModalVisible,
-    setIsCreateGameDateTimeModalVisible,
-  ] = useState(false);
-  const [
-    isCreateGameInviteFriendsModalVisible,
-    setIsInviteFriendsToEventModalVisible,
-  ] = useState(false);
+  const [ isCreateGameDateTimeModalVisible, setIsCreateGameDateTimeModalVisible ] = useState(false);
+  const [ isSelectEventTypeModalVisible, setIsSelectEventTypeModalVisible ] = useState(false);
+  const [ isCreateGameInviteFriendsModalVisible, setIsInviteFriendsToEventModalVisible ] = useState(false);
+  const [ isCreateEventDetailsModalVisible, setIsCreateEventDetailsModalVisible ] = useState(false);
 
-  // Handle Create Game vars
-  const [create_game_location, setCreateGameLocation] = useState(null);
+
   const [transactionStatus, setTransactionStatus] = useState(false);
 
-  // Attend Event
   const {
     transactionStatus: attend_event_status,
     executeQuery: run_attend_event,
@@ -72,10 +67,6 @@ export const Map = ({
       setIsInviteFriendsToEventModalVisible(true);
     }
   }, [attend_event_status]);
-
-  const resetCreateGameDetails = () => {
-    setCreateGameLocation(null);
-  };
 
   // Handle Map
   const [mapCenter, setMapCenter] = useState(defaultCenter);
@@ -139,7 +130,6 @@ export const Map = ({
   
     setMapEventsFiltered(filteredEvents);
   }, [findGameStartTime, findGameEndTime, map_events_full_day, eventTypesSelected]);
-  
 
   const [activePopup, setActivePopup] = useState(null);
   const handleSetActivePopup = (uuid) => {
@@ -150,9 +140,25 @@ export const Map = ({
     }
   };
 
-  const handleCreateGameSelectLocationClick = () => {
-    setCreateGameLocation(mapRef.current.getCenter().toJSON());
+  const handleCreateGameSelectLocationClick = async () => {
+    const location_selected = mapRef.current.getCenter().toJSON()
+    console.log('location_selected:', location_selected);
+    const lat = location_selected.lat;
+    const lon = location_selected.lng;
+    const address = await getAddressFromCoordinates(lat, lon, googleMapsApiKey);
+    
+    setCreateGameData({"Address": address, "Lat": lat, "Lon": lon});
+    console.log('createGameData:', createGameData);
     setIsCreateGameDateTimeModalVisible(!isCreateGameDateTimeModalVisible);
+  };
+
+  const exitCreateGameMode = () => {
+    setIsCreateGameMode(false);
+    setCreateGameData({});
+    setIsCreateGameDateTimeModalVisible(false);
+    setIsSelectEventTypeModalVisible(false);
+    setIsInviteFriendsToEventModalVisible(false);
+    setIsCreateEventDetailsModalVisible(false);
   };
 
   const logoutUser = () => {
@@ -207,49 +213,49 @@ export const Map = ({
               />
             ))}
         </GoogleMap>
-        {isCreateGameMode && (
-          <img
-            id="create-game-pin-marker"
-            src={pinIcon}
-            alt="Pin"
-            style={map_styles.pinStyle}
+        <CreateGameContext.Provider value={{ createGameData: createGameData, setCreateGameData }}>
+          {isCreateGameMode && (
+            <>
+              <img
+                id="create-game-pin-marker"
+                src={pinIcon}
+                alt="Pin"
+                style={map_styles.pinStyle}
+              />
+              <ButtonComponent
+                id="create-game-location-button"
+                onPress={handleCreateGameSelectLocationClick}
+                title="Set Game Location"
+                style={map_styles.bottomButtonStyle}
+              />
+            </>
+          )}
+          <CreateGameDateTimeModal
+            isVisible={isCreateGameDateTimeModalVisible}
+            setIsCreateGameDateTimeModalVisible={setIsCreateGameDateTimeModalVisible}
+            setIsSelectEventTypeModalVisible={setIsSelectEventTypeModalVisible}
+            onRequestClose={exitCreateGameMode}
           />
-        )}
-        {isCreateGameMode && (
-          <ButtonComponent
-            id="create-game-datetime-button"
-            onPress={handleCreateGameSelectLocationClick}
-            title="Set Game Location"
-            style={map_styles.bottomButtonStyle}
+          <SelectEventTypeModal
+            isVisible={isSelectEventTypeModalVisible}
+            setIsSelectEventTypeModalVisible={setIsSelectEventTypeModalVisible}
+            setIsInviteFriendsToEventModalVisible={setIsInviteFriendsToEventModalVisible}
+            onRequestClose={exitCreateGameMode}
           />
-        )}
-        <CreateGameDateTimeModal
-          isVisible={isCreateGameDateTimeModalVisible}
-          onRequestClose={() => setIsCreateGameDateTimeModalVisible(false)}
-          location={create_game_location}
-          googleMapsApiKey={googleMapsApiKey}
-          userSession={userSession}
-          setEventUUID={setEventUUID}
-          setIsCreateGameDateTimeModalVisible={
-            setIsCreateGameDateTimeModalVisible
-          }
-          setIsInviteFriendsToEventModalVisible={
-            setIsInviteFriendsToEventModalVisible
-          }
-          resetCreateGameDetails={resetCreateGameDetails}
-          setIsCreateGameMode={setIsCreateGameMode}
-        />
-        <InviteFriendsToEventModal
-          isVisible={isCreateGameInviteFriendsModalVisible}
-          setIsInviteFriendsToEventModalVisible={
-            setIsInviteFriendsToEventModalVisible
-          }
-          friendList={userSession.Friends}
-          eventUUID={event_uuid}
-          setEventUUID={setEventUUID}
-          onRequestClose={() => setIsInviteFriendsToEventModalVisible(false)}
-          userSession={userSession}
-        />
+          <InviteFriendsToEventModal
+            isVisible={isCreateGameInviteFriendsModalVisible}
+            setIsInviteFriendsToEventModalVisible={setIsInviteFriendsToEventModalVisible}
+            setIsCreateEventDetailsModalVisible={setIsCreateEventDetailsModalVisible}
+            onRequestClose={exitCreateGameMode}
+            isCreateGameMode={isCreateGameMode}
+            event_uuid={event_uuid}
+          />
+          <CreateEventDetailsModal
+            isVisible={isCreateEventDetailsModalVisible}
+            setIsCreateEventDetailsModalVisible={setIsCreateEventDetailsModalVisible}
+            onRequestClose={exitCreateGameMode}
+          />
+        </CreateGameContext.Provider>
       </LoadScript>
       <ButtonComponent
         title="Logout"
