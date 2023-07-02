@@ -120,14 +120,19 @@ export const Map = ({
       const eventTimestamp = new Date(event.StartTimestamp);
       const startTime = new Date(`${findGameSelectedDate}T${findGameStartTime}`);
       const endTime = new Date(`${findGameSelectedDate}T${findGameEndTime}`);
+
+      console.log('start_timestamp:', start_timestamp)
+      console.log('end_timestamp:', end_timestamp)
   
       return (
         eventTimestamp >= startTime &&
-        eventTimestamp <= endTime &&
-        eventTypesSelected.includes(event.EventTypeUUID)
+        eventTimestamp <= endTime
+        // &&
+        // eventTypesSelected.includes(event.EventTypeUUID)
       );
     });
-  
+    
+    console.log('filteredEvents:', filteredEvents)
     setMapEventsFiltered(filteredEvents);
   }, [findGameStartTime, findGameEndTime, map_events_full_day, eventTypesSelected]);
 
