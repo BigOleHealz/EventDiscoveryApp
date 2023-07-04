@@ -1,5 +1,4 @@
 import { format } from 'date-fns';
-import { zonedTimeToUtc, utcToZonedTime } from "date-fns-tz";
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, Text, ScrollView, CheckBox, Switch } from 'react-native';
 import { toast } from 'react-toastify';
@@ -26,68 +25,6 @@ import { useCustomCypherWrite } from '../hooks/CustomCypherHooks';
 import { CreateGameContext } from '../utils/Contexts';
 import styles from '../styles';
 
-export const CreateGameDateTimeModal = ({
-  isVisible,
-  onRequestClose,
-  setIsCreateGameDateTimeModalVisible,
-  setIsSelectEventTypeModalVisible,
-}) => {
-	const { userSession, setUserSession } = React.useContext(UserSessionContext);
-  const { createGameData, setCreateGameData } = React.useContext(CreateGameContext);
-
-  const currentDateInZonedTime = utcToZonedTime(new Date(), userSession.TimeZone);
-
-  const [ date_selected, setDateSelected ] = useState(format(currentDateInZonedTime, day_format));
-  const [ create_game_start_time, setCreateGameStartTime ] = useState(day_start_time);
-  const [ create_game_end_time, setCreateGameEndTime ] = useState(day_end_time);
-
-  const handleDateSelected = (date) => {
-    setDateSelected(date);
-  };
-
-  const handleSubmitButtonClick = () => {
-    const StartTimestampInUtc = zonedTimeToUtc(`${date_selected}T${create_game_start_time}`, userSession.TimeZone).toISOString().split('.')[0];
-    const EndTimestampInUtc = zonedTimeToUtc(`${date_selected}T${create_game_end_time}`, userSession.TimeZone).toISOString().split('.')[0];
-
-    setCreateGameData({
-      ...createGameData,
-      StartTimestamp: StartTimestampInUtc,
-      EndTimestamp: EndTimestampInUtc
-    });
-    setIsCreateGameDateTimeModalVisible(false);
-    setIsSelectEventTypeModalVisible(true);
-  };
-
-  return (
-    <ModalComponent
-      id="create-game-select-datetime-modal"
-      isVisible={isVisible}
-      onRequestClose={onRequestClose}
-      title="Select Date & Time"
-      menuButton={
-        <ButtonComponent
-          id="create-game-select-datetime-button"
-          title="Set Date & Time"
-          onPress={handleSubmitButtonClick}
-          style={styles.buttons.menu_button_styles}
-        />
-      }
-    >
-      <View>
-        <CalendarComponent
-          id="create-game-date-selector"
-          onDateSelected={handleDateSelected}
-        />
-        <TimeRangeSliderComponent
-          startTime={create_game_start_time}
-          setStartTime={setCreateGameStartTime}
-          endTime={create_game_end_time}
-          setEndTime={setCreateGameEndTime}
-        />
-      </View>
-    </ModalComponent>
-  );
-};
 
 export const SelectEventTypeModal = ({
   isVisible,

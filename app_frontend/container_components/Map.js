@@ -5,7 +5,6 @@ import { useReadCypher } from 'use-neo4j';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-import { CreateGameDateTimeModal, SelectEventTypeModal, InviteFriendsToEventModal, CreateEventDetailsModal } from './Modals';
 import { ButtonComponent } from '../base_components/ButtonComponent';
 import MapMarkerWithTooltip from './MapMarkerWithTooltip';
 
@@ -121,8 +120,6 @@ export const Map = ({
       const startTime = new Date(`${findGameSelectedDate}T${findGameStartTime}`);
       const endTime = new Date(`${findGameSelectedDate}T${findGameEndTime}`);
 
-      console.log('start_timestamp:', start_timestamp)
-      console.log('end_timestamp:', end_timestamp)
   
       return (
         eventTimestamp >= startTime &&
@@ -145,26 +142,7 @@ export const Map = ({
     }
   };
 
-  const handleCreateGameSelectLocationClick = async () => {
-    const location_selected = mapRef.current.getCenter().toJSON()
-    console.log('location_selected:', location_selected);
-    const lat = location_selected.lat;
-    const lon = location_selected.lng;
-    const address = await getAddressFromCoordinates(lat, lon, googleMapsApiKey);
-    
-    setCreateGameData({"Address": address, "Lat": lat, "Lon": lon});
-    console.log('createGameData:', createGameData);
-    setIsCreateGameDateTimeModalVisible(!isCreateGameDateTimeModalVisible);
-  };
 
-  const exitCreateGameMode = () => {
-    setIsCreateGameMode(false);
-    setCreateGameData({});
-    setIsCreateGameDateTimeModalVisible(false);
-    setIsSelectEventTypeModalVisible(false);
-    setIsInviteFriendsToEventModalVisible(false);
-    setIsCreateEventDetailsModalVisible(false);
-  };
 
   const logoutUser = () => {
     removeUserSession();
@@ -218,49 +196,6 @@ export const Map = ({
               />
             ))}
         </GoogleMap>
-        <CreateGameContext.Provider value={{ createGameData: createGameData, setCreateGameData }}>
-          {isCreateGameMode && (
-            <>
-              <img
-                id="create-game-pin-marker"
-                src={pinIcon}
-                alt="Pin"
-                style={map_styles.pinStyle}
-              />
-              <ButtonComponent
-                id="create-game-location-button"
-                onPress={handleCreateGameSelectLocationClick}
-                title="Set Game Location"
-                style={map_styles.bottomButtonStyle}
-              />
-            </>
-          )}
-          <CreateGameDateTimeModal
-            isVisible={isCreateGameDateTimeModalVisible}
-            setIsCreateGameDateTimeModalVisible={setIsCreateGameDateTimeModalVisible}
-            setIsSelectEventTypeModalVisible={setIsSelectEventTypeModalVisible}
-            onRequestClose={exitCreateGameMode}
-          />
-          <SelectEventTypeModal
-            isVisible={isSelectEventTypeModalVisible}
-            setIsSelectEventTypeModalVisible={setIsSelectEventTypeModalVisible}
-            setIsInviteFriendsToEventModalVisible={setIsInviteFriendsToEventModalVisible}
-            onRequestClose={exitCreateGameMode}
-          />
-          <InviteFriendsToEventModal
-            isVisible={isCreateGameInviteFriendsModalVisible}
-            setIsInviteFriendsToEventModalVisible={setIsInviteFriendsToEventModalVisible}
-            setIsCreateEventDetailsModalVisible={setIsCreateEventDetailsModalVisible}
-            onRequestClose={exitCreateGameMode}
-            isCreateGameMode={isCreateGameMode}
-            event_uuid={event_uuid}
-          />
-          <CreateEventDetailsModal
-            isVisible={isCreateEventDetailsModalVisible}
-            setIsCreateEventDetailsModalVisible={setIsCreateEventDetailsModalVisible}
-            onRequestClose={exitCreateGameMode}
-          />
-        </CreateGameContext.Provider>
       </LoadScript>
       <ButtonComponent
         title="Logout"
