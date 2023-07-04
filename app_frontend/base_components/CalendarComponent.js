@@ -1,11 +1,22 @@
 import React, { useState } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { Image, View, StyleSheet } from 'react-native';
 import { Calendar } from 'react-native-calendars';
+
+import leftArrowImage from '../assets/horizontal_arrow_left.png';
+import rightArrowImage from '../assets/horizontal_arrow_right.png';
 import styles from '../styles';
 
 export const CalendarComponent = ({ selected, onDateSelected, style }) => {
   const currentDate = new Date().toISOString().split('T')[0];
   const [selectedDate, setSelectedDate] = useState(selected || currentDate);
+
+  const renderArrow = (direction) => {
+    if (direction === 'left') {
+      return <Image source={leftArrowImage} style={calendar_styles.arrowStyle} />;
+    } else if (direction === 'right') {
+      return <Image source={rightArrowImage} style={calendar_styles.arrowStyle} />;
+    }
+  };
 
   return (
     <View style={calendar_styles.view}>
@@ -14,7 +25,7 @@ export const CalendarComponent = ({ selected, onDateSelected, style }) => {
         onDayPress={(day) => {
           setSelectedDate(day.dateString);
           console.log('Date Selected', day.dateString);
-          onDateSelected(day.dateString); // Pass the new selected date to the parent component
+          onDateSelected(day.dateString);
         }}
         markedDates={{
           [selectedDate]: {
@@ -23,6 +34,7 @@ export const CalendarComponent = ({ selected, onDateSelected, style }) => {
             selectedDotColor: 'orange',
           },
         }}
+        renderArrow={renderArrow}
         theme={calendar_styles.theme}
       />
     </View>
@@ -43,6 +55,10 @@ const calendar_styles = StyleSheet.create({
     todayTextColor: '#00adf5',
     dayTextColor: '#ddd',
     textDisabledColor: '#888',
-    monthTextColor: '#ddd',
+    monthTextColor: '#ddd'
   },
+  arrowStyle: {
+    width: 20,
+    height: 20,
+  }
 });

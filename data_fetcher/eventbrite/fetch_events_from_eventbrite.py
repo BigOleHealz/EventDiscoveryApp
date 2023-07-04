@@ -103,11 +103,11 @@ class EventbriteDataHandler:
             os.makedirs(directory_path)
     
     def download_homepages(self, state: str, city: str, date_str: str):
-        print("Downloading homepages")
+        print("Downloading homepages for {city} on {date_str} from eventbrite".format(city=city, date_str=date_str))
         homepages_output_directory = os.path.join(self.eventbrite_homepages_dir, city, date_str)
         os.makedirs(homepages_output_directory, exist_ok=True)
 
-        for page_no in range(1,3):
+        for page_no in range(1,5):
             try:
                 url = self.eventbrite_homepage_preformatted.format(state=state, city=city, page_no=page_no, date_str=date_str)
 
@@ -195,7 +195,6 @@ class EventbriteDataHandler:
 
                 try:
                     for script in scripts:
-                        # Check if script.string is not None before calling strip()
                         if script.string and script.string.strip().startswith('window.__SERVER_DATA__'):
                             script_text = script.string.strip().replace('window.__SERVER_DATA__ = ', '')
                             if script_text.endswith(';'):
@@ -279,10 +278,8 @@ class EventbriteDataHandler:
                     }
                     with open(full_path_event_data_json_file, 'w') as f:
                         f.write(json.dumps(error_data, indent=4))
-                        # f.write('\n')  # for newline after each JSON object
 
                 except Exception as e:
-                    
                     print(traceback.format_exc())
 
                     full_path_event_data_json_file = os.path.join(full_path_event_data_json_error_dir, event_filename)
@@ -298,8 +295,8 @@ class EventbriteDataHandler:
                 for date_str in date_list:
                     try:
 
-                        # self.download_homepages(state=location_dict["state"], city=location_dict["city"], date_str=date_str)
-                        # self.parse_homepages(city=location_dict["city"], date_str=date_str)
+                        self.download_homepages(state=location_dict["state"], city=location_dict["city"], date_str=date_str)
+                        self.parse_homepages(city=location_dict["city"], date_str=date_str)
                         self.parse_eventpages(city=location_dict["city"], date_str=date_str)
                     except Exception as e:
                         print(traceback.format_exc())
