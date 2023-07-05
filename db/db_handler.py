@@ -36,7 +36,7 @@ class Neo4jDB:
         return result
     
     def execute_query_with_params(self, query: str, params: dict):
-        self.logger.emit(f'Running {sys._getframe().f_code.co_name}:\n{query}')
+        # self.logger.emit(f'Running {sys._getframe().f_code.co_name}:\n{query}')
         tx = self.graph.begin()
         result = tx.run(query, params=params)
         tx.commit()

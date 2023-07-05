@@ -10,7 +10,7 @@ class Logger(logging.Logger):
     def __init__(self, log_group_name: str):
         super().__init__(name=log_group_name)
         
-        self.timestamp = datetime.now().strftime('%Y-%m-%dT%H-%M-%S')
+        self.timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
         self.log_group_name = log_group_name
         self.log_stream_name = self.timestamp
         
@@ -60,7 +60,7 @@ class Logger(logging.Logger):
         else:
             pass
     
-    def emit(self, msg: str):
+    def emit(self, msg: str, level: str = ''):
         try:
             self.cloudwatch_logs.put_log_events(
                 logGroupName=self.log_group_name,
@@ -68,9 +68,15 @@ class Logger(logging.Logger):
                 logEvents=[
                     {
                         'timestamp': int(round(time.time() * 1000)),
-                        'message': msg
+                        'message': f'[{level}] {msg}'
                     }
                 ]
             )
         except Exception as e:
             self.error("CloudWatchLogger.emit error: {}".format(e))
+
+    def info(self, msg: str):
+        self.emit(msg=msg, level='INFO')
+
+    def error(self, msg: str):
+        self.emit(msg=msg, level='ERROR')
