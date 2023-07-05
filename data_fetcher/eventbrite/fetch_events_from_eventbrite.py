@@ -81,10 +81,6 @@ class EventbriteDataHandler:
 
         response_text = response.choices[0].text.strip()
         response_json = json.loads(response_text)
-        # response_json['EVENT_TYPE_NAME'] = response_json['EVENT_TYPE_NAME'][0].upper() + response_json['EVENT_TYPE_NAME'][1:]
-        # response_json['EVENT_TYPE_NAME'] = response_json['EVENT_TYPE_NAME'].replace(" Event", "")
-        # if response_json['EVENT_TYPE_NAME'] == "Event":
-        #     response_json['EVENT_TYPE_NAME'] = "Generic"
         return response_json
     
     def __prepare_directory(self, directory_path):
@@ -98,12 +94,12 @@ class EventbriteDataHandler:
                     elif os.path.isdir(file_path):
                         shutil.rmtree(file_path)
                 except Exception as e:
-                    print(f"Failed to delete {file_path}. Reason: {e}")
+                    self.logger.error(f"Failed to delete {file_path}. Reason: {e}")
         else:
             os.makedirs(directory_path)
     
     def download_homepages(self, state: str, city: str, date_str: str):
-        print("Downloading homepages for {city} on {date_str} from eventbrite".format(city=city, date_str=date_str))
+        self.logger.info("Downloading homepages for {city} on {date_str} from eventbrite".format(city=city, date_str=date_str))
         homepages_output_directory = os.path.join(self.eventbrite_homepages_dir, city, date_str)
         os.makedirs(homepages_output_directory, exist_ok=True)
 
@@ -119,14 +115,14 @@ class EventbriteDataHandler:
                 
                 with open(full_file_path, 'w', encoding='utf-8') as f:
                     f.write(html_source)
-                print(f"Downloaded homepage for page no: {page_no}")
+                self.logger.info(f"Downloaded homepage for page no: {page_no}")
             except Exception as e:
-                print(f"Error Downloading Homepage {page_no}: {e}")
-                print(traceback.format_exc())
+                self.logger.error(f"Error Downloading Homepage {page_no}: {e}")
+                self.logger.error(traceback.format_exc())
                 import pdb; pdb.set_trace()
 
     def parse_homepages(self, city: str, date_str: str):
-        print(f"Parsing homepages for\nCity: {city}\nDate: {date_str}")
+        self.logger.info(f"Parsing homepages for\nCity: {city}\nDate: {date_str}")
         full_path_homepages__city_date_dir = os.path.join(self.eventbrite_homepages_dir, city, date_str)
         output_full_path_city_date_dir = os.path.join(self.eventbrite_eventpages_dir, city, date_str)
         
@@ -136,7 +132,7 @@ class EventbriteDataHandler:
             file_path = os.path.join(full_path_homepages__city_date_dir, filename)
 
             page_no = os.path.splitext(filename)[0].split("_")[1]
-            print(f"Parsing homepage for Page #: {page_no}")
+            self.logger.info(f"Parsing homepage for Page #: {page_no}")
         
             with open(file_path, 'r') as f:
                 html_source = f.read()
@@ -162,7 +158,7 @@ class EventbriteDataHandler:
 
 
     def parse_eventpages(self, city: str, date_str: str):
-        print(f"Parsing eventpages for {city} on {date_str}")
+        self.logger.info(f"Parsing eventpages for {city} on {date_str}")
 
         full_path_event_data_json_dir = os.path.join(self.eventbrite_event_data_json_dir, city, date_str)
         os.makedirs(os.path.dirname(full_path_event_data_json_dir), exist_ok=True)
@@ -280,7 +276,7 @@ class EventbriteDataHandler:
                         f.write(json.dumps(error_data, indent=4))
 
                 except Exception as e:
-                    print(traceback.format_exc())
+                    self.logger.error(traceback.format_exc())
 
                     full_path_event_data_json_file = os.path.join(full_path_event_data_json_error_dir, event_filename)
                     with open(full_path_event_data_json_file, 'w', encoding='utf-8') as f:
@@ -299,9 +295,9 @@ class EventbriteDataHandler:
                         self.parse_homepages(city=location_dict["city"], date_str=date_str)
                         self.parse_eventpages(city=location_dict["city"], date_str=date_str)
                     except Exception as e:
-                        print(traceback.format_exc())
+                        self.logger.error(traceback.format_exc())
             except Exception as e:
-                print(traceback.format_exc())
+                self.logger.error(traceback.format_exc())
 
 if __name__ == "__main__":
     handler = EventbriteDataHandler()
