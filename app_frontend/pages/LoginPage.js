@@ -8,13 +8,15 @@ import { TextComponent } from '../base_components/TextComponent';
 import { TextInputComponent } from '../base_components/TextInputComponent';
 import { GET_USER_LOGIN_INFO } from '../db/queries';
 import { useCustomCypherRead } from '../hooks/CustomCypherHooks';
-import { UserSessionContext } from '../utils/Contexts';
+import { LoggerContext, UserSessionContext } from '../utils/Contexts';
 import { hashPassword } from '../utils/HelperFunctions'
 import { storeUserSession } from '../utils/SessionManager';
 import styles from '../styles';
 
 export function LoginPage() {
+
 	const { userSession, setUserSession } = React.useContext(UserSessionContext);
+	const { logger, setLogger } = React.useContext(LoggerContext);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -39,25 +41,34 @@ export function LoginPage() {
   };
 
   const handleSubmit = () => {
+    logger.info(`Login attempt for email: ${email}`)
     const hashed_password = hashPassword(password);
     run_login({ email: email, hashed_password: hashed_password });
   };
 
   useEffect(() => {
     if (login_status.STATUS === 'ERROR') {
-      toast.error(`Error: ${login_status.RESPONSE}`);
-      console.log(login_status.RESPONSE);
+      const error_message = `Error: ${login_status.RESPONSE}`;
+      toast.error(error_message);
+      console.error(error_message);
+      logger.error(error_message);
     } else if (login_status.STATUS === 'SUCCESS') {
       if (login_status.RESPONSE.RECORD_COUNT === 0) {
-        toast.error(`Error: No account exists with that email & password combination.`);
+        const error_message = `Error: No account with email: ${email} exists`;
+        toast.error(error_message);
+        logger.error(error_message);
+
       } else if (login_status.RESPONSE.RECORD_COUNT > 1) {
-        toast.error(`Multiple accounts with taht email & password combination exist`);
+        const error_message = `Error: Multiple accounts with email: ${email} exist`;
+        toast.error(error_message);
+        logger.error(error_message);
       } else {
         const user = login_status.RESPONSE.RECORDS[0];
         user.TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
         storeUserSession(user);
         setUserSession(user);
         toast.success('Login Successful!');
+        logger.info(`Login Successful for email: ${email}`);
         resetLoginInfo();
       }
       reset_login_transaction_status();

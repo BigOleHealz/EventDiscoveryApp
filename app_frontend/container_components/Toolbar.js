@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { StyleSheet, View } from 'react-native';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -7,30 +7,16 @@ import notificationsIcon from '../assets/notifications-icon.png';
 import { ButtonComponent } from '../base_components/ButtonComponent';
 import { EventInvitesPanel } from './EventInvitesPanel';
 import { FriendRequestsPanel } from './FriendRequestsPanel';
-import { UserSessionContext } from '../utils/Contexts';
 import styles from '../styles';
 
 export const Toolbar = ({
   onLeftButtonClick,
-  onRightButtonClick,
-  isEventInvitesPanelVisible,
-  onEventInvitesButtonClick,
-  isFriendRequestsPanelVisible,
-  onFriendRequestsButtonClick,
 }) => {
 
   const [toolbarHeight, setToolbarHeight] = useState(0);
 
   return (
     <>
-      <EventInvitesPanel
-        isVisible={isEventInvitesPanelVisible}
-        toolbarHeight={toolbarHeight}
-      />
-      <FriendRequestsPanel
-        isVisible={isFriendRequestsPanelVisible}
-        toolbarHeight={toolbarHeight}
-      />
       <View
         testID="toolbar"
         style={toolbar_styles.toolbar}
@@ -40,13 +26,6 @@ export const Toolbar = ({
         }}
       >
         <ButtonComponent title="Find Games" onPress={onLeftButtonClick} style={toolbar_styles.toolbarButtonLeft} />
-        <View style={toolbar_styles.centerView}>
-          <View style={toolbar_styles.centeredButtonsContainer}>
-            <ButtonComponent icon={notificationsIcon} onPress={onEventInvitesButtonClick} style={toolbar_styles.centerButton} />
-            <ButtonComponent icon={friendsIcon} onPress={onFriendRequestsButtonClick} style={toolbar_styles.centerButton} />
-          </View>
-        </View>
-        <ButtonComponent title="Create Game" onPress={onRightButtonClick} style={toolbar_styles.toolbarButtonRight} />
       </View>
     </>
   );

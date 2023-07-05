@@ -38,3 +38,10 @@ export const convertUTCDateToLocalDate = (date) => {
   const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   return moment.utc(date).tz(userTimezone).format();
 }
+
+export function formatLogStreamNameDate() {
+  const d = new Date();
+  let formattedDate = d.toISOString();
+  formattedDate = formattedDate.replace(/:/g, '_').replace(/-/g, '_').replace('.', '_').replace('Z', '');
+  return formattedDate;
+};

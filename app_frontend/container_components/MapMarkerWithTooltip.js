@@ -4,6 +4,7 @@ import moment from 'moment';
 
 import { Marker, InfoWindow } from '@react-google-maps/api';
 import { ButtonComponent } from '../base_components/ButtonComponent';
+import { LoggerContext } from '../utils/Contexts';
 import { convertUTCDateToLocalDate } from '../utils/HelperFunctions';
 import '../css/custom-infowindow.css';
 import styles from '../styles';
@@ -12,13 +13,11 @@ const MapMarkerWithTooltip = ({
   event,
   activePopup,
   onSetActivePopup,
-  userSession,
-  onJoinGameButtonClick,
   setEventUUID,
-  setIsInviteFriendsToEventModalVisible,
 }) => {
   const [showTooltip, setShowTooltip] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
+  const { logger, setLogger } = React.useContext(LoggerContext);
 
   const position = { lat: event.Lat, lng: event.Lon };
 
@@ -37,17 +36,10 @@ const MapMarkerWithTooltip = ({
   };
 
   const handleMarkerClick = () => {
+    logger.info(`Marker clicked for event: ${event.UUID}\nEvent Name: ${event.EventName}`);
     onSetActivePopup(event.UUID);
   };
 
-  const handleJoinGameButtonClick = (eventUUID) => {
-    console.log('handleJoinGameButtonClick', eventUUID);
-    onJoinGameButtonClick({
-      attendee_uuid: userSession.UUID,
-      event_uuid: eventUUID,
-    });
-    setEventUUID(eventUUID);
-  };
 
   const renderInfoContent = () => {
     return (
@@ -103,13 +95,6 @@ const MapMarkerWithTooltip = ({
         <InfoWindow onCloseClick={handleMarkerClick}>
           <div style={tooltipStyles.container}>
             {renderInfoContent()}
-            <div>
-              <ButtonComponent
-                onPress={() => handleJoinGameButtonClick(event.UUID)}
-                title="Join Game"
-                style={tooltipStyles.buttonStyle}
-              />
-            </div>
           </div>
         </InfoWindow>
       )}

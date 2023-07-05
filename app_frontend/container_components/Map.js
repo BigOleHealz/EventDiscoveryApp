@@ -16,7 +16,7 @@ import {
 } from '../db/queries';
 import { useCustomCypherWrite } from '../hooks/CustomCypherHooks';
 import { getSecretValue } from '../utils/AWSHandler';
-import { UserSessionContext } from '../utils/Contexts';
+import { LoggerContext, UserSessionContext } from '../utils/Contexts';
 import { day_start_time, day_end_time } from '../utils/constants';
 import { getAddressFromCoordinates, convertUTCDateToLocalDate } from '../utils/HelperFunctions';
 
@@ -24,14 +24,17 @@ import { removeUserSession } from '../utils/SessionManager';
 import pinIcon from '../assets/pin.png';
 
 export const Map = ({
-  isCreateGameMode,
-  setIsCreateGameMode,
   findGameSelectedDate,
   findGameStartTime,
   findGameEndTime,
   eventTypesSelected
 }) => {
-	const { userSession, setUserSession } = React.useContext(UserSessionContext);
+  const { userSession, setUserSession } = React.useContext(UserSessionContext);
+  const { logger, setLogger } = React.useContext(LoggerContext);
+
+  // Start logging
+  logger.info("Map component is initializing...");
+
   // Handle Map
   const defaultCenter = {
     lat: 39.9526,
@@ -39,6 +42,7 @@ export const Map = ({
   };
 
   const [event_uuid, setEventUUID] = useState(null);
+  const [activePopup, setActivePopup] = useState(null);
   const [createGameData, setCreateGameData] = useState({});
 
   const [ isCreateGameDateTimeModalVisible, setIsCreateGameDateTimeModalVisible ] = useState(false);
@@ -49,23 +53,6 @@ export const Map = ({
 
   const [transactionStatus, setTransactionStatus] = useState(false);
 
-  const {
-    transactionStatus: attend_event_status,
-    executeQuery: run_attend_event,
-    resetTransactionStatus: reset_attend_event_transaction_status,
-  } = useCustomCypherWrite(CREATE_ATTEND_EVENT_RELATIONSHIP);
-
-  useEffect(() => {
-    if (attend_event_status.STATUS === 'ERROR') {
-      toast.error(`Error Creating Account: ${attend_event_status.RESPONSE}`);
-      console.log(attend_event_status.RESPONSE);
-      reset_attend_event_transaction_status();
-    } else if (attend_event_status.STATUS === 'SUCCESS') {
-      toast.success("You RSVP'd to this event!");
-      reset_attend_event_transaction_status();
-      setIsInviteFriendsToEventModalVisible(true);
-    }
-  }, [attend_event_status]);
 
   // Handle Map
   const [mapCenter, setMapCenter] = useState(defaultCenter);
@@ -96,31 +83,33 @@ export const Map = ({
   const { loading, error, records, run } = useReadCypher(FETCH_EVENTS_FOR_MAP);
 
   useEffect(() => {
-    console.log('findGameSelectedDate changed', findGameSelectedDate);
+    logger.info('findGameSelectedDate changed', findGameSelectedDate);
     const params = {
       account_uuid: userSession.UUID,
       start_timestamp: start_timestamp,
       end_timestamp: end_timestamp,
     };
-    console.log('params:', params);
+    logger.info('params:', params);
     run(params);
   }, [findGameSelectedDate, event_uuid, transactionStatus === false]);
 
   useEffect(() => {
     if (!loading && !error && records) {
       const mapEventsObjectList = recordsAsObjects(records);
-      console.log('records_fetch_events_for_map:', mapEventsObjectList);
+      logger.info('records_fetch_events_for_map:', mapEventsObjectList);
       setMapEventsFullDay(mapEventsObjectList);
     }
   }, [loading, error, records]);
 
   useEffect(() => {
+    const start_time_raw_string = `${findGameSelectedDate}T${findGameStartTime}`
+    const end_time_raw_string = `${findGameSelectedDate}T${findGameEndTime}`
+    logger.info(`Datetime changed - startTime: ${start_time_raw_string} endTime: ${end_time_raw_string}`);
+    const startTime = new Date(start_time_raw_string);
+    const endTime = new Date(end_time_raw_string);
+
     const filteredEvents = map_events_full_day.filter((event) => {
       const eventTimestamp = new Date(event.StartTimestamp);
-      const startTime = new Date(`${findGameSelectedDate}T${findGameStartTime}`);
-      const endTime = new Date(`${findGameSelectedDate}T${findGameEndTime}`);
-
-  
       return (
         eventTimestamp >= startTime &&
         eventTimestamp <= endTime
@@ -129,11 +118,12 @@ export const Map = ({
       );
     });
     
-    console.log('filteredEvents:', filteredEvents)
+    logger.info('filteredEvents:', filteredEvents)
     setMapEventsFiltered(filteredEvents);
   }, [findGameStartTime, findGameEndTime, map_events_full_day, eventTypesSelected]);
 
-  const [activePopup, setActivePopup] = useState(null);
+
+
   const handleSetActivePopup = (uuid) => {
     if (activePopup === uuid) {
       setActivePopup(null);
@@ -143,19 +133,22 @@ export const Map = ({
   };
 
 
-
   const logoutUser = () => {
+    logger.info("User logging out...");
     removeUserSession();
     setUserSession(null);
   };
 
   if (!googleMapsApiKey) {
+    logger.warning("Google Maps API key not found, rendering loading screen...");
     return (
       <View>
         <Text>Loading...</Text>
       </View>
     );
   }
+
+  logger.info("Rendering Map component...");
 
   return (
     <>
@@ -187,12 +180,7 @@ export const Map = ({
                 event={event}
                 activePopup={activePopup}
                 onSetActivePopup={handleSetActivePopup}
-                userSession={userSession}
-                onJoinGameButtonClick={run_attend_event}
                 setEventUUID={setEventUUID}
-                setIsInviteFriendsToEventModalVisible={
-                  setIsInviteFriendsToEventModalVisible
-                }
               />
             ))}
         </GoogleMap>

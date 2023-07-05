@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Image, View, StyleSheet } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 
+import { LoggerContext } from '../utils/Contexts';
 import leftArrowImage from '../assets/horizontal_arrow_left.png';
 import rightArrowImage from '../assets/horizontal_arrow_right.png';
 import styles from '../styles';
@@ -9,6 +10,7 @@ import styles from '../styles';
 export const CalendarComponent = ({ selected, onDateSelected, style }) => {
   const currentDate = new Date().toISOString().split('T')[0];
   const [selectedDate, setSelectedDate] = useState(selected || currentDate);
+  const { logger, setLogger } = React.useContext(LoggerContext);
 
   const renderArrow = (direction) => {
     if (direction === 'left') {
@@ -24,7 +26,7 @@ export const CalendarComponent = ({ selected, onDateSelected, style }) => {
         style={style} // Merge the default styles with the passed-in style
         onDayPress={(day) => {
           setSelectedDate(day.dateString);
-          console.log('Date Selected', day.dateString);
+          logger.info(`Date Selected: ${day.dateString}`);
           onDateSelected(day.dateString);
         }}
         markedDates={{

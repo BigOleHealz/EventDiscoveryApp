@@ -22,7 +22,6 @@ export const LeftSidePanel = ({
 }) => {
 
   const handleDateSelected = (date) => {
-    console.log('Left side panel selected date:', date);
     setFindGameSelectedDate(date);
     setFindGameStartTime(day_start_time);
     setFindGameEndTime(day_end_time);
