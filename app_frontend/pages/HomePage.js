@@ -1,12 +1,12 @@
 // HomePage.js
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View } from 'react-native';
 import { format } from 'date-fns';
 
 import styles from '../styles';
 import { day_start_time, day_end_time, day_format } from '../utils/constants';
-import { UserSessionContext } from '../utils/Contexts';
+import { LoggerContext, UserSessionContext } from '../utils/Contexts';
 import { Toolbar } from '../container_components/Toolbar';
 import { Map } from '../container_components/Map';
 import { LeftSidePanel } from '../container_components/LeftSidePanel';
@@ -45,57 +45,31 @@ export function HomePage() {
     setIsLeftPanelVisible(!isLeftPanelVisible);
   };
 
-  // Handle Modal
-  const handleCreateGameButtonClick = () => {
-    console.log('Create Game button clicked');
-    resetAllStates();
-    setIsCreateGameMode(!isCreateGameMode);
-  };
-
-  const handleEventInvitesButtonClick = () => {
-    resetAllStates();
-    setIsEventInvitesPanelVisible(!isEventInvitesPanelVisible);
-    console.log("Notification button clicked")
-  };
-
-  const handleFriendRequestsButtonClick = () => {
-    resetAllStates();
-    setIsFriendRequestsPanelVisible(!isFriendRequestsPanelVisible);
-    console.log("Friends button clicked")
-  };
 
   return (
     <View style={styles.container}>
-      <Toolbar
-        onLeftButtonClick={handleFindGamesButtonClick}
-        onRightButtonClick={handleCreateGameButtonClick}
-        isEventInvitesPanelVisible={isEventInvitesPanelVisible}
-        onEventInvitesButtonClick={handleEventInvitesButtonClick}
-        isFriendRequestsPanelVisible={isFriendRequestsPanelVisible}
-        onFriendRequestsButtonClick={handleFriendRequestsButtonClick}
-        // userSession={userSession}
-      />
-      <View style={styles.fullScreen}>
-        <Map
-          isCreateGameMode={isCreateGameMode}
-          setIsCreateGameMode={setIsCreateGameMode}
-          findGameSelectedDate={findGameSelectedDate}
-          findGameStartTime={findGameStartTime}
-          findGameEndTime={findGameEndTime}
-          eventTypesSelected={event_types_selected}
+        <Toolbar
+          onLeftButtonClick={handleFindGamesButtonClick}
         />
-        <LeftSidePanel
-          isVisible={isLeftPanelVisible}
-          findGameSelectedDate={findGameSelectedDate}
-          setFindGameSelectedDate={setFindGameSelectedDate}
-          findGameStartTime={findGameStartTime}
-          setFindGameStartTime={setFindGameStartTime}
-          findGameEndTime={findGameEndTime}
-          setFindGameEndTime={setFindGameEndTime}
-          eventTypesSelected={event_types_selected}
-          setEventTypesSelected={setEventTypesSelected}
-        />
-      </View>
+        <View style={styles.fullScreen}>
+          <Map
+            findGameSelectedDate={findGameSelectedDate}
+            findGameStartTime={findGameStartTime}
+            findGameEndTime={findGameEndTime}
+            eventTypesSelected={event_types_selected}
+          />
+          <LeftSidePanel
+            isVisible={isLeftPanelVisible}
+            findGameSelectedDate={findGameSelectedDate}
+            setFindGameSelectedDate={setFindGameSelectedDate}
+            findGameStartTime={findGameStartTime}
+            setFindGameStartTime={setFindGameStartTime}
+            findGameEndTime={findGameEndTime}
+            setFindGameEndTime={setFindGameEndTime}
+            eventTypesSelected={event_types_selected}
+            setEventTypesSelected={setEventTypesSelected}
+          />
+        </View>
     </View>
   );
 }

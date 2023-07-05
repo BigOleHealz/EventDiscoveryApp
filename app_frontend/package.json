@@ -9,6 +9,7 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@aws-sdk/client-cloudwatch-logs": "^3.363.0",
     "@aws-sdk/client-secrets-manager": "^3.321.1",
     "@aws-sdk/client-ses": "^3.329.0",
     "@expo/webpack-config": "^18.0.1",
