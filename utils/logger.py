@@ -61,6 +61,8 @@ class Logger(logging.Logger):
             pass
     
     def emit(self, msg: str, level: str = ''):
+        msg_formatted = f'[{level}] {msg}' if level else msg
+        print(msg_formatted)
         try:
             self.cloudwatch_logs.put_log_events(
                 logGroupName=self.log_group_name,
@@ -68,7 +70,7 @@ class Logger(logging.Logger):
                 logEvents=[
                     {
                         'timestamp': int(round(time.time() * 1000)),
-                        'message': f'[{level}] {msg}'
+                        'message': msg_formatted
                     }
                 ]
             )
