@@ -7,12 +7,12 @@ from botocore.exceptions import ClientError
 
 class Logger(logging.Logger):
 
-    def __init__(self, log_group_name: str):
+    def __init__(self, log_group_name: str, log_stream_name: str = None):
         super().__init__(name=log_group_name)
         
-        self.timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
+        self.timestamp = datetime.now().strftime('%Y-%m-%dT%H-%M-%S')
         self.log_group_name = log_group_name
-        self.log_stream_name = self.timestamp
+        self.log_stream_name = log_stream_name if log_stream_name else self.timestamp
         
         self.cloudwatch_logs = boto3.client('logs')
 
@@ -77,6 +77,15 @@ class Logger(logging.Logger):
 
     def info(self, msg: str):
         self.emit(msg=msg, level='INFO')
+
+    def debug(self, msg: str):
+        self.emit(msg=msg, level='DEBUG')
+
+    def warning(self, msg: str):
+        self.emit(msg=msg, level='WARNING')
+        
+    def critical(self, msg: str):
+        self.emit(msg=msg, level='CRITICAL')
 
     def error(self, msg: str):
         self.emit(msg=msg, level='ERROR')
