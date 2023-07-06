@@ -12,6 +12,8 @@ home = os.path.dirname(parent)
 sys.path.append(home)
 
 from db.db_handler import Neo4jDB
+from db import queries
+from utils.aws_handler import AWSHandler
 from utils.logger import Logger
 from utils.helper_functions import HelperFunctions
 from utils.logger import Logger
@@ -27,33 +29,23 @@ location_dicts_list = [
 
 class EventbriteDataHandler:
     def __init__(self):
-        self.logger = Logger(__name__)
+        self.logger = Logger(log_group_name="data_ingestion/eventbrite")
         self.neo4j = Neo4jDB(logger=self.logger)
+        self.aws_handler = AWSHandler(logger=self.logger)
     
-        # self.tzinfos = {"EDT": tzoffset("EDT", -4 * 3600)}
-
-        self.logger = Logger(__name__)
         self.helper_functions = HelperFunctions(logger=self.logger)
         openai.api_key = self.helper_functions.get_open_ai_api_key()
 
         self.eventbrite_homepage_preformatted = "https://www.eventbrite.com/d/{state}--{city}/all-events/?page={page_no}&start_date={date_str}&end_date={date_str}"
         self.event_data_script_type = "application/ld+json"
 
-
-        self.logger = Logger(__name__)
         self.helper_functions = HelperFunctions(logger=self.logger)
 
-        self.eventbrite_events_dir = os.getcwd()
-        
-        self.eventbrite_homepages_dir = os.path.join(
-            self.eventbrite_events_dir, "homepages"
-        )
-        self.eventbrite_eventpages_dir = os.path.join(
-            self.eventbrite_events_dir, "eventpages"
-        )
-        self.eventbrite_event_data_json_dir = os.path.join(
-            self.eventbrite_events_dir, "event_data_json"
-        )
+        self.bucket_name = "evently-data-scraper"
+        self.eventbrite_root_dir = 'eventbrite'
+        self.eventbrite_homepages_dir = os.path.join(self.eventbrite_root_dir, 'homepages')
+        self.eventbrite_eventpages_dir = os.path.join(self.eventbrite_root_dir, 'eventpages')
+        self.eventbrite_event_data_json_dir = os.path.join(self.eventbrite_root_dir, 'event_data_json')
 
         self.eventbrite_date_format = '%Y-%m-%dT%H:%M:%SZ'
 
@@ -65,7 +57,6 @@ class EventbriteDataHandler:
         self.event_type_mappings = self.neo4j.get_event_type_mappings()
         self.event_type_choices = [rec['EventType'] for rec in self.event_type_mappings]
         self.event_type_choices_mappings_uuid_to_eventtype = {rec['EventType']: rec['UUID'] for rec in self.event_type_mappings}
-        
     
     def categorize_event(self, event_data: dict, choices: list):
         prompt = f'''respond to the following prompt with the format `{{"MATCHED": (true|false), "CONFIDENCE_LEVEL":<confidence_level>,
@@ -100,200 +91,231 @@ class EventbriteDataHandler:
     
     def download_homepages(self, state: str, city: str, date_str: str):
         self.logger.info("Downloading homepages for {city} on {date_str} from eventbrite".format(city=city, date_str=date_str))
-        homepages_output_directory = os.path.join(self.eventbrite_homepages_dir, city, date_str)
-        os.makedirs(homepages_output_directory, exist_ok=True)
+        key_prefix = os.path.join(self.eventbrite_homepages_dir, date_str, city)
 
         for page_no in range(1,5):
             try:
-                url = self.eventbrite_homepage_preformatted.format(state=state, city=city, page_no=page_no, date_str=date_str)
+                output_file_key = os.path.join(key_prefix, f"homepage_{page_no}.html")
 
-                output_file_name = f"homepage_{page_no}.html"
-                full_file_path = os.path.join(homepages_output_directory, output_file_name)
+                file_exists_boolean = self.aws_handler.check_if_s3_file_exists(bucket=self.bucket_name, key=output_file_key)
+                if file_exists_boolean:
+                    self.logger.info(f"File {output_file_key} already exists in S3. Skipping...")
+                    continue
+                url = self.eventbrite_homepage_preformatted.format(state=state, city=city, page_no=page_no, date_str=date_str)
 
                 self.driver.get(url)
                 html_source = self.driver.page_source
+                self.aws_handler.write_to_s3(bucket=self.bucket_name, key=output_file_key, data=html_source)
                 
-                with open(full_file_path, 'w', encoding='utf-8') as f:
-                    f.write(html_source)
-                self.logger.info(f"Downloaded homepage for page no: {page_no}")
+                self.logger.info(f"Downloaded homepage from eventbrite:\nCity: {city}\nDate: {date_str}\nPage No: {page_no}")
             except Exception as e:
+                print(traceback.format_exc())
                 self.logger.error(f"Error Downloading Homepage {page_no}: {e}")
                 self.logger.error(traceback.format_exc())
                 import pdb; pdb.set_trace()
 
     def parse_homepages(self, city: str, date_str: str):
         self.logger.info(f"Parsing homepages for\nCity: {city}\nDate: {date_str}")
-        full_path_homepages__city_date_dir = os.path.join(self.eventbrite_homepages_dir, city, date_str)
-        output_full_path_city_date_dir = os.path.join(self.eventbrite_eventpages_dir, city, date_str)
-        
-        os.makedirs(os.path.dirname(output_full_path_city_date_dir), exist_ok=True)
+        input_key_prefix = os.path.join(self.eventbrite_homepages_dir, date_str, city)
+        file_list = [rec['Key'] for rec in self.aws_handler.list_files_in_s3_prefix_recursive(bucket=self.bucket_name, prefix=input_key_prefix)['Contents']]
 
-        for filename in os.listdir(full_path_homepages__city_date_dir):
-            file_path = os.path.join(full_path_homepages__city_date_dir, filename)
+        for filename in file_list:
 
-            page_no = os.path.splitext(filename)[0].split("_")[1]
+            page_no = os.path.splitext(filename.split('/')[-1])[0].split("_")[1]
+            output_key_prefix = os.path.join(self.eventbrite_eventpages_dir, date_str, city, page_no)
+            
             self.logger.info(f"Parsing homepage for Page #: {page_no}")
-        
-            with open(file_path, 'r') as f:
-                html_source = f.read()
+            html_source = self.aws_handler.read_from_s3(bucket=self.bucket_name, key=filename)
 
             soup = BeautifulSoup(html_source, 'lxml')
             scripts = soup.find_all('script', attrs={'type': self.event_data_script_type})
 
-            output_full_path_city_date_page_no_dir = os.path.join(output_full_path_city_date_dir, page_no)
-            self.__prepare_directory(output_full_path_city_date_page_no_dir)
-
             for i, script in enumerate(scripts):
-                event_data_raw = json.loads(script.string)
+                output_file_key = os.path.join(output_key_prefix, f"event_{i}.html")
+
+                file_exists_boolean = self.aws_handler.check_if_s3_file_exists(bucket=self.bucket_name, key=output_file_key)
+                if file_exists_boolean:
+                    self.logger.info(f"File {output_file_key} already exists in S3. Skipping...")
+                    continue
                 
+                event_data_raw = json.loads(script.string)
                 url = event_data_raw['url']
                 self.driver.get(url)
                 html_source = self.driver.page_source
 
-                output_file_name = f"event_{i}.html"
-                full_file_path = os.path.join(output_full_path_city_date_page_no_dir, output_file_name)
-
-                with open(full_file_path, 'w', encoding='utf-8') as f:
-                    f.write(html_source)
-
+                self.aws_handler.write_to_s3(bucket=self.bucket_name, key=output_file_key, data=html_source)
 
     def parse_eventpages(self, city: str, date_str: str):
-        self.logger.info(f"Parsing eventpages for {city} on {date_str}")
+        self.logger.info(f"Parsing eventpages for\nCity: {city}\nDate: {date_str}")
 
-        full_path_event_data_json_dir = os.path.join(self.eventbrite_event_data_json_dir, city, date_str)
-        os.makedirs(os.path.dirname(full_path_event_data_json_dir), exist_ok=True)
+        eventpages_date_city_prefix = os.path.join(self.eventbrite_eventpages_dir, date_str, city)
+        event_data_json_prefix = os.path.join(self.eventbrite_event_data_json_dir, date_str, city)
 
-        full_path_location_date_dir = os.path.join(self.eventbrite_eventpages_dir, city, date_str)
-        for page_no in os.listdir(full_path_location_date_dir):
+        file_list = [rec['Key'] for rec in self.aws_handler.list_files_in_s3_prefix_recursive(bucket=self.bucket_name, prefix=eventpages_date_city_prefix)['Contents']]
 
-            full_path_page_no_dir = os.path.join(full_path_location_date_dir, page_no)
+        for file_key in file_list:
+            page_no = file_key.split('/')[-2]
 
-            full_path_event_json_data_city_date_pageno = os.path.join(full_path_event_data_json_dir, page_no)
-            full_path_event_data_json_error_dir = os.path.join(full_path_event_json_data_city_date_pageno, "error")
-            full_path_event_data_json_success_dir = os.path.join(full_path_event_json_data_city_date_pageno, "success")
-            full_path_event_data_json_success_matched_dir = os.path.join(full_path_event_data_json_success_dir, "matched")
-            full_path_event_data_json_success_unmatched_dir = os.path.join(full_path_event_data_json_success_dir, "unmatched")
-            
-            os.makedirs(full_path_event_data_json_error_dir, exist_ok=True)
-            os.makedirs(full_path_event_data_json_success_dir, exist_ok=True)
-            os.makedirs(full_path_event_data_json_success_matched_dir, exist_ok=True)
-            os.makedirs(full_path_event_data_json_success_unmatched_dir, exist_ok=True)
+            event_json_data_page_no_prefix = os.path.join(event_data_json_prefix, page_no)
+            event_data_json_error_prefix = os.path.join(event_json_data_page_no_prefix, "error")
+            event_data_json_success_prefix = os.path.join(event_json_data_page_no_prefix, "success")
+            event_data_json_success_matched_prefix = os.path.join(event_data_json_success_prefix, "matched")
+            event_data_json_success_unmatched_prefix = os.path.join(event_data_json_success_prefix, "unmatched")
 
-            for filename in os.listdir(full_path_page_no_dir):
+            event_filename = f"{os.path.splitext(file_key.split('/')[-1])[0]}.json"
+            full_file_key_matched = os.path.join(event_data_json_success_matched_prefix, event_filename)
 
-                full_path_file = os.path.join(full_path_page_no_dir, filename)
-                with open(full_path_file, 'r') as f:
-                    html_source = f.read()
-                soup = BeautifulSoup(html_source, 'lxml')
+            file_exists_boolean = self.aws_handler.check_if_s3_file_exists(bucket=self.bucket_name, key=full_file_key_matched)
+            if file_exists_boolean:
+                self.logger.info(f"File {full_file_key_matched} already exists in S3. Skipping...")
+                continue
 
-                scripts = soup.find_all('script')
-                event_filename = f"{os.path.splitext(filename)[0]}.json"
+            html_source = self.aws_handler.read_from_s3(bucket=self.bucket_name, key=file_key)
+            soup = BeautifulSoup(html_source, 'lxml')
+            scripts = soup.find_all('script')
+
+            try:
+                for script in scripts:
+                    if script.string and script.string.strip().startswith('window.__SERVER_DATA__'):
+                        script_text = script.string.strip().replace('window.__SERVER_DATA__ = ', '')
+                        if script_text.endswith(';'):
+                            script_text = script_text[:-1]
+                        event_data_dict_raw = json.loads(script_text)
+
+                        location_details = event_data_dict_raw["components"]["eventMap"]
+                        structured_content = event_data_dict_raw["components"]["eventDescription"]["structuredContent"]
+
+                        event_description = ''
+                        for module in structured_content['modules']:
+                            if 'text' in module:
+                                event_description = module['text']
+                                break
+                        
+                        event_page_url = ''
+                        for module in structured_content['modules']:
+                            if 'url' in module:
+                                event_page_url = module['url']
+                                break
+                        
+                        image_url = ''
+                        for widget in structured_content['widgets']:
+                            for slide in widget['data']['slides']:
+                                image_dict = slide['image']
+                                if 'url' in image_dict:
+                                    image_url = image_dict['url']
+                                    break
+                            if image_url != '':
+                                break
+
+                        event_data_dict = {
+                            "StartTimestamp" : event_data_dict_raw["event"]["start"]["utc"].replace("Z", ""),
+                            "EndTimestamp" : event_data_dict_raw["event"]["end"]["utc"].replace("Z", ""),
+                            "EventName" : event_data_dict_raw["event"]["name"],
+                            "Source" : "eventbrite",
+                            "SourceEventID": int(event_data_dict_raw["event"]["id"]),
+                            "EventURL": event_data_dict_raw["event"]["url"],
+                            "Lon" : location_details["location"]["longitude"],
+                            "Lat" : location_details["location"]["latitude"],
+                            "Address" : location_details["venueAddress"],
+                            "Host" : location_details["venueName"],
+                            "PublicEventFlag" : True,
+                            "EventDescription" : event_description,
+                            "Summary" : event_data_dict_raw['components']['eventDescription']['summary'],
+                            "ImageURL": image_url,
+                            "EventPageURL": event_page_url
+                        }
+
+                        category_data_keys = ["EventName", "EventDescription", "Summary", "Host"]
+                        category_data = {key: event_data_dict[key] for key in category_data_keys}
+                        event_category_response = self.categorize_event(category_data, self.event_type_choices)
+                        
+                        event_type_name = event_category_response['EVENT_TYPE_NAME']
+                        event_data_dict['EventType'] = event_type_name
+                        event_type_uuid = self.event_type_choices_mappings_uuid_to_eventtype.get(event_type_name)
+                        if event_type_uuid is None:
+                            continue
+                        event_data_dict['EventTypeUUID'] = event_type_uuid
+                        event_data_dict['ConfidenceLevel'] = event_category_response['CONFIDENCE_LEVEL']
+
+                        if event_category_response['MATCHED']:
+                            full_path_file_name = full_file_key_matched
+                        else:
+                            full_path_file_name = os.path.join(event_data_json_success_unmatched_prefix, event_filename)
+                        
+                        self.aws_handler.write_to_s3(bucket=self.bucket_name, key=full_path_file_name, data=json.dumps(event_data_dict, indent=4))
+
+            except json.decoder.JSONDecodeError as e:
+                full_path_event_data_json_file = os.path.join(event_data_json_error_prefix, event_filename)
+                error_start = max(0, e.pos - 5)
+                error_end = min(len(script_text), e.pos + 6)
+                error_context = script_text[error_start:error_end]
+
+                error_data = {
+                    "error_message": str(traceback.format_exc()),
+                    "json_raw_text": script_text,
+                    "filename": event_filename,
+                    "error_context": error_context
+                }
+                self.aws_handler.write_to_s3(bucket=self.bucket_name, key=full_path_event_data_json_file, data=json.dumps(error_data, indent=4))
+
+            except Exception as e:
+                self.logger.error(traceback.format_exc())
+
+                full_path_event_data_json_file = os.path.join(event_data_json_error_prefix, event_filename)
+                self.aws_handler.write_to_s3(bucket=self.bucket_name, key=full_path_event_data_json_file, data=str(traceback.format_exc(), indent=4))
+
+    def __load_event(self, event_data: dict):
+        event_query_response = self.neo4j.execute_query_with_params(
+            query=queries.CHECK_IF_EVENT_EXISTS, params=event_data
+        )
+        if len(event_query_response) == 0:
+            self.neo4j.execute_query_with_params(
+                query=queries.CREATE_EVENT_IF_NOT_EXISTS, params=event_data
+            )
+    
+    def load_events_to_neo4j(self, city: str, date_str: str):
+        location_date_prefix = os.path.join(self.eventbrite_event_data_json_dir, date_str, city)
+        
+        for prefix in self.aws_handler.list_files_and_folders_in_s3_prefix(bucket=self.bucket_name, prefix=location_date_prefix)['folders']:
+            success_matched_folder_prefix = os.path.join(prefix, "success", "matched")
+            for event_file_key in self.aws_handler.list_files_and_folders_in_s3_prefix(bucket=self.bucket_name, prefix=success_matched_folder_prefix)['files']:
+                self.logger.info(msg="Loading event: {}".format(event_file_key))
+                event_data_dict_raw = self.aws_handler.read_from_s3(bucket=self.bucket_name, key=event_file_key)
+                event_data_dict = json.loads(event_data_dict_raw)
 
                 try:
-                    for script in scripts:
-                        if script.string and script.string.strip().startswith('window.__SERVER_DATA__'):
-                            script_text = script.string.strip().replace('window.__SERVER_DATA__ = ', '')
-                            if script_text.endswith(';'):
-                                script_text = script_text[:-1]
-                            event_data_dict_raw = json.loads(script_text)
-
-                            location_details = event_data_dict_raw["components"]["eventMap"]
-                            structured_content = event_data_dict_raw["components"]["eventDescription"]["structuredContent"]
-
-                            event_description = ''
-                            for module in structured_content['modules']:
-                                if 'text' in module:
-                                    event_description = module['text']
-                                    break
-                            
-                            event_page_url = ''
-                            for module in structured_content['modules']:
-                                if 'url' in module:
-                                    event_page_url = module['url']
-                                    break
-                            
-                            image_url = ''
-                            for widget in structured_content['widgets']:
-                                for slide in widget['data']['slides']:
-                                    image_dict = slide['image']
-                                    if 'url' in image_dict:
-                                        image_url = image_dict['url']
-                                        break
-                                if image_url != '':
-                                    break
-
-                            event_data_dict = {
-                                "StartTimestamp" : event_data_dict_raw["event"]["start"]["utc"].replace("Z", ""),
-                                "EndTimestamp" : event_data_dict_raw["event"]["end"]["utc"].replace("Z", ""),
-                                "EventName" : event_data_dict_raw["event"]["name"],
-                                "Source" : "eventbrite",
-                                "SourceEventID": int(event_data_dict_raw["event"]["id"]),
-                                "EventURL": event_data_dict_raw["event"]["url"],
-                                "Lon" : location_details["location"]["longitude"],
-                                "Lat" : location_details["location"]["latitude"],
-                                "Address" : location_details["venueAddress"],
-                                "Host" : location_details["venueName"],
-                                "PublicEventFlag" : True,
-                                "EventDescription" : event_description,
-                                "Summary" : event_data_dict_raw['components']['eventDescription']['summary'],
-                                "ImageURL": image_url,
-                                "EventPageURL": event_page_url
-                            }
-
-                            category_data_keys = ["EventName", "EventDescription", "Summary", "Host"]
-                            category_data = {key: event_data_dict[key] for key in category_data_keys}
-                            event_category_response = self.categorize_event(category_data, self.event_type_choices)
-                            
-                            event_type_name = event_category_response['EVENT_TYPE_NAME']
-                            event_data_dict['EventType'] = event_type_name
-                            event_type_uuid = self.event_type_choices_mappings_uuid_to_eventtype.get(event_type_name)
-                            if event_type_uuid is None:
-                                continue
-                            event_data_dict['EventTypeUUID'] = event_type_uuid
-                            event_data_dict['ConfidenceLevel'] = event_category_response['CONFIDENCE_LEVEL']
-
-                            if event_category_response['MATCHED']:
-                                full_path_file_name = os.path.join(full_path_event_data_json_success_matched_dir, event_filename)
-                            else:
-                                full_path_file_name = os.path.join(full_path_event_data_json_success_unmatched_dir, event_filename)
-                            
-                            with open(full_path_file_name, 'w', encoding='utf-8') as f:
-                                f.write(json.dumps(event_data_dict, indent=4))
-
-                except json.decoder.JSONDecodeError as e:
-                    full_path_event_data_json_file = os.path.join(full_path_event_data_json_error_dir, event_filename)
-                    error_start = max(0, e.pos - 5)
-                    error_end = min(len(script_text), e.pos + 6)
-                    error_context = script_text[error_start:error_end]
-
-                    error_data = {
-                        "error_message": str(traceback.format_exc()),
-                        "json_raw_text": script_text,
-                        "filename": event_filename,
-                        "error_context": error_context
-                    }
-                    with open(full_path_event_data_json_file, 'w') as f:
-                        f.write(json.dumps(error_data, indent=4))
-
+                    self.__load_event(event_data=event_data_dict)
                 except Exception as e:
-                    self.logger.error(traceback.format_exc())
+                    self.logger.error(msg="Error loading event: {}".format(event_file_key))
+                    self.logger.error(msg=e)
+                    self.logger.error(msg=traceback.format_exc())
+                    continue
 
-                    full_path_event_data_json_file = os.path.join(full_path_event_data_json_error_dir, event_filename)
-                    with open(full_path_event_data_json_file, 'w', encoding='utf-8') as f:
-                        f.write(html_source)
+        self.logger.info(msg="Done loading events for location: {}, date: {}".format(city, date_str))
+
 
     def run(self):
-
         date_list = [datetime.now().strftime("%Y-%m-%d")]
-        # date_list = ["2023-06-28"]
-        for location_dict in location_dicts_list:
+        for date_str in date_list:
             try:
-                for date_str in date_list:
+                for location_dict in location_dicts_list:
                     try:
-
                         self.download_homepages(state=location_dict["state"], city=location_dict["city"], date_str=date_str)
+                    except Exception as e:
+                        self.logger.error(traceback.format_exc())
+                for location_dict in location_dicts_list:
+                    try:
                         self.parse_homepages(city=location_dict["city"], date_str=date_str)
+                    except Exception as e:
+                        self.logger.error(traceback.format_exc())
+                for location_dict in location_dicts_list:
+                    try:
                         self.parse_eventpages(city=location_dict["city"], date_str=date_str)
+                    except Exception as e:
+                        self.logger.error(traceback.format_exc())
+                for location_dict in location_dicts_list:
+                    try:
+                        self.load_events_to_neo4j(city=location_dict["city"], date_str=date_str)
                     except Exception as e:
                         self.logger.error(traceback.format_exc())
             except Exception as e:
