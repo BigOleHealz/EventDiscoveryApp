@@ -92,26 +92,27 @@ export const INVITE_FRIENDS_TO_EVENT = `
 // WITH collect(eventType.UUID) as interestedEventTypeUUIDs
 // AND event.EventTypeUUID IN interestedEventTypeUUIDs
 export const FETCH_EVENTS_FOR_MAP = `
-    MATCH (event:Event)
-    WHERE $start_timestamp <= event.StartTimestamp <= $end_timestamp
-    OPTIONAL MATCH (event)-[r:ATTENDING]-()
-    WITH event, count(r) as AttendeeCount
-    MATCH (eventType:EventType)-[:RELATED_EVENT]->(event)
-    
-    RETURN
-        event.Address as Address,
-        event.CreatedByUUID as CreatedByUUID,
-        event.Host as Host,
-        event.Lon as Lon,
-        event.Lat as Lat,
-        event.StartTimestamp as StartTimestamp,
-        event.EndTimestamp as EndTimestamp,
-        event.EventName as EventName,
-        event.UUID as UUID,
-        event.EventURL as EventURL,
-        event.EventTypeUUID as EventTypeUUID,
-        eventType.EventType as EventType,
-        AttendeeCount;
+MATCH (event:Event)
+WHERE $start_timestamp <= event.StartTimestamp <= $end_timestamp
+OPTIONAL MATCH (event)-[r:ATTENDING]-()
+WITH event, count(r) as AttendeeCount
+MATCH (eventType:EventType)-[:RELATED_EVENT]->(event)
+
+RETURN
+    event.Address as Address,
+    event.CreatedByUUID as CreatedByUUID,
+    event.Host as Host,
+    event.Lon as Lon,
+    event.Lat as Lat,
+    event.StartTimestamp as StartTimestamp,
+    event.EndTimestamp as EndTimestamp,
+    event.EventName as EventName,
+    event.UUID as UUID,
+    event.EventURL as EventURL,
+    event.EventTypeUUID as EventTypeUUID,
+    eventType.EventType as EventType,
+    eventType.IconURI as EventTypeIconURI,
+    AttendeeCount;
     `;
 // apoc.date.format(datetime(n.StartTimestamp).epochMillis, "ms", "HH:mm") as FormattedStart;
 

@@ -7,6 +7,9 @@ import { ButtonComponent } from '../base_components/ButtonComponent';
 import { LoggerContext } from '../utils/Contexts';
 import { convertUTCDateToLocalDate } from '../utils/HelperFunctions';
 import '../css/custom-infowindow.css';
+
+import { event_types_icon_map } from '../utils/constants'
+
 import styles from '../styles';
 
 const MapMarkerWithTooltip = ({
@@ -85,6 +88,13 @@ const MapMarkerWithTooltip = ({
       onMouseOver={handleMouseOver}
       onMouseOut={handleMouseOut}
       onClick={handleMarkerClick}
+      icon={
+        event_types_icon_map.hasOwnProperty(event.EventType) ? 
+        { 
+          url: event_types_icon_map[event.EventType],
+          scaledSize: new window.google.maps.Size(42, 42) // Set the size you want
+        } : undefined
+      }
     >
       {showTooltip && (
         <InfoWindow>
