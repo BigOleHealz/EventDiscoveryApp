@@ -50,9 +50,7 @@ export const Map = ({
   const [ isCreateGameInviteFriendsModalVisible, setIsInviteFriendsToEventModalVisible ] = useState(false);
   const [ isCreateEventDetailsModalVisible, setIsCreateEventDetailsModalVisible ] = useState(false);
 
-
   const [transactionStatus, setTransactionStatus] = useState(false);
-
 
   // Handle Map
   const [mapCenter, setMapCenter] = useState(defaultCenter);
@@ -96,7 +94,7 @@ export const Map = ({
   useEffect(() => {
     if (!loading && !error && records) {
       const mapEventsObjectList = recordsAsObjects(records);
-      logger.info('records_fetch_events_for_map:', mapEventsObjectList);
+      console.log('mapEventsObjectList:', mapEventsObjectList)
       setMapEventsFullDay(mapEventsObjectList);
     }
   }, [loading, error, records]);
@@ -112,17 +110,14 @@ export const Map = ({
       const eventTimestamp = new Date(event.StartTimestamp);
       return (
         eventTimestamp >= startTime &&
-        eventTimestamp <= endTime
-        // &&
-        // eventTypesSelected.includes(event.EventTypeUUID)
+        eventTimestamp <= endTime &&
+        eventTypesSelected.includes(event.EventTypeUUID)
       );
     });
     
     logger.info('filteredEvents:', filteredEvents)
     setMapEventsFiltered(filteredEvents);
   }, [findGameStartTime, findGameEndTime, map_events_full_day, eventTypesSelected]);
-
-
 
   const handleSetActivePopup = (uuid) => {
     if (activePopup === uuid) {
@@ -131,7 +126,6 @@ export const Map = ({
       setActivePopup(uuid);
     }
   };
-
 
   const logoutUser = () => {
     logger.info("User logging out...");
