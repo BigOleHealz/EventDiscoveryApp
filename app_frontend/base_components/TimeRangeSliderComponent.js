@@ -83,6 +83,7 @@ export const TimeRangeSliderComponent = ({ startTime, endTime, setStartTime, set
 				labelSuffix=" hrs"
 				initialFromValue={0}
 				initialToValue={24}
+        showRangeLabels={false}
 			/>
       <View style={styles.timeSliderView}>
 				<Text style={time_range_slider_styles.text}>{formatTime(start)}</Text>

@@ -1,7 +1,7 @@
 #! /usr/bin/python3.8
 import os, json, traceback, sys, shutil
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 import openai
@@ -206,6 +206,9 @@ class EventbriteDataHandler:
                                     break
                             if image_url != '':
                                 break
+                        
+                        price = event_data_dict_raw['components']['conversionBar']['panelDisplayPrice']
+                        free_event_flag = True if price == 'Free' else False
 
                         event_data_dict = {
                             "StartTimestamp" : event_data_dict_raw["event"]["start"]["utc"].replace("Z", ""),
@@ -222,7 +225,9 @@ class EventbriteDataHandler:
                             "EventDescription" : event_description,
                             "Summary" : event_data_dict_raw['components']['eventDescription']['summary'],
                             "ImageURL": image_url,
-                            "EventPageURL": event_page_url
+                            "EventPageURL": event_page_url,
+                            "Price": price,
+                            "FreeEventFlag": free_event_flag,
                         }
 
                         category_data_keys = ["EventName", "EventDescription", "Summary", "Host"]
@@ -296,6 +301,9 @@ class EventbriteDataHandler:
 
     def run(self):
         date_list = [datetime.now().strftime("%Y-%m-%d")]
+        # date_list = []
+        # for i in range(0, 8):
+        #     date_list.append((datetime.now() + timedelta(days=i)).strftime("%Y-%m-%d"))
         for date_str in date_list:
             try:
                 for location_dict in location_dicts_list:
