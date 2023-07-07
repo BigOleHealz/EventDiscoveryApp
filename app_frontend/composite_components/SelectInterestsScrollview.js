@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { ScrollView, View, CheckBox, Text, StyleSheet } from 'react-native';
+import { ScrollView, View, CheckBox, Text, StyleSheet, Switch } from 'react-native';
 import { toast } from 'react-toastify';
 
+import { TextComponent } from '../base_components/TextComponent';
 import { GET_EVENT_TYPES } from '../db/queries';
 import { useCustomCypherRead } from '../hooks/CustomCypherHooks';
 import styles from '../styles';
@@ -13,9 +14,20 @@ export const SelectInterestsScrollView = ({
 }) => {
     const [event_types, setEventTypes] = useState([]);
     const [first_run, setFirstRun] = useState(true);
+    const [select_all_switch_toggled_flag, setSelectAllSwitchToggledFlag] = useState(false);
+
+    const handleSelectAllSwitchToggledFlagChange = (newValue) => {
+      setSelectAllSwitchToggledFlag(newValue);
+      const updatedEventTypes = event_types.map((eventType) => {
+        return { ...eventType, isChecked: newValue };
+      });
+      setEventTypes(updatedEventTypes);
+      let checkedUUIDs = updatedEventTypes.filter(item => item.isChecked).map(item => item.UUID);
+      setEventTypesSelected(checkedUUIDs);
+    };
 
     const handleValueChange = (index, newValue) => {
-        console.log('handleValueChange:', index, newValue);
+        console.log('eventTypesSelected:', eventTypesSelected);
         if(singleSelect && newValue) {
           let uncheckedEventTypes = event_types.map((eventType) => {
             return { ...eventType, isChecked: false };
@@ -37,7 +49,6 @@ export const SelectInterestsScrollView = ({
           console.log('event_type_object:', event_type_object)
           setEventTypesSelected(event_type_object)
         } else {
-          // else follow the previous logic
           const updatedEventTypes = event_types.map((eventType, i) => {
             if (i === index) {
               return { ...eventType, isChecked: newValue };
@@ -101,28 +112,53 @@ export const SelectInterestsScrollView = ({
 
   const EventTypeChecklistItem = ({ name, isChecked, onValueChange }) => {
     return (
-      <View style={modalStyles.itemContainer}>
+      <View style={selectInterestsScrollviewStyles.itemContainer}>
         <CheckBox value={isChecked} onValueChange={onValueChange} />
-        <Text style={modalStyles.itemText}>{name}</Text>
+        <Text style={selectInterestsScrollviewStyles.itemText}>{name}</Text>
       </View>
     );
   };
 
   return (
-    <ScrollView TestID="scrollview-select-interests" style={modalStyles.scrollView}>
-      {event_types.map((eventType, index) => (
-        <EventTypeChecklistItem
-          key={eventType.UUID}
-          name={eventType.EventType}
-          isChecked={eventType.isChecked}
-          onValueChange={(newValue) => handleValueChange(index, newValue)}
+    <View style={selectInterestsScrollviewStyles.parentContainer}>
+      <View style={selectInterestsScrollviewStyles.switchContainer}>
+        <Switch
+          TestID="switch-select-all-interests"
+          value={select_all_switch_toggled_flag}
+          onValueChange={handleSelectAllSwitchToggledFlagChange}
         />
-      ))}
-    </ScrollView>
+        <TextComponent style={selectInterestsScrollviewStyles.switchLabel}>
+          Toggle All Event Types
+        </TextComponent>
+      </View>
+      <ScrollView TestID="scrollview-select-interests" style={selectInterestsScrollviewStyles.scrollView}>
+        {event_types.map((eventType, index) => (
+          <EventTypeChecklistItem
+            key={eventType.UUID}
+            name={eventType.EventType}
+            isChecked={eventType.isChecked}
+            onValueChange={(newValue) => handleValueChange(index, newValue)}
+          />
+        ))}
+      </ScrollView>
+    </View>
   );
 }
 
-const modalStyles = StyleSheet.create({
+const selectInterestsScrollviewStyles = StyleSheet.create({
+  parentContainer: {
+    paddingTop: 20,
+    flex: 1,
+  },
+  switchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+  },
+  switchLabel: {
+    paddingLeft: 10,
+    paddingRight: 10,
+  },
   itemContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -139,7 +175,14 @@ const modalStyles = StyleSheet.create({
     backgroundColor: '#2196F3',
   },
   scrollView: {
-    marginLeft: 20,
-    marginRight: 20,
+    margin: 20,
+    shadowColor: '#000',
+		shadowOffset: {
+			width: 10,
+			height: 10,
+		},
+		shadowOpacity: 0.5,
+		shadowRadius: 10,
+		elevation: 5,
   },
 });
