@@ -1,17 +1,17 @@
-.gm-style-iw {
-  padding: 0px !important;
-  margin: 0px !important;
-  background-color: #333333 !important;
-}
-
-.gm-style-iw-c {
-  padding: 0px !important;
-  margin: 0px !important;
-  background-color: #333333 !important;
-}
-
 .gm-style-iw-d {
   padding: 0px !important;
   margin: 0px !important;
-  background-color: #333333 !important;
+  overflow: hidden !important;
+}
+
+.gm-style .gm-style-iw-t::after, .gm-style .gm-style-iw-t::before {
+  padding: 0px !important;
+  margin: 0px !important;
+  background: none !important;
+}
+
+.gm-style .gm-style-iw {
+  padding: 0px !important;
+  margin: 0px !important;
+  box-shadow: none !important;
 }

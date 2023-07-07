@@ -66,6 +66,12 @@ const MapMarkerWithTooltip = ({
               <td style={tooltipStyles.label}>Event Type:</td>
               <td style={tooltipStyles.value}>{event.EventType}</td>
             </tr>
+            {event.Price && (
+              <tr>
+                <td style={tooltipStyles.label}>Price:</td>
+                <td style={tooltipStyles.value}>{event.Price}</td>
+              </tr>
+            )}
             {event.EventURL && (
               <tr>
                 <td style={tooltipStyles.label}>Event URL:</td>
@@ -89,11 +95,15 @@ const MapMarkerWithTooltip = ({
       onMouseOut={handleMouseOut}
       onClick={handleMarkerClick}
       icon={
-        event_types_icon_map.hasOwnProperty(event.EventType) ? 
-        { 
-          url: event_types_icon_map[event.EventType],
-          scaledSize: new window.google.maps.Size(42, 42) // Set the size you want
-        } : undefined
+        event_types_icon_map.hasOwnProperty(event.EventType)
+          ? {
+              url: event_types_icon_map[event.EventType],
+              scaledSize: {
+                height: 50, // Set the desired height
+                width: 50, // Calculate the width based on the desired height and the aspect ratio
+              },
+            }
+          : undefined
       }
     >
       {showTooltip && (

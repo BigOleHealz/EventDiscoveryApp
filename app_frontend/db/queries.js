@@ -109,6 +109,8 @@ RETURN
     event.EventName as EventName,
     event.UUID as UUID,
     event.EventURL as EventURL,
+    event.Price as Price,
+    event.FreeEventFlag as FreeEventFlag,
     event.EventTypeUUID as EventTypeUUID,
     eventType.EventType as EventType,
     eventType.IconURI as EventTypeIconURI,

@@ -344,12 +344,12 @@ export const SelectInterestsModal = ({
   } = useCustomCypherWrite(CREATE_ACCOUNT_INTEREST_RELATIONSHIPS);
 
   const handleSubmitButtonClick = () => {
-    const selectedEventTypeUUIDs = event_types
-      .filter((eventType) => eventType.isChecked)
-      .map((eventType) => eventType.UUID);
+    // const selectedEventTypeUUIDs = event_types
+    //   .filter((eventType) => eventType.isChecked)
+    //   .map((eventType) => eventType.UUID);
     run_create_account_interest_relationships({
       account_uuid: accountUUID,
-      event_type_uuid_list: selectedEventTypeUUIDs,
+      event_type_uuid_list: event_types_selected,
     });
   };
 
