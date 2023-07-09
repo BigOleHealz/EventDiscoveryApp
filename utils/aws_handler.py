@@ -21,7 +21,6 @@ class AWSHandler:
         except ClientError as e:
             error_code = int(e.response['Error']['Code'])
             if error_code == 404:
-                self.logger.info(msg=f"File {key} does not exist in bucket {bucket}")
                 return False
             else:
                 self.logger.error(msg=f"An error occurred while checking for the file {key} in bucket {bucket}: {e}")
@@ -71,7 +70,7 @@ class AWSHandler:
         try:
             response = self.s3_client.get_object(Bucket=bucket, Key=key)
             data = response['Body'].read().decode('utf-8')
-            self.logger.info(msg=f'Successfully retrieved data from S3')
+            self.logger.info(msg=f'Successfully retrieved data from S3: {bucket}/{key}')
             return data
         except ClientError as e:
             self.logger.error(msg=f'Failed to read from S3: {e}')
