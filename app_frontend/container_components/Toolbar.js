@@ -25,7 +25,7 @@ export const Toolbar = ({
           setToolbarHeight(height);
         }}
       >
-        <ButtonComponent title="Find Games" onPress={onLeftButtonClick} style={toolbar_styles.toolbarButtonLeft} />
+        <ButtonComponent title="Find Events" onPress={onLeftButtonClick} style={toolbar_styles.toolbarButtonLeft} />
       </View>
     </>
   );

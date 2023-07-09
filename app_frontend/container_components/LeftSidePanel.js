@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Dimensions } from 'react-native';
 
 import { CalendarComponent } from '../base_components/CalendarComponent';
 import { TimeRangeSliderComponent } from '../base_components/TimeRangeSliderComponent';
@@ -8,6 +8,8 @@ import { SelectInterestsScrollView } from '../composite_components/SelectInteres
 import { day_start_time, day_end_time } from '../utils/constants';
 
 import styles from '../styles';
+
+const windowWidth = Dimensions.get('window').width;
 
 export const LeftSidePanel = ({
   isVisible,
@@ -32,7 +34,7 @@ export const LeftSidePanel = ({
       testID="left-side-panel"
       type="left"
       position={['-30%', '0%']}
-      title="Find Games"
+      // title="Find Games"
       isVisible={isVisible}
       style={panel_styles.sidePanel}
     >
@@ -60,7 +62,7 @@ const panel_styles = StyleSheet.create({
     position: 'absolute',
     top: 0,
     bottom: 0,
-    width: '30%',
+    width: windowWidth > 800 ? '30%' : '100%',
     backgroundColor: styles.appTheme.backgroundColor,
     justifyContent: 'center',
     alignItems: 'center',

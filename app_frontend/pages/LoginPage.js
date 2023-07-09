@@ -96,7 +96,7 @@ export function LoginPage() {
           <ButtonComponent
             title="Login"
             onPress={handleSubmit}
-            style={styles.buttons.menu_button_styles}
+            style={loginPageStyles.menu_button_styles}
           />
           <View style={loginPageStyles.hyperlinkContainer}>
             <View style={loginPageStyles.forgotPassword}>
@@ -160,4 +160,9 @@ const loginPageStyles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 16,
   },
+  menu_button_styles: {
+    ...styles.buttons.menu_button_styles,
+    width: '50%'
+
+  }
 });

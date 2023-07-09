@@ -64,7 +64,6 @@ const styles = StyleSheet.create({
     width: '100%',
     fontSize: 24,
     fontWeight: 'bold',
-    margin: 20,
     textAlign: 'center',
   },
   h2: {

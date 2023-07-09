@@ -14,7 +14,6 @@ export const PanelComponent = ({ isVisible, position, title, type, children, sty
 		}).start();
 	}, [isVisible]);
 
-	// const panelStyle = type === 'top' ? panel_styles.topPanel : panel_styles.sidePanel;
 	const panelPosition = type === 'top'
 		? { top: slideAnim.interpolate({ inputRange: [0, 1], outputRange: position }) }
 		: { left: slideAnim.interpolate({ inputRange: [0, 1], outputRange: position }) };
@@ -22,7 +21,7 @@ export const PanelComponent = ({ isVisible, position, title, type, children, sty
 	return isVisible ? (
 		<Animated.View style={[panelPosition, style]}>
 			<View style={panel_styles.panelsContainer}>
-				<Text style={panel_styles.panelTitleStyle}>{title}</Text>
+				{title && (<Text style={panel_styles.panelTitleStyle}>{title}</Text>)}
 				{children}
 			</View>
 		</Animated.View>
