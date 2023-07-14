@@ -121,8 +121,6 @@ const MapMarkerWithTooltip = ({
 };
 
 const tooltipStyles = StyleSheet.create({
-
-
   container: {
     display: 'flex',
     flexDirection: 'column',
@@ -131,9 +129,6 @@ const tooltipStyles = StyleSheet.create({
     padding: 10, // Add padding for better appearance
     borderRadius: '4px', // Add border radius for a smoother look
     margin: 0,
-  },
-  infoWindow: {
-    marginBotton: 300,
   },
   table: {
     margin: 10,
