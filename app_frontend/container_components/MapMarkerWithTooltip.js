@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import moment from 'moment';
 
 import { Marker, InfoWindow } from '@react-google-maps/api';
 import { ButtonComponent } from '../base_components/ButtonComponent';
 import { LoggerContext } from '../utils/Contexts';
 import { convertUTCDateToLocalDate } from '../utils/HelperFunctions';
-import '../css/custom-infowindow.css';
 
 import { event_types_icon_map } from '../utils/constants'
 
@@ -23,6 +22,7 @@ const MapMarkerWithTooltip = ({
   const { logger, setLogger } = React.useContext(LoggerContext);
 
   const position = { lat: event.Lat, lng: event.Lon };
+  const icon_size = 50;
 
   useEffect(() => {
     if (activePopup === event.UUID) {
@@ -99,30 +99,28 @@ const MapMarkerWithTooltip = ({
           ? {
               url: event_types_icon_map[event.EventType],
               scaledSize: {
-                height: 50, // Set the desired height
-                width: 50, // Calculate the width based on the desired height and the aspect ratio
+                height: icon_size, // Set the desired height
+                width: icon_size, // Calculate the width based on the desired height and the aspect ratio
               },
             }
           : undefined
       }
     >
       {showTooltip && (
-        <InfoWindow>
+        <InfoWindow position={position} onCloseClick={handleMarkerClick}>
           <View style={tooltipStyles.container}>{renderInfoContent()}</View>
         </InfoWindow>
       )}
       {activePopup === event.UUID && (
-        <InfoWindow onCloseClick={handleMarkerClick}>
-          <div style={tooltipStyles.container}>
-            {renderInfoContent()}
-          </div>
+        <InfoWindow position={position} onCloseClick={handleMarkerClick}>
+          <View style={tooltipStyles.container}>{renderInfoContent()}</View>
         </InfoWindow>
       )}
     </Marker>
   );
 };
 
-const tooltipStyles = {
+const tooltipStyles = StyleSheet.create({
   container: {
     display: 'flex',
     flexDirection: 'column',
@@ -145,12 +143,14 @@ const tooltipStyles = {
   label: {
     width: '30%',
     fontWeight: '600',
-    marginRight: '4px',
-    padding: '2px 10px 2px 0',
+    marginRight: 4,
+    paddingLeft: 4,
+    paddingTop: 2,
+    paddingBottom: 2,
     textAlign: 'right',
   },
   value: {
-    padding: '2px 0',
+    padding: 2,
   },
   buttonStyle: {
     backgroundColor: '#2196F3',
@@ -159,6 +159,6 @@ const tooltipStyles = {
     padding: 0,
     margin: 0,
   },
-};
+});
 
 export default MapMarkerWithTooltip;
