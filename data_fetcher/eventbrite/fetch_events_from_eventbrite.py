@@ -1,7 +1,7 @@
 #! /usr/bin/python3.8
 import os, json, traceback, sys
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
@@ -16,7 +16,8 @@ from bs4 import BeautifulSoup
 location_dicts_list = [
     {"city": "boston", "state": "ma"},
     {"city": "philadelphia", "state": "pa"},
-    {"city": "atlantic-city", "state": "nj"}
+    {"city": "atlantic-city", "state": "nj"},
+    {"city": "miami", "state": "fl"},
 ]
 
 class EventbriteDataHandler(DataHandler):
@@ -73,6 +74,7 @@ class EventbriteDataHandler(DataHandler):
             event_json_data_page_no_prefix = os.path.join(event_data_json_prefix, page_no)
             event_data_json_error_prefix = os.path.join(event_json_data_page_no_prefix, "error")
             event_data_json_success_prefix = os.path.join(event_json_data_page_no_prefix, "success")
+            event_data_json_success_online_prefix = os.path.join(event_data_json_success_prefix, "online")
             event_data_json_success_matched_prefix = os.path.join(event_data_json_success_prefix, "matched")
             event_data_json_success_unmatched_prefix = os.path.join(event_data_json_success_prefix, "unmatched")
 
@@ -143,23 +145,25 @@ class EventbriteDataHandler(DataHandler):
                             "Price": price,
                             "FreeEventFlag": free_event_flag,
                         }
-
-                        category_data_keys = ["EventName", "EventDescription", "Summary", "Host"]
-                        category_data = {key: event_data_dict[key] for key in category_data_keys}
-                        event_category_response = self.categorize_event(category_data, self.event_type_choices)
-                        
-                        event_type_name = event_category_response['EVENT_TYPE_NAME']
-                        event_data_dict['EventType'] = event_type_name
-                        event_type_uuid = self.event_type_choices_mappings_uuid_to_eventtype.get(event_type_name)
-                        if event_type_uuid is None:
-                            continue
-                        event_data_dict['EventTypeUUID'] = event_type_uuid
-                        event_data_dict['ConfidenceLevel'] = event_category_response['CONFIDENCE_LEVEL']
-
-                        if event_category_response['MATCHED']:
-                            full_path_file_name = full_file_key_matched
+                        if event_data_dict['Address'].lower().startswith("online"):
+                            full_path_file_name = os.path.join(event_data_json_success_online_prefix, event_filename)
                         else:
-                            full_path_file_name = os.path.join(event_data_json_success_unmatched_prefix, event_filename)
+                            category_data_keys = ["EventName", "EventDescription", "Summary", "Host"]
+                            category_data = {key: event_data_dict[key] for key in category_data_keys}
+                            event_category_response = self.categorize_event(category_data, self.event_type_choices)
+                            
+                            event_type_name = event_category_response['EVENT_TYPE_NAME']
+                            event_data_dict['EventType'] = event_type_name
+                            event_type_uuid = self.event_type_choices_mappings_uuid_to_eventtype.get(event_type_name)
+                            if event_type_uuid is None:
+                                continue
+                            event_data_dict['EventTypeUUID'] = event_type_uuid
+                            event_data_dict['ConfidenceLevel'] = event_category_response['CONFIDENCE_LEVEL']
+
+                            if event_category_response['MATCHED']:
+                                full_path_file_name = full_file_key_matched
+                            else:
+                                full_path_file_name = os.path.join(event_data_json_success_unmatched_prefix, event_filename)
                         
                         self.aws_handler.write_to_s3(bucket=self.bucket_name, key=full_path_file_name, data=json.dumps(event_data_dict, indent=4))
 
@@ -186,10 +190,10 @@ class EventbriteDataHandler(DataHandler):
 
 
     def run(self):
-        date_list = [datetime.now().strftime("%Y-%m-%d")]
-        # date_list = ['2023-07-11']
-        # for i in range(0, 8):
-        #     date_list.append((datetime.now() + timedelta(days=i)).strftime("%Y-%m-%d"))
+        date_list = []
+        # date_list = ['2023-07-22']
+        for i in range(0, 8):
+            date_list.append((datetime.now() + timedelta(days=i)).strftime("%Y-%m-%d"))
         for date_str in date_list:
             try:
                 for location_dict in location_dicts_list:
