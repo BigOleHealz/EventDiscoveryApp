@@ -8,6 +8,7 @@ import { LoggerContext } from '../utils/Contexts';
 import { convertUTCDateToLocalDate } from '../utils/HelperFunctions';
 
 import { event_types_icon_map } from '../utils/constants'
+import '../css/custom-infowindow.css';
 
 import styles from '../styles';
 
