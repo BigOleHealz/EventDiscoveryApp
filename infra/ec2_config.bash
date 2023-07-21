@@ -79,3 +79,17 @@ sudo chmod +x /usr/bin/chromedriver
 wget https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.rpm
 sudo yum install -y ./google-chrome-stable_current_*.rpm
 
+# sudo yum install -y httpd
+# sudo systemctl start httpd && sudo systemctl enable httpd
+# sudo usermod -a -G apache ec2-user
+# sudo chown -R ec2-user:apache /var/www
+# sudo chmod 2775 /var/www && find /var/www -type d -exec sudo chmod 2775 {} \;
+# find /var/www -type f -exec sudo chmod 0664 {} \;
+# sudo yum install -y mod_ssl
+
+# cd /etc/pki/tls/certs
+# sudo ./make-dummy-cert localhost.crt
+# sudo sed -i '/^SSLCertificateKeyFile/ s/^/#/' /etc/httpd/conf.d/ssl.conf
+# sudo systemctl restart httpd
+
+sudo amazon-linux-extras install nginx1.12
