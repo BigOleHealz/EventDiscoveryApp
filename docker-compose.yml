@@ -1,0 +1,23 @@
+version: '3'
+services:
+  flask_server:
+    build: 
+      context: .
+      dockerfile: flask_server/Dockerfile.server
+    volumes:
+      - ./flask_server:/app
+    ports:
+      - 5001:5000
+    restart: always
+
+  frontend:
+    build: 
+      context: ./app_frontend
+      dockerfile: Dockerfile.client
+    volumes:
+      - ./app_frontend:/app
+    ports:
+      - 19006:19006
+    restart: always
+    links: 
+      - flask_server

@@ -7,7 +7,8 @@ import { ButtonComponent } from '../base_components/ButtonComponent';
 import { TextComponent } from '../base_components/TextComponent';
 import { TextInputComponent } from '../base_components/TextInputComponent';
 import { GET_USER_LOGIN_INFO } from '../db/queries';
-import { useCustomCypherRead } from '../hooks/CustomCypherHooks';
+import { recordsAsObjects } from '../db/DBHandler';
+// import { useCustomCypherRead } from '../hooks/CustomCypherHooks';
 import { LoggerContext, UserSessionContext } from '../utils/Contexts';
 import { hashPassword } from '../utils/HelperFunctions'
 import { storeUserSession } from '../utils/SessionManager';
@@ -18,14 +19,60 @@ export function LoginPage() {
 	const { userSession, setUserSession } = React.useContext(UserSessionContext);
 	const { logger, setLogger } = React.useContext(LoggerContext);
 
+  const [fetching_user_login_info, setFetchingUserLoginInfo] = useState(false);
+  const [data, setData] = useState([{}])
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [hashed_password, setHashedPassword] = useState('');
 
-  const {
-    transactionStatus: login_status,
-    executeQuery: run_login,
-    resetTransactionStatus: reset_login_transaction_status
-  } = useCustomCypherRead(GET_USER_LOGIN_INFO);
+  useEffect(() => {
+    if (fetching_user_login_info) {
+        const hashed_password = hashPassword(password);
+
+        fetch('http://35.153.228.179:5001/get_user_login_info', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                email: email,
+                hashed_password: hashed_password,
+            }),
+        }).then(res => res.json())
+        .then(data => {
+          if (data.length === 0) {
+            const error_message = `Error: No account with email: ${email} exists`;
+            toast.error(error_message);
+            logger.error(error_message);
+
+          } else if (data.length > 1) {
+            const error_message = `Error: Multiple accounts with email: ${email} exist`;
+            toast.error(error_message);
+            logger.error(error_message);
+
+          } else if (data.length === 1) {
+            // setData(data);
+            // console.log(data);
+            const user = data[0];
+            user.TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            storeUserSession(user);
+            setUserSession(user);
+            toast.success('Login Successful!');
+            logger.info(`Login Successful for email: ${email}`);
+            resetLoginInfo();
+          } else {
+            const error_message = `Error: Unknown error occurred`;
+            toast.error(error_message);
+            logger.error(error_message);
+          }
+        }).catch((error) => {
+            console.error('Error:', error);
+        });
+    }
+    setFetchingUserLoginInfo(false);
+}, [fetching_user_login_info]);
+
 
   const resetLoginInfo = () => {
     setEmail('');
@@ -43,37 +90,9 @@ export function LoginPage() {
   const handleSubmit = () => {
     logger.info(`Login attempt for email: ${email}`)
     const hashed_password = hashPassword(password);
-    run_login({ email: email, hashed_password: hashed_password });
+    setFetchingUserLoginInfo(true);
+    // run_login({ email: email, hashed_password: hashed_password });
   };
-
-  useEffect(() => {
-    if (login_status.STATUS === 'ERROR') {
-      const error_message = `Error: ${login_status.RESPONSE}`;
-      toast.error(error_message);
-      console.error(error_message);
-      logger.error(error_message);
-    } else if (login_status.STATUS === 'SUCCESS') {
-      if (login_status.RESPONSE.RECORD_COUNT === 0) {
-        const error_message = `Error: No account with email: ${email} exists`;
-        toast.error(error_message);
-        logger.error(error_message);
-
-      } else if (login_status.RESPONSE.RECORD_COUNT > 1) {
-        const error_message = `Error: Multiple accounts with email: ${email} exist`;
-        toast.error(error_message);
-        logger.error(error_message);
-      } else {
-        const user = login_status.RESPONSE.RECORDS[0];
-        user.TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-        storeUserSession(user);
-        setUserSession(user);
-        toast.success('Login Successful!');
-        logger.info(`Login Successful for email: ${email}`);
-        resetLoginInfo();
-      }
-      reset_login_transaction_status();
-    }
-  }, [login_status]);
 
 
   return (
@@ -166,3 +185,41 @@ const loginPageStyles = StyleSheet.create({
 
   }
 });
+
+
+  // useEffect(() => {
+  //   if (login_status.STATUS === 'ERROR') {
+  //     const error_message = `Error: ${login_status.RESPONSE}`;
+  //     toast.error(error_message);
+  //     console.error(error_message);
+  //     logger.error(error_message);
+  //   } else if (login_status.STATUS === 'SUCCESS') {
+  //     if (login_status.RESPONSE.RECORD_COUNT === 0) {
+  //       const error_message = `Error: No account with email: ${email} exists`;
+  //       toast.error(error_message);
+  //       logger.error(error_message);
+
+  //     } else if (login_status.RESPONSE.RECORD_COUNT > 1) {
+  //       const error_message = `Error: Multiple accounts with email: ${email} exist`;
+  //       toast.error(error_message);
+  //       logger.error(error_message);
+  //     } else {
+  //       const user = login_status.RESPONSE.RECORDS[0];
+  //       user.TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  //       storeUserSession(user);
+  //       setUserSession(user);
+  //       toast.success('Login Successful!');
+  //       logger.info(`Login Successful for email: ${email}`);
+  //       resetLoginInfo();
+  //     }
+  //     reset_login_transaction_status();
+  //   }
+  // }, [login_status]);
+
+
+
+  // const {
+  //   transactionStatus: login_status,
+  //   executeQuery: run_login,
+  //   resetTransactionStatus: reset_login_transaction_status
+  // } = useCustomCypherRead(GET_USER_LOGIN_INFO);

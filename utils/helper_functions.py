@@ -2,8 +2,6 @@ import base64, hashlib, requests, functools, traceback
 import time
 from typing import Mapping
 
-from PIL import Image
-
 from utils.aws_handler import AWSHandler
 from utils.constants import ICON_SIZE, CITY_DATA
 from utils.logger import Logger
@@ -88,14 +86,6 @@ def hash_password(input_string: str):
     sha256.update(input_string.encode())
     return sha256.hexdigest()
 
-def get_scaled_dimensions(image_path: str):
-    image = Image.open(image_path)
-    width, height = image.size
-
-    if height > width:
-        return (int(ICON_SIZE * width / height), ICON_SIZE)
-    else:
-        return (ICON_SIZE, int(ICON_SIZE * width / height))
 
 def get_device_location():
     import geocoder

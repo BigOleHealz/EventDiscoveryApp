@@ -93,3 +93,10 @@ sudo yum install -y ./google-chrome-stable_current_*.rpm
 # sudo systemctl restart httpd
 
 sudo amazon-linux-extras install nginx1.12
+
+sudo yum groupinstall "Development Tools" -y
+sudo yum remove nodejs npm -y
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
+. ~/.nvm/nvm.sh
+npm install -g create-react-app
+npm install -g expo-cli
