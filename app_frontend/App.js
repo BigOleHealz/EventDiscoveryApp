@@ -10,19 +10,11 @@ import ErrorBoundary from './utils/ErrorBoundary';
 
 function MainComponent() {
 
-  const [neo4jDriverActive, setNeo4jDriverActive] = useState(false);
-  // const awsHandler = useAWSHandler();
 
   return (
-    <Neo4jProviderWrapper onDriverLoaded={setNeo4jDriverActive} >
-      {neo4jDriverActive ? (
         <Router>
           <AppHandler />
         </Router>
-      ) : (
-        <Text>Connecting to Database</Text>
-      )}
-    </Neo4jProviderWrapper>
   );
 }
 

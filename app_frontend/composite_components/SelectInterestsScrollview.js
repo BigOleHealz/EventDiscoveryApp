@@ -4,7 +4,7 @@ import { toast } from 'react-toastify';
 
 import { TextComponent } from '../base_components/TextComponent';
 import { GET_EVENT_TYPES } from '../db/queries';
-import { useCustomCypherRead } from '../hooks/CustomCypherHooks';
+// import { useCustomCypherRead } from '../hooks/CustomCypherHooks';
 import styles from '../styles';
 
 export const SelectInterestsScrollView = ({
@@ -63,52 +63,47 @@ export const SelectInterestsScrollView = ({
         }
     };
 
-    const {
-        transactionStatus: get_event_types_status,
-        executeQuery: run_get_event_types,
-        resetTransactionStatus: reset_get_event_types_transaction_status,
-      } = useCustomCypherRead(GET_EVENT_TYPES);
-    
     useEffect(() => {
-        if (first_run ) {
-            run_get_event_types({});
-        }
-    }, [first_run]);
+      if (first_run ) {
+        fetch('http://35.153.228.179:5001/get_event_type_mappings', {
+          method: 'GET',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+        })
+        .then(res => res.json())
+        .then(data => {
+          console.log('event_type_mappings:', data);
+          let eventTypeList;
+          if (eventTypesSelected) {
+            eventTypeList = data.map((eventType) => {
+              return {
+                ...eventType,
+                isChecked: eventTypesSelected.includes(eventType.UUID)
+              };
+            });
+          } else {
+            eventTypeList = data.map((eventType) => {
+              return {
+                ...eventType,
+                isChecked: false
+              };
+            });
+          }
+          setEventTypes(eventTypeList);
+          setFirstRun(false);
+        })
+        .catch((error) => {
+          toast.error(`Error Getting Event Types: ${error}`);
+          console.error(error);
+          setFirstRun(false);
+        });
+      }
+  }, [first_run]);
 
-    useEffect(() => {
-      if (get_event_types_status.STATUS === 'ERROR') {
-        toast.error(`Error Getting Event Types: ${get_event_types_status.RESPONSE}`);
-        console.error(get_event_types_status.RESPONSE);
-        reset_get_event_types_transaction_status();
-        setFirstRun(false);
-      } else if (get_event_types_status.STATUS === 'SUCCESS') {
-        let eventTypeList;
-        if (eventTypesSelected) {
-          eventTypeList = get_event_types_status.RESPONSE.RECORDS.map(
-              (eventType) => {
-                  return {
-                      ...eventType,
-                      isChecked: eventTypesSelected.includes(eventType.UUID)
-                  };
-              }
-          );
-        } else {
-          eventTypeList = get_event_types_status.RESPONSE.RECORDS.map(
-            (eventType) => {
-                return {
-                    ...eventType,
-                    isChecked: false
-                };
-            }
-          );
-        }
-        setEventTypes(eventTypeList);
-        reset_get_event_types_transaction_status();
-        setFirstRun(false);
-        } else {
-          console.log('Something else happened')
-        }
-    }, [get_event_types_status]);
+
+
+
 
   const EventTypeChecklistItem = ({ name, isChecked, onValueChange }) => {
     return (

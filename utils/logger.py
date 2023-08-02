@@ -14,7 +14,7 @@ class Logger(logging.Logger):
         self.log_group_name = log_group_name
         self.log_stream_name = log_stream_name if log_stream_name else self.timestamp
         
-        self.cloudwatch_logs = boto3.client('logs')
+        self.cloudwatch_logs = boto3.client('logs', region_name='us-east-1')
 
         try:
             self.cloudwatch_logs.create_log_group(logGroupName=self.log_group_name)

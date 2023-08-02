@@ -2,6 +2,7 @@
   "name": "helloworld",
   "version": "1.0.0",
   "main": "node_modules/expo/AppEntry.js",
+  "proxy": "http://localhost:5000",
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
@@ -20,6 +21,7 @@
     "date-fns": "^2.29.3",
     "emailjs-com": "^3.2.0",
     "expo": "~48.0.15",
+    "metro": "^0.77.0", 
     "moment-timezone": "^0.5.43",
     "neo4j-driver": "^5.7.0",
     "react": "18.2.0",

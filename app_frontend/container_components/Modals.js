@@ -20,7 +20,7 @@ import {
   CREATE_EVENT,
   INVITE_FRIENDS_TO_EVENT,
 } from '../db/queries';
-import { useCustomCypherWrite } from '../hooks/CustomCypherHooks';
+// import { useCustomCypherWrite } from '../hooks/CustomCypherHooks';
 
 import { CreateGameContext } from '../utils/Contexts';
 import styles from '../styles';

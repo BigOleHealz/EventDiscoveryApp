@@ -10,7 +10,7 @@ from utils.logger import Logger
 class AWSHandler:
     def __init__(self, logger: Logger):
         self.logger = logger
-        self.session = boto3.session.Session()
+        self.session = boto3.session.Session(region_name='us-east-1')
         self.s3_client = self.session.client('s3')
     
     def check_if_s3_file_exists(self, bucket: str, key: str):
