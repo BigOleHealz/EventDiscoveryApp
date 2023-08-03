@@ -20,3 +20,9 @@ data_fetcher/*/eventpages*
 .vscode*
 app_frontend/package-lock.json
 app_frontend/utils/aws_constants.js
+
+app_frontend/certification/*
+flask_server/certification/*
+flask_server/db/*
+flask_server/utils/*
+app_frontend/utils/aws_constants.js
