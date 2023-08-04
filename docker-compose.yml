@@ -9,6 +9,9 @@ services:
     ports:
       - 5001:5000
     restart: always
+    networks:
+      - mynetwork
+
 
   frontend:
     build: 
@@ -19,5 +22,23 @@ services:
     ports:
       - 19006:19006
     restart: always
-    links: 
+    networks:
+      - mynetwork
+
+
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile.nginx
+    ports:
+      - "80:80"
+    restart: always
+    depends_on:
+      - frontend
       - flask_server
+    networks:
+      - mynetwork
+
+networks:
+  mynetwork:
+    driver: bridge

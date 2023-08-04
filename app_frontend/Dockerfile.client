@@ -1,21 +1,12 @@
 # Use an official Node runtime as a parent image
 FROM node:16
 
-
-# Set the working directory in the container
 WORKDIR /app
 
-# Copy package.json and package-lock.json
 COPY package*.json ./
-
-# Copy the local node_modules folder to the container
 COPY node_modules ./node_modules
 RUN npm install -g expo-cli
 
-# Copy the rest of the code
 COPY . .
 
-# Other Dockerfile instructions...
-
-# CMD ["tail", "-f", "/dev/null"]
 CMD ["expo", "start", "--web"]
