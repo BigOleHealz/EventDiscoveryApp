@@ -1,5 +1,7 @@
 #! /bin/sh
 
+docker-compose down
+
 flask_server_dir="flask_server"
 db_dir="db"
 utils_dir="utils"
@@ -44,4 +46,5 @@ rm -rf $flask_server_dir/$utils_dir
 cp -r $db_dir $flask_server_dir/
 cp -r $utils_dir $flask_server_dir/
 
-docker-compose up --build
+docker-compose build
+docker-compose up -d

@@ -13,6 +13,7 @@ import { LoggerContext, UserSessionContext } from '../utils/Contexts';
 import { hashPassword } from '../utils/HelperFunctions'
 import { storeUserSession } from '../utils/SessionManager';
 import styles from '../styles';
+import { error } from 'neo4j-driver';
 
 export function LoginPage() {
 
@@ -30,7 +31,7 @@ export function LoginPage() {
     if (fetching_user_login_info) {
         const hashed_password = hashPassword(password);
 
-        fetch('http://35.153.228.179:5001/get_user_login_info', {
+        fetch('/api/get_user_login_info', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -44,11 +45,13 @@ export function LoginPage() {
           if (data.length === 0) {
             const error_message = `Error: No account with email: ${email} exists`;
             toast.error(error_message);
+            console.error(error_message);
             logger.error(error_message);
 
           } else if (data.length > 1) {
             const error_message = `Error: Multiple accounts with email: ${email} exist`;
             toast.error(error_message);
+            console.error(error_message);
             logger.error(error_message);
 
           } else if (data.length === 1) {
@@ -59,11 +62,13 @@ export function LoginPage() {
             storeUserSession(user);
             setUserSession(user);
             toast.success('Login Successful!');
+            console.log('Login Successful');
             logger.info(`Login Successful for email: ${email}`);
             resetLoginInfo();
           } else {
             const error_message = `Error: Unknown error occurred`;
             toast.error(error_message);
+            console.log(error_message);
             logger.error(error_message);
           }
         }).catch((error) => {
