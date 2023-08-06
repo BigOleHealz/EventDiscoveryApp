@@ -24,13 +24,13 @@ if ! docker info >/dev/null 2>&1; then
     done
 fi
 
-docker stop $(docker ps -q)
-docker rm $(docker ps -a -q)
-docker rmi $(docker images -a -q)
+# docker stop $(docker ps -q)
+# docker rm $(docker ps -a -q)
+# docker rmi $(docker images -a -q)
 
-docker container prune -f
-docker image prune -f
-docker system prune -a -f
+# docker container prune -f
+# docker image prune -f
+# docker system prune -a -f
 
 rm -rf $flask_server_dir/$db_dir
 rm -rf $flask_server_dir/$utils_dir

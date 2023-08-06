@@ -5,4 +5,5 @@ ENV CONTAINER_HOME=/var/www
 ADD . $CONTAINER_HOME
 WORKDIR $CONTAINER_HOME
 
+RUN apt-get update && apt-get install -y net-tools lsof
 RUN pip install -r $CONTAINER_HOME/requirements.txt
