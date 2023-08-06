@@ -39,7 +39,6 @@ export function LoginPage() {
             }),
         }).then(res => res.json())
         .then(data => {
-          console.log("data", data)
             const user = data;
             user.TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
             storeUserSession(user);

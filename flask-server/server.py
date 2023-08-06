@@ -32,26 +32,11 @@ def create_server():
 
             if not email or not hashed_password:
                 return jsonify({"message": "Missing email or hashed_password"}), 400
-            GET_USER_LOGIN_INFO = """
-                MATCH (account:Account)
-                WHERE account.Email = '{email}' AND account.PasswordHash = '{hashed_password}'
-                OPTIONAL MATCH (account)-[:FRIENDS_WITH]->(friend:Account)
-                WITH account, collect(DISTINCT {{friendUUID: friend.UUID, friendFirstName: friend.FirstName, friendLastName: friend.LastName, friendUsername: friend.Username}}) as Friends
-                OPTIONAL MATCH (account)-[:INTERESTED_IN]->(eventType:EventType)
-                WITH account, Friends, collect(DISTINCT eventType.UUID) as Interests
-                RETURN
-                    account.Email as Email,
-                    account.Username as Username,
-                    account.FirstName as FirstName,
-                    account.LastName as LastName,
-                    account.UUID as UUID,
-                    Friends,
-                    Interests;
-                """.format(email=email, hashed_password=hashed_password)
+            formatted_query = queries.GET_USER_LOGIN_INFO.format(email=email, hashed_password=hashed_password)
 
-            result = neo4j.execute_query(GET_USER_LOGIN_INFO)
+            result = neo4j.execute_query(formatted_query)
             
-            return result
+            return result[0]
 
         except Exception as e:
             # Return a 500 error with a description of the problem
