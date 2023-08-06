@@ -26,3 +26,6 @@ flask_server/certification/*
 flask_server/db/*
 flask_server/utils/*
 app_frontend/utils/aws_constants.js
+flask-server/certification/*
+flask-server/db/*
+flask-server/utils/*

@@ -1,44 +1,45 @@
-version: '3'
+version: '3.1'
 services:
-  flask_server:
+  flask:
     build: 
-      context: .
-      dockerfile: flask_server/Dockerfile.server
-    volumes:
-      - ./flask_server:/app
+      context: ./flask-server
+      dockerfile: Dockerfile.server
+    container_name: flask
+    command: gunicorn --bind 0.0.0.0:8000 --workers 4 "server:create_server()"
     ports:
-      - 5001:5000
-    restart: always
+      - 8000:8000
+    volumes:
+      - ./flask-server:/var/www
     networks:
-      - mynetwork
-
+      my-network:
+        aliases:
+          - flask-app
 
   frontend:
     build: 
       context: ./app_frontend
       dockerfile: Dockerfile.client
     volumes:
-      - ./app_frontend:/app
+      - ./app_frontend:/usr/src/app
     ports:
       - 19006:19006
-    restart: always
     networks:
-      - mynetwork
-
+      - my-network
+    depends_on:
+      - flask
 
   nginx:
     build:
       context: ./nginx
       dockerfile: Dockerfile.nginx
+    container_name: nginx
     ports:
       - "80:80"
-    restart: always
     depends_on:
+      - flask
       - frontend
-      - flask_server
     networks:
-      - mynetwork
+      - my-network
 
 networks:
-  mynetwork:
-    driver: bridge
+  my-network:
