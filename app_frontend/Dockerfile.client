@@ -1,12 +1,14 @@
 # Use an official Node runtime as a parent image
 FROM node:16
 
-WORKDIR /app
+WORKDIR /usr/src/app
 
 COPY package*.json ./
 COPY node_modules ./node_modules
 RUN npm install -g expo-cli
 
 COPY . .
+
+EXPOSE 19006
 
 CMD ["expo", "start", "--web"]
