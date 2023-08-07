@@ -1,14 +1,20 @@
 # Use an official Node runtime as a parent image
 FROM node:16
 
+# Set the working directory inside the container
 WORKDIR /usr/src/app
 
+# Copy the package.json and package-lock.json first for optimized caching
 COPY package*.json ./
-COPY node_modules ./node_modules
-RUN npm install -g expo-cli
 
+# Install dependencies
+RUN npm ci && npm install -g expo-cli
+
+# Copy the rest of the application
 COPY . .
 
+# Expose the port that the app runs on
 EXPOSE 19006
 
+# Define the command to run the app
 CMD ["expo", "start", "--web"]
