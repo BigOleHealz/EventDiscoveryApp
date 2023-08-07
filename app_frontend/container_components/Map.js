@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import { GoogleMap, LoadScript } from '@react-google-maps/api';
-// import { useReadCypher } from 'use-neo4j';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -9,7 +8,6 @@ import { ButtonComponent } from '../base_components/ButtonComponent';
 import MapMarkerWithTooltip from './MapMarkerWithTooltip';
 
 import { CreateGameContext } from '../utils/Contexts';
-import { recordsAsObjects } from '../db/DBHandler';
 import { getSecretValue } from '../utils/AWSHandler';
 import { LoggerContext, UserSessionContext } from '../utils/Contexts';
 import { day_start_time, day_end_time } from '../utils/constants';
@@ -55,8 +53,6 @@ export const Map = ({
     const fetchSecrets = async () => {
       const secrets = await getSecretValue('google_maps_api_key');
       if (secrets) {
-        console.log("google maps secret retrieved:", secrets)
-        // Use the secrets, e.g., set the API key
         setGoogleMapsApiKey(JSON.parse(secrets).GOOGLE_MAPS_API_KEY);
       }
     };
@@ -89,9 +85,7 @@ export const Map = ({
           }),
       }).then(res => res.json())
       .then(data => {
-          console.log("events:", data)
           setMapEventsFullDay(data);
-        
       }).catch((error) => {
           console.error('Error:', error);
       });
@@ -127,6 +121,11 @@ export const Map = ({
       setActivePopup(uuid);
     }
   };
+
+  useEffect(() => {
+    setFetchingEvents(true);
+  }, [findGameSelectedDate]);
+
 
   const logoutUser = () => {
     logger.info("User logging out...");

@@ -31,10 +31,10 @@ GET_ALL_NODE_UUIDS_BY_LABEL = "MATCH (n:{label}) RETURN n.UUID AS UUID;"
 ##### GET ALL NODES BY TYPE AS LIST #####
 
 GET_EVENT_TYPE_NAMES_MAPPINGS = """
-                                MATCH (n:EventType)
+                                MATCH (event:EventType)
                                 RETURN
-                                    n.UUID as UUID,
-                                    n.EventType AS EventType;
+                                    event.UUID as UUID,
+                                    event.EventType AS EventType;
                                 """
 
 
@@ -150,14 +150,12 @@ DETERMINE_IF_FRIEND_REQUESTS_ALREADY_EXISTS_OR_USERS_ALREADY_FRIENDS = """
 
 GET_FRIEND_REQUEST_STATUS = """
                             MATCH (a), (b)
-                            WHERE ID(a) = {node_a_id} AND ID(b) = {node_b_id}
+                                WHERE ID(a) = {node_a_id} AND ID(b) = {node_b_id}
                             RETURN EXISTS((a)-[:FRIEND_REQUEST]->(b)) AS friend_request_sent,
-                            EXISTS((a)-[:FRIENDS_WITH]->(b)) AS friends_with;
-                            
-MATCH (a)-[r:FRIEND_REQUEST]->(b)
-WHERE ID(a) = {node_a_id} AND ID(b) = {node_b_id}
-RETURN r.status
-
+                                EXISTS((a)-[:FRIENDS_WITH]->(b)) AS friends_with;
+                                MATCH (a)-[r:FRIEND_REQUEST]->(b)
+                                WHERE ID(a) = {node_a_id} AND ID(b) = {node_b_id}
+                            RETURN r.status
                             """
 
 
@@ -350,14 +348,6 @@ GET_NOTIFICATIONS = """
 #####################
 ###### CREATES ######
 #####################
-# CREATE_EVENT_IF_NOT_EXISTS = r"""
-#     MERGE (e:Event {Source: $params.Source, SourceEventID: $params.SourceEventID})
-#     ON CREATE SET e += $params
-#     WITH e
-#     MATCH (et:EventType {UUID: $params.EventTypeUUID})
-#     MERGE (et)-[:RELATED_EVENT]->(e)
-#     RETURN e.UUID as EventUUID;
-# """
 
 # MERGE_EVENT_TYPE_NODE = r"""
 #     WITH $params.uuid as uuid
@@ -368,16 +358,6 @@ GET_NOTIFICATIONS = """
 #     RETURN et.UUID as EventTypeUUID;
 # """
 
-# CREATE_EVENT_IF_NOT_EXISTS = r"""
-#                             MERGE (e:Event {Source: $params.Source, SourceEventID: $params.SourceEventID})
-#                             WITH e, $params as params
-#                                 WHERE e.UUID IS NULL // if Event node didn't exist before, e.UUID should be null
-#                                 MERGE (et:EventType {EventType: params.event_type})
-#                                 ON CREATE SET et.UUID = params.uuid
-#                                 WITH e, et
-#                                 MERGE (et)-[:RELATED_EVENT]->(e)
-#                             RETURN e.UUID as EventUUID;
-#                             """
 
 CHECK_IF_EVENT_EXISTS = r"""
                     MATCH (e:Event {Source: $params.Source, SourceEventID: $params.SourceEventID})

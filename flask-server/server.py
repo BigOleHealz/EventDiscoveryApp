@@ -11,7 +11,7 @@ neo4j = Neo4jDB(logger=logger)
 
 def create_server():
     app = Flask(__name__)
-    @app.route("/get_event_type_mappings")
+    @app.route("/get_event_type_mappings", methods=["GET"])
     def get_event_type_mappings():
         try:
             result = neo4j.execute_query(queries.GET_EVENT_TYPE_NAMES_MAPPINGS)

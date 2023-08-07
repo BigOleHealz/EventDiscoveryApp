@@ -3,8 +3,6 @@ import { ScrollView, View, CheckBox, Text, StyleSheet, Switch } from 'react-nati
 import { toast } from 'react-toastify';
 
 import { TextComponent } from '../base_components/TextComponent';
-import { GET_EVENT_TYPES } from '../db/queries';
-// import { useCustomCypherRead } from '../hooks/CustomCypherHooks';
 import styles from '../styles';
 
 export const SelectInterestsScrollView = ({
@@ -65,7 +63,7 @@ export const SelectInterestsScrollView = ({
 
     useEffect(() => {
       if (first_run ) {
-        fetch('http://35.153.228.179:5001/get_event_type_mappings', {
+        fetch('/api/get_event_type_mappings', {
           method: 'GET',
           headers: {
               'Content-Type': 'application/json',
