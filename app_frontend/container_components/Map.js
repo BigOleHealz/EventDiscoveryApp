@@ -10,11 +10,6 @@ import MapMarkerWithTooltip from './MapMarkerWithTooltip';
 
 import { CreateGameContext } from '../utils/Contexts';
 import { recordsAsObjects } from '../db/DBHandler';
-import {
-  FETCH_EVENTS_FOR_MAP,
-  CREATE_ATTEND_EVENT_RELATIONSHIP,
-} from '../db/queries';
-// import { useCustomCypherWrite } from '../hooks/CustomCypherHooks';
 import { getSecretValue } from '../utils/AWSHandler';
 import { LoggerContext, UserSessionContext } from '../utils/Contexts';
 import { day_start_time, day_end_time } from '../utils/constants';
@@ -44,6 +39,7 @@ export const Map = ({
   const [event_uuid, setEventUUID] = useState(null);
   const [activePopup, setActivePopup] = useState(null);
   const [createGameData, setCreateGameData] = useState({});
+  const [fetching_events, setFetchingEvents] = useState(true);
 
   const [ isCreateGameDateTimeModalVisible, setIsCreateGameDateTimeModalVisible ] = useState(false);
   const [ isSelectEventTypeModalVisible, setIsSelectEventTypeModalVisible ] = useState(false);
@@ -79,46 +75,50 @@ export const Map = ({
   const start_timestamp = convertUTCDateToLocalDate(new Date(`${findGameSelectedDate}T${day_start_time}`));
   const end_timestamp = convertUTCDateToLocalDate(new Date(`${findGameSelectedDate}T${day_end_time}`));
 
-  // const { loading, error, records, run } = useReadCypher(FETCH_EVENTS_FOR_MAP);
+  useEffect(() => {
+    if (fetching_events) {
 
-  // useEffect(() => {
-  //   logger.info('findGameSelectedDate changed', findGameSelectedDate);
-  //   const params = {
-  //     account_uuid: userSession.UUID,
-  //     start_timestamp: start_timestamp,
-  //     end_timestamp: end_timestamp,
-  //   };
-  //   logger.info('params:', params);
-  //   run(params);
-  // }, [findGameSelectedDate, event_uuid, transactionStatus === false]);
+      fetch('/api/events', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+              start_timestamp: start_timestamp,
+              end_timestamp: end_timestamp,
+          }),
+      }).then(res => res.json())
+      .then(data => {
+          console.log("events:", data)
+          setMapEventsFullDay(data);
+        
+      }).catch((error) => {
+          console.error('Error:', error);
+      });
 
-  // useEffect(() => {
-  //   if (!loading && !error && records) {
-  //     const mapEventsObjectList = recordsAsObjects(records);
-  //     console.log('mapEventsObjectList:', mapEventsObjectList)
-  //     setMapEventsFullDay(mapEventsObjectList);
-  //   }
-  // }, [loading, error, records]);
+      setFetchingEvents(false);
+    }
+  }, [fetching_events, start_timestamp, end_timestamp]);
 
-  // useEffect(() => {
-  //   const start_time_raw_string = `${findGameSelectedDate}T${findGameStartTime}`
-  //   const end_time_raw_string = `${findGameSelectedDate}T${findGameEndTime}`
-  //   logger.info(`Datetime changed - startTime: ${start_time_raw_string} endTime: ${end_time_raw_string}`);
-  //   const startTime = new Date(start_time_raw_string);
-  //   const endTime = new Date(end_time_raw_string);
+  useEffect(() => {
+    const start_time_raw_string = `${findGameSelectedDate}T${findGameStartTime}`
+    const end_time_raw_string = `${findGameSelectedDate}T${findGameEndTime}`
+    logger.info(`Datetime changed - startTime: ${start_time_raw_string} endTime: ${end_time_raw_string}`);
+    const startTime = new Date(start_time_raw_string);
+    const endTime = new Date(end_time_raw_string);
 
-  //   const filteredEvents = map_events_full_day.filter((event) => {
-  //     const eventTimestamp = new Date(event.StartTimestamp);
-  //     return (
-  //       eventTimestamp >= startTime &&
-  //       eventTimestamp <= endTime &&
-  //       eventTypesSelected.includes(event.EventTypeUUID)
-  //     );
-  //   });
+    const filteredEvents = map_events_full_day.filter((event) => {
+      const eventTimestamp = new Date(event.StartTimestamp);
+      return (
+        eventTimestamp >= startTime &&
+        eventTimestamp <= endTime &&
+        eventTypesSelected.includes(event.EventTypeUUID)
+      );
+    });
     
-  //   logger.info('filteredEvents:', filteredEvents)
-  //   setMapEventsFiltered(filteredEvents);
-  // }, [findGameStartTime, findGameEndTime, map_events_full_day, eventTypesSelected]);
+    logger.info('filteredEvents:', filteredEvents)
+    setMapEventsFiltered(filteredEvents);
+  }, [findGameStartTime, findGameEndTime, map_events_full_day, eventTypesSelected]);
 
   const handleSetActivePopup = (uuid) => {
     if (activePopup === uuid) {
@@ -168,7 +168,7 @@ export const Map = ({
             ],
           }}
         >
-          {/* {Array.isArray(map_events_filtered) &&
+          {Array.isArray(map_events_filtered) &&
             map_events_filtered.map((event) => (
               <MapMarkerWithTooltip
                 key={event.UUID}
@@ -177,7 +177,7 @@ export const Map = ({
                 onSetActivePopup={handleSetActivePopup}
                 setEventUUID={setEventUUID}
               />
-            ))} */}
+            ))}
         </GoogleMap>
       </LoadScript>
       <ButtonComponent
