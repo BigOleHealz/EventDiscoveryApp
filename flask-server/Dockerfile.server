@@ -2,8 +2,12 @@ FROM python:3.8-slim
 
 ENV CONTAINER_HOME=/var/www
 
-ADD . $CONTAINER_HOME
 WORKDIR $CONTAINER_HOME
 
+# Install the required packages first to leverage Docker layer caching
+ADD requirements.txt $CONTAINER_HOME/
 RUN apt-get update && apt-get install -y net-tools lsof
-RUN pip install -r $CONTAINER_HOME/requirements.txt
+RUN pip install -r requirements.txt
+
+# Add the rest of the files
+ADD . $CONTAINER_HOME
