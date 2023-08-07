@@ -171,43 +171,68 @@ AUTHENTICATE_ACCOUNT_EMAIL_AND_PASSWORD = """
 #####################################
 ######## GET BY RELATIONSHIP ########
 #####################################
-GET_EVENTS_RELATED_TO_USER = """
-                            MATCH (n:Person)
-                            WHERE n.Email = "{email}"
-                            WITH n
-                            MATCH (e:Event), (et:EventType)
-                            WHERE 
-                                (
-                                    (n)-[:INVITED|:CREATED_EVENT]->(e) 
-                                    OR (
-                                        e.PublicEventFlag = true
-                                        AND
-                                        (n)-[:INTERESTED_IN]->(et)-[:RELATED_EVENT]->(e)
-                                    )
-                                )
-                                AND (
-                                    "{start_ts}" <= e.StartTimestamp < "{end_ts}"
-                                    OR
-                                    "{start_ts}" < e.EndTimestamp <= "{end_ts}"
-                                    OR
-                                    (e.StartTimestamp <= "{start_ts}" AND "{end_ts}" <= e.EndTimestamp)
-                                )
-                                AND point.distance(point(
-                                    {{ longitude: e.Lon, latitude: e.Lat }}), 
-                                    point({{ longitude: {longitude}, latitude: {latitude} }})) <= {radius} * 1000
-                            WITH n, COLLECT(e) as events
-                            UNWIND events as event
-                            OPTIONAL MATCH (u:Person)-[r:ATTENDING]->(event)
-                            WITH n, event, COALESCE(count(r), 0) as AttendeeCount
-                            MATCH (et:EventType)
-                                WHERE ID(et) = event.EventTypeID
-                            WITH event, AttendeeCount, et,
-                                CASE
-                                    WHEN (n)-[:ATTENDING]->(event) THEN True
-                                    ELSE False
-                                END as ATTENDING_BOOLEAN
-                            RETURN event as Event, AttendeeCount, et.EventType as EventType, ATTENDING_BOOLEAN;
-                            """
+FETCH_EVENTS_FOR_MAP = """
+    MATCH (event:Event)
+    WHERE "{start_timestamp}" <= event.StartTimestamp <= "{end_timestamp}"
+    OPTIONAL MATCH (event)-[r:ATTENDING]-()
+    WITH event, count(r) as AttendeeCount
+    MATCH (eventType:EventType)-[:RELATED_EVENT]->(event)
+
+    RETURN
+        event.Address as Address,
+        event.CreatedByUUID as CreatedByUUID,
+        event.Host as Host,
+        event.Lon as Lon,
+        event.Lat as Lat,
+        event.StartTimestamp as StartTimestamp,
+        event.EndTimestamp as EndTimestamp,
+        event.EventName as EventName,
+        event.UUID as UUID,
+        event.EventURL as EventURL,
+        event.Price as Price,
+        event.FreeEventFlag as FreeEventFlag,
+        event.EventTypeUUID as EventTypeUUID,
+        eventType.EventType as EventType,
+        eventType.IconURI as EventTypeIconURI,
+        AttendeeCount;
+    """
+# GET_EVENTS_RELATED_TO_USER = """
+#                             MATCH (n:Person)
+#                             WHERE n.Email = "{email}"
+#                             WITH n
+#                             MATCH (e:Event), (et:EventType)
+#                             WHERE 
+#                                 (
+#                                     (n)-[:INVITED|:CREATED_EVENT]->(e) 
+#                                     OR (
+#                                         e.PublicEventFlag = true
+#                                         AND
+#                                         (n)-[:INTERESTED_IN]->(et)-[:RELATED_EVENT]->(e)
+#                                     )
+#                                 )
+#                                 AND (
+#                                     "{start_ts}" <= e.StartTimestamp < "{end_ts}"
+#                                     OR
+#                                     "{start_ts}" < e.EndTimestamp <= "{end_ts}"
+#                                     OR
+#                                     (e.StartTimestamp <= "{start_ts}" AND "{end_ts}" <= e.EndTimestamp)
+#                                 )
+#                                 AND point.distance(point(
+#                                     {{ longitude: e.Lon, latitude: e.Lat }}), 
+#                                     point({{ longitude: {longitude}, latitude: {latitude} }})) <= {radius} * 1000
+#                             WITH n, COLLECT(e) as events
+#                             UNWIND events as event
+#                             OPTIONAL MATCH (u:Person)-[r:ATTENDING]->(event)
+#                             WITH n, event, COALESCE(count(r), 0) as AttendeeCount
+#                             MATCH (et:EventType)
+#                                 WHERE ID(et) = event.EventTypeID
+#                             WITH event, AttendeeCount, et,
+#                                 CASE
+#                                     WHEN (n)-[:ATTENDING]->(event) THEN True
+#                                     ELSE False
+#                                 END as ATTENDING_BOOLEAN
+#                             RETURN event as Event, AttendeeCount, et.EventType as EventType, ATTENDING_BOOLEAN;
+#                             """
 
 GET_USER_LOGIN_INFO = """
                 MATCH (account:Account)

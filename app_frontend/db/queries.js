@@ -88,33 +88,30 @@ export const INVITE_FRIENDS_TO_EVENT = `
     RETURN e;
     `;
 
-// MATCH (account:Account {UUID: $account_uuid})-[:INTERESTED_IN]->(eventType:EventType)
-// WITH collect(eventType.UUID) as interestedEventTypeUUIDs
-// AND event.EventTypeUUID IN interestedEventTypeUUIDs
 export const FETCH_EVENTS_FOR_MAP = `
-MATCH (event:Event)
-WHERE $start_timestamp <= event.StartTimestamp <= $end_timestamp
-OPTIONAL MATCH (event)-[r:ATTENDING]-()
-WITH event, count(r) as AttendeeCount
-MATCH (eventType:EventType)-[:RELATED_EVENT]->(event)
+    MATCH (event:Event)
+    WHERE $start_timestamp <= event.StartTimestamp <= $end_timestamp
+    OPTIONAL MATCH (event)-[r:ATTENDING]-()
+    WITH event, count(r) as AttendeeCount
+    MATCH (eventType:EventType)-[:RELATED_EVENT]->(event)
 
-RETURN
-    event.Address as Address,
-    event.CreatedByUUID as CreatedByUUID,
-    event.Host as Host,
-    event.Lon as Lon,
-    event.Lat as Lat,
-    event.StartTimestamp as StartTimestamp,
-    event.EndTimestamp as EndTimestamp,
-    event.EventName as EventName,
-    event.UUID as UUID,
-    event.EventURL as EventURL,
-    event.Price as Price,
-    event.FreeEventFlag as FreeEventFlag,
-    event.EventTypeUUID as EventTypeUUID,
-    eventType.EventType as EventType,
-    eventType.IconURI as EventTypeIconURI,
-    AttendeeCount;
+    RETURN
+        event.Address as Address,
+        event.CreatedByUUID as CreatedByUUID,
+        event.Host as Host,
+        event.Lon as Lon,
+        event.Lat as Lat,
+        event.StartTimestamp as StartTimestamp,
+        event.EndTimestamp as EndTimestamp,
+        event.EventName as EventName,
+        event.UUID as UUID,
+        event.EventURL as EventURL,
+        event.Price as Price,
+        event.FreeEventFlag as FreeEventFlag,
+        event.EventTypeUUID as EventTypeUUID,
+        eventType.EventType as EventType,
+        eventType.IconURI as EventTypeIconURI,
+        AttendeeCount;
     `;
 // apoc.date.format(datetime(n.StartTimestamp).epochMillis, "ms", "HH:mm") as FormattedStart;
 
@@ -152,102 +149,102 @@ export const GET_USER_INFO = `
         }) as Friends;
     `;
 
-export const CREATE_FRIEND_REQUEST_RELATIONSHIP = `
-    MATCH (a:Person {UUID: $sender_email}), (b:Person {UUID: $recipient_email})
-    OPTIONAL MATCH (a)-[existingFriendRequest:FRIEND_REQUEST_SENT]->(b)
-    OPTIONAL MATCH (a)<-[existingFriendRequestReverse:FRIEND_REQUEST_SENT]-(b)
-    OPTIONAL MATCH (a)-[existingFriends:FRIENDS_WITH]-(b)
-    WITH a, b,
-        CASE
-            WHEN existingFriendRequest IS NOT NULL THEN
-                {STATUS: "ERROR", RESPONSE: "You have already sent a friend request to this person", UUID: existingFriendRequest.UUID}
-            WHEN existingFriendRequestReverse IS NOT NULL THEN
-                {STATUS: "ERROR", RESPONSE: "This person has already sent you a friend request", UUID: existingFriendRequestReverse.UUID}
-            WHEN existingFriends IS NOT NULL THEN
-                {STATUS: "ERROR", RESPONSE: "You are already friends with this person"}
-            ELSE
-                NULL
-        END as error
-    WITH a, b, error
-    WHERE error IS NULL
-    CREATE (a)-[r:FRIEND_REQUEST_SENT {FRIEND_REQUEST_TIMESTAMP: apoc.date.format(apoc.date.currentTimestamp(), "ms", "yyyy-MM-dd'T'HH:mm:ss"), STATUS: "PENDING", UUID: apoc.create.uuid()}]->(b)
-    RETURN {STATUS: "SUCCESS", RESPONSE: "Friend request sent", UUID: r.UUID} as result
-    `;
+// export const CREATE_FRIEND_REQUEST_RELATIONSHIP = `
+//     MATCH (a:Person {UUID: $sender_email}), (b:Person {UUID: $recipient_email})
+//     OPTIONAL MATCH (a)-[existingFriendRequest:FRIEND_REQUEST_SENT]->(b)
+//     OPTIONAL MATCH (a)<-[existingFriendRequestReverse:FRIEND_REQUEST_SENT]-(b)
+//     OPTIONAL MATCH (a)-[existingFriends:FRIENDS_WITH]-(b)
+//     WITH a, b,
+//         CASE
+//             WHEN existingFriendRequest IS NOT NULL THEN
+//                 {STATUS: "ERROR", RESPONSE: "You have already sent a friend request to this person", UUID: existingFriendRequest.UUID}
+//             WHEN existingFriendRequestReverse IS NOT NULL THEN
+//                 {STATUS: "ERROR", RESPONSE: "This person has already sent you a friend request", UUID: existingFriendRequestReverse.UUID}
+//             WHEN existingFriends IS NOT NULL THEN
+//                 {STATUS: "ERROR", RESPONSE: "You are already friends with this person"}
+//             ELSE
+//                 NULL
+//         END as error
+//     WITH a, b, error
+//     WHERE error IS NULL
+//     CREATE (a)-[r:FRIEND_REQUEST_SENT {FRIEND_REQUEST_TIMESTAMP: apoc.date.format(apoc.date.currentTimestamp(), "ms", "yyyy-MM-dd'T'HH:mm:ss"), STATUS: "PENDING", UUID: apoc.create.uuid()}]->(b)
+//     RETURN {STATUS: "SUCCESS", RESPONSE: "Friend request sent", UUID: r.UUID} as result
+//     `;
 
-export const GET_FRIEND_REQUESTS = `
-    MATCH (a)-[r:FRIEND_REQUEST {STATUS: "PENDING"}]->(b {UUID: $invitee_uuid})
-    RETURN 
-        a.FirstName as FirstName,
-        a.LastName as LastName,
-        a.Username as Username,
-        a.UUID as RequesterUUID,
-        r.UUID as FriendRequestUUID
-    ORDER BY r.FRIEND_REQUEST_TIMESTAMP DESC;
-    `;
+// export const GET_FRIEND_REQUESTS = `
+//     MATCH (a)-[r:FRIEND_REQUEST {STATUS: "PENDING"}]->(b {UUID: $invitee_uuid})
+//     RETURN 
+//         a.FirstName as FirstName,
+//         a.LastName as LastName,
+//         a.Username as Username,
+//         a.UUID as RequesterUUID,
+//         r.UUID as FriendRequestUUID
+//     ORDER BY r.FRIEND_REQUEST_TIMESTAMP DESC;
+//     `;
 
-export const GET_EVENT_INVITES = `
-    MATCH (n:Person {UUID: $invitee_uuid})-[r:INVITED]->(e:Event)
-    MATCH (inviter:Person {UUID: r.INVITED_BY_UUID})
-    WHERE r.STATUS = 'PENDING' AND datetime(e.EndTimestamp) > datetime()
-    OPTIONAL MATCH (e)-[attending:ATTENDING]-()
-    WITH e, inviter, r, count(attending) as AttendeeCount
-    RETURN r.INVITED_BY_UUID as InviterNodeUUID,
-        r.UUID as InviteRelationshipUUID,
-        inviter.Username as InviterUsername,
-        inviter.FirstName as InviterFirstName,
-        inviter.LastName as InviterLastName,
-        e.Address as Address,
-        e.EventName as EventName,
-        e.Host as Host,
-        e.EventType as EventType,
-        e.StartTimestamp as StartTimestamp,
-        e.EndTimestamp as EndTimestamp,
-        e.EventURL as EventURL,
-        e.UUID as EventNodeUUID,
-        AttendeeCount
-    ORDER BY r.INVITED_TIMESTAMP;
+// export const GET_EVENT_INVITES = `
+//     MATCH (n:Person {UUID: $invitee_uuid})-[r:INVITED]->(e:Event)
+//     MATCH (inviter:Person {UUID: r.INVITED_BY_UUID})
+//     WHERE r.STATUS = 'PENDING' AND datetime(e.EndTimestamp) > datetime()
+//     OPTIONAL MATCH (e)-[attending:ATTENDING]-()
+//     WITH e, inviter, r, count(attending) as AttendeeCount
+//     RETURN r.INVITED_BY_UUID as InviterNodeUUID,
+//         r.UUID as InviteRelationshipUUID,
+//         inviter.Username as InviterUsername,
+//         inviter.FirstName as InviterFirstName,
+//         inviter.LastName as InviterLastName,
+//         e.Address as Address,
+//         e.EventName as EventName,
+//         e.Host as Host,
+//         e.EventType as EventType,
+//         e.StartTimestamp as StartTimestamp,
+//         e.EndTimestamp as EndTimestamp,
+//         e.EventURL as EventURL,
+//         e.UUID as EventNodeUUID,
+//         AttendeeCount
+//     ORDER BY r.INVITED_TIMESTAMP;
 
-    `;
+//     `;
         // apoc.date.format(datetime(e.StartTimestamp).epochMillis, "ms", "hh:mm a") as FormattedStart,
         // apoc.date.format(datetime(e.EndTimestamp).epochMillis, "ms", "hh:mm a") as FormattedEnd,
 // e.StartTimestamp as StartTimestamp,
 
-export const RESPOND_TO_EVENT_INVITE = `
-    WITH $response as RESPONSE, apoc.date.format(apoc.date.currentTimestamp(), "ms", "yyyy-MM-dd'T'HH:mm:ss") AS CURRENT_DATETIME
-    MATCH (invitee:Account)-[r]-(event:Event)
-    WHERE r.UUID = $event_invite_uuid
-    SET
-        r.STATUS = RESPONSE,
-        r.RESPONSE_TIMESTAMP = CURRENT_DATETIME
-    WITH invitee, event, r, CURRENT_DATETIME, RESPONSE = "ACCEPTED" AS shouldCreateAttendingRelationship
-    FOREACH (_ IN CASE WHEN shouldCreateAttendingRelationship THEN [1] ELSE [] END |
-        MERGE (invitee)-[:ATTENDING {UUID: apoc.create.uuid(), ACCEPTED_TIMESTAMP: CURRENT_DATETIME}]->(event)
-    )
-    RETURN r.UUID as EVENT_INVITE_UUID;
-    `;
+// export const RESPOND_TO_EVENT_INVITE = `
+//     WITH $response as RESPONSE, apoc.date.format(apoc.date.currentTimestamp(), "ms", "yyyy-MM-dd'T'HH:mm:ss") AS CURRENT_DATETIME
+//     MATCH (invitee:Account)-[r]-(event:Event)
+//     WHERE r.UUID = $event_invite_uuid
+//     SET
+//         r.STATUS = RESPONSE,
+//         r.RESPONSE_TIMESTAMP = CURRENT_DATETIME
+//     WITH invitee, event, r, CURRENT_DATETIME, RESPONSE = "ACCEPTED" AS shouldCreateAttendingRelationship
+//     FOREACH (_ IN CASE WHEN shouldCreateAttendingRelationship THEN [1] ELSE [] END |
+//         MERGE (invitee)-[:ATTENDING {UUID: apoc.create.uuid(), ACCEPTED_TIMESTAMP: CURRENT_DATETIME}]->(event)
+//     )
+//     RETURN r.UUID as EVENT_INVITE_UUID;
+//     `;
 
-export const RESPOND_TO_FRIEND_REQUEST = `
-    WITH $response as RESPONSE, apoc.date.format(apoc.date.currentTimestamp(), "ms", "yyyy-MM-dd'T'HH:mm:ss") AS CURRENT_DATETIME
-    MATCH (friend_request_sender:Person)-[r]-(friend_request_receiver:Person)
-    WHERE r.UUID = $friend_request_uuid
-    SET
-        r.STATUS = RESPONSE,
-        r.RESPONSE_TIMESTAMP = CURRENT_DATETIME
-    WITH friend_request_sender, friend_request_receiver, r, CURRENT_DATETIME, RESPONSE = "ACCEPTED" AS shouldCreateFriendsWithRelationship
-    FOREACH (_ IN CASE WHEN shouldCreateFriendsWithRelationship THEN [1] ELSE [] END |
-        MERGE (friend_request_sender)-[:FRIENDS_WITH {UUID: apoc.create.uuid(), FRIENDS_SINCE_TIMESTAMP: CURRENT_DATETIME}]->(friend_request_receiver)
-    )
-    RETURN r.UUID as FRIEND_REQUEST_UUID;
-    `;
+// export const RESPOND_TO_FRIEND_REQUEST = `
+//     WITH $response as RESPONSE, apoc.date.format(apoc.date.currentTimestamp(), "ms", "yyyy-MM-dd'T'HH:mm:ss") AS CURRENT_DATETIME
+//     MATCH (friend_request_sender:Person)-[r]-(friend_request_receiver:Person)
+//     WHERE r.UUID = $friend_request_uuid
+//     SET
+//         r.STATUS = RESPONSE,
+//         r.RESPONSE_TIMESTAMP = CURRENT_DATETIME
+//     WITH friend_request_sender, friend_request_receiver, r, CURRENT_DATETIME, RESPONSE = "ACCEPTED" AS shouldCreateFriendsWithRelationship
+//     FOREACH (_ IN CASE WHEN shouldCreateFriendsWithRelationship THEN [1] ELSE [] END |
+//         MERGE (friend_request_sender)-[:FRIENDS_WITH {UUID: apoc.create.uuid(), FRIENDS_SINCE_TIMESTAMP: CURRENT_DATETIME}]->(friend_request_receiver)
+//     )
+//     RETURN r.UUID as FRIEND_REQUEST_UUID;
+//     `;
 
-export const CREATE_ATTEND_EVENT_RELATIONSHIP = `
-    MATCH (p:Person {UUID: $attendee_uuid}), (e:Event {UUID: $event_uuid})
-    MERGE (p)-[r:ATTENDING]->(e)
-    ON CREATE SET r.UUID = apoc.create.uuid(),
-                r.ACCEPTED_TIMESTAMP = apoc.date.format(apoc.date.currentTimestamp(), "ms", "yyyy-MM-dd'T'HH:mm:ss")
-    RETURN r;
+// export const CREATE_ATTEND_EVENT_RELATIONSHIP = `
+//     MATCH (p:Person {UUID: $attendee_uuid}), (e:Event {UUID: $event_uuid})
+//     MERGE (p)-[r:ATTENDING]->(e)
+//     ON CREATE SET r.UUID = apoc.create.uuid(),
+//                 r.ACCEPTED_TIMESTAMP = apoc.date.format(apoc.date.currentTimestamp(), "ms", "yyyy-MM-dd'T'HH:mm:ss")
+//     RETURN r;
 
-    `;
+    // `;
 
 export const DELETE_RELATIONSHIP_BY_UUID = `
     MATCH ()-[r]-()

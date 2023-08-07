@@ -15,7 +15,6 @@ def create_server():
     def get_event_type_mappings():
         try:
             result = neo4j.execute_query(queries.GET_EVENT_TYPE_NAMES_MAPPINGS)
-            # result = {"event" : "type_mappings"}
             return result
         except Exception as e:
             # Return a 500 error with a description of the problem
@@ -24,11 +23,11 @@ def create_server():
     @app.route("/get_user_login_info", methods=["POST"])
     def get_user_login_info():
         try:
-            data = request.get_json()  # Get data sent in POST request
-            if not data:
-                return jsonify({"message": "No input data provided"}), 400
-            email = data.get('email')
-            hashed_password = data.get('hashed_password')
+            body = request.get_json()
+            if not body:
+                return jsonify({"message": "No input body provided"}), 400
+            email = body.get('email')
+            hashed_password = body.get('hashed_password')
 
             if not email or not hashed_password:
                 return jsonify({"message": "Missing email or hashed_password"}), 400
@@ -42,8 +41,25 @@ def create_server():
             # Return a 500 error with a description of the problem
             return jsonify({"message": "An error occurred: " + str(e)}), 500
 
-    @app.route('/events')
+    @app.route('/events', methods=["POST"])
     def events():
-        return {"events" : ["event1", "event2"]}
+        try:
+            body = request.get_json()
+            if not body:
+                return jsonify({"message": "No input body provided"}), 400
+            start_timestamp = body.get('start_timestamp')
+            end_timestamp = body.get('end_timestamp')
+
+            if not start_timestamp or not end_timestamp:
+                return jsonify({"message": "Missing start_timestamp or end_timestamp"}), 400
+            formatted_query = queries.FETCH_EVENTS_FOR_MAP.format(start_timestamp=start_timestamp, end_timestamp=end_timestamp)
+
+            result = neo4j.execute_query(formatted_query)
+            
+            return result
+
+        except Exception as e:
+            # Return a 500 error with a description of the problem
+            return jsonify({"message": "An error occurred: " + str(e)}), 500
 
     return app
