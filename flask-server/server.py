@@ -17,7 +17,6 @@ def create_server():
             result = neo4j.execute_query(queries.GET_EVENT_TYPE_NAMES_MAPPINGS)
             return result
         except Exception as e:
-            # Return a 500 error with a description of the problem
             return jsonify({"message": "An error occurred: " + str(e)}), 500
 
     @app.route("/get_user_login_info", methods=["POST"])
@@ -38,7 +37,6 @@ def create_server():
             return result[0]
 
         except Exception as e:
-            # Return a 500 error with a description of the problem
             return jsonify({"message": "An error occurred: " + str(e)}), 500
 
     @app.route('/events', methods=["POST"])
@@ -59,7 +57,6 @@ def create_server():
             return result
 
         except Exception as e:
-            # Return a 500 error with a description of the problem
             return jsonify({"message": "An error occurred: " + str(e)}), 500
 
     return app
