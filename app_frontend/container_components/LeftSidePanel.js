@@ -34,7 +34,6 @@ export const LeftSidePanel = ({
       testID="left-side-panel"
       type="left"
       position={['-30%', '0%']}
-      // title="Find Games"
       isVisible={isVisible}
       style={panel_styles.sidePanel}
     >
