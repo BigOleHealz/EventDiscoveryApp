@@ -3,76 +3,76 @@ import { View, Text, StyleSheet } from 'react-native';
 import { Link } from 'react-router-native';
 import { ToastContainer, toast } from 'react-toastify';
 
-import { ButtonComponent } from '../base_components/ButtonComponent';
+import { GoogleLoginButton } from "react-social-login-buttons";
+import { LoginSocialGoogle } from "reactjs-social-login";
+
 import { TextComponent } from '../base_components/TextComponent';
-import { TextInputComponent } from '../base_components/TextInputComponent';
-import { GET_USER_LOGIN_INFO } from '../db/queries';
-import { recordsAsObjects } from '../db/DBHandler';
-import { LoggerContext, UserSessionContext } from '../utils/Contexts';
-import { hashPassword } from '../utils/HelperFunctions'
+import { CreateUsernameModal } from '../container_components/Modals';
+import { CreateUserProfileContext, LoggerContext, UserSessionContext } from '../utils/Contexts';
 import { storeUserSession } from '../utils/SessionManager';
 import styles from '../styles';
-import { error } from 'neo4j-driver';
 
 export function LoginPage() {
 
-	const { userSession, setUserSession } = React.useContext(UserSessionContext);
-	const { logger, setLogger } = React.useContext(LoggerContext);
+  const { userSession, setUserSession } = React.useContext(UserSessionContext);
+  const { logger, setLogger } = React.useContext(LoggerContext);
+  const { user_profile_context, setUserProfileContext } = React.useContext(CreateUserProfileContext);
+  const [isCreateUsernameModalVisible, setCreateUsernameModalVisible] = useState(false);
 
-  const [fetching_user_login_info, setFetchingUserLoginInfo] = useState(false);
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [fetching_user_profile, setFetchingUserLoginInfo] = useState(false);
+  const [googleIdToken, setGoogleIdToken] = useState(null); // New state to store the Google ID token
+
+  const [email, setEmail] = useState(null);
+  const [first_name, setFirstName] = useState(null);
+  const [last_name, setLastName] = useState(null);
+
+  const onGoogleLoginSuccess = ({ provider, data }) => {
+    // toast.success('Login Successful!');
+    console.log('Google login success:', provider, data);
+    console.log(provider, data);
+    console.log(data.access_token)
+    // setGoogleIdToken(data.access_token); 
+    setEmail(data.email);
+  };
 
   useEffect(() => {
-    if (fetching_user_login_info) {
-        const hashed_password = hashPassword(password);
-
-        fetch('/api/get_user_login_info', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                email: email,
-                hashed_password: hashed_password,
-            }),
-        }).then(res => res.json())
+    if (email) {
+      fetch('/api/get_user_profile', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: email
+        }),
+      }).then(res => res.json())
         .then(data => {
-            const user = data;
-            user.TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-            storeUserSession(user);
-            setUserSession(user);
-            toast.success('Login Successful!');
-            console.log('Login Successful');
-            logger.info(`Login Successful for email: ${email}`);
-            resetLoginInfo();
-          
+          console.log(data);
+          if (!data || data.length === 0) {
+            toast.error('No user data returned!');
+            console.error('No user data returned for email:', email);
+            
+            setCreateUsernameModalVisible(true);  // Show the modal if data list is empty
+            return; // Don't continue processing
+          }
+
+          const user = data;
+          user.TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+          storeUserSession(user);
+          setUserSession(user);
+          toast.success('Login Successful!');
+          console.log('Login Successful');
+          logger.info(`Login Successful for email: ${email}`);
+          resetLoginInfo();
+
         }).catch((error) => {
-            console.error('Error:', error);
+          console.error('Error:', error);
+          toast.error('An error occurred while fetching user profile!');
         });
     }
-    setFetchingUserLoginInfo(false);
-}, [fetching_user_login_info]);
-
-
-  const resetLoginInfo = () => {
-    setEmail('');
-    setPassword('');
-  };
-
-  const handleEmailChange = (newEmail) => {
-    setEmail(newEmail);
-  };
-
-  const handlePasswordChange = (newPassword) => {
-    setPassword(newPassword);
-  };
-
-  const handleSubmit = () => {
-    logger.info(`Login attempt for email: ${email}`)
-    setFetchingUserLoginInfo(true);
-  };
+    setEmail(false);
+  }, [email]);
 
   return (
     <>
@@ -80,36 +80,28 @@ export function LoginPage() {
       <View style={[loginPageStyles.container, styles.appTheme]} TestID="LoginFullPageContainer">
         <View style={styles.authContainer} TestID="LoginComponentsContainer">
           <TextComponent style={styles.h1}>Login</TextComponent>
-          <TextInputComponent
-            placeholder="Enter Email"
-            value={email}
-            onChangeText={handleEmailChange}
-          />
-          <TextInputComponent
-            placeholder="Enter Password"
-            value={password}
-            onChangeText={handlePasswordChange}
-            secureTextEntry={true}
-          />
-          <ButtonComponent
-            title="Login"
-            onPress={handleSubmit}
-            style={loginPageStyles.menu_button_styles}
-          />
-          <View style={loginPageStyles.hyperlinkContainer}>
-            <View style={loginPageStyles.forgotPassword}>
-              <Link to="/forgot-password">
-                <Text style={styles.hyperlinkText}>Forgot Password?</Text>
-              </Link>
-            </View>
-            <View style={loginPageStyles.createAccount}>
-              <TextComponent>Don't have an account? </TextComponent>
-              <Link to="/create-account">
-                <Text style={styles.hyperlinkText}>Create One</Text>
-              </Link>
+            <View>
+              <LoginSocialGoogle
+                client_id={"789121404004-6144ra31e6s5ls9eknrdkejljk12oak7.apps.googleusercontent.com"}
+                scope="openid profile email"
+                discoveryDocs="claims_supported"
+                access_type="offline"
+                onResolve={onGoogleLoginSuccess}
+                onReject={(err) => {
+                  toast.error('Login Failed!');
+                  console.log(err);
+                }}
+              >
+                <GoogleLoginButton />
+              </LoginSocialGoogle>
             </View>
           </View>
-        </View>
+        <CreateUsernameModal 
+          isVisible={isCreateUsernameModalVisible} 
+          setCreateUsernameModalVisible={setCreateUsernameModalVisible}
+          onRequestClose={() => setCreateUsernameModalVisible(false)} 
+          // onSubmitButtonClick={handleUsernameSubmitButtonClick}
+        />
       </View>
     </>
   );
@@ -160,6 +152,31 @@ const loginPageStyles = StyleSheet.create({
   menu_button_styles: {
     ...styles.buttons.menu_button_styles,
     width: '50%'
-
   }
 });
+
+
+
+  // useEffect(() => {
+  //   if (googleIdToken) {
+  //     fetchUserInfo(googleIdToken);
+
+  //   }
+  // }, [googleIdToken]);
+
+
+  // const fetchUserInfo = (idToken) => {
+  //   // Make the API request to the specified endpoint with the Google ID token
+  //   console.log("url:", `https://oauth2.googleapis.com/tokeninfo?id_token=${idToken}`)
+  //   fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${idToken}`)
+  //     .then((res) => res.json())
+  //     .then((data) => {
+  //       // Handle the response data as needed (e.g., store user session, etc.)
+  //       console.log('User Info:', data);
+  //       // Example: storeUserSession(data); // Store user session information
+  //       // ... other handling logic ...
+  //     })
+  //     .catch((error) => {
+  //       console.error('Error:', error);
+  //     });
+  // };

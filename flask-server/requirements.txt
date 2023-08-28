@@ -6,3 +6,4 @@ boto3
 botocore
 pandas
 requests
+PyJWT==2.8.0
