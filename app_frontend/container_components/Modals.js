@@ -1,7 +1,7 @@
 import { format } from 'date-fns';
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, Text, ScrollView, CheckBox, Switch } from 'react-native';
-import { toast } from 'react-toastify';
+import { ToastContainer, toast } from 'react-toastify';
 import { v4 as uuidv4 } from 'uuid';
 
 import { ButtonComponent } from '../base_components/ButtonComponent';
@@ -13,7 +13,7 @@ import { SelectInterestsScrollView } from '../composite_components/SelectInteres
 
 import { ModalComponent } from '../base_components/ModalComponent';
 import { day_start_time, day_end_time, day_format } from '../utils/constants';
-import { UserSessionContext } from '../utils/Contexts';
+import { CreateUserProfileContext, UserSessionContext } from '../utils/Contexts';
 
 import {
   CREATE_ACCOUNT_INTEREST_RELATIONSHIPS,
@@ -308,23 +308,6 @@ export const CreateEventDetailsModal = ({
     </ModalComponent>
   );
 };
-  // const [ address, setAddress ] = useState(createGameData.Address);
-
-  // const handleAddressChange = (text) => {
-  //   setAddress(text);
-  // };
-
-  // useEffect(() => {
-  //   setAddress(createGameData.Address);
-  // }, [createGameData.Address]);
-
-{/* <TextInputComponent
-id="create-game-address"
-placeholder="Address"
-value={address}
-onChangeText={handleAddressChange}
-/> */}
-
 
 
 export const SelectInterestsModal = ({
@@ -344,9 +327,6 @@ export const SelectInterestsModal = ({
   } = useCustomCypherWrite(CREATE_ACCOUNT_INTEREST_RELATIONSHIPS);
 
   const handleSubmitButtonClick = () => {
-    // const selectedEventTypeUUIDs = event_types
-    //   .filter((eventType) => eventType.isChecked)
-    //   .map((eventType) => eventType.UUID);
     run_create_account_interest_relationships({
       account_uuid: accountUUID,
       event_type_uuid_list: event_types_selected,
@@ -391,6 +371,93 @@ export const SelectInterestsModal = ({
     >
       <SelectInterestsScrollView setEventTypesSelected={setEventTypesSelected} />
     </ModalComponent>
+  );
+};
+
+export const CreateUsernameModal = ({
+  isVisible,
+  setCreateUsernameModalVisible,
+  onRequestClose,
+  onSubmitButtonClick,
+}) => {
+
+  const [username, setUsername] = useState('');
+  const [fetching_username_is_taken, setFetchingUsernameExists] = useState(false);
+  const { user_profile_context, setUserProfileContext } = React.useContext(CreateUserProfileContext);
+
+  const handleUsernameChange = (text) => {
+    setUsername(text);
+  };
+
+  const handleSubmitButtonClick = () => {
+    // console.log('Username:', username);
+    setFetchingUsernameExists(true);
+  };
+
+  useEffect(() => {
+    if (fetching_username_is_taken) {
+      fetch('/api/is_username_taken', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: username
+        }),
+      }).then(res => res.json())
+        .then(data => {
+          console.log(data);
+          if (data) {
+            if (data.usernameExists === true) {
+              toast.error('Username is taken!');
+              console.error('Username is taken!');
+            } else {
+              toast.success('Username is available!');
+              console.log('Username is available!');
+              // onSubmitButtonClick(username);
+              setUserProfileContext({
+                ...user_profile_context,
+                Username: username,
+              });
+            }
+          }
+        }).catch((error) => {
+          console.error('Error:', error);
+          toast.error('An error occurred while fetching user profile!');
+        });
+    }
+    setFetchingUsernameExists(false);
+  }, [fetching_username_is_taken]);
+
+  return (
+    <>
+      <ToastContainer />
+      <ModalComponent
+        id="create-username-modal"
+        isVisible={isVisible}
+        onRequestClose={onRequestClose}
+        title="Create Username"
+        menuButton={
+          <ButtonComponent
+            id="submit-username-button"
+            title="Submit Username"
+            onPress={handleSubmitButtonClick}
+            style={styles.buttons.menu_button_styles}
+          />
+        }
+      >
+        <View>
+          <TextComponent style={styles.h1}>Welcome to Evently</TextComponent>
+          <TextInputComponent
+            id="input-username"
+            placeholder="Select Username"
+            value={username}
+            onChangeText={handleUsernameChange}
+            style={modalStyles.componentStyle}
+          />
+        </View>
+      </ModalComponent>
+    </>
   );
 };
 

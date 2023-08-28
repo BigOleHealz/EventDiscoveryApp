@@ -5,3 +5,5 @@ export const UserSessionContext = React.createContext();
 export const CreateGameContext = React.createContext();
 
 export const LoggerContext = React.createContext();
+
+export const CreateUserProfileContext = React.createContext({});

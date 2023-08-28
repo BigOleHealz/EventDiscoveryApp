@@ -232,9 +232,9 @@ FETCH_EVENTS_FOR_MAP = """
 #                             RETURN event as Event, AttendeeCount, et.EventType as EventType, ATTENDING_BOOLEAN;
 #                             """
 
-GET_USER_LOGIN_INFO = """
+GET_USER_PROFILE = """
                 MATCH (account:Account)
-                WHERE account.Email = '{email}' AND account.PasswordHash = '{hashed_password}'
+                WHERE account.Email = '{email}'
                 OPTIONAL MATCH (account)-[:FRIENDS_WITH]->(friend:Account)
                 WITH account, collect(DISTINCT {{friendUUID: friend.UUID, friendFirstName: friend.FirstName, friendLastName: friend.LastName, friendUsername: friend.Username}}) as Friends
                 OPTIONAL MATCH (account)-[:INTERESTED_IN]->(eventType:EventType)
@@ -248,6 +248,12 @@ GET_USER_LOGIN_INFO = """
                     Friends,
                     Interests;
                 """
+
+IS_USERNAME_TAKEN = """
+                    MATCH (account:Account)
+                    WHERE account.Username = '{username}'
+                    RETURN COUNT(account) > 0 AS usernameExists;
+                    """
 
 GET_PERSON_FRIENDS_UUID_NAME_MAPPINGS_BY_EMAIL = """
                                                 MATCH (:Person {{Email: "{email}"}})-[:FRIENDS_WITH]->(n)

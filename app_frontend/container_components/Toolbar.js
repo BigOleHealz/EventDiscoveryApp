@@ -5,8 +5,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import friendsIcon from '../assets/friends-icon.png';
 import notificationsIcon from '../assets/notifications-icon.png';
 import { ButtonComponent } from '../base_components/ButtonComponent';
-import { EventInvitesPanel } from './EventInvitesPanel';
-import { FriendRequestsPanel } from './FriendRequestsPanel';
+// import { EventInvitesPanel } from './EventInvitesPanel';
+// import { FriendRequestsPanel } from './FriendRequestsPanel';
 import styles from '../styles';
 
 export const Toolbar = ({
