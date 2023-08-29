@@ -20,7 +20,6 @@ import {
   CREATE_EVENT,
   INVITE_FRIENDS_TO_EVENT,
 } from '../db/queries';
-// import { useCustomCypherWrite } from '../hooks/CustomCypherHooks';
 
 import { CreateGameContext } from '../utils/Contexts';
 import styles from '../styles';
@@ -310,87 +309,24 @@ export const CreateEventDetailsModal = ({
 };
 
 
-export const SelectInterestsModal = ({
-  isVisible,
-  setSelectInterestsModalVisible,
-  onRequestClose,
-  accountUUID,
-  onSubmitButtonClick,
-}) => {
-
-  const [event_types_selected, setEventTypesSelected] = useState([]);
-
-  const {
-    transactionStatus: create_account_interest_relationships_status,
-    executeQuery: run_create_account_interest_relationships,
-    resetTransactionStatus: reset_create_account_interest_relationships_transaction_status,
-  } = useCustomCypherWrite(CREATE_ACCOUNT_INTEREST_RELATIONSHIPS);
-
-  const handleSubmitButtonClick = () => {
-    run_create_account_interest_relationships({
-      account_uuid: accountUUID,
-      event_type_uuid_list: event_types_selected,
-    });
-  };
-
-  useEffect(() => {
-    if (create_account_interest_relationships_status.STATUS === 'ERROR') {
-      toast.error(
-        `Error Creating Interests: ${create_account_interest_relationships_status.RESPONSE}`
-      );
-      console.error(create_account_interest_relationships_status.RESPONSE);
-      reset_create_account_interest_relationships_transaction_status();
-    } else if (
-      create_account_interest_relationships_status.STATUS === 'SUCCESS'
-    ) {
-      console.log(
-        'Create Interests Response:',
-        create_account_interest_relationships_status.RESPONSE
-      );
-      toast.success(`Interests Set Successfully!`);
-      reset_create_account_interest_relationships_transaction_status();
-      onSubmitButtonClick();
-    }
-  }, [create_account_interest_relationships_status]);
-
-
-  return (
-    <ModalComponent
-      TestID="select-interests-modal"
-      isVisible={isVisible}
-      onRequestClose={onRequestClose}
-      title="What Type of Events Do You Like?"
-      menuButton={
-        <ButtonComponent
-          id="select-interests-submit-button"
-          title="Submit"
-          onPress={handleSubmitButtonClick}
-          style={modalStyles.buttonStyle}
-        />
-      }
-    >
-      <SelectInterestsScrollView setEventTypesSelected={setEventTypesSelected} />
-    </ModalComponent>
-  );
-};
 
 export const CreateUsernameModal = ({
   isVisible,
   setCreateUsernameModalVisible,
   onRequestClose,
+  onUsernameAvailable,
   onSubmitButtonClick,
 }) => {
 
   const [username, setUsername] = useState('');
   const [fetching_username_is_taken, setFetchingUsernameExists] = useState(false);
-  const { user_profile_context, setUserProfileContext } = React.useContext(CreateUserProfileContext);
+  const { create_user_profile_context, setCreateUserProfileContext } = React.useContext(CreateUserProfileContext);
 
   const handleUsernameChange = (text) => {
     setUsername(text);
   };
 
   const handleSubmitButtonClick = () => {
-    // console.log('Username:', username);
     setFetchingUsernameExists(true);
   };
 
@@ -409,21 +345,24 @@ export const CreateUsernameModal = ({
           console.log(data);
           if (data) {
             if (data.usernameExists === true) {
-              toast.error('Username is taken!');
-              console.error('Username is taken!');
+              const message = `Username is taken!`;
+              toast.error(message);
+              console.error(message);
             } else {
-              toast.success('Username is available!');
-              console.log('Username is available!');
-              // onSubmitButtonClick(username);
-              setUserProfileContext({
-                ...user_profile_context,
+              const message = `Username is available!`;
+              toast.success(message);
+              console.log(message);
+              setCreateUserProfileContext({
+                ...create_user_profile_context,
                 Username: username,
+                UUID: uuidv4(),
               });
+              onUsernameAvailable();
             }
           }
         }).catch((error) => {
           console.error('Error:', error);
-          toast.error('An error occurred while fetching user profile!');
+          toast.error('An error occurred while checking if username exists!');
         });
     }
     setFetchingUsernameExists(false);
@@ -450,16 +389,53 @@ export const CreateUsernameModal = ({
           <TextComponent style={styles.h1}>Welcome to Evently</TextComponent>
           <TextInputComponent
             id="input-username"
-            placeholder="Select Username"
+            placeholder="Enter Username"
             value={username}
             onChangeText={handleUsernameChange}
-            style={modalStyles.componentStyle}
           />
         </View>
       </ModalComponent>
     </>
   );
 };
+
+export const SelectInterestsModal = ({
+  isVisible,
+  setIsSelectInterestsModalVisible,
+  onRequestClose,
+  onInterestsSelected,
+  accountUUID,
+  onSubmitButtonClick,
+  updateSelectedUUIDs
+}) => {
+
+  const [event_types_selected, setEventTypesSelected] = useState([]);
+
+  const handleSubmit = () => {
+    updateSelectedUUIDs(event_types_selected); // Update the selected UUIDs
+    onSubmitButtonClick(event_types_selected); // Call the original submit function with the latest selectedUUIDs
+  }
+
+  return (
+    <ModalComponent
+      TestID="select-interests-modal"
+      isVisible={isVisible}
+      onRequestClose={onRequestClose}
+      title="What Type of Events Do You Like?"
+      menuButton={
+        <ButtonComponent
+          id="select-interests-submit-button"
+          title="Submit"
+          onPress={handleSubmit}
+          style={modalStyles.buttonStyle}
+        />
+      }
+    >
+      <SelectInterestsScrollView setEventTypesSelected={setEventTypesSelected} />
+    </ModalComponent>
+  );
+};
+
 
 const modalStyles = StyleSheet.create({
   itemContainer: {
@@ -485,7 +461,10 @@ const modalStyles = StyleSheet.create({
     margin: 20,
   },
   componentStyle: {
+    width: '100%',
     margin: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
   }
 });
 

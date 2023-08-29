@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { Link } from 'react-router-native';
+import { View, StyleSheet } from 'react-native';
+import { useNavigate } from 'react-router-native';
 import { ToastContainer, toast } from 'react-toastify';
 
 import { GoogleLoginButton } from "react-social-login-buttons";
 import { LoginSocialGoogle } from "reactjs-social-login";
 
 import { TextComponent } from '../base_components/TextComponent';
-import { CreateUsernameModal } from '../container_components/Modals';
 import { CreateUserProfileContext, LoggerContext, UserSessionContext } from '../utils/Contexts';
 import { storeUserSession } from '../utils/SessionManager';
 import styles from '../styles';
@@ -16,24 +15,24 @@ export function LoginPage() {
 
   const { userSession, setUserSession } = React.useContext(UserSessionContext);
   const { logger, setLogger } = React.useContext(LoggerContext);
-  const { user_profile_context, setUserProfileContext } = React.useContext(CreateUserProfileContext);
-  const [isCreateUsernameModalVisible, setCreateUsernameModalVisible] = useState(false);
+  const { create_user_profile_context, setCreateUserProfileContext } = React.useContext(CreateUserProfileContext);
+  const navigate = useNavigate();
 
-
-  const [fetching_user_profile, setFetchingUserLoginInfo] = useState(false);
-  const [googleIdToken, setGoogleIdToken] = useState(null); // New state to store the Google ID token
 
   const [email, setEmail] = useState(null);
   const [first_name, setFirstName] = useState(null);
   const [last_name, setLastName] = useState(null);
 
   const onGoogleLoginSuccess = ({ provider, data }) => {
-    // toast.success('Login Successful!');
-    console.log('Google login success:', provider, data);
-    console.log(provider, data);
-    console.log(data.access_token)
-    // setGoogleIdToken(data.access_token); 
     setEmail(data.email);
+    setFirstName(data.given_name);
+    setLastName(data.family_name);
+  };
+
+  const resetLoginInfo = () => {
+    setEmail(null);
+    setFirstName(null);
+    setLastName(null);
   };
 
   useEffect(() => {
@@ -50,11 +49,15 @@ export function LoginPage() {
         .then(data => {
           console.log(data);
           if (!data || data.length === 0) {
-            toast.error('No user data returned!');
-            console.error('No user data returned for email:', email);
-            
-            setCreateUsernameModalVisible(true);  // Show the modal if data list is empty
-            return; // Don't continue processing
+            toast.success('Welcome New User!');
+            console.log('No user data returned for email:', email);
+            setCreateUserProfileContext({
+              FirstName: first_name,
+              LastName: last_name,
+              Email: email
+            });
+            navigate('/create-account');
+            return;
           }
 
           const user = data;
@@ -65,7 +68,6 @@ export function LoginPage() {
           console.log('Login Successful');
           logger.info(`Login Successful for email: ${email}`);
           resetLoginInfo();
-
         }).catch((error) => {
           console.error('Error:', error);
           toast.error('An error occurred while fetching user profile!');
@@ -80,28 +82,22 @@ export function LoginPage() {
       <View style={[loginPageStyles.container, styles.appTheme]} TestID="LoginFullPageContainer">
         <View style={styles.authContainer} TestID="LoginComponentsContainer">
           <TextComponent style={styles.h1}>Login</TextComponent>
-            <View>
-              <LoginSocialGoogle
-                client_id={"789121404004-6144ra31e6s5ls9eknrdkejljk12oak7.apps.googleusercontent.com"}
-                scope="openid profile email"
-                discoveryDocs="claims_supported"
-                access_type="offline"
-                onResolve={onGoogleLoginSuccess}
-                onReject={(err) => {
-                  toast.error('Login Failed!');
-                  console.log(err);
-                }}
-              >
-                <GoogleLoginButton />
-              </LoginSocialGoogle>
-            </View>
+          <View>
+            <LoginSocialGoogle
+              client_id={"789121404004-6144ra31e6s5ls9eknrdkejljk12oak7.apps.googleusercontent.com"}
+              scope="openid profile email"
+              discoveryDocs="claims_supported"
+              access_type="offline"
+              onResolve={onGoogleLoginSuccess}
+              onReject={(err) => {
+                toast.error('Login Failed!');
+                console.log(err);
+              }}
+            >
+              <GoogleLoginButton />
+            </LoginSocialGoogle>
           </View>
-        <CreateUsernameModal 
-          isVisible={isCreateUsernameModalVisible} 
-          setCreateUsernameModalVisible={setCreateUsernameModalVisible}
-          onRequestClose={() => setCreateUsernameModalVisible(false)} 
-          // onSubmitButtonClick={handleUsernameSubmitButtonClick}
-        />
+        </View>
       </View>
     </>
   );

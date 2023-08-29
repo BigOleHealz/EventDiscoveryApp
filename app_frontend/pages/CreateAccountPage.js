@@ -1,179 +1,127 @@
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Link, useNavigate } from 'react-router-native';
+import { useNavigate } from 'react-router-native';
 import { ToastContainer, toast } from 'react-toastify';
 
-
-import { ButtonComponent } from '../base_components/ButtonComponent';
-import { TextComponent } from '../base_components/TextComponent';
-import { TextInputComponent } from '../base_components/TextInputComponent';
-import { SelectInterestsModal } from '../container_components/Modals';
-import { CREATE_PERSON_NODE } from '../db/queries';
-import { useCustomCypherWrite } from '../hooks/CustomCypherHooks';
-import { hashPassword } from '../utils/HelperFunctions'
+import { CreateUsernameModal, SelectInterestsModal } from '../container_components/Modals';
+import { CreateUserProfileContext, LoggerContext } from '../utils/Contexts';
 import styles from '../styles';
 import { is } from 'date-fns/locale';
 
-export function CreateAccountPage({ awsHandler }) {
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
-  const [userName, setUserName] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+export function CreateAccountPage() {
+  const { create_user_profile_context, setCreateUserProfileContext } = React.useContext(CreateUserProfileContext);
+  const [isCreateUsernameModalVisible, setCreateUsernameModalVisible] = useState(true);
+  const [isSelectInterestsModalVisible, setIsSelectInterestsModalVisible] = useState(false);
+  const [selectedUUIDs, setSelectedUUIDs] = useState([]);
 
-  const [selectInterestsModalVisible, setSelectInterestsModalVisible] = useState(true);
-  const [accountCreatedUUID, setAccountCreatedUUID] = useState(null);
+  const [ email, setEmail ] = useState(false);
+
+  const [is_creating_person_node, setIsCreatingPersonNode] = useState(false);
 
   const navigate = useNavigate();
 
-
-  const {
-    transactionStatus: create_account_status,
-    executeQuery: run_create_account,
-    resetTransactionStatus: reset_create_account_transaction_status
-  } = useCustomCypherWrite(CREATE_PERSON_NODE);
-
-
-  const resetCreateAccountInfo = () => {
-    setFirstName('');
-    setLastName('');
-    setEmail('');
-    setUserName('');
-    setPassword('');
-    setConfirmPassword('');
-  };
-
-  const handleFirstNameChange = (newFirstName) => {
-    setFirstName(newFirstName);
-  };
-
-  const handleLastNameChange = (newLastName) => {
-    setLastName(newLastName);
-  };
-
-  const handleEmailChange = (newEmail) => {
-    setEmail(newEmail);
-  };
-
-  const handleUsernameChange = (newUserName) => {
-    setUserName(newUserName);
-  };
-
-  const handlePasswordChange = (newPassword) => {
-    setPassword(newPassword);
-  };
-
-  const handleConfirmPasswordChange = (newConfirmPassword) => {
-    setConfirmPassword(newConfirmPassword);
-  };
-
-  const handleSubmit = () => {
-    // Check if all fields are filled
-    if (!firstName || !lastName || !email || !userName || !password || !confirmPassword) {
-      toast.error('All fields must be filled!');
-      return;
-    }
-
-    // Check if passwords match
-    if (password !== confirmPassword) {
-      toast.error('Passwords do not match!');
-      return;
-    }
-
-    const hashed_password = hashPassword(password);
-    run_create_account(
-      {
-        first_name: firstName,
-        last_name: lastName,
-        user_name: userName,
-        email: email,
-        hashed_password: hashed_password
-      }
-    );
+  const handleSelectInterestSubmitButtonClick = (interestUUIDs) => {
+    setCreateUserProfileContext({
+      ...create_user_profile_context,
+      InterestUUIDs: interestUUIDs
+    });
+    setIsCreatingPersonNode(true);
   };
 
   useEffect(() => {
-    if (create_account_status.STATUS === 'ERROR') {
-      toast.error(`Error Creating Account: ${create_account_status.RESPONSE}`);
-      console.log(create_account_status.RESPONSE);
-    } else if (create_account_status.STATUS === 'SUCCESS') {
-      setAccountCreatedUUID(create_account_status.RESPONSE.RECORDS[0].UUID);
+    if (email) {
+      fetch('/api/get_user_profile', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: email
+        }),
+      }).then(res => res.json())
+        .then(data => {
+          console.log(data);
+          if (!data || data.length === 0) {
+            toast.success('Welcome New User!');
+            console.log('No user data returned for email:', email);
+            setCreateUserProfileContext({
+              FirstName: first_name,
+              LastName: last_name,
+              Email: email
+            });
+            navigate('/create-account');
+            return;
+          }
 
-      toast.success('Account Created Successfully!');
-      resetCreateAccountInfo();
-      reset_create_account_transaction_status();
-      setSelectInterestsModalVisible(true);
+          const user = data;
+          user.TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+          storeUserSession(user);
+          setUserSession(user);
+          toast.success('Login Successful!');
+          console.log('Login Successful');
+          logger.info(`Login Successful for email: ${email}`);
+          resetLoginInfo();
+        }).catch((error) => {
+          console.error('Error:', error);
+          toast.error('An error occurred while fetching user profile!');
+        });
     }
-  }, [create_account_status]);
+    setEmail(false);
+  }, [email]);
 
-  const handleSelectInterestsModalSubmit = () => {
-    setSelectInterestsModalVisible(false);
-    navigate('/login');
-  }
+  useEffect(() => {
+    if (is_creating_person_node) {
+      console.log('create_user_profile_context:', create_user_profile_context)
+      fetch('/api/create_person_node', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          Username: create_user_profile_context.Username,
+          Email: create_user_profile_context.Email,
+          FirstName: create_user_profile_context.FirstName,
+          LastName: create_user_profile_context.LastName,
+          InterestUUIDs: create_user_profile_context.InterestUUIDs,
+          UUID: create_user_profile_context.UUID
+        })
+      }).then(res => res.json())
+        .then(data => {
+          console.log(data);
+          if (data.success) {
+            toast.success('Account Created Successfully!');
+            navigate('/login');
+          } else {
+            toast.error('Failed to create account: ' + (data.message || 'Unknown error'));
+          }
+        }).catch((error) => {
+          console.error('Error:', error);
+          toast.error('An error occurred while creating user profile!');
+        });
+    }
+    setIsCreatingPersonNode(false);
+  }, [is_creating_person_node]);
 
 
   return (
     <>
       <ToastContainer />
       <View style={[createAccountStyles.container, styles.appTheme]} TestID="CreateAccountFullPageContainer">
-        <View style={styles.authContainer} TestID="CreateAccountComponentsContainer">
-          <TextComponent style={styles.h1}>Create Account</TextComponent>
-
-          <TextInputComponent
-            placeholder="Enter First Name" // Added placeholder
-            onChangeText={handleFirstNameChange}
-            value={firstName}
-          />
-          <TextInputComponent
-            placeholder="Enter LastName" // Added placeholder
-            onChangeText={handleLastNameChange}
-            value={lastName}
-          />
-          <TextInputComponent
-            keyboardType="email-address"
-            placeholder="Enter Email" // Added placeholder
-            onChangeText={handleEmailChange}
-            value={email}
-          />
-          <TextInputComponent
-            placeholder="Enter Username"
-            onChangeText={handleUsernameChange}
-            value={userName}
-          />
-          <TextInputComponent
-            secureTextEntry={true}
-            placeholder="Enter Password" // Added placeholder
-            onChangeText={handlePasswordChange}
-            value={password}
-          />
-          <TextInputComponent
-            secureTextEntry={true}
-            placeholder="Re-Enter Password"
-            onChangeText={handleConfirmPasswordChange}
-            value={confirmPassword}
-          />
-          <ButtonComponent
-            title="Create Account"
-            onPress={handleSubmit}
-            style={styles.buttons.menu_button_styles}
-          />
-          <View style={createAccountStyles.loginLinkContainer}>
-            <TextComponent>Already have an account? </TextComponent>
-            <Link to="/login">
-              <TextComponent style={createAccountStyles.loginLink}>Login</TextComponent>
-            </Link>
-          </View>
-        </View>
-        {accountCreatedUUID &&
-          <SelectInterestsModal
-            isVisible={selectInterestsModalVisible}
-            onRequestClose={() => setSelectInterestsModalVisible(false)}
-            setSelectInterestsModalVisible={setSelectInterestsModalVisible}
-            accountUUID={accountCreatedUUID}
-            onSubmitButtonClick={handleSelectInterestsModalSubmit}
-          />
-        }
+        <CreateUsernameModal 
+          isVisible={isCreateUsernameModalVisible} 
+          setCreateUsernameModalVisible={setCreateUsernameModalVisible}
+          onRequestClose={() => setCreateUsernameModalVisible(false)}
+          onUsernameAvailable={() => {
+            setCreateUsernameModalVisible(false);
+            setIsSelectInterestsModalVisible(true);
+          }}
+        />
+        <SelectInterestsModal 
+          isVisible={isSelectInterestsModalVisible}
+          setIsSelectInterestsModalVisible={setIsSelectInterestsModalVisible}
+          onSubmitButtonClick={handleSelectInterestSubmitButtonClick}  // this is the callback
+          updateSelectedUUIDs={setSelectedUUIDs}
+        />
       </View>
     </>
   );
@@ -198,19 +146,3 @@ const createAccountStyles = StyleSheet.create({
     textDecorationLine: 'underline',
   },
 });
-
-
-  // const sendConfirmationEmail = async (email) => {
-  //   // Replace this with your desired email sending method
-  //   // For example, using emailjs
-  //   try {
-  //     const templateParams = {
-  //       to_email: email,
-  //       // Any other data you want to pass to the email template
-  //     };
-  //     const result = await emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', templateParams, 'YOUR_USER_ID');
-  //     console.log('Email sent successfully:', result);
-  //   } catch (error) {
-  //     console.error('Failed to send email:', error);
-  //   }
-  // };
