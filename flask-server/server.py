@@ -104,7 +104,7 @@ def create_server():
             elif not uuid:
                 return jsonify({"message": "Missing uuid"}), 400
             elif not interest_uuids:
-                return jsonify({"message": "Missing interest_uuids"}), 400
+                return jsonify({"message": "You must select at least one event type"}), 400
             formatted_query = queries.CREATE_PERSON_NODE.format(username=username,
                                                                 email=email,
                                                                 first_name=first_name,

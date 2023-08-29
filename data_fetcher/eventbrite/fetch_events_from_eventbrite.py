@@ -145,7 +145,8 @@ class EventbriteDataHandler(DataHandler):
                             "Price": price,
                             "FreeEventFlag": free_event_flag,
                         }
-                        if event_data_dict['Address'].lower().startswith("online"):
+                        address_lower = event_data_dict['Address'].lower()
+                        if "online" in address_lower or "virtual" in address_lower:
                             full_path_file_name = os.path.join(event_data_json_success_online_prefix, event_filename)
                         else:
                             category_data_keys = ["EventName", "EventDescription", "Summary", "Host"]
