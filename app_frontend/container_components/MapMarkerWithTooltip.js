@@ -56,12 +56,8 @@ const MapMarkerWithTooltip = ({
               <td style={tooltipStyles.value}>{event.EventName}</td>
             </tr>
             <tr>
-              <td style={tooltipStyles.label}>Starts At:</td>
-              <td style={tooltipStyles.value}>{moment(convertUTCDateToLocalDate(event.StartTimestamp)).format('hh:mm a')}</td>
-            </tr>
-            <tr>
-              <td style={tooltipStyles.label}>Ends At:</td>
-              <td style={tooltipStyles.value}>{moment(convertUTCDateToLocalDate(event.EndTimestamp)).format('hh:mm a')}</td>
+              <td style={tooltipStyles.label}>Time:</td>
+              <td style={tooltipStyles.value}>{moment(convertUTCDateToLocalDate(event.StartTimestamp)).format('hh:mm a')} - {moment(convertUTCDateToLocalDate(event.EndTimestamp)).format('hh:mm a')}</td>
             </tr>
             <tr>
               <td style={tooltipStyles.label}>Event Type:</td>

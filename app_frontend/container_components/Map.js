@@ -59,7 +59,31 @@ export const Map = ({
 
     fetchSecrets();
   }, []);
+
+  useEffect(() => {
+    getUserLocation();
+  }, []);
+  
   const mapRef = React.useRef();
+
+  const getUserLocation = () => {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        setMapCenter({
+          lat: latitude,
+          lng: longitude
+        });
+      },
+      (error) => {
+        console.error("Error getting user's location:", error);
+        toast.error("Error fetching your location. Defaulting to Philadelphia.");
+      },
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+    );
+  };
+
+  
   const onLoad = (map) => {
     mapRef.current = map;
   };
@@ -153,7 +177,7 @@ export const Map = ({
       >
         <GoogleMap
           mapContainerStyle={map_styles.mapContainerStyle}
-          zoom={15}
+          zoom={10}
           center={mapCenter}
           draggable={true}
           onLoad={onLoad}
