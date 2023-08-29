@@ -55,7 +55,6 @@ def create_server():
 
             result = neo4j.execute_query(formatted_query)
 
-            print(result)
             return result[0]
 
         except Exception as e:
@@ -80,30 +79,48 @@ def create_server():
 
         except Exception as e:
             return jsonify({"message": "An error occurred: " + str(e)}), 500
+    
+    @app.route('/create_person_node', methods=["POST"])
+    def create_person_node():
+        try:
+            body = request.get_json()
+            if not body:
+                return jsonify({"message": "No input body provided"}), 400
+            username = body.get('Username')
+            email = body.get('Email')
+            first_name = body.get('FirstName')
+            last_name = body.get('LastName')
+            uuid = body.get('UUID')
+            interest_uuids = body.get('InterestUUIDs')
+
+            if not username:
+                return jsonify({"message": "Missing username"}), 400
+            elif not email:
+                return jsonify({"message": "Missing email"}), 400
+            elif not first_name:
+                return jsonify({"message": "Missing first_name"}), 400
+            elif not last_name:
+                return jsonify({"message": "Missing last_name"}), 400
+            elif not uuid:
+                return jsonify({"message": "Missing uuid"}), 400
+            elif not interest_uuids:
+                return jsonify({"message": "Missing interest_uuids"}), 400
+            formatted_query = queries.CREATE_PERSON_NODE.format(username=username,
+                                                                email=email,
+                                                                first_name=first_name,
+                                                                last_name=last_name,
+                                                                uuid=uuid,
+                                                                interest_uuids=interest_uuids
+                                                            )
+            logger.info(f"formatted_query: {formatted_query}")
+            result = neo4j.execute_query(formatted_query)
+            
+            # Check if result has the UUID key, indicating a successful creation
+            if 'UUID' in result[0]:
+                return jsonify({"success": True, "UUID": result[0]['UUID']})
+            else:
+                return jsonify({"success": False, "message": "Person node could not be created"}), 400
+        except Exception as e:
+            return jsonify({"message": "An error occurred: " + str(e)}), 500
 
     return app
-    # @app.route('/tokensignin', methods=['POST'])
-    # def tokensignin():
-    #     import jwt
-    #     # Get the ID token from the request
-    #     print(request.form)
-    #     id_token = request.form.get('idToken')
-
-    #     # Here, you can implement the token verification logic using the `PyJWT` library.
-    #     GOOGLE_SIGNING_KEY = '789121404004-6144ra31e6s5ls9eknrdkejljk12oak7.apps.googleusercontent.com'  # Replace this with the actual Google signing key.
-    #     try:
-    #         decoded = jwt.decode(id_token, GOOGLE_SIGNING_KEY, algorithms=['RS256'])
-    #         # If verification is successful, the `decoded` variable will contain the token payload.
-    #         # You can access the user information from the `decoded` variable and return it as a response.
-
-    #         # For demonstration purposes, let's assume the token contains a 'sub' claim representing the user's ID.
-    #         user_id = decoded.get('sub')
-    #         response_data = {'user_id': user_id}
-
-    #         return response_data, 200
-
-    #     except jwt.exceptions.ExpiredSignatureError:
-    #         return {'error': 'Token has expired.'}, 401
-    #     except jwt.exceptions.InvalidTokenError:
-    #         return {'error': 'Invalid token.'}, 400
-

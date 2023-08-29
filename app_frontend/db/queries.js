@@ -6,7 +6,6 @@ export const CREATE_PERSON_NODE = `
         LastName: $last_name,
         Username: $user_name,
         Email: $email,
-        PasswordHash: $hashed_password,
         UUID: apoc.create.uuid(),
         AccountCreatedTimestamp: apoc.date.format(apoc.date.currentTimestamp(), "ms", "yyyy-MM-dd'T'HH:mm:ss")
     })

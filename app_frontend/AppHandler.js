@@ -2,11 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Route, Routes, useNavigate } from 'react-router-native';
 import { ToastContainer } from 'react-toastify';
 
-import { ForgotPassword } from './pages/ForgotPassword';
 import { LoginPage } from './pages/LoginPage';
 import { HomePage } from './pages/HomePage';
 import { CreateAccountPage } from './pages/CreateAccountPage';
-import { LoggerContext, UserSessionContext } from './utils/Contexts';
+import { CreateUserProfileContext, LoggerContext, UserSessionContext } from './utils/Contexts';
 import { formatLogStreamNameDate } from './utils/HelperFunctions';
 import { Logger } from './utils/Logger';  // import Logger
 import { getUserSession } from './utils/SessionManager';
@@ -15,6 +14,7 @@ import { getUserSession } from './utils/SessionManager';
 export function AppHandler() {
   const [userSession, setUserSession] = useState(null);
   const [logger, setLogger] = useState(null);
+  const [create_user_profile_context, setCreateUserProfileContext] = useState(null);
   const [redirectRoute, setRedirectRoute] = useState(null);
   const navigate = useNavigate();
 
@@ -25,7 +25,6 @@ export function AppHandler() {
 
     })();
   }, []);
-
 
   useEffect(() => {
     if (userSession) {
@@ -49,12 +48,13 @@ export function AppHandler() {
       <ToastContainer />
       <UserSessionContext.Provider value={{ userSession, setUserSession }}>
         <LoggerContext.Provider value={{ logger, setLogger }}>
-          <Routes>
-            <Route path="/" element={<HomePage/>}/>
-            <Route path="/login" element={<LoginPage/>}/>
-            <Route path="/forgot-password" element={<ForgotPassword/>}/>
-            <Route path="/create-account" element={<CreateAccountPage/>}/>
-          </Routes>
+          <CreateUserProfileContext.Provider value={{ create_user_profile_context, setCreateUserProfileContext }}>
+            <Routes>
+              <Route path="/" element={<HomePage/>}/>
+              <Route path="/login" element={<LoginPage/>}/>
+              <Route path="/create-account" element={<CreateAccountPage/>}/>
+            </Routes>
+          </CreateUserProfileContext.Provider>
         </LoggerContext.Provider>
       </UserSessionContext.Provider>
     </>

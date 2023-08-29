@@ -32,9 +32,11 @@ GET_ALL_NODE_UUIDS_BY_LABEL = "MATCH (n:{label}) RETURN n.UUID AS UUID;"
 
 GET_EVENT_TYPE_NAMES_MAPPINGS = """
                                 MATCH (event:EventType)
+                                WHERE event.EventType <> 'Dummy Event Type'
                                 RETURN
                                     event.UUID as UUID,
-                                    event.EventType AS EventType;
+                                    event.EventType AS EventType
+                                ORDER BY event.EventType;
                                 """
 
 
@@ -70,13 +72,8 @@ GET_ACCOUNT_NODE_BY_EMAIL = """
                             MATCH (n:Account)
                                 WHERE n.Email = '{email}'
                             RETURN
-                                n
+                                n;
                             """
-# n.Email as Email,
-# n.Username as Username,
-# n.FirstName as FirstName,
-# n.LastName as LastName,
-# n.UUID as UUID;
 
 GET_ACCOUNT_NODE_BY_USERNAME = """
                                 MATCH (n:Account)
@@ -84,11 +81,6 @@ GET_ACCOUNT_NODE_BY_USERNAME = """
                                 RETURN
                                     n;
                                 """
-# n.Email as Email,
-# n.Username as Username,
-# n.FirstName as FirstName,
-# n.LastName as LastName,
-# n.UUID as UUID;
 
 GET_ACCOUNT_NODE_BY_EMAIL_OR_USERNAME = """
                                         MATCH (n:Account)
@@ -344,25 +336,27 @@ GET_NOTIFICATIONS = """
                     RETURN type(r) AS NOTIFICATION_TYPE, e AS NOTIFICATION_DETAILS;
                     """
 
-# AND
-# (
-#     datetime() <= datetime(e.StartTimestamp)
-#     OR
-#     datetime(e.StartTimestamp) <= datetime() <= datetime(e.EndTimestamp)
-# )
-
 #####################
 ###### CREATES ######
 #####################
 
-# MERGE_EVENT_TYPE_NODE = r"""
-#     WITH $params.uuid as uuid
-#     MERGE (et:EventType {EventType: $params.event_type})
-#     ON CREATE SET
-#         et.UUID = uuid,
-#         et.EventType = $params.event_type
-#     RETURN et.UUID as EventTypeUUID;
-# """
+
+CREATE_PERSON_NODE = """
+    CREATE (n:Account:Person {{
+        FirstName: "{first_name}", 
+        LastName: "{last_name}",
+        Email: "{email}",
+        Username: "{username}",
+        UUID: "{uuid}",
+        AccountCreatedTimestamp: apoc.date.format(apoc.date.currentTimestamp(), "ms", "yyyy-MM-dd'T'HH:mm:ss")
+    }})
+    FOREACH (interestUUID IN {interest_uuids} |
+        MERGE (e:EventType {{UUID: interestUUID}})
+        MERGE (n)-[:INTERESTED_IN {{UUID: apoc.create.uuid()}}]->(e)
+    )
+    
+    RETURN n.UUID as UUID;
+    """
 
 
 CHECK_IF_EVENT_EXISTS = r"""

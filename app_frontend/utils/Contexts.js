@@ -6,4 +6,4 @@ export const CreateGameContext = React.createContext();
 
 export const LoggerContext = React.createContext();
 
-export const CreateUserProfileContext = React.createContext({});
+export const CreateUserProfileContext = React.createContext();
