@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { Image, View, StyleSheet } from 'react-native';
+import { Image, View } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 
 import { LoggerContext } from '../utils/Contexts';
 import leftArrowImage from '../assets/horizontal_arrow_left.png';
 import rightArrowImage from '../assets/horizontal_arrow_right.png';
-import styles from '../styles';
+import { calendar_styles }  from '../styles';
 
 export const CalendarComponent = ({ selected, onDateSelected, style }) => {
   const currentDate = new Date().toISOString().split('T')[0];
@@ -42,25 +42,3 @@ export const CalendarComponent = ({ selected, onDateSelected, style }) => {
     </View>
   );
 };
-
-const calendar_styles = StyleSheet.create({
-  view: {
-    padding: styles.appTheme.padding,
-    width: '100%',
-  },
-  theme: {
-    backgroundColor: '#222222',
-    calendarBackground: '#222222',
-    textSectionTitleColor: '#b6c1cd',
-    selectedDayBackgroundColor: '#00adf5',
-    selectedDayTextColor: '#ffffff',
-    todayTextColor: '#00adf5',
-    dayTextColor: '#ddd',
-    textDisabledColor: '#888',
-    monthTextColor: '#ddd'
-  },
-  arrowStyle: {
-    width: 20,
-    height: 20,
-  }
-});

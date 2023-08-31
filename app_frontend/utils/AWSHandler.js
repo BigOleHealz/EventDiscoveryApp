@@ -15,7 +15,7 @@ import AWS from 'aws-sdk';
  */
 
 
-async function getSecretValue(secretId) {
+export async function getSecretValue(secretId) {
   const response = await fetch(`https://o83fz5lh02.execute-api.us-east-1.amazonaws.com/Stage/fetch_secret?secret_id=${secretId}`);
 
   if (!response.ok) {
@@ -57,23 +57,23 @@ class AWSHandler {
 
 };
 
-const AWSHandlerContext = createContext(null);
+// const AWSHandlerContext = createContext(null);
 
-const useAWSHandler = () => {
-  return useContext(AWSHandlerContext);
-};
+// const useAWSHandler = () => {
+//   return useContext(AWSHandlerContext);
+// };
 
-const AWSHandlerProviderWrapper = ({ children }) => {
-  const awsHandler = new AWSHandler();
+// const AWSHandlerProviderWrapper = ({ children }) => {
+//   const awsHandler = new AWSHandler();
 
-  return (
-    <AWSHandlerContext.Provider value={awsHandler}>
-      {children}
-    </AWSHandlerContext.Provider>
-  );
-};
+//   return (
+//     <AWSHandlerContext.Provider value={awsHandler}>
+//       {children}
+//     </AWSHandlerContext.Provider>
+//   );
+// };
 
-export { AWSHandlerProviderWrapper, useAWSHandler, AWSHandlerContext, getSecretValue };
+// export { AWSHandlerProviderWrapper, useAWSHandler, AWSHandlerContext, getSecretValue };
 
 
 // async sendVerificationEmail(email, token) {

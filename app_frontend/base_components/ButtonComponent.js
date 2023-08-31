@@ -1,10 +1,8 @@
 import React from 'react';
-import { TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { TouchableOpacity, Image } from 'react-native';
 
 import { TextComponent } from './TextComponent';
-import styles from '../styles';
-
-const button_styles = styles.buttons;
+import { button_styles } from '../styles';
 
 export const ButtonComponent = ({
   title,
@@ -13,28 +11,20 @@ export const ButtonComponent = ({
   icon,
   isMenuButton,
 }) => {
-  const buttonStyle = isMenuButton
+  const thisButtonStyle = isMenuButton
     ? button_styles.menu_button_styles
     : button_styles.clear_button_styles;
 
   return (
     <TouchableOpacity
-      style={[button_styles.standardButton, buttonStyle, style]}
+      style={[button_styles.standardButton, thisButtonStyle, style]}
       onPress={onPress}
     >
       {icon ? (
-        <Image source={icon} style={buttonStyles.icon} />
+        <Image source={icon} style={button_styles.icon} />
       ) : (
         <TextComponent style={button_styles.button_text}>{title}</TextComponent>
       )}
     </TouchableOpacity>
   );
 };
-
-const buttonStyles = StyleSheet.create({
-  icon: {
-    height: 30,
-    width: 30,
-    resizeMode: 'contain',
-  },
-});

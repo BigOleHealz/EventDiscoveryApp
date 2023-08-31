@@ -4,12 +4,13 @@ import React, { useState, useEffect } from 'react';
 import { View } from 'react-native';
 import { format } from 'date-fns';
 
-import styles from '../styles';
 import { day_start_time, day_end_time, day_format } from '../utils/constants';
 import { LoggerContext, UserSessionContext } from '../utils/Contexts';
 import { Toolbar } from '../container_components/Toolbar';
 import { Map } from '../container_components/Map';
 import { LeftSidePanel } from '../container_components/LeftSidePanel';
+
+import { common_styles }  from '../styles';
 
 export function HomePage() {
 
@@ -45,13 +46,12 @@ export function HomePage() {
     setIsLeftPanelVisible(!isLeftPanelVisible);
   };
 
-
   return (
-    <View style={styles.container}>
+    <View style={common_styles.container}>
         <Toolbar
           onLeftButtonClick={handleFindGamesButtonClick}
         />
-        <View style={styles.fullScreen}>
+        <View style={common_styles.fullScreen}>
           <Map
             findGameSelectedDate={findGameSelectedDate}
             findGameStartTime={findGameStartTime}

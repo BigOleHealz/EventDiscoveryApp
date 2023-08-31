@@ -1,5 +1,4 @@
 import React from 'react';
-import { StyleSheet, Dimensions } from 'react-native';
 
 import { CalendarComponent } from '../base_components/CalendarComponent';
 import { TimeRangeSliderComponent } from '../base_components/TimeRangeSliderComponent';
@@ -7,9 +6,7 @@ import { PanelComponent } from '../base_components/PanelComponent';
 import { SelectInterestsScrollView } from '../composite_components/SelectInterestsScrollview';
 import { day_start_time, day_end_time } from '../utils/constants';
 
-import styles from '../styles';
-
-const windowWidth = Dimensions.get('window').width;
+import { side_panel_styles } from '../styles';
 
 export const LeftSidePanel = ({
   isVisible,
@@ -35,7 +32,7 @@ export const LeftSidePanel = ({
       type="left"
       position={['-30%', '0%']}
       isVisible={isVisible}
-      style={panel_styles.sidePanel}
+      style={side_panel_styles.container}
     >
       <CalendarComponent
         testID="left-calendar"
@@ -55,31 +52,3 @@ export const LeftSidePanel = ({
     </PanelComponent>
   );
 };
-
-const panel_styles = StyleSheet.create({
-  sidePanel: {
-    position: 'absolute',
-    top: 0,
-    bottom: 0,
-    width: windowWidth > 800 ? '30%' : '100%',
-    backgroundColor: styles.appTheme.backgroundColor,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 10,
-      height: 10,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 10,
-    elevation: 5,
-  },
-  sidePanelContentContainerStyle: {
-    flex: 1,
-    flexDirection: 'column',
-    justifyContent: 'flex-start',
-    alignItems: 'stretch',
-    padding: 10,
-    width: '100%',
-  },
-});

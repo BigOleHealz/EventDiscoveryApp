@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 import moment from 'moment';
 
 import { Marker, InfoWindow } from '@react-google-maps/api';
@@ -10,7 +10,7 @@ import { convertUTCDateToLocalDate } from '../utils/HelperFunctions';
 import { event_types_icon_map } from '../utils/constants'
 import '../css/custom-infowindow.css';
 
-import styles from '../styles';
+import { common_styles, tooltip_styles }  from '../styles';
 
 const MapMarkerWithTooltip = ({
   event,
@@ -47,33 +47,33 @@ const MapMarkerWithTooltip = ({
 
   const renderInfoContent = () => {
     return (
-      <View style={tooltipStyles.container}>
-        <div style={tooltipStyles.address}>{event.Address}</div>
-        <table style={tooltipStyles.table}>
+      <View style={tooltip_styles.container}>
+        <div style={tooltip_styles.address}>{event.Address}</div>
+        <table style={tooltip_styles.table}>
           <tbody>
             <tr>
-              <td style={tooltipStyles.label}>Name:</td>
-              <td style={tooltipStyles.value}>{event.EventName}</td>
+              <td style={tooltip_styles.label}>Name:</td>
+              <td style={tooltip_styles.value}>{event.EventName}</td>
             </tr>
             <tr>
-              <td style={tooltipStyles.label}>Time:</td>
-              <td style={tooltipStyles.value}>{moment(convertUTCDateToLocalDate(event.StartTimestamp)).format('hh:mm a')} - {moment(convertUTCDateToLocalDate(event.EndTimestamp)).format('hh:mm a')}</td>
+              <td style={tooltip_styles.label}>Time:</td>
+              <td style={tooltip_styles.value}>{moment(convertUTCDateToLocalDate(event.StartTimestamp)).format('hh:mm a')} - {moment(convertUTCDateToLocalDate(event.EndTimestamp)).format('hh:mm a')}</td>
             </tr>
             <tr>
-              <td style={tooltipStyles.label}>Event Type:</td>
-              <td style={tooltipStyles.value}>{event.EventType}</td>
+              <td style={tooltip_styles.label}>Event Type:</td>
+              <td style={tooltip_styles.value}>{event.EventType}</td>
             </tr>
             {event.Price && (
               <tr>
-                <td style={tooltipStyles.label}>Price:</td>
-                <td style={tooltipStyles.value}>{event.Price}</td>
+                <td style={tooltip_styles.label}>Price:</td>
+                <td style={tooltip_styles.value}>{event.Price}</td>
               </tr>
             )}
             {event.EventURL && (
               <tr>
-                <td style={tooltipStyles.label}>Event URL:</td>
-                <td style={tooltipStyles.value}>
-                  <a href={event.EventURL} target="_blank" rel="noopener noreferrer" style={styles.hyperlinkText}>
+                <td style={tooltip_styles.label}>Event URL:</td>
+                <td style={tooltip_styles.value}>
+                  <a href={event.EventURL} target="_blank" rel="noopener noreferrer" style={common_styles.hyperlinkText}>
                     {event.EventURL}
                   </a>
                 </td>
@@ -105,57 +105,16 @@ const MapMarkerWithTooltip = ({
     >
       {showTooltip && (
         <InfoWindow position={position} onCloseClick={handleMarkerClick}>
-          <View style={tooltipStyles.container}>{renderInfoContent()}</View>
+          <View style={tooltip_styles.container}>{renderInfoContent()}</View>
         </InfoWindow>
       )}
       {activePopup === event.UUID && (
         <InfoWindow position={position} onCloseClick={handleMarkerClick}>
-          <View style={tooltipStyles.container}>{renderInfoContent()}</View>
+          <View style={tooltip_styles.container}>{renderInfoContent()}</View>
         </InfoWindow>
       )}
     </Marker>
   );
 };
-
-const tooltipStyles = StyleSheet.create({
-  container: {
-    display: 'flex',
-    flexDirection: 'column',
-    backgroundColor: '#222', // Dark background color
-    color: '#fff', // Light text color
-    padding: 10, // Add padding for better appearance
-    borderRadius: '4px', // Add border radius for a smoother look
-    margin: 0,
-  },
-  table: {
-    margin: 10,
-    borderCollapse: 'collapse',
-    width: '100%',
-  },
-  address: {
-    fontWeight: 'bold',
-    textAlign: 'center',
-    justifyContent: 'center',
-  },
-  label: {
-    width: '30%',
-    fontWeight: '600',
-    marginRight: 4,
-    paddingLeft: 4,
-    paddingTop: 2,
-    paddingBottom: 2,
-    textAlign: 'right',
-  },
-  value: {
-    padding: 2,
-  },
-  buttonStyle: {
-    backgroundColor: '#2196F3',
-  },
-  infoWindowStyle: {
-    padding: 0,
-    margin: 0,
-  },
-});
 
 export default MapMarkerWithTooltip;

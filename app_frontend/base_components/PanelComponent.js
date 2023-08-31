@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import { StyleSheet, Text, View, Animated } from 'react-native';
-import styles from '../styles';
+import { common_styles } from '../styles';
 
 
 export const PanelComponent = ({ isVisible, position, title, type, children, style }) => {
@@ -30,7 +30,7 @@ export const PanelComponent = ({ isVisible, position, title, type, children, sty
 
 const panel_styles = StyleSheet.create({
 	panelsContainer: {
-		backgroundColor: styles.appTheme.backgroundColor,
+		backgroundColor: common_styles.appTheme.backgroundColor,
 		flex: 1,
 		flexDirection: 'column',
 		justifyContent: 'flex-start',
@@ -43,6 +43,6 @@ const panel_styles = StyleSheet.create({
 		fontWeight: 'bold',
 		textAlign: 'center',
 		marginBottom: 10,
-		color: styles.appTheme.color
+		color: common_styles.appTheme.color
 	},
-})
+});
