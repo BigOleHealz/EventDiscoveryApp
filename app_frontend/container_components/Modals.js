@@ -1,10 +1,8 @@
-import { format } from 'date-fns';
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Text, ScrollView, CheckBox, Switch } from 'react-native';
+import { View, Text, ScrollView, CheckBox, Switch } from 'react-native';
 import { ToastContainer, toast } from 'react-toastify';
 import { v4 as uuidv4 } from 'uuid';
 
-import { ButtonComponent } from '../base_components/ButtonComponent';
 import { CalendarComponent } from '../base_components/CalendarComponent';
 import { TextComponent } from '../base_components/TextComponent';
 import { TextInputComponent } from '../base_components/TextInputComponent';
@@ -315,10 +313,8 @@ export const CreateEventDetailsModal = ({
 
 export const CreateUsernameModal = ({
   isVisible,
-  setCreateUsernameModalVisible,
   onRequestClose,
   onUsernameAvailable,
-  onSubmitButtonClick,
 }) => {
 
   const [username, setUsername] = useState('');
@@ -379,18 +375,10 @@ export const CreateUsernameModal = ({
         isVisible={isVisible}
         onRequestClose={onRequestClose}
         title="Create Username"
-        menuButton={
-          <ButtonComponent
-            id="submit-username-button"
-            title="Submit Username"
-            onPress={handleSubmitButtonClick}
-            // style={styles.buttons.menu_button_styles}
-            isMenuButton={true}
-          />
-        }
+        submitButtonText="Submit Username"
+        onSubmitButtonClick={handleSubmitButtonClick}
       >
         <View>
-          <TextComponent style={styles.h1}>Welcome to Evently</TextComponent>
           <TextInputComponent
             id="input-username"
             placeholder="Enter Username"
@@ -415,7 +403,7 @@ export const SelectInterestsModal = ({
 
   const [event_types_selected, setEventTypesSelected] = useState([]);
 
-  const handleSubmit = () => {
+  const handleSubmitButtonClick = () => {
     updateSelectedUUIDs(event_types_selected); // Update the selected UUIDs
     onSubmitButtonClick(event_types_selected); // Call the original submit function with the latest selectedUUIDs
   }
@@ -426,15 +414,8 @@ export const SelectInterestsModal = ({
       isVisible={isVisible}
       onRequestClose={onRequestClose}
       title="What Type of Events Do You Like?"
-      menuButton={
-        <ButtonComponent
-          id="select-interests-submit-button"
-          title="Submit"
-          onPress={handleSubmit}
-          // style={modal_styles.buttonStyle}
-          isMenuButton={true}
-        />
-      }
+      submitButtonText="Submit Interests"
+      onSubmitButtonClick={handleSubmitButtonClick}
     >
       <SelectInterestsScrollView setEventTypesSelected={setEventTypesSelected} />
     </ModalComponent>

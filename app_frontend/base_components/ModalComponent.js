@@ -3,17 +3,19 @@ import {
   View,
   TouchableWithoutFeedback,
 } from 'react-native';
-import { modal_component_styles }  from '../styles';
 
+import { ButtonComponent } from '../base_components/ButtonComponent';
 import { TextComponent } from '../base_components/TextComponent';
+
+import { modal_component_styles }  from '../styles';
 
 export const ModalComponent = ({
   isVisible,
   onRequestClose,
   title,
   children,
-
-  menuButton,
+  submitButtonText,
+  onSubmitButtonClick
 }) => {
   return (
     <Modal
@@ -41,7 +43,11 @@ export const ModalComponent = ({
               {children}
             </View>
             <View TestID="view-submit-button" style={modal_component_styles.submit_button_container}>
-              {menuButton}
+              <ButtonComponent
+                title={submitButtonText}
+                onPress={onSubmitButtonClick}
+                isMenuButton={true}
+              />
             </View>
           </View>
         </View>
