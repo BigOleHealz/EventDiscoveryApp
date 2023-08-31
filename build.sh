@@ -38,9 +38,5 @@ rm -rf $flask_server_dir/$utils_dir
 cp -r $db_dir $flask_server_dir/
 cp -r $utils_dir $flask_server_dir/
 
-ln -sf $(pwd)/$db_dir $flask_server_dir/$db_dir
-ln -sf $(pwd)/$utils_dir $flask_server_dir/$utils_dir
-
-
 docker-compose build
 docker-compose up -d
