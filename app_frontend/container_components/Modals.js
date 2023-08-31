@@ -22,7 +22,7 @@ import {
 } from '../db/queries';
 
 import { CreateGameContext } from '../utils/Contexts';
-import styles from '../styles';
+import { modal_styles }  from '../styles';
 
 
 export const SelectEventTypeModal = ({
@@ -61,7 +61,8 @@ export const SelectEventTypeModal = ({
           id="create-game-select-event-type-button"
           title="Select Event Type"
           onPress={handleSubmitButtonClick}
-          style={styles.buttons.menu_button_styles}
+          // style={styles.buttons.menu_button_styles}
+          isMenuButton={true}
         />
       }
     >
@@ -158,9 +159,9 @@ export const InviteFriendsToEventModal = ({
 
   const FriendChecklistItem = ({ name, isChecked, onValueChange }) => {
     return (
-      <View style={modalStyles.itemContainer}>
+      <View style={modal_styles.itemContainer}>
         <CheckBox value={isChecked} onValueChange={onValueChange} />
-        <Text style={modalStyles.itemText}>{name}</Text>
+        <Text style={modal_styles.itemText}>{name}</Text>
       </View>
     );
   };
@@ -178,11 +179,12 @@ export const InviteFriendsToEventModal = ({
             anyChecked ? 'Send Invites & Create Game' : 'Skip & Create Game'
           }
           onPress={handleSubmitButtonClick}
-          style={styles.buttons.menu_button_styles}
+          // style={styles.buttons.menu_button_styles}
+          isMenuButton={true}
         />
       }
     >
-      <ScrollView style={modalStyles.scrollView}>
+      <ScrollView style={modal_styles.scrollView}>
         {friends.map((friend, index) => (
           <FriendChecklistItem
             key={friend.friendUUID}
@@ -274,7 +276,8 @@ export const CreateEventDetailsModal = ({
           id="create-game-event-details-button"
           title="Create Event"
           onPress={handleSubmitButtonClick}
-          style={styles.buttons.menu_button_styles}
+          // style={styles.buttons.menu_button_styles}
+          isMenuButton={true}
         />
       }
     >
@@ -284,16 +287,16 @@ export const CreateEventDetailsModal = ({
           placeholder="Event Name"
           value={event_name}
           onChangeText={handleEventNameChange}
-          style={modalStyles.componentStyle}
+          style={modal_styles.componentStyle}
         />
         <TextInputComponent
           id="create-game-event-description"
           placeholder="Event Description"
           value={event_description}
           onChangeText={handleEventDescriptionChange}
-          style={modalStyles.componentStyle}
+          style={modal_styles.componentStyle}
         />
-        <View style={modalStyles.componentStyle}>
+        <View style={modal_styles.componentStyle}>
           <TextComponent>
             Public Event?
           </TextComponent>
@@ -381,7 +384,8 @@ export const CreateUsernameModal = ({
             id="submit-username-button"
             title="Submit Username"
             onPress={handleSubmitButtonClick}
-            style={styles.buttons.menu_button_styles}
+            // style={styles.buttons.menu_button_styles}
+            isMenuButton={true}
           />
         }
       >
@@ -427,7 +431,8 @@ export const SelectInterestsModal = ({
           id="select-interests-submit-button"
           title="Submit"
           onPress={handleSubmit}
-          style={modalStyles.buttonStyle}
+          // style={modal_styles.buttonStyle}
+          isMenuButton={true}
         />
       }
     >
@@ -437,36 +442,7 @@ export const SelectInterestsModal = ({
 };
 
 
-const modalStyles = StyleSheet.create({
-  itemContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 10,
-    marginBottom: 10,
-  },
-  itemText: {
-    marginLeft: 10,
-    fontSize: 16,
-    color: styles.appTheme.color,
-  },
-  buttonStyle: {
-    marginBottom: 20,
-    backgroundColor: '#2196F3',
-  },
-  scrollView: {
-    marginLeft: 20,
-    marginRight: 20,
-  },
-  textInputStyle: {
-    margin: 20,
-  },
-  componentStyle: {
-    width: '100%',
-    margin: 8,
-    flexDirection: 'row',
-    alignItems: 'center',
-  }
-});
+
 
 
 

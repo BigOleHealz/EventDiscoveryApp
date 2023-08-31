@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import { View, Text } from 'react-native';
 import RangeSlider from 'react-native-range-slider-expo';
-import styles from '../styles';
+
 import { day_end_time } from '../utils/constants';
+import { time_range_slider_styles }  from '../styles';
 
 export const TimeRangeSliderComponent = ({ startTime, endTime, setStartTime, setEndTime }) => {
 	const [start, setStart] = useState(startTime);
@@ -59,7 +60,6 @@ export const TimeRangeSliderComponent = ({ startTime, endTime, setStartTime, set
     }
   };
   
-
 	return (
 		<View>
 			<RangeSlider
@@ -85,19 +85,10 @@ export const TimeRangeSliderComponent = ({ startTime, endTime, setStartTime, set
 				initialToValue={24}
         showRangeLabels={false}
 			/>
-      <View style={styles.timeSliderView}>
+      <View style={time_range_slider_styles.timeSliderView}>
 				<Text style={time_range_slider_styles.text}>{formatTime(start)}</Text>
 				<Text style={time_range_slider_styles.text}>{formatTime(end)}</Text>
 			</View>
 		</View>
 	);
 };
-
-const time_range_slider_styles = StyleSheet.create({
-    view: {
-        padding: 20,
-    },
-    text: {
-        color: styles.appTheme.color
-    }
-});

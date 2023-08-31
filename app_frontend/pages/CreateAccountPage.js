@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View } from 'react-native';
 import { useNavigate } from 'react-router-native';
 import { ToastContainer, toast } from 'react-toastify';
 
 import { CreateUsernameModal, SelectInterestsModal } from '../container_components/Modals';
 import { CreateUserProfileContext, LoggerContext } from '../utils/Contexts';
-import styles from '../styles';
+import { create_account_styles }  from '../styles';
 import { is } from 'date-fns/locale';
 
 export function CreateAccountPage() {
@@ -106,7 +106,7 @@ export function CreateAccountPage() {
   return (
     <>
       <ToastContainer />
-      <View style={[createAccountStyles.container, styles.appTheme]} TestID="CreateAccountFullPageContainer">
+      <View style={[create_account_styles.container]} TestID="CreateAccountFullPageContainer">
         <CreateUsernameModal 
           isVisible={isCreateUsernameModalVisible} 
           setCreateUsernameModalVisible={setCreateUsernameModalVisible}
@@ -126,23 +126,3 @@ export function CreateAccountPage() {
     </>
   );
 }
-
-
-const createAccountStyles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-  },
-  loginLinkContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    margin: 16
-  },
-  loginLink: {
-    color: '#2196F3',
-    textDecorationLine: 'underline',
-  },
-});

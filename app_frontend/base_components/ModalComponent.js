@@ -1,10 +1,9 @@
 import {
   Modal,
   View,
-  StyleSheet,
   TouchableWithoutFeedback,
 } from 'react-native';
-import styles from '../styles';
+import { modal_component_styles }  from '../styles';
 
 import { TextComponent } from '../base_components/TextComponent';
 
@@ -50,50 +49,3 @@ export const ModalComponent = ({
     </Modal>
   );
 };
-
-const modal_component_styles = StyleSheet.create({
-  backdrop: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  modalContainer: {
-    height: '80%',
-    width: '40%',
-    flexDirection: 'column',  // make sure the flex direction is column
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: styles.appTheme.backgroundColor,
-    borderRadius: 10,
-		overflow: 'hidden'
-  },
-  titleContainer: {
-    borderBottomWidth: 1,
-    borderColor: 'rgba(96, 96, 96, 0.5)',
-    padding: 10,
-    margin: 10,
-    width: '100%',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: styles.appTheme.color,
-  },
-  submit_button_container: {
-    borderTopWidth: 1,
-    borderColor: 'rgba(96, 96, 96, 0.5)',
-    padding: 10,
-    margin: 10,
-    width: '100%',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  contentContainer: {
-    flex: 1, 
-    width: '100%',
-  }
-
-});

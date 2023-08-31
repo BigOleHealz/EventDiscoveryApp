@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 import 'react-toastify/dist/ReactToastify.css';
 
 import friendsIcon from '../assets/friends-icon.png';
@@ -7,7 +7,7 @@ import notificationsIcon from '../assets/notifications-icon.png';
 import { ButtonComponent } from '../base_components/ButtonComponent';
 // import { EventInvitesPanel } from './EventInvitesPanel';
 // import { FriendRequestsPanel } from './FriendRequestsPanel';
-import styles from '../styles';
+import { toolbar_styles }  from '../styles';
 
 export const Toolbar = ({
   onLeftButtonClick,
@@ -30,37 +30,3 @@ export const Toolbar = ({
     </>
   );
 };
-
-const toolbar_styles = StyleSheet.create({
-  toolbar: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: styles.appTheme.backgroundColor,
-    padding: 15,
-  },
-  toolbarComponent: {
-    height: '100%',
-  },
-  toolbarButtonLeft: {
-    paddingLeft: 10,
-  },
-  toolbarButtonRight: {
-    paddingRight: 10,
-  },
-  centerView: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  centeredButtonsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-  },
-  centerButton: {
-    paddingHorizontal: 10,
-  },
-  icon: {
-    height: 35,
-    width: 35
-  }
-});

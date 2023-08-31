@@ -16,6 +16,8 @@ import { getAddressFromCoordinates, convertUTCDateToLocalDate } from '../utils/H
 import { removeUserSession } from '../utils/SessionManager';
 import pinIcon from '../assets/pin.png';
 
+import { map_styles } from '../styles';
+
 export const Map = ({
   findGameSelectedDate,
   findGameStartTime,
@@ -212,39 +214,3 @@ export const Map = ({
     </>
   );
 };
-
-const buttonHeight = 50;
-const map_styles = StyleSheet.create({
-  mapContainerStyle: {
-    flex: 1,
-    width: '100%',
-  },
-  pinStyle: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -100%)',
-  },
-  bottomButtonStyle: {
-    position: 'absolute',
-    bottom: 20,
-    left: '50%',
-    height: buttonHeight,
-    width: '30%',
-    transform: 'translateX(-50%)',
-    backgroundColor: '#2196F3',
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  logoutButtonStyle: {
-    position: 'absolute',
-    bottom: 20,
-    left: 20,
-    width: '20%',
-    height: buttonHeight,
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
