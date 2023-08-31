@@ -18,15 +18,22 @@ class Logger(logging.Logger):
         try:
             self.cloudwatch_logs.create_log_group(logGroupName=self.log_group_name)
         except ClientError as e:
-            if e.response['Error']['Code'] != 'ResourceAlreadyExistsException':
+            if e.response['Error']['Code'] == 'ResourceAlreadyExistsException':
+                print(f'Log Group already exists: {self.log_group_name}\nError{e}')
+            else:
+                print(f'Error creating log group: {e}')
                 raise Exception(f'Traceback: {traceback.format_exc()}')
+
 
         try:
             self.cloudwatch_logs.create_log_stream(logGroupName=self.log_group_name, logStreamName=self.log_stream_name)
         except ClientError as e:
-            if e.response['Error']['Code'] != 'ResourceAlreadyExistsException':
+            if e.response['Error']['Code'] == 'ResourceAlreadyExistsException':
+                print(f'Log stream already exists: {self.log_group_name}/{self.log_stream_name}\nError{e}')
+            else:
+                print(f'Error creating log stream: {e}')
                 raise Exception(f'Traceback: {traceback.format_exc()}')
-        
+
         self.sequence_token = None
         
         self.logger = logging.getLogger(__name__)
@@ -37,8 +44,6 @@ class Logger(logging.Logger):
         self.handler.setFormatter(self.formatter)
         self.logger.addHandler(self.handler)
         
-        self.info('logger initiated')
-
     @property
     def log_level_function_mappings(self):
         return {

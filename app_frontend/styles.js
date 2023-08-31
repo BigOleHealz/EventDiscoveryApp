@@ -183,47 +183,6 @@ export const login_page_styles = StyleSheet.create({
   }
 });
 
-export const tooltip_styles = StyleSheet.create({
-  container: {
-    display: 'flex',
-    flexDirection: 'column',
-    backgroundColor: '#222', // Dark background color
-    color: '#fff', // Light text color
-    padding: 10, // Add padding for better appearance
-    borderRadius: '4px', // Add border radius for a smoother look
-    margin: 0,
-  },
-  table: {
-    margin: 10,
-    borderCollapse: 'collapse',
-    width: '100%',
-  },
-  address: {
-    fontWeight: 'bold',
-    textAlign: 'center',
-    justifyContent: 'center',
-  },
-  label: {
-    width: '30%',
-    fontWeight: '600',
-    marginRight: 4,
-    paddingLeft: 4,
-    paddingTop: 2,
-    paddingBottom: 2,
-    textAlign: 'right',
-  },
-  value: {
-    padding: 2,
-  },
-  buttonStyle: {
-    backgroundColor: '#2196F3',
-  },
-  infoWindowStyle: {
-    padding: 0,
-    margin: 0,
-  },
-});
-
 export const map_styles = StyleSheet.create({
   mapContainerStyle: {
     flex: 1,
@@ -388,7 +347,8 @@ export const side_panel_styles = StyleSheet.create({
 
 export const text_component_styles = StyleSheet.create({
   view: {
-    ...common_styles.appTheme
+    color: common_styles.appTheme.color,
+    padding: common_styles.appTheme.padding
   }
 });
 
@@ -419,6 +379,7 @@ export const time_range_slider_styles = StyleSheet.create({
     color: common_styles.appTheme.color
   },
   timeSliderView: {
+    padding: 0,
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
@@ -458,7 +419,48 @@ export const toolbar_styles = StyleSheet.create({
     width: 35
   }
 });
-// export default styles;
+
+export const tooltip_styles = StyleSheet.create({
+  container: {
+    display: 'flex',
+    flexDirection: 'column',
+    backgroundColor: '#222', // Dark background color
+    color: '#fff', // Light text color
+    padding: 10, // Add padding for better appearance
+    borderRadius: '4px', // Add border radius for a smoother look
+    margin: 0,
+  },
+  table: {
+    margin: 10,
+    borderCollapse: 'collapse',
+    width: '100%',
+  },
+  title: {
+    // fontWeight: 'bold',
+    // textAlign: 'center',
+    // justifyContent: 'center',
+    ...common_styles.h1,
+  },
+  label: {
+    width: '30%',
+    fontWeight: '600',
+    marginRight: 4,
+    paddingLeft: 4,
+    paddingTop: 2,
+    paddingBottom: 2,
+    textAlign: 'right',
+  },
+  value: {
+    padding: 2,
+  },
+  buttonStyle: {
+    backgroundColor: '#2196F3',
+  },
+  infoWindowStyle: {
+    padding: 0,
+    margin: 0,
+  },
+});
 
 export const top_panel_styles = StyleSheet.create({
 	container: {

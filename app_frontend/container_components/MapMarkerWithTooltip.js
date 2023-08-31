@@ -48,12 +48,12 @@ const MapMarkerWithTooltip = ({
   const renderInfoContent = () => {
     return (
       <View style={tooltip_styles.container}>
-        <div style={tooltip_styles.address}>{event.Address}</div>
+        <div style={tooltip_styles.title}>{event.EventName}</div>
         <table style={tooltip_styles.table}>
           <tbody>
             <tr>
-              <td style={tooltip_styles.label}>Name:</td>
-              <td style={tooltip_styles.value}>{event.EventName}</td>
+              <td style={tooltip_styles.label}>Address:</td>
+              <td style={tooltip_styles.value}>{event.Address}</td>
             </tr>
             <tr>
               <td style={tooltip_styles.label}>Time:</td>

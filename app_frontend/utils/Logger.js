@@ -1,7 +1,7 @@
 import { formatLogStreamNameDate } from '../utils/HelperFunctions';
 
 export class Logger {
-  constructor(logGroupName, logStreamName = null) {
+  constructor({ logGroupName, logStreamName = null }) {
     this.logGroupName = logGroupName;
     this.logStreamName = logStreamName;
     if (!this.logStreamName) {
@@ -13,7 +13,8 @@ export class Logger {
     const logData = {
       log_level: level,
       log_message: message,
-      timestamp: Date.now()
+      log_group: this.logGroupName,
+      log_stream: this.logStreamName
     };
     
     try {

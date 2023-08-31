@@ -28,12 +28,12 @@ export function AppHandler() {
 
   useEffect(() => {
     if (userSession) {
-      const newLogger = new Logger('ui/app_handler', `${userSession.Email}/${formatLogStreamNameDate()}`);
+      const newLogger = new Logger({ logGroupName: 'ui/app_handler', logStreamName: `${userSession.Email}/${formatLogStreamNameDate()}` });
       setLogger(newLogger);
       navigate('/');
     }
     else {
-      const newLogger = new Logger('ui/app_handler', `no_user_session/${formatLogStreamNameDate()}`);
+      const newLogger = new Logger({ logGroupName: 'ui/app_handler', logStreamName: `no_user_session/${formatLogStreamNameDate()}` });
       setLogger(newLogger);
       if (redirectRoute) {
         navigate(redirectRoute);
