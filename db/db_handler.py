@@ -25,11 +25,9 @@ class Neo4jDB:
         self.logger.emit("Successfully connected to Neo4j DB")
     
     def run_command(self, command: str):
-        self.logger.emit(f'Running {sys._getframe().f_code.co_name}:\n{command}')
         return self.graph.run(command)
     
     def execute_query(self, query: str):
-        self.logger.emit(f'Running {sys._getframe().f_code.co_name}:\n{query}')
         result = self.run_command(query)
         result = [dict(rec) for rec in result]
         

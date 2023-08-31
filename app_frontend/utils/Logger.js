@@ -1,14 +1,4 @@
-import { CloudWatchLogsClient, CreateLogGroupCommand, CreateLogStreamCommand, DescribeLogGroupsCommand, DescribeLogStreamsCommand, PutLogEventsCommand } from "@aws-sdk/client-cloudwatch-logs";
-import { aws_region, aws_access_key_id, aws_secret_access_key } from '../utils/aws_constants';
 import { formatLogStreamNameDate } from '../utils/HelperFunctions';
-
-const client = new CloudWatchLogsClient({
-  region: aws_region,
-  credentials: {
-    accessKeyId: aws_access_key_id,
-    secretAccessKey: aws_secret_access_key
-  }
-});
 
 export class Logger {
   constructor(logGroupName, logStreamName = null) {
@@ -17,79 +7,34 @@ export class Logger {
     if (!this.logStreamName) {
       this.logStreamName = formatLogStreamNameDate();
     }
-    this.initialization = this.initializeLogGroup().then(() => this.createLogStream());
-
-  };
-
-  async initializeLogGroup() {
-    const describeParams = {
-      logGroupNamePrefix: this.logGroupName,
-    };
-
-    try {
-      const describeResponse = await client.send(new DescribeLogGroupsCommand(describeParams));
-
-      // Check if log group exists
-      const exists = describeResponse.logGroups.some(group => group.logGroupName === this.logGroupName);
-
-      if (!exists) {
-        // Create log group if it doesn't exist
-        const createParams = {
-          logGroupName: this.logGroupName,
-        };
-        const createCommand = new CreateLogGroupCommand(createParams);
-        const createResponse = await client.send(createCommand);
-        console.log("Log group created:", createResponse);
-      }
-    } catch (err) {
-      console.log("Error initializing log group:", err);
-    }
-  };
-
-  async createLogStream() {
-    const describeParams = {
-      logGroupName: this.logGroupName,
-      logStreamNamePrefix: this.logStreamName,
-    };
-  
-    try {
-      const describeResponse = await client.send(new DescribeLogStreamsCommand(describeParams));
-      const exists = describeResponse.logStreams.some(stream => stream.logStreamName === this.logStreamName);
-  
-      if (!exists) {
-        // Create log stream if it doesn't exist
-        const params = {
-          logGroupName: this.logGroupName,
-          logStreamName: this.logStreamName,
-        };
-        const createStreamCommand = new CreateLogStreamCommand(params);
-        const response = await client.send(createStreamCommand);
-      }
-    } catch (err) {
-      console.log("Error creating log stream:", err);
-    }
-  };
+  }
 
   async logEvents(level, message) {
-    await this.initialization;
-    const params = {
-      logEvents: [
-        {
-          message: `[${level}] ${message}`,
-          timestamp: Date.now()
-        },
-      ],
-      logGroupName: this.logGroupName,
-      logStreamName: this.logStreamName, // Use level as log stream name
+    const logData = {
+      log_level: level,
+      log_message: message,
+      timestamp: Date.now()
     };
-
+    
     try {
-      const putLogCommand = new PutLogEventsCommand(params);
-      const response = await client.send(putLogCommand);
+      await fetch('/api/logs', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(logData)
+      }).then(res => res.json())
+        .then(data => {
+          if (!data.message || data.message !== 'success') {
+            console.error('Failed to log message:', data.message || 'Unknown error');
+          }
+        }).catch((error) => {
+          console.error('Error logging message:', error);
+        });
     } catch (err) {
       console.log("Error putting log events:", err);
     }
-  };
+  }
 
   async info(message) {
     console.info(message);
@@ -112,7 +57,7 @@ export class Logger {
   }
 
   async critical(message) {
-    console.critical(message);
+    console.error(message);
     await this.logEvents('CRITICAL', message);
   }
 }

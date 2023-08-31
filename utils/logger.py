@@ -4,7 +4,6 @@ from datetime import datetime
 import boto3
 from botocore.exceptions import ClientError
 
-
 class Logger(logging.Logger):
 
     def __init__(self, log_group_name: str, log_stream_name: str = None):
@@ -38,8 +37,18 @@ class Logger(logging.Logger):
         self.handler.setFormatter(self.formatter)
         self.logger.addHandler(self.handler)
         
-        self.emit('logger initiated')
+        self.info('logger initiated')
 
+    @property
+    def log_level_function_mappings(self):
+        return {
+            'INFO': self.info,
+            'DEBUG': self.debug,
+            'WARNING': self.warning,
+            'CRITICAL': self.critical,
+            'ERROR': self.error
+        }
+    
     def log(self, msg: str, level: str):
         INFO_LEVEL_STRING = 'INFO'
         DEBUG_LEVEL_STRING = 'DEBUG'

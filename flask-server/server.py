@@ -1,16 +1,50 @@
 #! /usr/bin/python3
+import traceback
+from datetime import datetime
 
+from flask import Flask, request, jsonify
 from db.db_handler import Neo4jDB
 from db import queries
 from utils.logger import Logger
 
-from flask import Flask, request, jsonify
 
-logger = Logger(log_group_name=f"api")
-neo4j = Neo4jDB(logger=logger)
+api_logger = Logger(log_group_name=f"api")
+neo4j = Neo4jDB(logger=api_logger)
+
+session_logger = None
 
 def create_server():
     app = Flask(__name__)
+
+    @app.route('/logs', methods=['POST'])
+    def send_logs_to_cloudwatch():
+        global session_logger
+        
+        LOG_GROUP = 'YOUR_LOG_GROUP_NAME'
+        LOG_STREAM = datetime.now().strftime('%Y-%m-%dT%H-%M-%S')
+        if session_logger is None:
+            session_logger = Logger(log_group_name=LOG_GROUP, log_stream_name=LOG_STREAM)
+
+        try:
+            body = request.get_json()
+            if not body:
+                return jsonify({"message": "No input body provided"}), 400
+            log_message = body.get('log_message')
+            log_level = body.get('log_level')
+            if not log_message:
+                return {"message": "No log_message provided"}, 400
+            if not log_level:
+                return {"message": "No log_level provided"}, 400
+            log_level_function = session_logger.log_level_function_mappings.get(log_level)
+            if not log_level_function:
+                return {"message": f"Invalid log_level provided: {log_level}. Valid log_level values are {[key for key in session_logger.log_level_function_mappings.keys()]}"}, 400
+            log_level_function(log_message)
+            return {"message": "success"}, 200
+        except:
+            api_logger.error(f"An error occurred: {traceback.format_exc()}")
+            return {"message": "An error occurred"}, 500
+        return {"message": "Logs sent successfully"}, 200
+            
     @app.route("/get_event_type_mappings", methods=["GET"])
     def get_event_type_mappings():
         try:
@@ -112,7 +146,6 @@ def create_server():
                                                                 uuid=uuid,
                                                                 interest_uuids=interest_uuids
                                                             )
-            logger.info(f"formatted_query: {formatted_query}")
             result = neo4j.execute_query(formatted_query)
             
             # Check if result has the UUID key, indicating a successful creation
