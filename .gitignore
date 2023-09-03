@@ -1,31 +1,15 @@
 *__pycache__*
 Testing/data/csv/enriched/events.csv
-utils/secrets_manager.py
-logs/*
-myvenv/*
-Testing/recent_query.cypher
 
 infra/stonks_lambdas/removed_params.json
 infra/stonks_lambdas/get_node/dependencies/*
 infra/stonks_lambdas/get_node/.aws-sam/deps/*
 
-app_frontend/.env
 app_frontend/node_modules*
-data_fetcher/*/homepages*
-data_fetcher/*/event_data_json*
-data_fetcher/*/eventpages*
+app_frontend/package-lock.json
 .eslintrc
 .prettierrc
 .expo*
 .vscode*
-app_frontend/package-lock.json
-app_frontend/utils/aws_constants.js
-
-app_frontend/certification/*
-flask_server/certification/*
-flask_server/db/*
-flask_server/utils/*
-app_frontend/utils/aws_constants.js
-flask-server/certification/*
 flask-server/db/*
 flask-server/utils/*
