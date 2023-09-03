@@ -383,16 +383,26 @@ export const time_range_slider_styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
+  container_style: {
+    paddingTop: 0,
+    paddingBottom: 0,
+    height: 'auto' 
+  },
+  handle_label_style: {
+    backgroundColor: 'transparent',
+    color: '#000'
+  },
+  label_style: {
+    fontSize: 16,
+    color: '#000'
+  }
 });
 
 export const toolbar_styles = StyleSheet.create({
   toolbar: {
-    ...common_styles.appTheme,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    // backgroundColor: styles.appTheme.backgroundColor,
-    padding: 15,
   },
   toolbarComponent: {
     height: '100%',

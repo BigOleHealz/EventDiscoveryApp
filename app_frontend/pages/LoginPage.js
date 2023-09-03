@@ -7,6 +7,7 @@ import { GoogleLoginButton } from "react-social-login-buttons";
 import { LoginSocialGoogle } from "reactjs-social-login";
 
 import { TextComponent } from '../base_components/TextComponent';
+import { getSecretValue } from '../utils/AWSHandler';
 import { CreateUserProfileContext, LoggerContext, UserSessionContext } from '../utils/Contexts';
 import { storeUserSession } from '../utils/SessionManager';
 import { common_styles, login_page_styles } from '../styles';
@@ -16,11 +17,26 @@ export function LoginPage() {
   const { userSession, setUserSession } = React.useContext(UserSessionContext);
   const { logger, setLogger } = React.useContext(LoggerContext);
   const { create_user_profile_context, setCreateUserProfileContext } = React.useContext(CreateUserProfileContext);
+
+  const [googleClientId, setGoogleClientId] = useState(null);
+
   const navigate = useNavigate();
 
   const [email, setEmail] = useState(null);
   const [first_name, setFirstName] = useState(null);
   const [last_name, setLastName] = useState(null);
+
+  useEffect(() => {
+    const fetchSecrets = async () => {
+      const secrets = await getSecretValue('google_oauth_credentials');
+      if (secrets) {
+        setGoogleClientId(JSON.parse(secrets).client_id);
+      }
+    };
+
+    fetchSecrets();
+  }, []);
+
 
   const onGoogleLoginSuccess = ({ provider, data }) => {
     setEmail(data.email);
@@ -79,20 +95,25 @@ export function LoginPage() {
       <View style={[login_page_styles.container]} TestID="LoginFullPageContainer">
         <View style={login_page_styles.authContainer} TestID="LoginComponentsContainer">
           <TextComponent style={login_page_styles.title}>Login</TextComponent>
+
           <View>
-            <LoginSocialGoogle
-              client_id={"789121404004-6144ra31e6s5ls9eknrdkejljk12oak7.apps.googleusercontent.com"}
-              scope="openid profile email"
-              discoveryDocs="claims_supported"
-              access_type="offline"
-              onResolve={onGoogleLoginSuccess}
-              onReject={(err) => {
-                toast.error('Login Failed!');
-                console.log(err);
-              }}
-            >
-              <GoogleLoginButton />
-            </LoginSocialGoogle>
+            {
+              googleClientId && ( // Render the component only if googleClientId is not null
+                <LoginSocialGoogle
+                  client_id={googleClientId}
+                  scope="openid profile email"
+                  discoveryDocs="claims_supported"
+                  access_type="offline"
+                  onResolve={onGoogleLoginSuccess}
+                  onReject={(err) => {
+                    toast.error('Login Failed!');
+                    console.log(err);
+                  }}
+                >
+                  <GoogleLoginButton />
+                </LoginSocialGoogle>
+              )
+            }
           </View>
         </View>
       </View>

@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "app_frontend",
-    "slug": "app_frontend",
+    "name": "Evently",
+    "slug": "Evently",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",

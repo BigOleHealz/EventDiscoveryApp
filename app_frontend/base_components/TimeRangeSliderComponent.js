@@ -61,7 +61,7 @@ export const TimeRangeSliderComponent = ({ startTime, endTime, setStartTime, set
   };
   
 	return (
-		<View style={{ paddingTop: 0, paddingBottom:0 }}>
+		<View>
 			<RangeSlider
 				min={0}
 				max={24}
@@ -74,11 +74,11 @@ export const TimeRangeSliderComponent = ({ startTime, endTime, setStartTime, set
 				thumbBorderColor="#ddd"
 				selectedColor="#2196F3"
 				unselectedColor="#ddd"
-				containerStyle={{ paddingTop: 0, paddingBottom: 0, height: 'auto' }}
+				containerStyle={time_range_slider_styles.container_style}
         handleLabel={sliderValueToFormattedTime}
-				handleLabelStyle={{ backgroundColor: 'transparent', color: '#000' }}
+				handleLabelStyle={time_range_slider_styles.handle_label_style}
 				handleLabelVisible={false}
-				labelStyle={{ fontSize: 16, color: '#000' }}
+				labelStyle={time_range_slider_styles.label_style}
 				labelPrefix="Time: "
 				labelSuffix=" hrs"
 				initialFromValue={0}
