@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import { View, Text } from 'react-native';
 import { GoogleMap, LoadScript } from '@react-google-maps/api';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -120,6 +120,7 @@ export const Map = ({
     }
   }, [fetching_events, start_timestamp, end_timestamp]);
 
+  console.debug('map_events_full_day:', map_events_full_day);
   useEffect(() => {
     const start_time_raw_string = `${findGameSelectedDate}T${findGameStartTime}`
     const end_time_raw_string = `${findGameSelectedDate}T${findGameEndTime}`

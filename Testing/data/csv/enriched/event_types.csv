@@ -1,31 +1,10 @@
-EventTypeID,EventType,UUID
-1,Sports,
-2,Live Music & Concerts,
-3,Pickup Basketball,
-4,LGBTQ+,
-5,Professional & Networking,
-6,"Health, Fitness, & Wellness",
-7,Food & Drinks Specials,
-8,Arts & Crafts,
-9,Social,
-10,Walking Group,
-11,Community,
-12,Religious,
-13,Gardening,
-14,Political,
-15,Happy Hour,
-16,Volunteering,
-17,Festival,
-18,Comedy,
-19,Book Clubs,
-20,Tours,
-21,Outdoor Activities,
-22,Kids & Children,
-23,Games,
-24,Self-Improvement,
-25,Cooking Class,
-26,Trivia,
-27,Yoga,
-28,Dancing
-70,Dummy Event Type,f85a0fb0-d54f-4a9d-8d5f-8cf6066215e9
-
+EventTypeID,EventType,UUID,pinColor
+1,Sports,,#FF0000
+2,Live Music & Concerts,,#00FF00
+3,Professional & Networking,,#0000FF
+4,"Health, Fitness, Wellness, & Yoga",,#FFA500
+5,Food & Drinks Specials,,#8A2BE2
+6,Social,,#FFD700
+7,Festival,,#DC143C
+8,Comedy,,#20B2AA
+70,Dummy Event Type,f85a0fb0-d54f-4a9d-8d5f-8cf6066215e9,#708090
