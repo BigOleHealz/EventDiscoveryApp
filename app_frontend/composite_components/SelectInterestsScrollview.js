@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { ScrollView, View, CheckBox, Text, StyleSheet, Switch } from 'react-native';
+import { ScrollView, Switch, Text, View } from 'react-native';
+import { Checkbox } from 'react-native-paper';
 import { toast } from 'react-toastify';
 
 import { TextComponent } from '../base_components/TextComponent';
@@ -98,11 +99,15 @@ export const SelectInterestsScrollView = ({
       });
     }
   }, [first_run]);
-
-  const EventTypeChecklistItem = ({ name, isChecked, onValueChange }) => {
+  const EventTypeChecklistItem = ({ name, isChecked, onValueChange, color }) => {
     return (
       <View style={select_interests_scrollview_styles.itemContainer}>
-        <CheckBox value={isChecked} onValueChange={onValueChange} />
+        <Checkbox 
+          status={isChecked ? 'checked' : 'unchecked'}
+          color={color}
+          uncheckedColor={color}
+          onPress={onValueChange}
+        />
         <Text style={select_interests_scrollview_styles.itemText}>{name}</Text>
       </View>
     );
@@ -126,7 +131,8 @@ export const SelectInterestsScrollView = ({
             key={eventType.UUID}
             name={eventType.EventType}
             isChecked={eventType.isChecked}
-            onValueChange={(newValue) => handleValueChange(index, newValue)}
+            color={eventType.PinColor}
+            onValueChange={() => handleValueChange(index, !eventType.isChecked)}
           />
         ))}
       </ScrollView>

@@ -35,7 +35,8 @@ GET_EVENT_TYPE_NAMES_MAPPINGS = """
                                 WHERE event.EventType <> 'Dummy Event Type'
                                 RETURN
                                     event.UUID as UUID,
-                                    event.EventType AS EventType
+                                    event.EventType AS EventType,
+                                    event.pinColor as PinColor
                                 ORDER BY event.EventType;
                                 """
 
@@ -43,18 +44,6 @@ GET_EVENT_TYPE_NAMES_MAPPINGS = """
 ###############################
 ##### GET INDIVIDUAL NODE #####
 ###############################
-
-GET_ACCOUNT_NODE_BY_ID = """
-                            MATCH (n:Account)
-                                WHERE ID(n) = {node_id}
-                            RETURN 
-                                n;
-                            """
-# n.Email as Email,
-# n.Username as Username,
-# n.FirstName as FirstName,
-# n.LastName as LastName,
-# n.UUID as UUID;
 
 GET_ACCOUNT_NODE_BY_UUID = """
                             MATCH (n:Account)
@@ -184,6 +173,7 @@ FETCH_EVENTS_FOR_MAP = """
         event.EventTypeUUID as EventTypeUUID,
         eventType.EventType as EventType,
         eventType.IconURI as EventTypeIconURI,
+        eventType.pinColor as PinColor,
         AttendeeCount;
     """
 # GET_EVENTS_RELATED_TO_USER = """

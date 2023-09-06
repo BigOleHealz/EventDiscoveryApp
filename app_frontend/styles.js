@@ -300,8 +300,8 @@ export const select_interests_scrollview_styles = StyleSheet.create({
   itemContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 10,
-    marginBottom: 10,
+    // marginTop: 10,
+    // marginBottom: 10,
   },
   itemText: {
     marginLeft: 10,
