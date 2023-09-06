@@ -6,10 +6,13 @@ services:
       dockerfile: Dockerfile.server
     container_name: flask
     command: gunicorn --bind 0.0.0.0:8000 --workers 4 "server:create_server()"
+    restart: always
     ports:
       - 8000:8000
     volumes:
-      - ./flask-server:/var/www
+      - ./flask-server:/app
+      - ./db:/app/db
+      - ./utils:/app/utils
     networks:
       my-network:
         aliases:
@@ -20,7 +23,7 @@ services:
       context: ./app_frontend
       dockerfile: Dockerfile.client
     volumes:
-      - ./app_frontend:/usr/src/app
+      - ./app_frontend:/app
     ports:
       - 19006:19006
     networks:
