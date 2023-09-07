@@ -7,7 +7,6 @@ import { GoogleLoginButton } from "react-social-login-buttons";
 import { LoginSocialGoogle } from "reactjs-social-login";
 
 import { TextComponent } from '../base_components/TextComponent';
-import { getSecretValue } from '../utils/AWSHandler';
 import { CreateUserProfileContext, LoggerContext, UserSessionContext } from '../utils/Contexts';
 import { storeUserSession } from '../utils/SessionManager';
 import { common_styles, login_page_styles } from '../styles';
@@ -18,6 +17,7 @@ export function LoginPage() {
   const { logger, setLogger } = React.useContext(LoggerContext);
   const { create_user_profile_context, setCreateUserProfileContext } = React.useContext(CreateUserProfileContext);
 
+  const [fetching_google_client_id, setFetchingGoogleClientId] = useState(true);
   const [googleClientId, setGoogleClientId] = useState(null);
 
   const navigate = useNavigate();
@@ -27,15 +27,26 @@ export function LoginPage() {
   const [last_name, setLastName] = useState(null);
 
   useEffect(() => {
-    const fetchSecrets = async () => {
-      const secrets = await getSecretValue('google_oauth_credentials');
-      if (secrets) {
-        setGoogleClientId(JSON.parse(secrets).client_id);
-      }
-    };
-
-    fetchSecrets();
-  }, []);
+    if (fetching_google_client_id) {
+      fetch('/api/get_aws_secret', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            secret_id: 'google_oauth_credentials',
+        }),
+      }).then(res => res.json())
+      .then(data => {
+          if (data) {
+            setGoogleClientId(data.client_id);
+          }
+      }).catch((error) => {
+          console.error('Error:', error);
+      });
+      setFetchingGoogleClientId(false);
+    }
+  }, [fetching_google_client_id]);
 
 
   const onGoogleLoginSuccess = ({ provider, data }) => {
@@ -62,7 +73,6 @@ export function LoginPage() {
         }),
       }).then(res => res.json())
         .then(data => {
-          console.log(data);
           if (!data || data.length === 0) {
             toast.success('Welcome New User!');
             console.log('No user data returned for email:', email);

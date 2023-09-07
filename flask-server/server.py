@@ -1,6 +1,7 @@
 #! /usr/bin/python3
-import traceback
+import json, traceback
 from datetime import datetime
+import boto3
 
 from flask import Flask, request, jsonify
 from db.db_handler import Neo4jDB
@@ -15,6 +16,27 @@ session_loggers_cache = {}
 
 def create_server():
     app = Flask(__name__)
+
+    @app.route('/get_aws_secret', methods=['POST'])
+    def get_aws_secret():
+        try:
+            body = request.get_json()
+            if not body:
+                return jsonify({"message": "No input body provided"}), 400
+            secret_id = body.get('secret_id')
+            if not secret_id:
+                return jsonify({"message": "No secret_id provided"}), 400
+            if secret_id not in ["google_maps_api_key", "google_oauth_credentials"]:
+                return jsonify({"message": "Invalid secret_id provided. None of your business. Get off of my website scammer."}), 400
+            client = boto3.client('secretsmanager', region_name='us-east-1')
+            response = client.get_secret_value(SecretId=secret_id)
+            secret_string = response['SecretString']
+            secret_dict = json.loads(secret_string)
+
+            return jsonify(secret_dict), 200
+        except Exception as e:
+            api_logger.error(f"An error occurred: {traceback.format_exc()}")
+            return {"message": f"An error occurred: {traceback.format_exc()}"}, 500
 
     @app.route('/logs', methods=['POST'])
     def send_logs_to_cloudwatch():
@@ -49,7 +71,6 @@ def create_server():
         except:
             api_logger.error(f"An error occurred: {traceback.format_exc()}")
             return {"message": f"An error occurred: {traceback.format_exc()}"}, 500
-    
             
     @app.route("/get_event_type_mappings", methods=["GET"])
     def get_event_type_mappings():
@@ -154,7 +175,6 @@ def create_server():
                                                             )
             result = neo4j.execute_query(formatted_query)
             
-            # Check if result has the UUID key, indicating a successful creation
             if 'UUID' in result[0]:
                 return jsonify({"success": True, "UUID": result[0]['UUID']})
             else:
