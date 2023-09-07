@@ -7,11 +7,9 @@ import 'react-toastify/dist/ReactToastify.css';
 import { ButtonComponent } from '../base_components/ButtonComponent';
 import MapMarkerWithTooltip from './MapMarkerWithTooltip';
 
-import { CreateGameContext } from '../utils/Contexts';
-import { getSecretValue } from '../utils/AWSHandler';
-import { LoggerContext, UserSessionContext } from '../utils/Contexts';
+import { CreateGameContext, LoggerContext, UserSessionContext } from '../utils/Contexts';
 import { day_start_time, day_end_time } from '../utils/constants';
-import { getAddressFromCoordinates, convertUTCDateToLocalDate } from '../utils/HelperFunctions';
+import { convertUTCDateToLocalDate, getAddressFromCoordinates, getUserLocation } from '../utils/HelperFunctions';
 
 import { removeUserSession } from '../utils/SessionManager';
 import pinIcon from '../assets/pin.png';
@@ -36,35 +34,48 @@ export const Map = ({
     lng: -75.1652,
   };
 
+  const [mapCenter, setMapCenter] = useState(defaultCenter);
+  const [googleMapsApiKey, setGoogleMapsApiKey] = useState(null); // Add this state to store the API key
+
   const [event_uuid, setEventUUID] = useState(null);
   const [activePopup, setActivePopup] = useState(null);
   const [createGameData, setCreateGameData] = useState({});
-  const [fetching_events, setFetchingEvents] = useState(true);
+  const [fetching_google_maps_api_key, setFetchingGoogleMapsApiKey] = useState(true);
+  const [fetching_events, setFetchingEvents] = useState(false);
 
   const [ isCreateGameDateTimeModalVisible, setIsCreateGameDateTimeModalVisible ] = useState(false);
   const [ isSelectEventTypeModalVisible, setIsSelectEventTypeModalVisible ] = useState(false);
   const [ isCreateGameInviteFriendsModalVisible, setIsInviteFriendsToEventModalVisible ] = useState(false);
   const [ isCreateEventDetailsModalVisible, setIsCreateEventDetailsModalVisible ] = useState(false);
 
-  const [transactionStatus, setTransactionStatus] = useState(false);
-
-  // Handle Map
-  const [mapCenter, setMapCenter] = useState(defaultCenter);
-  const [googleMapsApiKey, setGoogleMapsApiKey] = useState(null); // Add this state to store the API key
-  useEffect(() => {
-    const fetchSecrets = async () => {
-      const secrets = await getSecretValue('google_maps_api_key');
-      if (secrets) {
-        setGoogleMapsApiKey(JSON.parse(secrets).GOOGLE_MAPS_API_KEY);
-      }
-    };
-
-    fetchSecrets();
-  }, []);
 
   useEffect(() => {
     getUserLocation();
   }, []);
+
+  useEffect(() => {
+    if (fetching_google_maps_api_key) {
+      fetch('/api/get_aws_secret', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            secret_id: 'google_maps_api_key',
+        }),
+      }).then(res => res.json())
+      .then(data => {
+          if (data) {
+            setGoogleMapsApiKey(data.GOOGLE_MAPS_API_KEY);
+          }
+      }).catch((error) => {
+          console.error('Error:', error);
+      });
+
+      setFetchingGoogleMapsApiKey(false);
+      setFetchingEvents(true);
+    }
+  }, [fetching_google_maps_api_key]);
   
   const mapRef = React.useRef();
 
@@ -93,7 +104,6 @@ export const Map = ({
   // Handle Map Events
   const [map_events_full_day, setMapEventsFullDay] = useState([]);
   const [map_events_filtered, setMapEventsFiltered] = useState([]);
-
   const start_timestamp = convertUTCDateToLocalDate(new Date(`${findGameSelectedDate}T${day_start_time}`));
   const end_timestamp = convertUTCDateToLocalDate(new Date(`${findGameSelectedDate}T${day_end_time}`));
 
