@@ -23,7 +23,10 @@ const MapMarkerWithTooltip = ({
   const { logger, setLogger } = React.useContext(LoggerContext);
 
   const position = { lat: event.Lat, lng: event.Lon };
-  const icon_size = 50;
+  const icon_size = {
+    height: 50,
+    width: 30
+  }
 
   useEffect(() => {
     if (activePopup === event.UUID) {
@@ -95,10 +98,7 @@ const MapMarkerWithTooltip = ({
         event_types_icon_map.hasOwnProperty(event.EventType)
           ? {
               url: event_types_icon_map[event.EventType],
-              scaledSize: {
-                height: icon_size, // Set the desired height
-                width: icon_size, // Calculate the width based on the desired height and the aspect ratio
-              },
+              scaledSize: icon_size
             }
           : undefined
       }
