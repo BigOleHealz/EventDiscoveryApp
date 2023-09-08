@@ -8,8 +8,8 @@ import { LoginSocialGoogle } from "reactjs-social-login";
 
 import { TextComponent } from '../base_components/TextComponent';
 import { CreateUserProfileContext, LoggerContext, UserSessionContext } from '../utils/Contexts';
-import { storeUserSession } from '../utils/SessionManager';
-import { common_styles, login_page_styles } from '../styles';
+import { useSetGoogleClientId, useSetUserProfile } from '../utils/Hooks';
+import { login_page_styles } from '../styles';
 
 export function LoginPage() {
 
@@ -20,40 +20,9 @@ export function LoginPage() {
   const [fetching_google_client_id, setFetchingGoogleClientId] = useState(true);
   const [googleClientId, setGoogleClientId] = useState(null);
 
-  const navigate = useNavigate();
-
   const [email, setEmail] = useState(null);
   const [first_name, setFirstName] = useState(null);
   const [last_name, setLastName] = useState(null);
-
-  useEffect(() => {
-    if (fetching_google_client_id) {
-      fetch('/api/get_aws_secret', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            secret_id: 'google_oauth_credentials',
-        }),
-      }).then(res => res.json())
-      .then(data => {
-          if (data) {
-            setGoogleClientId(data.client_id);
-          }
-      }).catch((error) => {
-          console.error('Error:', error);
-      });
-      setFetchingGoogleClientId(false);
-    }
-  }, [fetching_google_client_id]);
-
-
-  const onGoogleLoginSuccess = ({ provider, data }) => {
-    setEmail(data.email);
-    setFirstName(data.given_name);
-    setLastName(data.family_name);
-  };
 
   const resetLoginInfo = () => {
     setEmail(null);
@@ -61,43 +30,15 @@ export function LoginPage() {
     setLastName(null);
   };
 
-  useEffect(() => {
-    if (email) {
-      fetch('/api/get_user_profile', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: email
-        }),
-      }).then(res => res.json())
-        .then(data => {
-          if (!data || data.length === 0) {
-            toast.success('Welcome New User!');
-            console.log('No user data returned for email:', email);
-            setCreateUserProfileContext({
-              FirstName: first_name,
-              LastName: last_name,
-              Email: email
-            });
-            navigate('/create-account');
-            return;
-          }
-          const user = data;
-          user.TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-          storeUserSession(user);
-          setUserSession(user);
-          toast.success('Login Successful!');
-          logger.info(`Login Successful for email: ${email}`);
-          resetLoginInfo();
-        }).catch((error) => {
-          console.error('Error:', error);
-          toast.error('An error occurred while fetching user profile!');
-        });
-    }
-    setEmail(false);
-  }, [email]);
+  useSetGoogleClientId(fetching_google_client_id, setFetchingGoogleClientId, setGoogleClientId);
+  useSetUserProfile(email, setCreateUserProfileContext, setUserSession, first_name, last_name, resetLoginInfo, logger);
+
+  const onGoogleLoginSuccess = ({ provider, data }) => {
+    setEmail(data.email);
+    setFirstName(data.given_name);
+    setLastName(data.family_name);
+  };
+
 
   return (
     <>
@@ -108,7 +49,7 @@ export function LoginPage() {
 
           <View>
             {
-              googleClientId && ( // Render the component only if googleClientId is not null
+              googleClientId && (
                 <LoginSocialGoogle
                   client_id={googleClientId}
                   scope="openid profile email"

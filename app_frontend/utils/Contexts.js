@@ -1,6 +1,9 @@
 import React from 'react';
 
-export const UserSessionContext = React.createContext();
+export const UserSessionContext = React.createContext({
+    userSession: null,
+    setUserSession: () => {}
+});
 
 export const CreateGameContext = React.createContext();
 
