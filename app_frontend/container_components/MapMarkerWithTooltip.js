@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { View } from 'react-native';
 import moment from 'moment';
 
-import { Marker, InfoWindow } from '@react-google-maps/api';
+import { InfoWindow, Marker } from '@react-google-maps/api';
 import { ButtonComponent } from '../base_components/ButtonComponent';
 import { LoggerContext } from '../utils/Contexts';
 import { convertUTCDateToLocalDate } from '../utils/HelperFunctions';
 
-import { event_types_icon_map } from '../utils/constants'
+import { event_types_icon_map, icon_size } from '../utils/constants'
 import '../css/custom-infowindow.css';
 
 import { common_styles, tooltip_styles }  from '../styles';
@@ -16,17 +16,12 @@ const MapMarkerWithTooltip = ({
   event,
   activePopup,
   onSetActivePopup,
-  setEventUUID,
+  clusterer
 }) => {
   const [showTooltip, setShowTooltip] = useState(false);
-  const [showPopup, setShowPopup] = useState(false);
   const { logger, setLogger } = React.useContext(LoggerContext);
 
   const position = { lat: event.Lat, lng: event.Lon };
-  const icon_size = {
-    height: 50,
-    width: 30
-  }
 
   useEffect(() => {
     if (activePopup === event.UUID) {
@@ -102,6 +97,7 @@ const MapMarkerWithTooltip = ({
             }
           : undefined
       }
+      clusterer={clusterer}
     >
       {showTooltip && (
         <InfoWindow position={position} onCloseClick={handleMarkerClick}>

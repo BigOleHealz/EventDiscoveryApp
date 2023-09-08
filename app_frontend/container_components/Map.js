@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text } from 'react-native';
-import { GoogleMap, LoadScript } from '@react-google-maps/api';
+import { GoogleMap, LoadScript, MarkerClusterer } from '@react-google-maps/api';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -8,8 +8,9 @@ import { ButtonComponent } from '../base_components/ButtonComponent';
 import MapMarkerWithTooltip from './MapMarkerWithTooltip';
 
 import { CreateGameContext, LoggerContext, UserSessionContext } from '../utils/Contexts';
-import { day_start_time, day_end_time } from '../utils/constants';
-import { convertUTCDateToLocalDate, getAddressFromCoordinates, getUserLocation } from '../utils/HelperFunctions';
+import { day_start_time, day_end_time, defaultCenter } from '../utils/constants';
+import { convertUTCDateToLocalDate, getAddressFromCoordinates } from '../utils/HelperFunctions';
+import { setUserLocation, useFetchEvents, useFetchGoogleMapsApiKey, useFilterEvents, useSetUserLocation } from '../utils/Hooks';
 
 import { removeUserSession } from '../utils/SessionManager';
 import pinIcon from '../assets/pin.png';
@@ -28,128 +29,30 @@ export const Map = ({
   // Start logging
   logger.info("Map component is initializing...");
 
-  // Handle Map
-  const defaultCenter = {
-    lat: 39.9526,
-    lng: -75.1652,
-  };
-
+  // Handle Map Events
+  const mapRef = React.useRef();
   const [mapCenter, setMapCenter] = useState(defaultCenter);
-  const [googleMapsApiKey, setGoogleMapsApiKey] = useState(null); // Add this state to store the API key
+  const [googleMapsApiKey, setGoogleMapsApiKey] = useState(null);
+  const [map_events_full_day, setMapEventsFullDay] = useState([]);
+  const [map_events_filtered, setMapEventsFiltered] = useState([]);
 
-  const [event_uuid, setEventUUID] = useState(null);
   const [activePopup, setActivePopup] = useState(null);
-  const [createGameData, setCreateGameData] = useState({});
   const [fetching_google_maps_api_key, setFetchingGoogleMapsApiKey] = useState(true);
   const [fetching_events, setFetchingEvents] = useState(false);
 
-  const [ isCreateGameDateTimeModalVisible, setIsCreateGameDateTimeModalVisible ] = useState(false);
-  const [ isSelectEventTypeModalVisible, setIsSelectEventTypeModalVisible ] = useState(false);
-  const [ isCreateGameInviteFriendsModalVisible, setIsInviteFriendsToEventModalVisible ] = useState(false);
-  const [ isCreateEventDetailsModalVisible, setIsCreateEventDetailsModalVisible ] = useState(false);
+  const start_timestamp = convertUTCDateToLocalDate(new Date(`${findGameSelectedDate}T${day_start_time}`));
+  const end_timestamp = convertUTCDateToLocalDate(new Date(`${findGameSelectedDate}T${day_end_time}`));
 
-
-  useEffect(() => {
-    getUserLocation();
-  }, []);
-
-  useEffect(() => {
-    if (fetching_google_maps_api_key) {
-      fetch('/api/get_aws_secret', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            secret_id: 'google_maps_api_key',
-        }),
-      }).then(res => res.json())
-      .then(data => {
-          if (data) {
-            setGoogleMapsApiKey(data.GOOGLE_MAPS_API_KEY);
-          }
-      }).catch((error) => {
-          console.error('Error:', error);
-      });
-
-      setFetchingGoogleMapsApiKey(false);
-      setFetchingEvents(true);
-    }
-  }, [fetching_google_maps_api_key]);
-  
-  const mapRef = React.useRef();
-
-  const getUserLocation = () => {
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const { latitude, longitude } = position.coords;
-        setMapCenter({
-          lat: latitude,
-          lng: longitude
-        });
-      },
-      (error) => {
-        console.error("Error getting user's location:", error);
-        toast.error("Error fetching your location. Defaulting to Philadelphia.");
-      },
-      { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
-    );
-  };
-
+  useFetchGoogleMapsApiKey(fetching_google_maps_api_key, setGoogleMapsApiKey, setFetchingGoogleMapsApiKey, setFetchingEvents);
+  useSetUserLocation(setMapCenter);
+  useFetchEvents(fetching_events, start_timestamp, end_timestamp, setMapEventsFullDay, setFetchingEvents);
+  useFilterEvents(findGameSelectedDate, findGameStartTime, findGameEndTime, map_events_full_day, eventTypesSelected, setMapEventsFiltered, logger);
   
   const onLoad = (map) => {
     mapRef.current = map;
   };
 
-  // Handle Map Events
-  const [map_events_full_day, setMapEventsFullDay] = useState([]);
-  const [map_events_filtered, setMapEventsFiltered] = useState([]);
-  const start_timestamp = convertUTCDateToLocalDate(new Date(`${findGameSelectedDate}T${day_start_time}`));
-  const end_timestamp = convertUTCDateToLocalDate(new Date(`${findGameSelectedDate}T${day_end_time}`));
-
-  useEffect(() => {
-    if (fetching_events) {
-
-      fetch('/api/events', {
-          method: 'POST',
-          headers: {
-              'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-              start_timestamp: start_timestamp,
-              end_timestamp: end_timestamp,
-          }),
-      }).then(res => res.json())
-      .then(data => {
-          setMapEventsFullDay(data);
-      }).catch((error) => {
-          console.error('Error:', error);
-      });
-
-      setFetchingEvents(false);
-    }
-  }, [fetching_events, start_timestamp, end_timestamp]);
-
   console.debug('map_events_full_day:', map_events_full_day);
-  useEffect(() => {
-    const start_time_raw_string = `${findGameSelectedDate}T${findGameStartTime}`
-    const end_time_raw_string = `${findGameSelectedDate}T${findGameEndTime}`
-    logger.info(`Datetime changed - startTime: ${start_time_raw_string} endTime: ${end_time_raw_string}`);
-    const startTime = new Date(start_time_raw_string);
-    const endTime = new Date(end_time_raw_string);
-
-    const filteredEvents = map_events_full_day.filter((event) => {
-      const eventTimestamp = new Date(event.StartTimestamp);
-      return (
-        eventTimestamp >= startTime &&
-        eventTimestamp <= endTime &&
-        eventTypesSelected.includes(event.EventTypeUUID)
-      );
-    });
-    
-    logger.info('filteredEvents:', filteredEvents)
-    setMapEventsFiltered(filteredEvents);
-  }, [findGameStartTime, findGameEndTime, map_events_full_day, eventTypesSelected]);
 
   const handleSetActivePopup = (uuid) => {
     if (activePopup === uuid) {
@@ -179,8 +82,6 @@ export const Map = ({
     );
   }
 
-  logger.info("Rendering Map component...");
-
   return (
     <>
       <LoadScript
@@ -204,16 +105,22 @@ export const Map = ({
             ],
           }}
         >
-          {Array.isArray(map_events_filtered) &&
-            map_events_filtered.map((event) => (
+          <MarkerClusterer
+            options={{ imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m' }}
+            maxZoom={20}
+          >
+          {(clusterer) => (
+            Array.isArray(map_events_filtered) && map_events_filtered.map((event) => (
               <MapMarkerWithTooltip
                 key={event.UUID}
                 event={event}
                 activePopup={activePopup}
                 onSetActivePopup={handleSetActivePopup}
-                setEventUUID={setEventUUID}
+                clusterer={clusterer}
               />
-            ))}
+            ))
+          )}
+          </MarkerClusterer>
         </GoogleMap>
       </LoadScript>
       <ButtonComponent
@@ -225,3 +132,9 @@ export const Map = ({
     </>
   );
 };
+
+// const [createGameData, setCreateGameData] = useState({});
+// const [ isCreateGameDateTimeModalVisible, setIsCreateGameDateTimeModalVisible ] = useState(false);
+// const [ isSelectEventTypeModalVisible, setIsSelectEventTypeModalVisible ] = useState(false);
+// const [ isCreateGameInviteFriendsModalVisible, setIsInviteFriendsToEventModalVisible ] = useState(false);
+// const [ isCreateEventDetailsModalVisible, setIsCreateEventDetailsModalVisible ] = useState(false);
