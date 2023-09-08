@@ -56,3 +56,13 @@ export const event_types_icon_map = {
     "Volunteering": volunteering_icon,
     "Yoga": yoga_icon
 };
+
+export const defaultCenter = {
+    lat: 39.9526,
+    lng: -75.1652,
+};
+
+export const icon_size = {
+    height: 50,
+    width: 30
+};
