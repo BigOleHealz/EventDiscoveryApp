@@ -69,8 +69,7 @@ export const Map = ({
 
   const logoutUser = () => {
     logger.info("User logging out...");
-    removeUserSession();
-    setUserSession(null);
+    removeUserSession(setUserSession);
   };
 
   if (!googleMapsApiKey) {

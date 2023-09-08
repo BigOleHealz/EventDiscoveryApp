@@ -7,7 +7,7 @@ import { HomePage } from './pages/HomePage';
 import { CreateAccountPage } from './pages/CreateAccountPage';
 import { CreateUserProfileContext, LoggerContext, UserSessionContext } from './utils/Contexts';
 import { formatLogStreamNameDate } from './utils/HelperFunctions';
-import { Logger } from './utils/Logger';  // import Logger
+import { Logger } from './utils/Logger'; 
 import { getUserSession } from './utils/SessionManager';
 
 
@@ -22,7 +22,6 @@ export function AppHandler() {
     (async () => {
       const session = await getUserSession();
       setUserSession(session);
-
     })();
   }, []);
 
