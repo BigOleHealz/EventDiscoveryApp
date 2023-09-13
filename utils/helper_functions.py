@@ -15,12 +15,6 @@ class HelperFunctions:
             "GOOGLE_MAPS_API_KEY"
         ]
 
-    def get_open_ai_api_key(self):
-        open_ai_api_key = self.aws_handler.get_secret("open_ai_api_key")[
-            "OPEN_AI_API_KEY"
-        ]
-        return open_ai_api_key
-
     def get_lat_lon_from_address(self, address: str):
         url = f"https://maps.googleapis.com/maps/api/geocode/json?address={address}&key={self.google_maps_api_key}"
         response = requests.get(url)

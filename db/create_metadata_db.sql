@@ -2,7 +2,6 @@ DROP TABLE IF EXISTS metadata.events_successful;
 DROP TABLE IF EXISTS metadata.events_raw;
 DROP TABLE IF EXISTS metadata.ingestions;
 DROP TABLE IF EXISTS metadata.event_type_source_mappings;
-DROP TABLE IF EXISTS metadata.dates_ingested;
 DROP TABLE IF EXISTS metadata.event_types;
 DROP TABLE IF EXISTS metadata.regions;
 DROP TABLE IF EXISTS metadata.sources;
@@ -124,7 +123,7 @@ ALTER TABLE sessions ADD FOREIGN KEY (account_uuid) REFERENCES users (UUID) ON D
 -- Sources
 INSERT INTO sources (source,source_url) VALUES
   ('eventbrite','https://www.eventbrite.com/d/{state_code}--{city_code}/{event_type_id}--events/?page={page_no}&start_date={start_date}&end_date={end_date}'),
-  ('meetup','https://www.meetup.com/find/?location={country_code}--{state_code}--{city_code}&source=EVENTS&customStartDate={start_date}&customEndDate={end_date}&distance=twentyFiveMiles&eventType=inPerson&categoryId={event_type_id}');
+  ('meetup','https://www.meetup.com/find/?location={country_code}--{state_code}--{city_code}&eventType=inPerson&source=EVENTS&customStartDate={start_date}&customEndDate={end_date}&distance=twentyFiveMiles&eventType=inPerson&categoryId={event_type_id}');
 
 -- Regions
 INSERT INTO regions (city_code,state_code,country_code) VALUES
@@ -174,4 +173,3 @@ INSERT INTO users (UUID, Email, Username, FirstName, LastName, AccountCreatedTim
   ('7987238-47e3-4132-adc6-78555dfdaac4', 'manisha@gmail.com', 'manishasmith', 'Manisha', 'Smith', NOW(), TRUE),
   ('0c816c74-5412-4c44-81d1-7c1e9d39dc62', 'scott@gmail.com', 'scottsmith', 'Scott', 'Smith', NOW(), TRUE),
   ('ae36de82-eee0-4a45-b332-afcdd30685ac', 'dummy@gmail.com', 'dummyuser', 'Dummy', 'User', NOW(), TRUE);
-

@@ -92,17 +92,16 @@ INSERT_RAW_EVENT = """
         s3_link,
         error_message
     ) VALUES(
-        '{UUID}',
-        '{source}',
-        {source_id},
-        '{event_url}',
-        '{ingestion_status}',
-        '{ingestion_uuid}',
-        {region_id},
-        '{event_start_date}',
-        '{s3_link}',
-        '{error_message}'
+        %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
     );
+"""
+
+UPDATE_RAW_EVENT_INGESTION_STATUS = """
+    UPDATE events_raw
+    SET
+        ingestion_status='{status}',
+        error_message='{error_message}'
+    WHERE UUID='{UUID}';
 """
 
 INSERT_EVENT_SUCCESSFULLY_INGESTED = """
