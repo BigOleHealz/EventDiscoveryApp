@@ -1,5 +1,5 @@
 #! /usr/bin/python3.8
-import abc, os, json, traceback, sys
+import abc, traceback
 from datetime import datetime, timedelta
 import pandas as pd
 
@@ -12,11 +12,13 @@ from utils.constants import DATE_FORMAT
 from utils.logger import Logger
 
 class MetadataHandler(abc.ABC):
-    def __init__(self, logger: Logger=None):
+    def __init__(self, aws_handler: AWSHandler=None, logger: Logger=None):
         if logger is None:
             logger = Logger(log_group_name=f"metadata_handler")
         self.logger = logger
-        self.aws_handler = AWSHandler(logger=self.logger)
+        if aws_handler is None:
+            aws_handler = AWSHandler(logger=self.logger)
+        self.aws_handler = aws_handler
 
         connection_details = {}
         try:
@@ -153,6 +155,17 @@ class MetadataHandler(abc.ABC):
         self.cursor.execute(query)
         self.connection.commit()
     
+    def update_raw_event_ingestion_status(self, uuid: str, status: str, error_message: str=None):
+        if error_message is None:
+            error_message = ''
+        query = rds_queries.UPDATE_RAW_EVENT_INGESTION_STATUS.format(
+            UUID=uuid,
+            status=status,
+            error_message=error_message
+        )
+        self.cursor.execute(query)
+        self.connection.commit()
+    
     def close_ingestion_attempt(self, uuid: str, status: str, success_count: int, error_count: int, virtual_count: int):
         query = rds_queries.CLOSE_INGESTION_ATTEMPT.format(
             UUID=uuid,
@@ -166,20 +179,12 @@ class MetadataHandler(abc.ABC):
         self.connection.commit()
     
     def insert_raw_event(self, record: dict):
-        query = rds_queries.INSERT_RAW_EVENT.format(
-            UUID=record['UUID'],
-            source=record['source'],
-            source_id=record['source_id'],
-            event_url=record['event_url'],
-            ingestion_status=record['ingestion_status'],
-            ingestion_uuid=record['ingestion_uuid'],
-            region_id=record['region_id'],
-            event_start_date=record['event_start_date'],
-            s3_link=record['s3_link'],
-            error_message=record.get('error_message', '')
+        data = (
+            record['UUID'], record['source'], record['source_id'], record['event_url'],
+            record['ingestion_status'], record['ingestion_uuid'], record['region_id'],
+            record['event_start_date'], record['s3_link'], record.get('error_message', '')
         )
-        
-        self.cursor.execute(query)
+        self.cursor.execute(rds_queries.INSERT_RAW_EVENT, data)
         self.connection.commit()
     
     def insert_event_successfully_ingested(self, record: dict):
@@ -194,8 +199,3 @@ class MetadataHandler(abc.ABC):
 
         self.cursor.execute(rds_queries.INSERT_EVENT_SUCCESSFULLY_INGESTED, data)
         self.connection.commit()
-
-
-if __name__ == "__main__":
-    metadata_handler = MetadataHandler()
-    get_ingestions_to_attempt = metadata_handler.get_ingestions_to_attempt()
