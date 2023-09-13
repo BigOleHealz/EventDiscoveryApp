@@ -1,43 +1,180 @@
 #! /usr/bin/python3.8
-import os, json, traceback, sys
-
+import abc, os, json, traceback, sys
+from uuid import uuid4
+import pandas as pd
 from datetime import datetime, timedelta
+
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
 home = os.path.dirname(parent)
 sys.path.append(home)
 
-from data_fetcher.DataHandler import DataHandler
+from db.db_handler import Neo4jDB
+from  db import rds_queries
+from db import queries
+from db.metadata_db_handler import MetadataHandler
 from utils.constants import DATETIME_FORMAT
+from utils.aws_handler import AWSHandler
+from utils.logger import Logger
 
 from bs4 import BeautifulSoup
 
-location_dicts_list = [
-    {"city": "boston", "state": "ma"},
-    {"city": "philadelphia", "state": "pa"},
-    {"city": "atlantic-city", "state": "nj"},
-    {"city": "miami", "state": "fl"},
-]
+class DataRecordHandler(MetadataHandler, abc.ABC):
+    def __init__(self, row: pd.Series, logger: Logger=None):
+        if logger is None:
+            logger = Logger(log_group_name=f"eventbrite_data_handler")
+        self.logger = logger
+        super().__init__(logger=self.logger)
+        self.neo4j = Neo4jDB(logger=self.logger)
 
-class EventbriteDataHandler(DataHandler):
-    def __init__(self):
-        self.homepage_preformatted = "https://www.eventbrite.com/d/{state}--{city}/all-events/?page={page_no}&start_date={date_str}&end_date={date_str}"
+        self.row = row
+        self.uuid = str(uuid4())
+        self.row['UUID'] = self.uuid
+        self.bucket_name = "evently-data-scraper"
+
+        self.root_dir = self.row['source']
+        self.homepages_dir = os.path.join(self.root_dir, 'homepages')
+        self.eventpages_dir = os.path.join(self.root_dir, 'eventpages')
+        self.event_data_json_dir = os.path.join(self.root_dir, 'event_data_json')
+
+        self.city_code=self.row['city_code']
+        self.date=self.row['date']
+        self.source_event_type_id=self.row['source_event_type_id']
+
+        self.homepage_prefix = os.path.join(self.homepages_dir, self.date, self.city_code, self.source_event_type_id)
+        self.eventpages_date_city_prefix = os.path.join(self.eventpages_dir, self.date, self.city_code, self.source_event_type_id)
+        self.event_data_json_prefix = os.path.join(self.event_data_json_dir, self.date, self.city_code, self.source_event_type_id)
+
+        self.success_record_count = 0
+        self.error_record_count = 0
+        self.virtual_record_count = 0
+
+        chrome_options = Options()
+        chrome_options.add_argument("--headless")
+
+        self.driver = webdriver.Chrome(options=chrome_options)
+
+        self.event_data = {}
+
+    @abc.abstractmethod
+    def parse_homepages(self, city: str, date_str: str):
+        pass
+
+    @abc.abstractmethod
+    def parse_eventpages(self, city: str, date_str: str):
+        pass
+
+    def download_and_save_page_to_s3(self, url: str, output_file_key: str):
+        try:
+            self.logger.info(f"Fetching webpage content for {url}")
+            self.driver.get(url)
+            html_source = self.driver.page_source
+            self.logger.info(f"Saving webpage content to S3")
+            self.aws_handler.write_to_s3(bucket=self.bucket_name, key=output_file_key, data=html_source)
+            self.logger.info(f"Done saving webpage content to S3")
+
+        except Exception as e:
+            self.logger.error(msg=f"Error fetching homepage for {url}")
+            self.logger.error(msg=e)
+            self.logger.error(msg=traceback.format_exc())
+            raise e
+    
+    def __load_event(self, event_data: dict):
+        event_query_response = self.neo4j.execute_query_with_params(
+            query=queries.CHECK_IF_EVENT_EXISTS, params=event_data
+        )
+        
+        raw_event_data_dict = {
+            "UUID": event_data['UUID'],
+            "source": event_data['Source'],
+            "source_id": self.row['source_id'],
+            "event_url": event_data['EventURL'],
+            "ingestion_status": "SUCCESS",
+            "ingestion_uuid": self.uuid,
+            "region_id": self.row['region_id'],
+            "event_start_date": self.row['date'],
+            "s3_link": event_data.get('S3Link', ''),
+            "error_message": ""
+        }
+        if len(event_query_response) == 0:
+            self.neo4j.execute_query_with_params(query=queries.CREATE_EVENT_IF_NOT_EXISTS, params=event_data)
+            
+            self.insert_raw_event(record=raw_event_data_dict)
+            self.insert_event_successfully_ingested(record=event_data)
+    
+    def load_events_to_neo4j(self):
+        self.update_ingestion_attempt(uuid=self.uuid, status="PARSING_EVENTPAGES")
+        location_date_prefix = os.path.join(self.event_data_json_dir, self.date, self.city_code, self.source_event_type_id)
+        
+        for prefix in self.aws_handler.list_files_and_folders_in_s3_prefix(bucket=self.bucket_name, prefix=location_date_prefix)['folders']:
+            success_matched_folder_prefix = os.path.join(prefix, "success")
+            for event_file_key in self.aws_handler.list_files_and_folders_in_s3_prefix(bucket=self.bucket_name, prefix=success_matched_folder_prefix)['files']:
+                self.logger.info(msg="Loading event: {}".format(event_file_key))
+                event_data_dict_raw = self.aws_handler.read_from_s3(bucket=self.bucket_name, key=event_file_key)
+                event_data_dict = json.loads(event_data_dict_raw)
+
+                try:
+                    self.__load_event(event_data=event_data_dict)
+                except Exception as e:
+                    self.logger.error(msg="Error loading event: {}".format(event_file_key))
+                    self.logger.error(msg=e)
+                    self.logger.error(msg=traceback.format_exc())
+                    continue
+
+        self.logger.info(msg="Done loading events for location: {}, date: {}, source_event_type_id".format(self.city_code, self.date, self.source_event_type_id))
+
+        self.close_ingestion_attempt(uuid=self.uuid, status="SUCCESS", success_count=self.success_record_count, error_count=self.error_record_count, virtual_count=self.virtual_record_count)
+
+    def run(self):
+        self.download_homepages()
+        self.parse_homepages()
+        self.parse_eventpages()
+        self.load_events_to_neo4j()
+
+class EventbriteDataHandler(DataRecordHandler):
+    def __init__(self, row: pd.Series, aws_handler: AWSHandler, logger: Logger=None):
         self.event_data_script_type = "application/ld+json"
+        row['city_code'] = row['city_code'].replace(" ", "-")
+            
+        if logger is None:
+            logger = Logger(log_group_name=f"eventbrite_data_handler")
+        self.logger = logger
+        if aws_handler is None:
+            aws_handler = AWSHandler(logger=self.logger)
+        self.aws_handler = aws_handler
+
+        super().__init__(row=row, logger=self.logger)
 
         self.eventbrite_date_format = '%Y-%m-%dT%H:%M:%SZ'
-        super().__init__(data_source="eventbrite")
 
+    def download_homepages(self):
+        self.insert_ingestion_attempt(row=self.row)
+        for page_no in range(1,2):
+            output_file_key = os.path.join(self.homepage_prefix, f"homepage_{page_no}.html")
+            url = self.row['source_url'].format(
+                    state_code=self.row['state_code'],
+                    city_code=self.city_code,
+                    event_type_id=self.source_event_type_id,
+                    page_no=page_no,
+                    start_date=self.date,
+                    end_date=self.date
+                )
+            self.download_and_save_page_to_s3(url=url, output_file_key=output_file_key)
+        self.update_ingestion_attempt(uuid=self.uuid, status="HOMEPAGES_COPIED_TO_S3")
 
-    def parse_homepages(self, city: str, date_str: str):
-        self.logger.info(f"Parsing homepages for\nCity: {city}\nDate: {date_str}")
-        input_key_prefix = os.path.join(self.homepages_dir, date_str, city)
+    def parse_homepages(self):
+        self.update_ingestion_attempt(uuid=self.uuid, status="PARSING_HOMEPAGES")
+        self.logger.info(f"Parsing homepages for Date: {self.date}\nCity: {self.city_code}\nEvent Type: {self.source_event_type_id}")
+        input_key_prefix = os.path.join(self.homepages_dir, self.date, self.city_code, self.source_event_type_id)
         file_list = [rec['Key'] for rec in self.aws_handler.list_files_in_s3_prefix_recursive(bucket=self.bucket_name, prefix=input_key_prefix)['Contents']]
 
         for filename in file_list:
 
             page_no = os.path.splitext(filename.split('/')[-1])[0].split("_")[1]
-            output_key_prefix = os.path.join(self.eventpages_dir, date_str, city, page_no)
+            output_key_prefix = os.path.join(self.eventpages_dir, self.date, self.city_code, self.source_event_type_id, page_no)
             
             self.logger.info(f"Parsing homepage for Page #: {page_no}")
             html_source = self.aws_handler.read_from_s3(bucket=self.bucket_name, key=filename)
@@ -59,27 +196,24 @@ class EventbriteDataHandler(DataHandler):
                 html_source = self.driver.page_source
 
                 self.aws_handler.write_to_s3(bucket=self.bucket_name, key=output_file_key, data=html_source)
+        self.update_ingestion_attempt(uuid=self.uuid, status="HOMEPAGES_PARSED")
 
-    def parse_eventpages(self, city: str, date_str: str):
-        self.logger.info(f"Parsing eventpages for\nCity: {city}\nDate: {date_str}")
+    def parse_eventpages(self):
+        self.update_ingestion_attempt(uuid=self.uuid, status="PARSING_EVENTPAGES")
+        self.logger.info(f"Parsing eventpages for\nDate: {self.date}City: {self.city_code}\n")
 
-        eventpages_date_city_prefix = os.path.join(self.eventpages_dir, date_str, city)
-        event_data_json_prefix = os.path.join(self.event_data_json_dir, date_str, city)
-
-        file_list = [rec['Key'] for rec in self.aws_handler.list_files_in_s3_prefix_recursive(bucket=self.bucket_name, prefix=eventpages_date_city_prefix)['Contents']]
+        file_list = [rec['Key'] for rec in self.aws_handler.list_files_in_s3_prefix_recursive(bucket=self.bucket_name, prefix=self.eventpages_date_city_prefix)['Contents']]
 
         for file_key in file_list:
             page_no = file_key.split('/')[-2]
 
-            event_json_data_page_no_prefix = os.path.join(event_data_json_prefix, page_no)
+            event_json_data_page_no_prefix = os.path.join(self.event_data_json_prefix, page_no)
             event_data_json_error_prefix = os.path.join(event_json_data_page_no_prefix, "error")
             event_data_json_success_prefix = os.path.join(event_json_data_page_no_prefix, "success")
             event_data_json_success_online_prefix = os.path.join(event_data_json_success_prefix, "online")
-            event_data_json_success_matched_prefix = os.path.join(event_data_json_success_prefix, "matched")
-            event_data_json_success_unmatched_prefix = os.path.join(event_data_json_success_prefix, "unmatched")
 
             event_filename = f"{os.path.splitext(file_key.split('/')[-1])[0]}.json"
-            full_file_key_matched = os.path.join(event_data_json_success_matched_prefix, event_filename)
+            full_file_key_matched = os.path.join(event_data_json_success_prefix, event_filename)
 
             file_exists_boolean = self.aws_handler.check_if_s3_file_exists(bucket=self.bucket_name, key=full_file_key_matched)
             if file_exists_boolean:
@@ -90,6 +224,7 @@ class EventbriteDataHandler(DataHandler):
             soup = BeautifulSoup(html_source, 'lxml')
             scripts = soup.find_all('script')
 
+            event_uuid = str(uuid4())
             try:
                 for script in scripts:
                     if script.string and script.string.strip().startswith('window.__SERVER_DATA__'):
@@ -127,10 +262,11 @@ class EventbriteDataHandler(DataHandler):
                         free_event_flag = True if price == 'Free' else False
 
                         event_data_dict = {
+                            "UUID": event_uuid,
                             "StartTimestamp" : event_data_dict_raw["event"]["start"]["utc"].replace("Z", ""),
                             "EndTimestamp" : event_data_dict_raw["event"]["end"]["utc"].replace("Z", ""),
                             "EventName" : event_data_dict_raw["event"]["name"],
-                            "Source" : "eventbrite",
+                            "Source" : self.row['source'],
                             "SourceEventID": int(event_data_dict_raw["event"]["id"]),
                             "EventURL": event_data_dict_raw["event"]["url"],
                             "Lon" : location_details["location"]["longitude"],
@@ -144,27 +280,19 @@ class EventbriteDataHandler(DataHandler):
                             "EventPageURL": event_page_url,
                             "Price": price,
                             "FreeEventFlag": free_event_flag,
+                            "EventTypeUUID": self.row['target_event_type_uuid'],
+                            "EventType": self.row['source_event_type_id'],
+                            "S3Link": f"s3://{self.bucket_name}/{file_key}",
+                            "EventType": self.row['target_event_type_string'],
                         }
+                        
                         address_lower = event_data_dict['Address'].lower()
                         if "online" in address_lower or "virtual" in address_lower:
+                            self.virtual_record_count += 1
                             full_path_file_name = os.path.join(event_data_json_success_online_prefix, event_filename)
                         else:
-                            category_data_keys = ["EventName", "EventDescription", "Summary", "Host"]
-                            category_data = {key: event_data_dict[key] for key in category_data_keys}
-                            event_category_response = self.categorize_event(category_data, self.event_type_choices)
-                            
-                            event_type_name = event_category_response['EVENT_TYPE_NAME']
-                            event_data_dict['EventType'] = event_type_name
-                            event_type_uuid = self.event_type_choices_mappings_uuid_to_eventtype.get(event_type_name)
-                            if event_type_uuid is None:
-                                continue
-                            event_data_dict['EventTypeUUID'] = event_type_uuid
-                            event_data_dict['ConfidenceLevel'] = event_category_response['CONFIDENCE_LEVEL']
-
-                            if event_category_response['MATCHED']:
-                                full_path_file_name = full_file_key_matched
-                            else:
-                                full_path_file_name = os.path.join(event_data_json_success_unmatched_prefix, event_filename)
+                            self.success_record_count += 1
+                            full_path_file_name = full_file_key_matched
                         
                         self.aws_handler.write_to_s3(bucket=self.bucket_name, key=full_path_file_name, data=json.dumps(event_data_dict, indent=4))
 
@@ -180,45 +308,18 @@ class EventbriteDataHandler(DataHandler):
                     "filename": event_filename,
                     "error_context": error_context
                 }
+                self.error_record_count += 1
                 self.aws_handler.write_to_s3(bucket=self.bucket_name, key=full_path_event_data_json_file, data=json.dumps(error_data, indent=4))
 
             except Exception as e:
                 self.logger.error(traceback.format_exc())
 
+                self.error_record_count += 1
                 full_path_event_data_json_file = os.path.join(event_data_json_error_prefix, event_filename)
-                self.aws_handler.write_to_s3(bucket=self.bucket_name, key=full_path_event_data_json_file, data=str(traceback.format_exc(), indent=4))
+                self.aws_handler.write_to_s3(bucket=self.bucket_name, key=full_path_event_data_json_file, data=str(traceback.format_exc()))
+        
+        self.update_ingestion_attempt(uuid=self.uuid, status="EVENTPAGES_PARSED")
 
-
-
-    def run(self):
-        date_list = []
-        # date_list = ['2023-07-22']
-        for i in range(0, 8):
-            date_list.append((datetime.now() + timedelta(days=i)).strftime("%Y-%m-%d"))
-        for date_str in date_list:
-            try:
-                for location_dict in location_dicts_list:
-                    try:
-                        self.download_homepages(state=location_dict["state"], city=location_dict["city"], date_str=date_str)
-                    except Exception as e:
-                        self.logger.error(traceback.format_exc())
-                for location_dict in location_dicts_list:
-                    try:
-                        self.parse_homepages(city=location_dict["city"], date_str=date_str)
-                    except Exception as e:
-                        self.logger.error(traceback.format_exc())
-                for location_dict in location_dicts_list:
-                    try:
-                        self.parse_eventpages(city=location_dict["city"], date_str=date_str)
-                    except Exception as e:
-                        self.logger.error(traceback.format_exc())
-                for location_dict in location_dicts_list:
-                    try:
-                        self.load_events_to_neo4j(city=location_dict["city"], date_str=date_str)
-                    except Exception as e:
-                        self.logger.error(traceback.format_exc())
-            except Exception as e:
-                self.logger.error(traceback.format_exc())
 
 if __name__ == "__main__":
     handler = EventbriteDataHandler()
