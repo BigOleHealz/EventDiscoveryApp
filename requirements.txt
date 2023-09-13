@@ -10,3 +10,4 @@ Flask-Login==0.6.2
 pytz==2022.7.1
 flask
 flask_cors
+pymysql==1.1.0

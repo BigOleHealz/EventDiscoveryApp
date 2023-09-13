@@ -356,19 +356,10 @@ CHECK_IF_EVENT_EXISTS = r"""
 
 CREATE_EVENT_IF_NOT_EXISTS=r"""
                             MERGE (e:Event {Source: $params.Source, SourceEventID: $params.SourceEventID})
-                            ON CREATE SET e += $params, e.UUID = apoc.create.uuid() 
+                            ON CREATE SET e += $params
                             WITH e, $params as params
-                            WHERE e.UUID IS NOT NULL
-                                MERGE (et:EventType {EventType: params.EventType})
-                                    ON CREATE SET et.UUID = apoc.create.uuid()
-                                WITH e, et, params
-                                    MERGE (et)-[:RELATED_EVENT]->(e)
-                                WITH e, params
-                                    MERGE (ab:Account:Business {Address: params.Address, Title: params.Host})
-                                        ON CREATE SET ab.Lat = params.Lat, ab.Lon = params.Lon, ab.UUID = apoc.create.uuid()
-                                    MERGE (ab)-[:HOSTING_EVENT]->(e)
-                            RETURN e.UUID as EventUUID, ab.UUID as AccountBusinessUUID;
-
+                            MATCH (et:EventType {UUID: params.EventTypeUUID})
+                            MERGE (et)-[:RELATED_EVENT]->(e);
                             """
 
 CREATE_EVENT_WITH_RELATIONSHIPS = """MERGE (event:Event {properties})
@@ -405,7 +396,7 @@ CREATE_ACCOUNT_INTERESTED_IN_RELATIONSHIPS = """
 
 CREATE_ACCOUNT_INTERESTED_IN_RELATIONSHIPS_BY_MANUALLY_ASSIGNED_ID = """
                                                                     MATCH (a:Account), (et:EventType)
-                                                                    WHERE ID(a) = {account_id} AND et.EventTypeID IN {interest_id_list}
+                                                                    WHERE ID(a) = {account_id} AND et.UUID IN {interest_id_list}
                                                                     CREATE (a)-[:INTERESTED_IN]->(et);
                                                                     """
 

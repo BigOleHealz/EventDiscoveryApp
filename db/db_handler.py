@@ -257,12 +257,7 @@ class Neo4jDB:
         node = self.__create_node(node_labels='EventType', properties=properties)
         return node
     
-    def create_person_node(self, properties: dict=None, password: str=None):
-        self.logger.emit(f'Running {sys._getframe().f_code.co_name}')
-        if password is None:
-            password = ''
-        password_hash = hash_password(input_string=password)
-        properties['PasswordHash'] = password_hash
+    def create_person_node(self, properties: dict=None):
         self.logger.emit(f'Running {sys._getframe().f_code.co_name}')
         node = self.__create_node(node_labels=['Account', 'Person'], properties=properties)
         return node

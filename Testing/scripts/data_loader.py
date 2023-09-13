@@ -34,7 +34,7 @@ class DataLoader:
     def load_event_types_to_neo4j_db(self):
         self.logger.emit('Loading Event Types')
         df = pd.read_csv(os.path.join(self.enriched_data_folder_path, 'event_types.csv'))
-        df['UUID'] = df['UUID'].apply(lambda x: str(uuid4()) if pd.isna(x) else x)
+        # df['UUID'] = df['UUID'].apply(lambda x: str(uuid4()) if pd.isna(x) else x)
         for _, row in df.iterrows():
             self.neo4j.create_event_type_node(properties=row.to_dict())
 
@@ -51,7 +51,7 @@ class DataLoader:
         df['UUID'] = df['UUID'].apply(lambda x: str(uuid4()) if pd.isna(x) else x)
         person_properties_list = ['FirstName','LastName','Username','Email', 'UUID']
         for _, row in df[person_properties_list].iterrows():
-            self.neo4j.create_person_node(properties=row.to_dict(), password=row['Email'].split('@')[0])
+            self.neo4j.create_person_node(properties=row.to_dict())
             
         for _, row in df[['Email', 'Interests','Friends']].iterrows():
             person_node = self.neo4j.graph.nodes.match("Person", Email=row['Email']).first()
@@ -115,8 +115,8 @@ if __name__ == '__main__':
     dl.load_persons_to_neo4j_db()
     dl.load_businesses_to_neo4j_db()
     
-    dl.wipe_events()
-    ctd = CreateTestData()
-    ctd.create_events_csv()
-    dl.load_events_to_neo4j_db()
-    dl.load_attending_relationships()
+    # dl.wipe_events()
+    # ctd = CreateTestData()
+    # ctd.create_events_csv()
+    # dl.load_events_to_neo4j_db()
+    # dl.load_attending_relationships()
