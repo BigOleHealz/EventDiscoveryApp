@@ -56,6 +56,7 @@ class DataRecordHandler(MetadataHandler, abc.ABC):
         self.driver = webdriver.Chrome(options=chrome_options)
 
         self.event_data = {}
+        self.neo4j_datetime_format = "%Y-%m-%dT%H:%M:%S"
 
     @abc.abstractmethod
     def download_homepages(self):

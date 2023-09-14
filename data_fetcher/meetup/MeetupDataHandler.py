@@ -3,6 +3,7 @@ import os, json, traceback, sys
 from uuid import uuid4
 from datetime import date, datetime
 import pandas as pd
+import pytz
 
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
@@ -33,37 +34,38 @@ class MeetupDataHandler(DataRecordHandler):
         self.date_time_formatter = "{year}-{month}-{day}T{hour}%3A{minute}%3A{second}-04%3A00"
         self.address_format_string = "{street}, {city}, {state}, {country}"
     
-    def format_start_datetime(self, datetime_object: datetime):
-        return self.date_time_formatter.format(
-            year=datetime_object.year,
-            month=str(datetime_object.month).zfill(2),
-            day=str(datetime_object.day).zfill(2),
-            hour='00',
-            minute='00',
-            second='00'
-        )
-    
-    def format_end_datetime(self, datetime_object: datetime):
-        return self.date_time_formatter.format(
-            year=datetime_object.year,
-            month=str(datetime_object.month).zfill(2),
-            day=str(datetime_object.day).zfill(2),
-            hour='23',
-            minute='59',
-            second='59'
+    def __format_start_datetime(self, datetime_object: datetime):
+        return (
+            self.date_time_formatter.format(
+                year=datetime_object.year,
+                month=str(datetime_object.month).zfill(2),
+                day=str(datetime_object.day).zfill(2),
+                hour='00',
+                minute='00',
+                second='00'
+            ),
+            self.date_time_formatter.format(
+                year=datetime_object.year,
+                month=str(datetime_object.month).zfill(2),
+                day=str(datetime_object.day).zfill(2),
+                hour='23',
+                minute='59',
+                second='59'
+            )
         )
 
     def download_homepages(self):
         output_file_key = os.path.join(self.homepage_prefix, f"homepage.html")
 
         datetime_object = datetime.strptime(self.date, '%Y-%m-%d')
+        (formatted_start_date, formatted_end_date) = self.__format_start_datetime(datetime_object)
         url = self.row['source_url'].format(
                 country_code=self.row['country_code'],
                 state_code=self.row['state_code'],
                 city_code=self.city_code,
                 event_type_id=self.source_event_type_id,
-                start_date=self.format_start_datetime(datetime_object),
-                end_date=self.format_end_datetime(datetime_object)
+                start_date=formatted_start_date,
+                end_date=formatted_end_date
             )
         try:
             self.driver.get(url)
@@ -168,8 +170,8 @@ class MeetupDataHandler(DataRecordHandler):
 
                 event_data_dict = {
                     "UUID": event_uuid,
-                    "StartTimestamp" : important_data["dateTime"],
-                    "EndTimestamp" : important_data["endTime"],
+                    "StartTimestamp" : datetime.fromisoformat(important_data["dateTime"]).astimezone(pytz.UTC).strftime(self.neo4j_datetime_format),
+                    "EndTimestamp" : datetime.fromisoformat(important_data["endTime"]).astimezone(pytz.UTC).strftime(self.neo4j_datetime_format),
                     "EventName" : important_data["title"],
                     "Source" : self.row['source'],
                     "SourceEventID": int(important_data["id"]),
