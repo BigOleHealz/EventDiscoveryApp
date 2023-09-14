@@ -4,11 +4,11 @@ import comedy_icon from '../assets/event_type_icons/Comedy.png';
 import community_icon from '../assets/event_type_icons/Community.png';
 import cooking_class_icon from '../assets/event_type_icons/CookingClass.png';
 import dancing_icon from '../assets/event_type_icons/Dancing.png';
-import festival_icon from '../assets/event_type_icons/Festival.png';
+// import festival_icon from '../assets/event_type_icons/Festival.png';
 import food_and_drinks_specials_icon from '../assets/event_type_icons/Food&DrinksSpecials.png';
 import games_icon from '../assets/event_type_icons/Games.png';
 import happy_hour_icon from '../assets/event_type_icons/HappyHour.png';
-import health_fitness_wellness_yoga_icon from '../assets/event_type_icons/HealthFitnessWellness&Yoga.png';
+import health_fitness_sports_wellness_yoga_icon from '../assets/event_type_icons/HealthFitnessSportsWellness&Yoga.png';
 import kids_and_children_icon from '../assets/event_type_icons/Kids&Children.png';
 import lgbtq_icon from '../assets/event_type_icons/LGBTQ+.png';
 import live_music_and_concerts_icon from '../assets/event_type_icons/LiveMusic&Concerts.png';
@@ -16,6 +16,7 @@ import outdoor_activities_icon from '../assets/event_type_icons/OutdoorActivitie
 import political_icon from '../assets/event_type_icons/Political.png';
 import professional_networking_icon from '../assets/event_type_icons/Professional&Networking.png';
 import religious_icon from '../assets/event_type_icons/Religious.png';
+import science_technology_icon from '../assets/event_type_icons/Science&Technology.png';
 import self_improvement_icon from '../assets/event_type_icons/Self-Improvement.png';
 import social_icon from '../assets/event_type_icons/Social.png';
 import sports_icon from '../assets/event_type_icons/Sports.png';
@@ -36,11 +37,11 @@ export const event_types_icon_map = {
     "Community": community_icon,
     "Cooking Class": cooking_class_icon,
     "Dancing": dancing_icon,
-    "Festival": festival_icon,
+    // "Festival": festival_icon,
     "Food & Drinks Specials": food_and_drinks_specials_icon,
     "Games": games_icon,
     "Happy Hour": happy_hour_icon,
-    "Health, Fitness, Wellness, & Yoga": health_fitness_wellness_yoga_icon,
+    "Health, Fitness, Sports, Wellness, & Yoga": health_fitness_sports_wellness_yoga_icon,
     "Kids & Children": kids_and_children_icon,
     "LGBTQ+": lgbtq_icon,
     "Live Music & Concerts": live_music_and_concerts_icon,
@@ -48,6 +49,7 @@ export const event_types_icon_map = {
     "Political": political_icon,
     "Professional & Networking": professional_networking_icon,
     "Religious": religious_icon,
+    "Science & Technology": science_technology_icon,
     "Self-Improvement": self_improvement_icon,
     "Social": social_icon,
     "Sports": sports_icon,

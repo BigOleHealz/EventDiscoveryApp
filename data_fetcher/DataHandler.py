@@ -7,11 +7,13 @@ sys.path.append(parent)
 
 from db.metadata_db_handler import MetadataHandler
 from data_fetcher.eventbrite.EventbriteDataHandler import EventbriteDataHandler
+from data_fetcher.meetup.MeetupDataHandler import MeetupDataHandler
 from utils.aws_handler import AWSHandler
 from utils.logger import Logger
 
 source_handler_mapping = {
-    "eventbrite": EventbriteDataHandler
+    "eventbrite": EventbriteDataHandler,
+    "meetup": MeetupDataHandler
 }
 class DataIngestionHandler(MetadataHandler, abc.ABC):
     def __init__(self):

@@ -36,7 +36,7 @@ GET_EVENT_TYPE_NAMES_MAPPINGS = """
                                 RETURN
                                     event.UUID as UUID,
                                     event.EventType AS EventType,
-                                    event.pinColor as PinColor
+                                    event.PinColor as PinColor
                                 ORDER BY event.EventType;
                                 """
 
@@ -173,7 +173,7 @@ FETCH_EVENTS_FOR_MAP = """
         event.EventTypeUUID as EventTypeUUID,
         eventType.EventType as EventType,
         eventType.IconURI as EventTypeIconURI,
-        eventType.pinColor as PinColor,
+        eventType.PinColor as PinColor,
         AttendeeCount;
     """
 # GET_EVENTS_RELATED_TO_USER = """
