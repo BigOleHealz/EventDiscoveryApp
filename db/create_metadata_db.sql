@@ -13,7 +13,7 @@ DROP TABLE IF EXISTS metadata.users;
 CREATE TABLE sources (
   _id integer AUTO_INCREMENT PRIMARY KEY,
   source varchar(255),
-  source_url varchar(255)
+  source_url varchar(300)
 );
 
 CREATE TABLE ingestions (
@@ -123,7 +123,7 @@ ALTER TABLE sessions ADD FOREIGN KEY (account_uuid) REFERENCES users (UUID) ON D
 -- Sources
 INSERT INTO sources (source,source_url) VALUES
   ('eventbrite','https://www.eventbrite.com/d/{state_code}--{city_code}/{event_type_id}--events/?page={page_no}&start_date={start_date}&end_date={end_date}'),
-  ('meetup','https://www.meetup.com/find/?location={country_code}--{state_code}--{city_code}&eventType=inPerson&source=EVENTS&customStartDate={start_date}&customEndDate={end_date}&distance=twentyFiveMiles&eventType=inPerson&categoryId={event_type_id}');
+  ('meetup','https://www.meetup.com/find/?location={country_code}--{state_code}--{city_code}&eventType=inPerson&source=EVENTS&customStartDate={start_date}T00%3A00%3A00-04%3A00&customEndDate={end_date}T23%3A59%3A00-04%3A00&distance=twentyFiveMiles&categoryId={event_type_id}');
 
 -- Regions
 INSERT INTO regions (city_code,state_code,country_code) VALUES

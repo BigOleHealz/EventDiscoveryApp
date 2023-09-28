@@ -16,7 +16,6 @@ from utils.logger import Logger
 
 from bs4 import BeautifulSoup
 
-        
 class MeetupDataHandler(DataRecordHandler):
     def __init__(self, row: pd.Series, aws_handler: AWSHandler, logger: Logger=None):
         self.event_data_script_type = "application/json"
@@ -33,40 +32,11 @@ class MeetupDataHandler(DataRecordHandler):
 
         self.date_time_formatter = "{year}-{month}-{day}T{hour}%3A{minute}%3A{second}-04%3A00"
         self.address_format_string = "{street}, {city}, {state}, {country}"
-    
-    def __format_start_datetime(self, datetime_object: datetime):
-        return (
-            self.date_time_formatter.format(
-                year=datetime_object.year,
-                month=str(datetime_object.month).zfill(2),
-                day=str(datetime_object.day).zfill(2),
-                hour='00',
-                minute='00',
-                second='00'
-            ),
-            self.date_time_formatter.format(
-                year=datetime_object.year,
-                month=str(datetime_object.month).zfill(2),
-                day=str(datetime_object.day).zfill(2),
-                hour='23',
-                minute='59',
-                second='59'
-            )
-        )
 
     def download_homepages(self):
         output_file_key = os.path.join(self.homepage_prefix, f"homepage.html")
 
-        datetime_object = datetime.strptime(self.date, '%Y-%m-%d')
-        (formatted_start_date, formatted_end_date) = self.__format_start_datetime(datetime_object)
-        url = self.row['source_url'].format(
-                country_code=self.row['country_code'],
-                state_code=self.row['state_code'],
-                city_code=self.city_code,
-                event_type_id=self.source_event_type_id,
-                start_date=formatted_start_date,
-                end_date=formatted_end_date
-            )
+        url = self.row['source_url'].format(country_code=self.row['country_code'],state_code=self.row['state_code'],city_code=self.city_code,event_type_id=self.source_event_type_id,start_date=self.date,end_date=self.date)
         try:
             self.driver.get(url)
             html_source = self.driver.page_source
@@ -81,7 +51,6 @@ class MeetupDataHandler(DataRecordHandler):
     def parse_homepages(self, file_list: list):
         try:
             for filename in file_list:
-                
                 output_key_prefix = os.path.join(self.eventpages_dir, self.date, self.city_code, self.source_event_type_id)
                 
                 html_source = self.aws_handler.read_from_s3(bucket=self.bucket_name, key=filename)
@@ -96,15 +65,17 @@ class MeetupDataHandler(DataRecordHandler):
                 for i, script in enumerate(scripts):
                     
                     event_data_raw = json.loads(script.string)
-                    important_data = event_data_raw['props']['pageProps']['__APOLLO_STATE__']
+
+                    page_props = event_data_raw['props']['pageProps']
+                    important_data = page_props.get('__APOLLO_STATE__')
+                    if important_data is None:
+                        continue
                     event_keys = [key for key in important_data.keys() if key.startswith("Event:")]
                     raw_event_data = {key : important_data[key] for key in event_keys}
 
                     for key, value in raw_event_data.items():
                         url = value['eventUrl']
-                        
                         source_event_id = value['id']
-                        
                         output_file_key = os.path.join(output_key_prefix, source_event_id)
 
                         file_exists_boolean = self.aws_handler.check_if_s3_file_exists(bucket=self.bucket_name, key=output_file_key)
@@ -150,6 +121,7 @@ class MeetupDataHandler(DataRecordHandler):
                 "source_id": self.row['source_id'],
                 "event_url": source_event_id,
                 "ingestion_uuid": self.uuid,
+                'ingestion_status': "PENDING",
                 "region_id": self.row['region_id'],
                 "event_start_date": self.row['date'],
                 "error_message": ""
@@ -199,7 +171,6 @@ class MeetupDataHandler(DataRecordHandler):
                 else:
                     self.success_record_count += 1
                     output_file_key = full_file_key_success
-                    raw_event_data_dict['ingestion_status'] = "PENDING"
                 
                 self.aws_handler.write_to_s3(bucket=self.bucket_name, key=output_file_key, data=json.dumps(event_data_dict, indent=4))
 
