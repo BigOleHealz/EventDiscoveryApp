@@ -20,7 +20,7 @@ from utils.logger import Logger
 class DataRecordHandler(MetadataHandler, abc.ABC):
     def __init__(self, row: pd.Series, logger: Logger=None):
         if logger is None:
-            logger = Logger(log_group_name=f"eventbrite_data_handler")
+            logger = Logger(log_group_name=f"data_handler")
         self.logger = logger
         super().__init__(logger=self.logger)
         self.neo4j = Neo4jDB(logger=self.logger)
@@ -102,7 +102,7 @@ class DataRecordHandler(MetadataHandler, abc.ABC):
                 self.logger.error(msg=traceback.format_exc())
                 continue
 
-        self.logger.info(msg="Done loading events for location: {}, date: {}, source_event_type_id".format(self.city_code, self.date, self.source_event_type_id))
+        self.logger.info(msg="Done loading events for location: {}, date: {}, source_event_type_id: {}".format(self.city_code, self.date, self.source_event_type_id))
         self.close_ingestion_attempt(uuid=self.uuid, status="SUCCESS", success_count=self.success_record_count, error_count=self.error_record_count, virtual_count=self.virtual_record_count)
 
     def parent_download_homepages(self):

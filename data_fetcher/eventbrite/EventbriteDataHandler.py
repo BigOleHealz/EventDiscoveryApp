@@ -30,7 +30,7 @@ class EventbriteDataHandler(DataRecordHandler):
         super().__init__(row=row, logger=self.logger)
 
     def download_homepages(self):
-        for page_no in range(1,2):
+        for page_no in range(1,4):
             output_file_key = os.path.join(self.homepage_prefix, f"homepage_{page_no}.html")
             url = self.row['source_url'].format(
                     state_code=self.row['state_code'],
@@ -109,6 +109,7 @@ class EventbriteDataHandler(DataRecordHandler):
                 "source_id": self.row['source_id'],
                 "event_url": source_event_id,
                 "ingestion_uuid": self.uuid,
+                'ingestion_status': "PENDING",
                 "region_id": self.row['region_id'],
                 "event_start_date": self.row['date'],
                 "error_message": ""
@@ -185,7 +186,6 @@ class EventbriteDataHandler(DataRecordHandler):
                         else:
                             self.success_record_count += 1
                             output_file_key = full_file_key_success
-                            raw_event_data_dict['ingestion_status'] = "PENDING"
                         
                         self.aws_handler.write_to_s3(bucket=self.bucket_name, key=output_file_key, data=json.dumps(event_data_dict, indent=4))
 
