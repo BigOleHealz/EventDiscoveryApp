@@ -14,17 +14,12 @@ sys.path.append(home)
 from db import queries
 from db.db_handler import Neo4jDB
 from db.metadata_db_handler import MetadataHandler
+from utils.aws_handler import AWSHandler
 from utils.logger import Logger
 
 
 class DataRecordHandler(MetadataHandler, abc.ABC):
-    def __init__(self, row: pd.Series, logger: Logger=None):
-        if logger is None:
-            logger = Logger(log_group_name=f"data_handler")
-        self.logger = logger
-        super().__init__(logger=self.logger)
-        self.neo4j = Neo4jDB(logger=self.logger)
-
+    def __init__(self, row: pd.Series):
         self.row = row
         self.uuid = str(uuid4())
         self.row['UUID'] = self.uuid
@@ -38,6 +33,11 @@ class DataRecordHandler(MetadataHandler, abc.ABC):
         self.city_code=self.row['city_code']
         self.date=self.row['date']
         self.source_event_type_id=self.row['source_event_type_id']
+
+        self.logger = Logger(log_group_name=f"data_handler/{self.row['source']}", log_stream_name=f"{self.date}_{self.city_code}_{self.source_event_type_id}_{self.uuid}")
+        self.aws_handler = AWSHandler(logger=self.logger)
+        super().__init__(logger=self.logger)
+        self.neo4j = Neo4jDB(logger=self.logger)
 
         self.homepage_prefix = os.path.join(self.homepages_dir, self.date, self.city_code, self.source_event_type_id)
         self.eventpages_date_city_prefix = os.path.join(self.eventpages_dir, self.date, self.city_code, self.source_event_type_id)
@@ -78,7 +78,6 @@ class DataRecordHandler(MetadataHandler, abc.ABC):
         if len(event_query_response) == 0:
             self.neo4j.execute_query_with_params(query=queries.CREATE_EVENT_IF_NOT_EXISTS, params=event_data)
 
-            
             self.update_raw_event_ingestion_status(uuid=event_data['UUID'], status="SUCCESS")
             self.insert_event_successfully_ingested(record=event_data)
         else:
@@ -134,13 +133,23 @@ class DataRecordHandler(MetadataHandler, abc.ABC):
         try:
             self.logger.info(f"Parsing eventpages for Date: {self.date}\nCity: {self.city_code}\nEvent Type: {self.source_event_type_id}")
             self.update_ingestion_attempt(uuid=self.uuid, status="PARSING_EVENTPAGES")
-            file_list = [rec['Key'] for rec in self.aws_handler.list_files_in_s3_prefix_recursive(bucket=self.bucket_name, prefix=self.eventpages_date_city_prefix)['Contents']]
+            
+            response = self.aws_handler.list_files_in_s3_prefix_recursive(bucket=self.bucket_name, prefix=self.eventpages_date_city_prefix)
+
+            if not response:
+                self.logger.info("No files found to parse.")
+                self.update_ingestion_attempt(uuid=self.uuid, status="NO_RECORDS")
+                return
+
+            file_list = [rec['Key'] for rec in response.get('Contents', [])]  # Use get() to provide a default empty list
+
             self.parse_eventpages(file_list=file_list)
             self.logger.info(f"Done parsing eventpages")
             self.update_ingestion_attempt(uuid=self.uuid, status="EVENTPAGES_PARSED")
         except Exception as e:
             self.update_ingestion_attempt(uuid=self.uuid, status="ERROR_PARSING_EVENTPAGES")
             raise e
+
     
     def run(self):
         self.parent_download_homepages()

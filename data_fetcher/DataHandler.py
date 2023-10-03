@@ -25,7 +25,7 @@ class DataIngestionHandler(MetadataHandler, abc.ABC):
         df_ingestions_to_be_performed = self.get_ingestions_to_attempt()
         for _, row in df_ingestions_to_be_performed.iterrows():
             try:
-                handler = source_handler_mapping[row['source']](row=row, aws_handler=self.aws_handler, logger=self.logger)
+                handler = source_handler_mapping[row['source']](row=row, aws_handler=self.aws_handler)
                 handler.run()
             except Exception as e:
                 self.logger.error(msg=e)
