@@ -89,7 +89,7 @@ class MetadataHandler(abc.ABC):
     
     def calculate_dates_to_be_ingested(self):
         start_date = datetime.today()
-        end_date = start_date + timedelta(days=7)
+        end_date = start_date + timedelta(days=3)
         date_list = [(start_date + timedelta(days=x)).strftime(DATE_FORMAT) for x in range((end_date-start_date).days + 1)]
         df = pd.DataFrame(date_list, columns=['date'])
         return df

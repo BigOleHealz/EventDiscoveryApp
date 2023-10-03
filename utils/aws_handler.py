@@ -33,6 +33,9 @@ class AWSHandler:
         try:
             response = self.s3_client.list_objects_v2(Bucket=bucket, Prefix=prefix)
             self.logger.info(msg=f"Successfully listed files in bucket {bucket} with prefix {prefix}")
+            if 'Contents' not in response:
+                self.logger.info(msg=f"No files found in bucket {bucket} with prefix {prefix}")
+                return []
             return response
         except ClientError as e:
             self.logger.error(msg=f"An error occurred while listing files in bucket {bucket} with prefix {prefix}: {e}")
@@ -40,7 +43,7 @@ class AWSHandler:
         except Exception as error:
             self.logger.error(msg=error)
             raise ValueError(error)
-    
+
     def list_files_and_folders_in_s3_prefix(self, bucket: str, prefix: str):
         try:
             if not prefix.endswith('/'):

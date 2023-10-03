@@ -10,24 +10,16 @@ sys.path.append(home)
 
 from DataRecordHandler import DataRecordHandler
 from utils.aws_handler import AWSHandler
-from utils.logger import Logger
 
 from bs4 import BeautifulSoup
 
         
 class EventbriteDataHandler(DataRecordHandler):
-    def __init__(self, row: pd.Series, aws_handler: AWSHandler, logger: Logger=None):
+    def __init__(self, row: pd.Series, aws_handler: AWSHandler):
         self.event_data_script_type = "application/ld+json"
         row['city_code'] = row['city_code'].replace(" ", "-")
             
-        if logger is None:
-            logger = Logger(log_group_name=f"eventbrite_data_handler")
-        self.logger = logger
-        if aws_handler is None:
-            aws_handler = AWSHandler(logger=self.logger)
-        self.aws_handler = aws_handler
-
-        super().__init__(row=row, logger=self.logger)
+        super().__init__(row=row)
 
     def download_homepages(self):
         for page_no in range(1,4):
