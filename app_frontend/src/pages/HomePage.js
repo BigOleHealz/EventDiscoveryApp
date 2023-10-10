@@ -65,7 +65,6 @@ export function HomePage() {
         <LeftSidePanel
           isVisible={isLeftPanelVisible}
           toolbarHeight={toolbarHeight}
-
           findGameSelectedDate={findGameSelectedDate}
           setFindGameSelectedDate={setFindGameSelectedDate}
           findGameStartTime={findGameStartTime}

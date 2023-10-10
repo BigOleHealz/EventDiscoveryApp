@@ -13,11 +13,11 @@ import { ModalComponent } from '../base_components/ModalComponent';
 import { day_start_time, day_end_time, day_format } from '../utils/constants';
 import { CreateUserProfileContext, UserSessionContext } from '../utils/Contexts';
 
-import {
-  CREATE_ACCOUNT_INTEREST_RELATIONSHIPS,
-  CREATE_EVENT,
-  INVITE_FRIENDS_TO_EVENT,
-} from '../db/queries';
+// import {
+//   CREATE_ACCOUNT_INTEREST_RELATIONSHIPS,
+//   CREATE_EVENT,
+//   INVITE_FRIENDS_TO_EVENT,
+// } from '../db/queries';
 
 import { CreateGameContext } from '../utils/Contexts';
 import { modal_styles }  from '../styles';
@@ -378,14 +378,14 @@ export const CreateUsernameModal = ({
         submitButtonText="Submit Username"
         onSubmitButtonClick={handleSubmitButtonClick}
       >
-        <View>
+        <div>
           <TextInputComponent
             id="input-username"
             placeholder="Enter Username"
             value={username}
             onChangeText={handleUsernameChange}
           />
-        </View>
+        </div>
       </ModalComponent>
     </>
   );

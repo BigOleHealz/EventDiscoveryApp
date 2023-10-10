@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Route, Routes, useNavigate } from 'react-router-dom';  // Step 1
+import { Route, Routes, useNavigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 
 import { LoginPage } from './pages/LoginPage';
 import { HomePage } from './pages/HomePage';
-// import { CreateAccountPage } from './pages/CreateAccountPage';
+import { CreateAccountPage } from './pages/CreateAccountPage';
 import { CreateUserProfileContext, LoggerContext, UserSessionContext } from './utils/Contexts';
 import { formatLogStreamNameDate } from './utils/HelperFunctions';
 import { Logger } from './utils/Logger'; 
@@ -51,7 +51,7 @@ export function AppHandler() {
             <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/login" element={<LoginPage />} />
-              {/* <Route path="/create-account" element={<CreateAccountPage />} /> */}
+              <Route path="/create-account" element={<CreateAccountPage />} />
             </Routes>
           </CreateUserProfileContext.Provider>
         </LoggerContext.Provider>

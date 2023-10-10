@@ -22,6 +22,10 @@ export async function getAddressFromCoordinates(latitude, longitude, apiKey) {
   }
 };
 
+export const getDateStringFromDateObject = (date) => {
+  return date.toISOString().split('T')[0];
+}
+
 export const convertUTCDateToLocalDate = (date) => {
   const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   return moment.utc(date).tz(userTimezone).format();
