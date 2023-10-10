@@ -15,18 +15,17 @@ export function HomePage() {
   const [toolbarHeight, setToolbarHeight] = useState(0);
 
   const { userSession, setUserSession } = React.useContext(UserSessionContext);
-
-  if (!userSession) {
-    return null;
-  }
-
-  const [event_types_selected, setEventTypesSelected] = useState(userSession.Interests);
+  const [event_types_selected, setEventTypesSelected] = useState(userSession ? userSession.Interests : []);
 
   // Handle left side panel
   const [isLeftPanelVisible, setIsLeftPanelVisible] = useState(false);
   const [isCreateGameMode, setIsCreateGameMode] = useState(false);
   const [isEventInvitesPanelVisible, setIsEventInvitesPanelVisible] = useState(false);
   const [isFriendRequestsPanelVisible, setIsFriendRequestsPanelVisible] = useState(false);
+
+  if (!userSession) {
+    return null;
+  }
 
   const resetAllStates = () => {
     setIsLeftPanelVisible(false);
