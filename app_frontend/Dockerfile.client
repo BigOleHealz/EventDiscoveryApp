@@ -7,14 +7,13 @@ WORKDIR /app
 # Copy the package.json and package-lock.json first for optimized caching
 COPY package*.json ./
 
-# Install dependencies
-RUN npm ci && npm install -g expo-cli
-
 # Copy the rest of the application
 COPY . .
 
 # Expose the port that the app runs on
-EXPOSE 19006
+EXPOSE 3000
+
 
 # Define the command to run the app
-CMD ["expo", "start", "--web"]
+
+CMD ["npm", "start"]
