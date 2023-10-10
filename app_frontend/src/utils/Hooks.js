@@ -40,9 +40,7 @@ export const useFetchGoogleMapsApiKey = (fetching_google_maps_api_key, setGoogle
         }),
       }).then(res => res.json())
       .then(data => {
-        console.log('data:', data)
         if (data) {
-          console.log('data.GOOGLE_MAPS_API_KEY:', data.GOOGLE_MAPS_API_KEY)
           setGoogleMapsApiKey(data.GOOGLE_MAPS_API_KEY);
         }
       }).catch((error) => {

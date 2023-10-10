@@ -1,5 +1,4 @@
-// import React from 'react';
-import { BrowserRouter as Router } from 'react-router-dom';  // Step 1
+import { BrowserRouter as Router } from 'react-router-dom';
 
 import { AppHandler } from './AppHandler';
 import ErrorBoundary from './utils/ErrorBoundary';

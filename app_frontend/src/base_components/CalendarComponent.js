@@ -1,27 +1,22 @@
-import React, { useState, useContext } from 'react';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import '../css/calendarOverrides.css'
 
-import { LoggerContext } from '../utils/Contexts';
+import { getDateStringFromDateObject } from '../utils/HelperFunctions';
 import { calendar_styles }  from '../styles';
 
 export const CalendarComponent = ({ selected, onDateSelected, style }) => {
-  const currentDate = new Date();
-  const [selectedDate, setSelectedDate] = useState(selected || currentDate);
-  const { logger } = useContext(LoggerContext);
 
   const onChange = date => {
-    setSelectedDate(date);
-    logger.info(`Date Selected: ${date}`);
-    onDateSelected(date);
+    const formatted_date = getDateStringFromDateObject(date);
+    onDateSelected(formatted_date);
   };
 
   return (
     <div style={calendar_styles.view}>
       <Calendar
-        value={selectedDate}
         onChange={onChange}
+        calendarType="US"
       />
     </div>
   );

@@ -212,6 +212,7 @@ export const map_styles = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
+    color: defaultFontColor
   },
 };
 
@@ -342,7 +343,7 @@ export const side_panel_styles = {
     display: 'flex',
     flexDirection: 'column',     
     alignItems: 'center',        // Center children horizontally
-    justifyContent: 'center',    // Center children vertically
+    justifyContent: 'flex-start',    // Center children vertically
     boxShadow: '10px 10px 10px 0px rgba(0, 0, 0, 0.50)',
   }
 };

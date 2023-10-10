@@ -101,32 +101,33 @@ export const Map = ({
             ],
           }}
         >
-          <MarkerClusterer
+          {/* <MarkerClusterer
             options={{ imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m' }}
             maxZoom={20}
-          >
-          {
-          (clusterer) => (
-            Array.isArray(map_events_filtered) && map_events_filtered.map((event) => (
-              <MapMarkerWithTooltip
-                key={event.UUID}
-                event={event}
-                activePopup={activePopup}
-                onSetActivePopup={handleSetActivePopup}
-                clusterer={clusterer}
-              />
-            ))
-          )
-          }
-          </MarkerClusterer>
+          > */}
+            {
+              // (clusterer) => (
+                Array.isArray(map_events_filtered) && map_events_filtered.map((event) => (
+                  <MapMarkerWithTooltip
+                    key={event.UUID}
+                    event={event}
+                    activePopup={activePopup}
+                    onSetActivePopup={handleSetActivePopup}
+                    // Removed clusterer prop
+                  />
+                ))
+              // )
+            }
+          {/* </MarkerClusterer> */}
+
         </GoogleMap>
       </LoadScript>
-      <button
-        onClick={() => logoutUser()}
+      <ButtonComponent
+        title="Logout"  // Use title prop to set the button text
+        onPress={() => logoutUser()}  // Use onPress prop for click handler
         style={map_styles.logoutButtonStyle}
-      >
-        Logout
-      </button>
+      />
+
       <ToastContainer />
     </>
   );
