@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-
+import { GoogleLogin } from 'react-google-login';
 import { useNavigate } from 'react-router-dom';
 import { storeUserSession } from './SessionManager';
 import { toast } from 'react-toastify';
@@ -81,7 +81,6 @@ export const useSetUserProfile = (email, setCreateUserProfileContext, setUserSes
   const navigate = useNavigate();
 
   useEffect(() => {
-    const email = "matt.t.healy1994@gmail.com"
     if (email) {
       fetch('/api/get_user_profile', {
         method: 'POST',
@@ -117,6 +116,34 @@ export const useSetUserProfile = (email, setCreateUserProfileContext, setUserSes
     }
   }, [email, setCreateUserProfileContext, setUserSession, first_name, last_name, logger, navigate]);
 };
+
+export const useBypassLoginIfInDebugMode = (setEmail, setFirstName, setLastName) => {
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const isDebugMode = urlParams.get('debug');
+    if (isDebugMode === 'true') {
+      setEmail('matt.t.healy1994@gmail.com');
+      setFirstName('Matt');
+      setLastName('Healy');
+    }
+  }, []);
+};
+
+export const useInitializeGoogleLoginButton = (googleClientId, handleCallbackResponse) => {
+  useEffect(() => {
+    if (googleClientId) {
+    /* global google */
+      google.accounts.id.initialize({
+        client_id: googleClientId,
+        callback: handleCallbackResponse
+      });
+      google.accounts.id.renderButton(
+        document.getElementById("signInDiv"),
+        { theme: "outline", size: "large" }
+      );
+    }
+  }, [googleClientId]);
+}
 
 export const useFilterEvents = (findGameSelectedDate, findGameStartTime, findGameEndTime, map_events_full_day, eventTypesSelected, setMapEventsFiltered, logger) => {
   useEffect(() => {

@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import jwt_decode from "jwt-decode";
 import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
-import { GoogleLogin } from 'react-google-login';
 
 import { TextComponent } from '../base_components/TextComponent';
 import { CreateUserProfileContext, LoggerContext, UserSessionContext } from '../utils/Contexts';
-import { useSetGoogleClientId, useSetUserProfile } from '../utils/Hooks';
+import { useBypassLoginIfInDebugMode, useInitializeGoogleLoginButton, useSetGoogleClientId, useSetUserProfile } from '../utils/Hooks';
 import { login_page_styles } from '../styles';
 
 export function LoginPage() {
@@ -27,40 +27,28 @@ export function LoginPage() {
     setLastName(null);
   };
 
+  function handleCallbackResponse(response) {
+    var userObject = jwt_decode(response.credential);
+    setEmail(userObject.email);
+    setFirstName(userObject.given_name);
+    setLastName(userObject.family_name);
+  };
+
   useSetGoogleClientId(fetching_google_client_id, setFetchingGoogleClientId, setGoogleClientId);
   useSetUserProfile(email, setCreateUserProfileContext, setUserSession, first_name, last_name, resetLoginInfo, logger);
-
-  const responseGoogle = (response) => {
-    if (response.error) {
-      toast.error('Login Failed!');
-      console.log(response.error);
-    } else {
-      setEmail(response.profileObj.email);
-      setFirstName(response.profileObj.givenName);
-      setLastName(response.profileObj.familyName);
-      // You can also save the Google tokenId to your state or session if needed
-    }
-  };
+  useBypassLoginIfInDebugMode(setEmail, setFirstName, setLastName);
+  useInitializeGoogleLoginButton(googleClientId, handleCallbackResponse);
 
   return (
     <>
       <ToastContainer />
       <div style={login_page_styles.container} testid="LoginFullPageContainer">
-        <div style={login_page_styles.authContainer} testid="LoginComponentsContainer">
-          <TextComponent style={login_page_styles.title}>Login</TextComponent>
+        <div id="signInDiv"></div>
 
-          {googleClientId && (
-            <GoogleLogin
-              clientId={googleClientId}
-              onSuccess={responseGoogle}
-              onFailure={responseGoogle}
-              buttonText="Login with Google"
-              uxMode="redirect"
-              redirectUri="https://bigolehealz.ninja"
-            />
-          
-          )}
-        </div>
+        {/* <div style={login_page_styles.authContainer} testid="LoginComponentsContainer"> */}
+          {/* <TextComponent style={login_page_styles.title}>Login</TextComponent> */}
+
+        {/* </div> */}
       </div>
     </>
   );
