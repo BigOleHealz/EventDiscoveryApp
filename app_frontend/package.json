@@ -1,54 +1,48 @@
 {
-  "name": "helloworld",
-  "version": "1.0.0",
-  "main": "node_modules/expo/AppEntry.js",
-  "proxy": "http://localhost:5000",
-  "scripts": {
-    "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
-    "web": "expo start --web"
-  },
+  "name": "wipe_test",
+  "version": "0.1.0",
+  "private": true,
   "dependencies": {
-    "@aws-sdk/client-cloudwatch-logs": "^3.363.0",
-    "@aws-sdk/client-secrets-manager": "^3.321.1",
-    "@aws-sdk/client-ses": "^3.329.0",
-    "@expo/webpack-config": "^18.0.1",
-    "@react-google-maps/api": "^2.18.1",
-    "@react-native-async-storage/async-storage": "^1.17.11",
-    "@react-native-google-signin/google-signin": "^10.0.1",
-    "aws-sdk": "^2.1377.0",
-    "crypto-js": "^4.1.1",
-    "date-fns": "^2.29.3",
-    "emailjs-com": "^3.2.0",
-    "expo": "~48.0.15",
-    "jsonwebtoken": "^9.0.1",
-    "metro": "^0.77.0",
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
+    "@mui/material": "^5.14.12",
+    "@react-google-maps/api": "^2.19.2",
+    "@testing-library/jest-dom": "^5.17.0",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "date-fns": "^2.30.0",
     "moment-timezone": "^0.5.43",
-    "neo4j-driver": "^5.7.0",
-    "react": "18.2.0",
+    "react": "^18.2.0",
+    "react-calendar": "^4.6.0",
     "react-dom": "^18.2.0",
-    "react-native": "0.71.7",
-    "react-native-calendars": "^1.1295.0",
-    "react-native-elements": "^3.4.3",
-    "react-native-gesture-handler": "^1.10.3",
-    "react-native-mail": "^6.1.1",
-    "react-native-paper": "^5.7.2",
-    "react-native-range-slider-expo": "^1.4.3",
-    "react-native-svg": "^13.11.0",
-    "react-native-uuid": "^2.0.1",
-    "react-native-vector-icons": "^9.2.0",
-    "react-native-web": "~0.18.11",
-    "react-router-dom": "^6.11.1",
-    "react-router-native": "^6.11.1",
-    "react-social-login-buttons": "^3.9.1",
-    "react-toastify": "^9.1.2",
-    "reactjs-social-login": "^2.6.2",
-    "use-neo4j": "^0.3.13",
+    "react-google-login": "^5.2.2",
+    "react-router-dom": "^6.16.0",
+    "react-scripts": "5.0.1",
+    "react-toastify": "^9.1.3",
     "web-vitals": "^2.1.4"
   },
-  "devDependencies": {
-    "@babel/core": "^7.20.0"
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
   },
-  "private": true
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
 }

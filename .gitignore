@@ -9,7 +9,6 @@ app_frontend/node_modules*
 app_frontend/package-lock.json
 .eslintrc
 .prettierrc
-.expo*
 .vscode*
 flask-server/db/*
 flask-server/utils/*

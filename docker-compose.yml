@@ -1,5 +1,18 @@
 version: '3.1'
 services:
+  frontend:
+    build: 
+      context: ./app_frontend
+      dockerfile: Dockerfile.client
+    volumes:
+      - ./app_frontend:/app
+    ports:
+      - 3000:3000
+    networks:
+      - my-network
+    depends_on:
+      - flask
+
   flask:
     build: 
       context: ./flask-server
@@ -17,19 +30,6 @@ services:
       my-network:
         aliases:
           - flask-app
-
-  frontend:
-    build: 
-      context: ./app_frontend
-      dockerfile: Dockerfile.client
-    volumes:
-      - ./app_frontend:/app
-    ports:
-      - 19006:19006
-    networks:
-      - my-network
-    depends_on:
-      - flask
 
   nginx:
     build:

@@ -9,8 +9,8 @@ utils_dir="utils"
 kill -9 $(lsof -t -i:5001)
 sudo kill -9 $(sudo lsof -t -i:5001)
 
-kill -9 $(lsof -t -i:19006)
-sudo kill -9 $(sudo lsof -t -i:19006)
+kill -9 $(lsof -t -i:3000)
+sudo kill -9 $(sudo lsof -t -i:3000)
 
 if ! docker info >/dev/null 2>&1; then
     echo "Starting Docker..."
