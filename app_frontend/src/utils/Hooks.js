@@ -4,6 +4,84 @@ import { useNavigate } from 'react-router-dom';
 import { storeUserSession } from './SessionManager';
 import { toast } from 'react-toastify';
 
+export const useCreateUserProfile = (email, create_user_profile_context, setCreateUserProfileContext, setEmail, navigate) => {
+  useEffect(() => {
+    if (email) {
+      fetch('/api/get_user_profile', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: email
+        }),
+      }).then(res => res.json())
+        .then(data => {
+          console.log(data);
+          if (!data || data.length === 0) {
+            toast.success('Welcome New User!');
+            console.log('No user data returned for email:', email);
+            setCreateUserProfileContext({
+              FirstName: first_name,
+              LastName: last_name,
+              Email: email
+            });
+            navigate('/create-account');
+            return;
+          }
+
+          const user = data;
+          user.TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+          storeUserSession(user);
+          setUserSession(user);
+          toast.success('Login Successful!');
+          console.log('Login Successful');
+          logger.info(`Login Successful for email: ${email}`);
+          resetLoginInfo();
+        }).catch((error) => {
+          console.error('Error:', error);
+          toast.error('An error occurred while fetching user profile!');
+        });
+    }
+    setEmail(false);
+  }, [email]);
+};
+
+export const useCreatePersonNode = (is_creating_person_node, create_user_profile_context, setIsCreatingPersonNode, navigate) => {
+  useEffect(() => {
+    if (is_creating_person_node) {
+      console.log('create_user_profile_context:', create_user_profile_context)
+      fetch('/api/create_person_node', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          Username: create_user_profile_context.Username,
+          Email: create_user_profile_context.Email,
+          FirstName: create_user_profile_context.FirstName,
+          LastName: create_user_profile_context.LastName,
+          InterestUUIDs: create_user_profile_context.InterestUUIDs,
+          UUID: create_user_profile_context.UUID
+        })
+      }).then(res => res.json())
+        .then(data => {
+          console.log(data);
+          if (data.success) {
+            toast.success('Account Created Successfully!');
+            navigate('/login');
+          } else {
+            toast.error('Failed to create account: ' + (data.message || 'Unknown error'));
+          }
+        }).catch((error) => {
+          console.error('Error:', error);
+          toast.error('An error occurred while creating user profile!');
+        });
+    }
+    setIsCreatingPersonNode(false);
+  }, [is_creating_person_node]);
+};
+
 export const useFetchEvents = (fetching_events, start_timestamp, end_timestamp, setMapEventsFullDay, setFetchingEvents) => {
   useEffect(() => {
     if (fetching_events) {

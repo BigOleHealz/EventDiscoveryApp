@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import jwt_decode from "jwt-decode";
-import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 
 import { TextComponent } from '../base_components/TextComponent';
@@ -40,16 +39,14 @@ export function LoginPage() {
   useInitializeGoogleLoginButton(googleClientId, handleCallbackResponse);
 
   return (
-    <>
+    <div style={login_page_styles.container} testid="LoginFullPageContainer">
       <ToastContainer />
-      <div style={login_page_styles.container} testid="LoginFullPageContainer">
-        <div id="signInDiv"></div>
-
-        {/* <div style={login_page_styles.authContainer} testid="LoginComponentsContainer"> */}
-          {/* <TextComponent style={login_page_styles.title}>Login</TextComponent> */}
-
-        {/* </div> */}
+      <div>
+        <TextComponent style={login_page_styles.title}>
+          Login
+        </TextComponent>
       </div>
-    </>
+      <div id="signInDiv"></div>
+    </div>
   );
 };
