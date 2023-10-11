@@ -1,4 +1,13 @@
-dash==2.4.1
+six>=1.15.0
 pandas
 gunicorn==20.1.0
-dash-bootstrap-components==1.2.1
+geocoder==1.38.1
+py2neo==2021.2.3
+Random-Word==1.0.11
+boto3==1.26.65
+botocore==1.29.65
+Flask-Login==0.6.2
+pytz==2022.7.1
+flask
+flask_cors
+pymysql==1.1.0

@@ -1,0 +1,12 @@
+[Unit]
+Description=My Daemon
+
+[Service]
+WorkingDirectory=/home/ec2-user/workspace/EventApp
+ExecStart=/bin/bash -c "venv; /usr/bin/python3 /home/ec2-user/workspace/EventApp/app.py"
+Restart=always
+User=daemon_user
+
+[Install]
+WantedBy=multi-user.target
+

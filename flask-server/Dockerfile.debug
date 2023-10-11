@@ -1,0 +1,16 @@
+FROM python:3.8-slim
+
+ENV CONTAINER_HOME=/app
+
+WORKDIR $CONTAINER_HOME
+
+# Install the required packages first to leverage Docker layer caching
+ADD requirements.txt $CONTAINER_HOME/
+RUN apt-get update && apt-get install -y net-tools lsof
+RUN pip install -r requirements.txt ptvsd  # Add ptvsd for debugging
+
+# Add the rest of the files
+ADD . $CONTAINER_HOME
+
+# Run Flask in debug mode
+CMD ["python", "-m", "ptvsd", "--host", "0.0.0.0", "--port", "5678", "--wait", "server.py"]

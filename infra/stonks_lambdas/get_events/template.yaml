@@ -1,0 +1,54 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  get_events
+
+  Sample SAM Template for get_events
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 15
+    MemorySize: 128
+
+Resources:
+  GetEventsFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: scripts/
+      Handler: app.lambda_handler
+      Runtime: python3.8
+      Architectures:
+        - x86_64
+      Events:
+        GetEvent:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /get_events
+            Method: get
+      VpcConfig:
+        SecurityGroupIds:
+          - sg-079973eae8f86dbd2
+        SubnetIds:
+          - subnet-012e5ae1e2441a315
+          - subnet-0379a9b494e2e8a5e
+          - subnet-090202a6d91fd177f
+          - subnet-0981164af421b1374
+          - subnet-056fcb27f333750b5
+      Layers:
+        - arn:aws:lambda:us-east-1:620803767360:layer:dependencies:102
+
+
+Outputs:
+  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
+  # Find out more about other implicit resources you can reference within SAM
+  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
+  GetEventApi:
+    Description: "API Gateway endpoint URL for Prod stage for Hello World function"
+    Value:  https://o83fz5lh02.execute-api.us-east-1.amazonaws.com/Stage
+  GetEventsFunction:
+    Description: "Hello World Lambda Function ARN"
+    Value: arn:aws:execute-api:us-east-1:620803767360:o83fz5lh02/*/GET/get_events
+  GetEventsFunctionIamRole:
+    Description: "Implicit IAM Role created for Hello World function"
+    Value: arn:aws:iam::620803767360:role/service-role/stonks-lambdas-GetEventsFunction-role-fid28ln6
