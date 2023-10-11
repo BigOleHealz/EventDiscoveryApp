@@ -13,14 +13,7 @@ import { ModalComponent } from '../base_components/ModalComponent';
 import { day_start_time, day_end_time, day_format } from '../utils/constants';
 import { CreateUserProfileContext, UserSessionContext } from '../utils/Contexts';
 
-// import {
-//   CREATE_ACCOUNT_INTEREST_RELATIONSHIPS,
-//   CREATE_EVENT,
-//   INVITE_FRIENDS_TO_EVENT,
-// } from '../db/queries';
-
 import { CreateGameContext } from '../utils/Contexts';
-import { modal_styles }  from '../styles';
 
 
 export const SelectEventTypeModal = ({
@@ -54,257 +47,11 @@ export const SelectEventTypeModal = ({
       isVisible={isVisible}
       onRequestClose={onRequestClose}
       title="What Type of Event is This?"
-      // menuButton={
-        // <ButtonComponent
-        //   id="create-game-select-event-type-button"
-        //   title="Select Event Type"
-        //   onPress={handleSubmitButtonClick}
-        //   // style={styles.buttons.menu_button_styles}
-        //   isMenuButton={true}
-        // />
-      // }
     >
       <SelectInterestsScrollView
         setEventTypesSelected={setEventType}
         singleSelect={true}
       />
-    </ModalComponent>
-  );
-};
-
-export const InviteFriendsToEventModal = ({
-  isVisible,
-  setIsInviteFriendsToEventModalVisible,
-  setIsCreateEventDetailsModalVisible,
-  onRequestClose,
-  isCreateGameMode,
-  event_uuid
-}) => {
-	const { userSession, setUserSession } = React.useContext(UserSessionContext);
-  const { createGameData, setCreateGameData } = React.useContext(CreateGameContext);
-
-  const initialFriends = userSession.Friends.map((friend) => {
-    return {
-      ...friend,
-      isChecked: false,
-    };
-  });
-
-  const [friends, setFriends] = React.useState(initialFriends);
-  const [anyChecked, setAnyChecked] = React.useState(false);
-
-  const handleValueChange = (index, newValue) => {
-    const updatedFriends = friends.map((friend, i) => {
-      if (i === index) {
-        return { ...friend, isChecked: newValue };
-      }
-      return friend;
-    });
-    setFriends(updatedFriends);
-    setAnyChecked(updatedFriends.some((friend) => friend.isChecked));
-  };
-
-  const {
-		transactionStatus: invite_friends_to_event_status,
-		executeQuery: run_invite_friends_to_event,
-		resetTransactionStatus: reset_invite_friends_to_event_transaction_status
-	} = useCustomCypherWrite(INVITE_FRIENDS_TO_EVENT);
-
-  const invite_friends_to_event = (invite_uuid_list) => {
-		console.log("Creating Event: ", invite_uuid_list);
-		run_invite_friends_to_event(invite_uuid_list);
-	};
-
-  useEffect(() => {
-		if (invite_friends_to_event_status.STATUS === 'ERROR') {
-      const error_message = `Error Sending Event Invites: ${invite_friends_to_event_status.RESPONSE}`;
-			toast.error(error_message);
-			console.log(error_message);
-			reset_invite_friends_to_event_transaction_status();
-		} else if (invite_friends_to_event_status.STATUS === 'SUCCESS') {
-			toast.success(`Event Invites Sent Successfully!`);
-			reset_invite_friends_to_event_transaction_status();
-		}
-	}, [invite_friends_to_event_status]);
-
-  const handleSubmitButtonClick = () => {
-    const selectedFriendUUIDs = friends
-      .filter((friend) => friend.isChecked)
-      .map((friend) => friend.friendUUID);
-    console.log('Selected friends:', selectedFriendUUIDs);
-
-    if (isCreateGameMode) {
-      setCreateGameData({
-        ...createGameData,
-        InvitedFriends: selectedFriendUUIDs
-      });
-      setIsInviteFriendsToEventModalVisible(false);
-      setIsCreateEventDetailsModalVisible(true);
-    } else if (!event_uuid) {
-      const error_message = `Error: No Event UUID`;
-      toast.error(error_message);
-      console.log(error_message);
-      setIsInviteFriendsToEventModalVisible(false);
-    } else {
-      invite_friends_to_event({
-        "event_uuid" : event_uuid,
-        "inviter_uuid" : userSession.UUID,
-        "friend_invite_list" : selectedFriendUUIDs,
-      });
-      setIsInviteFriendsToEventModalVisible(false);
-    }
-  }
-
-  const FriendChecklistItem = ({ name, isChecked, onValueChange }) => {
-    return (
-      <View style={modal_styles.itemContainer}>
-        <CheckBox value={isChecked} onValueChange={onValueChange} />
-        <Text style={modal_styles.itemText}>{name}</Text>
-      </View>
-    );
-  };
-
-  return (
-    <ModalComponent
-      id="create-game-invite-friend-modal"
-      isVisible={isVisible}
-      onRequestClose={onRequestClose}
-      title="Invite Friends"
-      menuButton={
-        <ButtonComponent
-          id="create-game-invite-friends-button"
-          title={
-            anyChecked ? 'Send Invites & Create Game' : 'Skip & Create Game'
-          }
-          onPress={handleSubmitButtonClick}
-          // style={styles.buttons.menu_button_styles}
-          isMenuButton={true}
-        />
-      }
-    >
-      <ScrollView style={modal_styles.scrollView}>
-        {friends.map((friend, index) => (
-          <FriendChecklistItem
-            key={friend.friendUUID}
-            name={friend.friendUsername}
-            isChecked={friend.isChecked}
-            onValueChange={(newValue) => handleValueChange(index, newValue)}
-          />
-        ))}
-      </ScrollView>
-    </ModalComponent>
-  );
-};
-
-export const CreateEventDetailsModal = ({
-  isVisible,
-  onRequestClose,
-}) => {
-  const { userSession, setUserSession } = React.useContext(UserSessionContext);
-  const { createGameData, setCreateGameData } = React.useContext(CreateGameContext);
-
-  const [ event_name, setEventName ] = useState('');
-  const [ event_description, setEventDescription ] = useState('');
-  const [ public_event_flag, setPublicEventFlag ] = useState(false);
-
-  const handleEventNameChange = (text) => {
-    setEventName(text);
-  };
-  const handleEventDescriptionChange = (text) => {
-    setEventDescription(text);
-  };
-  const handlePublicEventFlagChange = (value) => {
-    console.log('Public Event Flag:', value);
-    setPublicEventFlag(!public_event_flag);
-  };
-
-	const {
-		transactionStatus: create_event_status,
-		executeQuery: run_create_event,
-		resetTransactionStatus: reset_create_event_transaction_status
-	} = useCustomCypherWrite(CREATE_EVENT);
-
-  const create_event = (event_data) => {
-		console.log("Creating Event: ", event_data);
-		run_create_event(event_data);
-	};
-
-  useEffect(() => {
-		if (create_event_status.STATUS === 'ERROR') {
-      const error_message = `Error Creating Event: ${create_event_status.RESPONSE}`;
-			toast.error(error_message);
-			console.log(error_message);
-			reset_create_event_transaction_status();
-		} else if (create_event_status.STATUS === 'SUCCESS') {
-			toast.success(`Event Created Successfully!`);
-			reset_create_event_transaction_status();
-		}
-	}, [create_event_status]);
-
-
-  const handleSubmitButtonClick = () => {
-    if (event_name === '') {
-      toast.error('Please Input a Name for This Event');
-      return;
-    } else {
-      const newCreateGameData = {
-        ...createGameData,
-        EventName: event_name,
-        EventDescription: event_description,
-        PublicEventFlag: public_event_flag,
-        CreatedByUUID: userSession.UUID,
-        Host: userSession.Username,
-        UUID: uuidv4(),
-      };
-      console.log('Create Game Data:', newCreateGameData)
-      setCreateGameData(newCreateGameData);
-      create_event(newCreateGameData)
-      onRequestClose();
-    }
-  };
-
-  return (
-    <ModalComponent
-      id="create-game-event-details-modal"
-      isVisible={isVisible}
-      onRequestClose={onRequestClose}
-      title="Fill Out Event Details"
-      menuButton={
-        <ButtonComponent
-          id="create-game-event-details-button"
-          title="Create Event"
-          onPress={handleSubmitButtonClick}
-          // style={styles.buttons.menu_button_styles}
-          isMenuButton={true}
-        />
-      }
-    >
-      <View>
-        <TextInputComponent
-          id="create-game-event-name"
-          placeholder="Event Name"
-          value={event_name}
-          onChangeText={handleEventNameChange}
-          style={modal_styles.componentStyle}
-        />
-        <TextInputComponent
-          id="create-game-event-description"
-          placeholder="Event Description"
-          value={event_description}
-          onChangeText={handleEventDescriptionChange}
-          style={modal_styles.componentStyle}
-        />
-        <View style={modal_styles.componentStyle}>
-          <TextComponent>
-            Public Event?
-          </TextComponent>
-          <Switch
-            id="create-game-public-event-flag"
-            value={public_event_flag}
-            onValueChange={handlePublicEventFlagChange}
-          />
-        </View>
-      </View>
     </ModalComponent>
   );
 };
@@ -321,11 +68,13 @@ export const CreateUsernameModal = ({
   const [fetching_username_is_taken, setFetchingUsernameExists] = useState(false);
   const { create_user_profile_context, setCreateUserProfileContext } = React.useContext(CreateUserProfileContext);
 
-  const handleUsernameChange = (text) => {
-    setUsername(text);
+  const handleUsernameChange = (event) => {
+    console.log("event", event)
+    setUsername(event.target.value);
   };
 
   const handleSubmitButtonClick = () => {
+    console.log('Username:', username)
     setFetchingUsernameExists(true);
   };
 
@@ -381,7 +130,7 @@ export const CreateUsernameModal = ({
         <div>
           <TextInputComponent
             id="input-username"
-            placeholder="Enter Username"
+            label="Enter Username"
             value={username}
             onChangeText={handleUsernameChange}
           />
@@ -507,3 +256,242 @@ export const SelectInterestsModal = ({
   //     setIsCreateGameMode(false);
   //   }
   // }, [create_event_status]);
+
+
+
+// export const InviteFriendsToEventModal = ({
+//   isVisible,
+//   setIsInviteFriendsToEventModalVisible,
+//   setIsCreateEventDetailsModalVisible,
+//   onRequestClose,
+//   isCreateGameMode,
+//   event_uuid
+// }) => {
+// 	const { userSession, setUserSession } = React.useContext(UserSessionContext);
+//   const { createGameData, setCreateGameData } = React.useContext(CreateGameContext);
+
+//   const initialFriends = userSession.Friends.map((friend) => {
+//     return {
+//       ...friend,
+//       isChecked: false,
+//     };
+//   });
+
+//   const [friends, setFriends] = React.useState(initialFriends);
+//   const [anyChecked, setAnyChecked] = React.useState(false);
+
+//   const handleValueChange = (index, newValue) => {
+//     const updatedFriends = friends.map((friend, i) => {
+//       if (i === index) {
+//         return { ...friend, isChecked: newValue };
+//       }
+//       return friend;
+//     });
+//     setFriends(updatedFriends);
+//     setAnyChecked(updatedFriends.some((friend) => friend.isChecked));
+//   };
+
+//   const {
+// 		transactionStatus: invite_friends_to_event_status,
+// 		executeQuery: run_invite_friends_to_event,
+// 		resetTransactionStatus: reset_invite_friends_to_event_transaction_status
+// 	} = useCustomCypherWrite(INVITE_FRIENDS_TO_EVENT);
+
+//   const invite_friends_to_event = (invite_uuid_list) => {
+// 		console.log("Creating Event: ", invite_uuid_list);
+// 		run_invite_friends_to_event(invite_uuid_list);
+// 	};
+
+//   useEffect(() => {
+// 		if (invite_friends_to_event_status.STATUS === 'ERROR') {
+//       const error_message = `Error Sending Event Invites: ${invite_friends_to_event_status.RESPONSE}`;
+// 			toast.error(error_message);
+// 			console.log(error_message);
+// 			reset_invite_friends_to_event_transaction_status();
+// 		} else if (invite_friends_to_event_status.STATUS === 'SUCCESS') {
+// 			toast.success(`Event Invites Sent Successfully!`);
+// 			reset_invite_friends_to_event_transaction_status();
+// 		}
+// 	}, [invite_friends_to_event_status]);
+
+//   const handleSubmitButtonClick = () => {
+//     const selectedFriendUUIDs = friends
+//       .filter((friend) => friend.isChecked)
+//       .map((friend) => friend.friendUUID);
+//     console.log('Selected friends:', selectedFriendUUIDs);
+
+//     if (isCreateGameMode) {
+//       setCreateGameData({
+//         ...createGameData,
+//         InvitedFriends: selectedFriendUUIDs
+//       });
+//       setIsInviteFriendsToEventModalVisible(false);
+//       setIsCreateEventDetailsModalVisible(true);
+//     } else if (!event_uuid) {
+//       const error_message = `Error: No Event UUID`;
+//       toast.error(error_message);
+//       console.log(error_message);
+//       setIsInviteFriendsToEventModalVisible(false);
+//     } else {
+//       invite_friends_to_event({
+//         "event_uuid" : event_uuid,
+//         "inviter_uuid" : userSession.UUID,
+//         "friend_invite_list" : selectedFriendUUIDs,
+//       });
+//       setIsInviteFriendsToEventModalVisible(false);
+//     }
+//   }
+
+//   const FriendChecklistItem = ({ name, isChecked, onValueChange }) => {
+//     return (
+//       <View style={select_interests_scrollview_styles.itemContainer}>
+//         <CheckBox value={isChecked} onValueChange={onValueChange} />
+//         <Text style={select_interests_scrollview_styles.itemText}>{name}</Text>
+//       </View>
+//     );
+//   };
+
+//   return (
+//     <ModalComponent
+//       id="create-game-invite-friend-modal"
+//       isVisible={isVisible}
+//       onRequestClose={onRequestClose}
+//       title="Invite Friends"
+//       menuButton={
+//         <ButtonComponent
+//           id="create-game-invite-friends-button"
+//           title={
+//             anyChecked ? 'Send Invites & Create Game' : 'Skip & Create Game'
+//           }
+//           onPress={handleSubmitButtonClick}
+//           // style={styles.buttons.menu_button_styles}
+//           isMenuButton={true}
+//         />
+//       }
+//     >
+//       <ScrollView style={modal_styles.scrollView}>
+//         {friends.map((friend, index) => (
+//           <FriendChecklistItem
+//             key={friend.friendUUID}
+//             name={friend.friendUsername}
+//             isChecked={friend.isChecked}
+//             onValueChange={(newValue) => handleValueChange(index, newValue)}
+//           />
+//         ))}
+//       </ScrollView>
+//     </ModalComponent>
+//   );
+// };
+
+// export const CreateEventDetailsModal = ({
+//   isVisible,
+//   onRequestClose,
+// }) => {
+//   const { userSession, setUserSession } = React.useContext(UserSessionContext);
+//   const { createGameData, setCreateGameData } = React.useContext(CreateGameContext);
+
+//   const [ event_name, setEventName ] = useState('');
+//   const [ event_description, setEventDescription ] = useState('');
+//   const [ public_event_flag, setPublicEventFlag ] = useState(false);
+
+//   const handleEventNameChange = (text) => {
+//     setEventName(text);
+//   };
+//   const handleEventDescriptionChange = (text) => {
+//     setEventDescription(text);
+//   };
+//   const handlePublicEventFlagChange = (value) => {
+//     console.log('Public Event Flag:', value);
+//     setPublicEventFlag(!public_event_flag);
+//   };
+
+// 	const {
+// 		transactionStatus: create_event_status,
+// 		executeQuery: run_create_event,
+// 		resetTransactionStatus: reset_create_event_transaction_status
+// 	} = useCustomCypherWrite(CREATE_EVENT);
+
+//   const create_event = (event_data) => {
+// 		console.log("Creating Event: ", event_data);
+// 		run_create_event(event_data);
+// 	};
+
+//   useEffect(() => {
+// 		if (create_event_status.STATUS === 'ERROR') {
+//       const error_message = `Error Creating Event: ${create_event_status.RESPONSE}`;
+// 			toast.error(error_message);
+// 			console.log(error_message);
+// 			reset_create_event_transaction_status();
+// 		} else if (create_event_status.STATUS === 'SUCCESS') {
+// 			toast.success(`Event Created Successfully!`);
+// 			reset_create_event_transaction_status();
+// 		}
+// 	}, [create_event_status]);
+
+
+//   const handleSubmitButtonClick = () => {
+//     if (event_name === '') {
+//       toast.error('Please Input a Name for This Event');
+//       return;
+//     } else {
+//       const newCreateGameData = {
+//         ...createGameData,
+//         EventName: event_name,
+//         EventDescription: event_description,
+//         PublicEventFlag: public_event_flag,
+//         CreatedByUUID: userSession.UUID,
+//         Host: userSession.Username,
+//         UUID: uuidv4(),
+//       };
+//       console.log('Create Game Data:', newCreateGameData)
+//       setCreateGameData(newCreateGameData);
+//       create_event(newCreateGameData)
+//       onRequestClose();
+//     }
+//   };
+
+//   return (
+//     <ModalComponent
+//       id="create-game-event-details-modal"
+//       isVisible={isVisible}
+//       onRequestClose={onRequestClose}
+//       title="Fill Out Event Details"
+//       menuButton={
+//         <ButtonComponent
+//           id="create-game-event-details-button"
+//           title="Create Event"
+//           onPress={handleSubmitButtonClick}
+//           // style={styles.buttons.menu_button_styles}
+//           isMenuButton={true}
+//         />
+//       }
+//     >
+//       <View>
+//         <TextInputComponent
+//           id="create-game-event-name"
+//           placeholder="Event Name"
+//           value={event_name}
+//           onChangeText={handleEventNameChange}
+//           style={modal_styles.componentStyle}
+//         />
+//         <TextInputComponent
+//           id="create-game-event-description"
+//           placeholder="Event Description"
+//           value={event_description}
+//           onChangeText={handleEventDescriptionChange}
+//           style={modal_styles.componentStyle}
+//         />
+//         <View style={modal_styles.componentStyle}>
+//           <TextComponent>
+//             Public Event?
+//           </TextComponent>
+//           <Switch
+//             id="create-game-public-event-flag"
+//             value={public_event_flag}
+//             onValueChange={handlePublicEventFlagChange}
+//           />
+//         </View>
+//       </View>
+//     </ModalComponent>
+//   );
+// };

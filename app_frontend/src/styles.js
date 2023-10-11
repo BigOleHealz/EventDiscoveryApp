@@ -73,11 +73,11 @@ export const login_page_styles = {
   },
   container: {
     ...common_styles.appTheme,
-    flex: '1',
     display: 'flex',
+    flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: '0',
+    height: '100vh',
   },
   title: common_styles.h1,
   label: {
@@ -117,25 +117,27 @@ export const login_page_styles = {
   }
 };
 
-// export const create_account_styles = StyleSheet.create({
-//   container: {
-//     ...common_styles.appTheme,
-//     flex: 1,
-//     justifyContent: 'center',
-//     alignItems: 'center',
-//     paddingHorizontal: 16,
-//   },
-//   loginLinkContainer: {
-//     flexDirection: 'row',
-//     justifyContent: 'center',
-//     alignItems: 'center',
-//     margin: 16
-//   },
-//   loginLink: {
-//     color: '#2196F3',
-//     textDecorationLine: 'underline',
-//   },
-// });
+export const create_account_styles = {
+  container: {
+    ...common_styles.appTheme,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: '16px',
+  },
+  loginLinkContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    margin: '16px'
+  },
+  loginLink: {
+    color: '#2196F3',
+    textDecoration: 'underline',
+  },
+};
+
 export const button_styles = {
   standardButton: {
     paddingLeft: defaultPadding,
@@ -149,7 +151,12 @@ export const button_styles = {
   },
   menu_button_styles: {
     backgroundColor: brightBlueColor,
+    marginBottom: 20,
     height: '50px',
+    alignItems: 'center',
+    justifyContent: 'center',
+    margin: '10px auto',
+    padding: '10px auto',
   },
   clear_button_styles: {
     backgroundColor: defaultBackgroundColor,
@@ -168,8 +175,6 @@ export const button_styles = {
 export const calendar_styles = {
   view: {
     boxSizing: 'border-box',
-    // width: 'calc(100% - 20px)', // Account for the padding
-  
     padding: '10px',
     overflowX: 'hidden', // Prevent horizontal overflow
   },
@@ -186,7 +191,6 @@ export const calendar_styles = {
     monthTextColor: '#ddd'
   }
 };
-
 
 export const map_styles = {
   mapContainerStyle: {
@@ -216,82 +220,58 @@ export const map_styles = {
   },
 };
 
-// export const modal_component_styles = StyleSheet.create({
-//   backdrop: {
-//     flex: 1,
-//     justifyContent: 'center',
-//     alignItems: 'center',
-//     backgroundColor: 'rgba(0, 0, 0, 0.5)',
-//   },
-//   modalContainer: {
-//     height: '80%',
-//     width: '40%',
-//     flexDirection: 'column',  // make sure the flex direction is column
-//     justifyContent: 'space-between',
-//     alignItems: 'center',
-//     backgroundColor: common_styles.appTheme.backgroundColor,
-//     borderRadius: 10,
-// 		overflow: 'hidden'
-//   },
-//   titleContainer: {
-//     borderBottomWidth: 1,
-//     borderColor: 'rgba(96, 96, 96, 0.5)',
-//     padding: 10,
-//     margin: 10,
-//     width: '100%',
-//     alignItems: 'center',
-//     justifyContent: 'center',
-//   },
-//   title: {
-//     fontSize: 20,
-//     fontWeight: 'bold',
-//     color: common_styles.appTheme.color,
-//   },
-//   submit_button_container: {
-//     borderTopWidth: 1,
-//     borderColor: 'rgba(96, 96, 96, 0.5)',
-//     padding: 10,
-//     margin: 10,
-//     width: '100%',
-//     alignItems: 'center',
-//     justifyContent: 'center',
-//   },
-//   contentContainer: {
-//     flex: 1, 
-//     width: '100%',
-//   }
-// });
+export const modal_component_styles = {
+  backdrop: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 128, 128, 1)',
+  },
+  modalContainer: {
+    height: '100%',
+    width: '40%',
+    flexDirection: 'column',  // make sure the flex direction is column
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: common_styles.appTheme.backgroundColor,
+    borderRadius: 10,
+    overflow: 'hidden',
+    marginLeft: 'auto',
+    marginRight: 'auto'
+  },
+  titleContainer: {
+    borderBottom: '1px solid rgba(96, 96, 96, 0.5)',
+    backgroundColor: common_styles.appTheme.backgroundColor,
+    margin: '10px auto',
+    padding: '10px auto',
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: common_styles.appTheme.color,
+    textAlign: 'center',
+  },
+  submit_button_container: {
+    borderTop: '1px solid rgba(96, 96, 96, 0.5)',
+    padding: 10,
+    margin: 'auto',
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  contentContainer: {
+    flex: 1,
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 10,
+    marginBottom: 10,
+  }
+};
 
-// export const modal_styles = StyleSheet.create({
-//   itemContainer: {
-//     flexDirection: 'row',
-//     alignItems: 'center',
-//     marginTop: 10,
-//     marginBottom: 10,
-//   },
-//   itemText: {
-//     marginLeft: 10,
-//     fontSize: 16,
-//     color: common_styles.appTheme.color,
-//   },
-//   buttonStyle: {
-//     marginBottom: 20,
-//     backgroundColor: brightBlueColor,
-//   },
-//   scrollView: {
-//     marginLeft: 20,
-//     marginRight: 20,
-//   },
-//   textInputStyle: {
-//     margin: 20,
-//   },
-//   componentStyle: {
-//     width: '100%',
-//     margin: 8,
-//     flexDirection: 'row',
-//     alignItems: 'center',
-//   }
-// });
 export const select_interests_scrollview_styles = {
   parentContainer: {
     paddingTop: '20px',
@@ -319,18 +299,13 @@ export const select_interests_scrollview_styles = {
   itemText: {
     marginLeft: '10px',
     fontSize: '16px',
-    color: common_styles.appTheme.color, 
-  },
-  buttonStyle: {
-    marginBottom: '20px',
-    backgroundColor: '#2196F3',
+    color: common_styles.appTheme.color,
   },
   scrollView: {
     margin: '20px',
     boxShadow: '10px 10px 10px 0px rgba(0, 0, 0, 0.5)',
   },
 };
-
 
 export const side_panel_styles = {
   container: {
@@ -341,17 +316,12 @@ export const side_panel_styles = {
     // minWidth: '300px',
     backgroundColor: common_styles.appTheme.backgroundColor,
     display: 'flex',
-    flexDirection: 'column',     
+    flexDirection: 'column',
     alignItems: 'center',        // Center children horizontally
     justifyContent: 'flex-start',    // Center children vertically
     boxShadow: '10px 10px 10px 0px rgba(0, 0, 0, 0.50)',
   }
 };
-
-
-
-
-
 
 export const text_component_styles = {
   view: {
@@ -360,25 +330,34 @@ export const text_component_styles = {
   }
 };
 
+export const text_input_styles = {
+  container: {
+    width: '100%',
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    padding: 0,
+    margin: 10
+  },
+  input: {
+    fontSize: 16,
+    width: '100%',
+    // height: 40,
+    color: common_styles.appTheme.color,
+    borderColor: common_styles.appTheme.color, // Set border color to transparent to avoid overlapping
+    outlineWidth: 1, // Remove outline 
+  },
+  inputLabel: {
+    color: common_styles.appTheme.color,
+    fontSize: 16,
+    fontWeight: 'bold',
+    paddingLeft: 4,
+    paddingTop: 2,
+    paddingBottom: 2,
+  }
+};
 
-// export const text_input_styles = StyleSheet.create({
-//   container: {
-//     width: '100%',
-//     borderWidth: 1,
-//     borderRadius: 8,
-//     paddingHorizontal: 20,
-//     paddingVertical: 10,
-//     padding: 0,
-//     margin: 10
-//   },
-//   input: {
-//     fontSize: 16,
-//     height: 40,
-//     color: common_styles.appTheme.color,
-//     borderColor: 'rgba(0, 0, 0, 0)', // Set border color to transparent to avoid overlapping
-//     outlineWidth: 0, // Remove outline 
-//   },
-// });
 export const time_range_slider_styles = {
   view: {
     padding: '20px',
@@ -395,7 +374,7 @@ export const time_range_slider_styles = {
   container_style: {
     paddingTop: '0px',
     paddingBottom: '0px',
-    height: 'auto' 
+    height: 'auto'
   },
   handle_label_style: {
     backgroundColor: 'transparent',
@@ -444,6 +423,7 @@ export const toolbar_styles = {
     width: '35px'
   }
 };
+
 export const tooltip_styles = {
   container: {
     display: 'flex',
@@ -485,26 +465,3 @@ export const tooltip_styles = {
     margin: 0,
   },
 };
-
-
-// export const top_panel_styles = StyleSheet.create({
-// 	container: {
-// 		position: 'absolute',
-// 		left: '20%',
-// 		right: '20%',
-// 		backgroundColor: common_styles.appTheme.backgroundColor,
-// 		justifyContent: 'center',
-// 		alignItems: 'center',
-// 		shadowColor: '#000',
-// 		shadowOffset: {
-// 			width: 10,
-// 			height: 10,
-// 		},
-// 		width: '60%',
-// 		shadowOpacity: 0.25,
-// 		shadowRadius: 10,
-// 		elevation: 5,
-// 		zIndex: 10,
-// 		overflow: 'hidden',
-// 	},
-// })
