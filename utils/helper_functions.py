@@ -1,105 +1,92 @@
-from datetime import datetime as dt
-import numpy as np
+import base64, hashlib, requests, functools, traceback
+import time
+from typing import Mapping
 
-from constants import totalList
-
-def get_selection(month, day, selection):
-    """
-        Get the amount of rides per hour based on the time selected
-        This also higlights the color of the histogram bars based on
-        if the hours are selected
-    """
-    xVal, yVal, xSelected = [], [], []
-    colorVal = [
-        "#F4EC15",
-        "#DAF017",
-        "#BBEC19",
-        "#9DE81B",
-        "#80E41D",
-        "#66E01F",
-        "#4CDC20",
-        "#34D822",
-        "#24D249",
-        "#25D042",
-        "#26CC58",
-        "#28C86D",
-        "#29C481",
-        "#2AC093",
-        "#2BBCA4",
-        "#2BB5B8",
-        "#2C99B4",
-        "#2D7EB0",
-        "#2D65AC",
-        "#2E4EA4",
-        "#2E38A4",
-        "#3B2FA0",
-        "#4E2F9C",
-        "#603099",
-    ]
-
-    # Put selected times into a list of numbers xSelected
-    xSelected.extend([int(x) for x in selection])
-
-    for i in range(24):
-        # If bar is selected then color it white
-        if i in xSelected and len(xSelected) < 24:
-            colorVal[i] = "#FFFFFF"
-        xVal.append(i)
-        # Get the number of rides at a particular time
-        yVal.append(len(totalList[month][day][totalList[month][day].index.hour == i]))
-    return [np.array(xVal), np.array(yVal), np.array(colorVal)]
+from utils.aws_handler import AWSHandler
+from utils.constants import ICON_SIZE, CITY_DATA
+from utils.logger import Logger
 
 
-def getLatLonColor(selectedData, month, day):
-    " Get the Coordinates of the chosen months, dates and times "
-    listCoords = totalList[month][day]
+class HelperFunctions:
+    def __init__(self, logger: Logger):
+        self.logger = logger
+        self.aws_handler = AWSHandler(logger=self.logger)
+        self.google_maps_api_key = self.aws_handler.get_secret("google_maps_api_key")[
+            "GOOGLE_MAPS_API_KEY"
+        ]
 
-    # No times selected, output all times for chosen month and date
-    if selectedData is None or len(selectedData) == 0:
-        return listCoords
-    listStr = "listCoords["
-    for time in selectedData:
-        if selectedData.index(time) != len(selectedData) - 1:
-            listStr += "(totalList[month][day].index.hour==" + str(int(time)) + ") | "
-        else:
-            listStr += "(totalList[month][day].index.hour==" + str(int(time)) + ")]"
-    return eval(listStr)
+    def get_lat_lon_from_address(self, address: str):
+        url = f"https://maps.googleapis.com/maps/api/geocode/json?address={address}&key={self.google_maps_api_key}"
+        response = requests.get(url)
+        resp_json_payload = response.json()
+        lat_lon = resp_json_payload["results"][0]["geometry"]["location"]
+        return lat_lon
 
+    def get_address_from_lat_lon(self, lat: float, lon: float):
+        url = f"https://maps.googleapis.com/maps/api/geocode/json?latlng={lat},{lon}&key={self.google_maps_api_key}"
 
-def total_rides_calculation(date_picked, bars_selected):
-    
-    firstOutput = ""
+        response = requests.get(url)
+        resp_json_payload = response.json()
+        address = resp_json_payload["results"][0]["formatted_address"]
 
-    if bars_selected is not None or len(bars_selected) != 0:
-        date_temp = dt.strptime(date_picked, "%Y-%m-%d")
-        totalInSelection = 0
-        for x in bars_selected:
-            totalInSelection += len(
-                totalList[date_temp.month - 4][date_temp.day - 1][
-                    totalList[date_temp.month - 4][date_temp.day - 1].index.hour
-                    == int(x)
-                ]
+        return address
+
+    def get_geodata_from_venue_name(self, venue_name):
+        try:
+            params = {
+                "address": f"{venue_name}",
+                "sensor": "false",
+                "region": "us",
+                "key": self.google_maps_api_key,
+            }
+
+            req = requests.get(
+                "https://maps.googleapis.com/maps/api/geocode/json", params=params
             )
-        firstOutput = f"Total rides in selection: {totalInSelection:,d}"
+            res = req.json()
 
-    if (bars_selected is None
-        or bars_selected is None
-        or len(bars_selected)==24
-        or len(bars_selected)==0
-    ):
-        return firstOutput, (date_picked, " - showing hour(s): All")
+            # Use the first result
+            result = res["results"][0]
 
-    holder = sorted([int(x) for x in bars_selected])
-    if holder == list(range(min(holder), max(holder) + 1)):
-        return (
-            firstOutput,
-            (
-                date_picked,
-                " - showing hour(s): ",
-                holder[0],
-                "-",
-                holder[len(holder) - 1],
-            ),
-        )
-    holder_to_string = ", ".join(str(x) for x in holder)
-    return firstOutput, (date_picked, " - showing hour(s): ", holder_to_string)
+            geodata = dict()
+            geodata["address"] = result["formatted_address"]
+            geodata["latitude"] = result["geometry"]["location"]["lat"]
+            geodata["longitude"] = result["geometry"]["location"]["lng"]
+
+            return geodata
+        except Exception as e:
+            print(f"Error getting geodata from venue name: {e}")
+            import pdb; pdb.set_trace()
+            
+            traceback.print_exc()
+
+    def get_timezone_from_lat_lon_timestamp(self, lat: float, lon: float, timestamp: int):
+        response = requests.get(f'https://maps.googleapis.com/maps/api/timezone/json?location={lat},{lon}&timestamp={timestamp}&key={self.google_maps_api_key}')
+
+        data = response.json()
+        timezone = data['timeZoneId']
+
+        return timezone
+
+
+def format_decode_image(path: str):
+    return "data:image/png;base64,{}".format(
+        base64.b64encode(open(path, "rb").read()).decode("ascii")
+    )
+
+
+def hash_password(input_string: str):
+    sha256 = hashlib.sha256()
+    sha256.update(input_string.encode())
+    return sha256.hexdigest()
+
+
+def get_device_location():
+    import geocoder
+
+    # latlng = geocoder.ip('me').latlng
+    # return {'Lat' : latlng[0], 'Lng' : latlng[-1]}
+    return {
+        "Lat": CITY_DATA["Philadelphia"]["Lat"]["center"],
+        "Lon": CITY_DATA["Philadelphia"]["Lon"]["center"],
+    }

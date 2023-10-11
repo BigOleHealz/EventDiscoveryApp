@@ -1,0 +1,12 @@
+import React from 'react';
+
+export const UserSessionContext = React.createContext({
+    userSession: null,
+    setUserSession: () => {}
+});
+
+export const CreateGameContext = React.createContext();
+
+export const LoggerContext = React.createContext();
+
+export const CreateUserProfileContext = React.createContext();

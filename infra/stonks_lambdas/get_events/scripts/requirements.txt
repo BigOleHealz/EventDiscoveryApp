@@ -1,0 +1,6 @@
+pandas==1.5.3
+six>=1.15.0
+py2neo==2021.2.3
+requests
+geocoder==1.38.1
+Pillow==9.4.0
