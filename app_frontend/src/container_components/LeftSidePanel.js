@@ -10,7 +10,6 @@ import { side_panel_styles } from '../styles';
 
 export const LeftSidePanel = ({
   isVisible,
-  toolbarHeight,
   findGameSelectedDate,
   setFindGameSelectedDate,
   findGameStartTime,
@@ -20,12 +19,6 @@ export const LeftSidePanel = ({
   eventTypesSelected,
   setEventTypesSelected
 }) => {
-
-  const adjustedStyles = {
-    ...side_panel_styles.container,
-    top: toolbarHeight
-  };
-
 
   const handleDateSelected = (date) => {
     setFindGameSelectedDate(date);
@@ -39,7 +32,7 @@ export const LeftSidePanel = ({
       type="left"
       position={['-30%', '0%']}
       isVisible={isVisible}
-      style={adjustedStyles}
+      style={side_panel_styles.container}
     >
       <CalendarComponent
         testid="left-calendar"

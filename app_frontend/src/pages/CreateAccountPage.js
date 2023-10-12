@@ -33,9 +33,10 @@ export function CreateAccountPage() {
 
 
   return (
-    <React.Fragment>
+    // <React.Fragment>
+    <>
       <ToastContainer />
-      <div style={create_account_styles.container} data-testid="CreateAccountFullPageContainer">
+      <div style={create_account_styles.container} id="CreateAccountFullPageContainer">
         <CreateUsernameModal 
           isVisible={isCreateUsernameModalVisible} 
           setCreateUsernameModalVisible={setCreateUsernameModalVisible}
@@ -52,6 +53,6 @@ export function CreateAccountPage() {
           updateSelectedUUIDs={setSelectedUUIDs}
         />
       </div>
-    </React.Fragment>
+    </>
   );
 }

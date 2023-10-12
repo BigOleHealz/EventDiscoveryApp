@@ -1,43 +1,86 @@
 import React, { useEffect, useState } from 'react';
-// import { View, Text, ScrollView, CheckBox, Switch } from 'react-native';
 import { ToastContainer, toast } from 'react-toastify';
+import { format } from 'date-fns';
 import { v4 as uuidv4 } from 'uuid';
 
-// import { CalendarComponent } from '../base_components/CalendarComponent';
-import { TextComponent } from '../base_components/TextComponent';
+import { CalendarComponent } from '../base_components/CalendarComponent';
+import { ModalComponent } from '../base_components/ModalComponent';
 import { TextInputComponent } from '../base_components/TextInputComponent';
-// import { TimeRangeSliderComponent } from '../base_components/TimeRangeSliderComponent';
+import { TimeRangeSliderComponent } from '../base_components/TimeRangeSliderComponent';
 import { SelectInterestsScrollView } from '../composite_components/SelectInterestsScrollview';
 
-import { ModalComponent } from '../base_components/ModalComponent';
 import { day_start_time, day_end_time, day_format } from '../utils/constants';
-import { CreateUserProfileContext, UserSessionContext } from '../utils/Contexts';
+import { CreateGameContext, CreateUserProfileContext, UserSessionContext } from '../utils/Contexts';
+import { convertUTCDateToLocalDate } from '../utils/HelperFunctions';
 
-import { CreateGameContext } from '../utils/Contexts';
 
+export const CreateEventDatetimeModal = ({
+  isVisible,
+  // onRequestClose,
+  onSubmitButtonClick,
+  onRequestClose
+}) => {
+  const { create_game_context, setCreateGameContext } = React.useContext(CreateGameContext);
+
+  const currentDateTime = new Date();
+  const [selected_date, setSelectedDate] = useState(format(currentDateTime, day_format));
+  const [start_time, setStartTime] = useState(day_start_time);
+  const [end_time, setEndTime] = useState(day_end_time);
+
+  const addDateTimesToCreateGameContext = () => {
+    const start_timestamp = convertUTCDateToLocalDate(new Date(`${selected_date}T${start_time}`));
+    const end_timestamp = convertUTCDateToLocalDate(new Date(`${selected_date}T${end_time}`));
+    setCreateGameContext({
+      ...create_game_context,
+      StartTimestamp: start_timestamp,
+      EndTimestamp: end_timestamp
+    })
+    onSubmitButtonClick();
+  }
+  return (
+    <ModalComponent
+      id="create-event-datetime-modal"
+      isVisible={isVisible}
+      onRequestClose={onRequestClose}
+      title="When is the Event?"
+      submitButtonText="Submit Datetime"
+      onSubmitButtonClick={addDateTimesToCreateGameContext}
+    >
+      <CalendarComponent
+        testid="left-calendar"
+        selected={selected_date}
+        onDateSelected={setSelectedDate}
+      />
+      <TimeRangeSliderComponent
+        startTime={start_time}
+        setStartTime={setStartTime}
+        endTime={end_time}
+        setEndTime={setEndTime}
+      />
+    </ModalComponent>
+  )
+}
 
 export const SelectEventTypeModal = ({
   isVisible,
-  setIsSelectEventTypeModalVisible,
-  setIsInviteFriendsToEventModalVisible,
+  onSubmitButtonClick,
   onRequestClose,
 }) => {
-  const { createGameData, setCreateGameData } = React.useContext(CreateGameContext);
+  const { create_game_context, setCreateGameContext } = React.useContext(CreateGameContext);
   const [event_type, setEventType] = useState(null);
 
-  console.log('Create Game Data:', createGameData)
-
-  const handleSubmitButtonClick = () => {
+  const addEventTypeToCreateGameContext = () => {
     if (!event_type) {
       toast.error('Please select an event type.');
       return;
     } else {
-      setCreateGameData({
-        ...createGameData,
+      const new_data = {...create_game_context, ...event_type}
+      console.log("new_data", new_data)
+      setCreateGameContext({
+        ...create_game_context,
         ...event_type
       });
-      setIsSelectEventTypeModalVisible(false);
-      setIsInviteFriendsToEventModalVisible(true);
+      onSubmitButtonClick()
     }
   };
 
@@ -47,6 +90,8 @@ export const SelectEventTypeModal = ({
       isVisible={isVisible}
       onRequestClose={onRequestClose}
       title="What Type of Event is This?"
+      submitButtonText="Submit Event Type"
+      onSubmitButtonClick={addEventTypeToCreateGameContext}
     >
       <SelectInterestsScrollView
         setEventTypesSelected={setEventType}
@@ -55,8 +100,6 @@ export const SelectEventTypeModal = ({
     </ModalComponent>
   );
 };
-
-
 
 export const CreateUsernameModal = ({
   isVisible,
@@ -170,9 +213,6 @@ export const SelectInterestsModal = ({
     </ModalComponent>
   );
 };
-
-
-
 
 
 

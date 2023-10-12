@@ -8,6 +8,9 @@ const defaultMargin = 10;
 const defaultBorderRadius = 8;
 const brightBlueColor = '#2196F3';
 
+const toolbar_height = 6;
+const display_container_top = 100 - toolbar_height;
+
 export const common_styles = {
   appTheme: {
     backgroundColor: defaultBackgroundColor,
@@ -79,7 +82,10 @@ export const login_page_styles = {
     alignItems: 'center',
     height: '100vh',
   },
-  title: common_styles.h1,
+  title: {
+    ...common_styles.h1,
+    margin: '10px auto',
+  },
   label: {
     width: '100%',
     fontSize: '16px',
@@ -140,17 +146,15 @@ export const create_account_styles = {
 
 export const button_styles = {
   standardButton: {
-    paddingLeft: defaultPadding,
-    paddingRight: defaultPadding,
-    paddingTop: '5px',
-    paddingBottom: '5px',
-    borderRadius: defaultBorderRadius,
+    height: '100%',
+    borderColor: 'rgba(0, 0, 0, 0.0)', // Set border color to transparent to avoid overlapping
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
   },
   menu_button_styles: {
     backgroundColor: brightBlueColor,
+    borderRadius: defaultBorderRadius,
     marginBottom: 20,
     height: '50px',
     alignItems: 'center',
@@ -195,10 +199,9 @@ export const calendar_styles = {
 export const map_styles = {
   mapContainerStyle: {
     display: 'flex',
-    // width: '100%',
-    // height: '100%',
     width: '100vw',
-    height: '100vh',
+    height: `${display_container_top}vh`,
+    flexDirection: 'column',
   },
   pinStyle: {
     position: 'absolute',
@@ -254,14 +257,6 @@ export const modal_component_styles = {
     color: common_styles.appTheme.color,
     textAlign: 'center',
   },
-  submit_button_container: {
-    borderTop: '1px solid rgba(96, 96, 96, 0.5)',
-    padding: 10,
-    margin: 'auto',
-    width: '100%',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   contentContainer: {
     flex: 1,
     width: '100%',
@@ -310,7 +305,7 @@ export const select_interests_scrollview_styles = {
 export const side_panel_styles = {
   container: {
     position: 'absolute',
-    top: 0,
+    height: `${display_container_top}vh`,
     bottom: 0,
     width: windowWidth > 800 ? '30%' : '100%',
     // minWidth: '300px',
@@ -392,17 +387,21 @@ export const toolbar_styles = {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    height: `${toolbar_height}vh`,
     width: '100%',
-    paddingTop: '0px'
   },
   toolbarComponent: {
-    height: '100%',
+    ...button_styles.standardButton,
+    padding: '20px auto',
   },
   toolbarButtonLeft: {
-    paddingLeft: '10px',
+   ...button_styles.standardButton,
+   padding: '20px auto',
+
   },
   toolbarButtonRight: {
-    paddingRight: '10px',
+    ...button_styles.standardButton,
+    padding: '20px auto',
   },
   centerView: {
     flex: '1',
