@@ -3,17 +3,18 @@
 import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 
-import { day_start_time, day_end_time, day_format } from '../utils/constants';
-import { LoggerContext, UserSessionContext } from '../utils/Contexts';
 import { Toolbar } from '../container_components/Toolbar';
 import { Map } from '../container_components/Map';
 import { LeftSidePanel } from '../container_components/LeftSidePanel';
+import { CreateEventDatetimeModal, SelectEventTypeModal } from '../container_components/Modals';
 
+import { day_start_time, day_end_time, day_format } from '../utils/constants';
+import { LoggerContext, UserSessionContext, CreateGameContext } from '../utils/Contexts';
 import { common_styles }  from '../styles';
 
 export function HomePage() {
-  const [toolbarHeight, setToolbarHeight] = useState(0);
 
+  const { create_game_context, setCreateGameContext } = React.useContext(CreateGameContext);
   const { userSession, setUserSession } = React.useContext(UserSessionContext);
   const [event_types_selected, setEventTypesSelected] = useState(userSession ? userSession.Interests : []);
 
@@ -26,6 +27,14 @@ export function HomePage() {
   if (!userSession) {
     return null;
   }
+
+
+  // const [createGameData, setCreateGameData] = useState({});
+  const [ isCreateGameDateTimeModalVisible, setIsCreateGameDateTimeModalVisible ] = useState(true);
+  const [ isSelectEventTypeModalVisible, setIsSelectEventTypeModalVisible ] = useState(false);
+  const [ isCreateGameInviteFriendsModalVisible, setIsInviteFriendsToEventModalVisible ] = useState(false);
+  const [ isCreateEventDetailsModalVisible, setIsCreateEventDetailsModalVisible ] = useState(false);
+
 
   const resetAllStates = () => {
     setIsLeftPanelVisible(false);
@@ -45,15 +54,39 @@ export function HomePage() {
     setIsLeftPanelVisible(!isLeftPanelVisible);
   };
 
+  const handleCreateGameButtonClick = () => {
+    console.log('Create Game button clicked')
+    resetAllStates();
+    setIsCreateGameDateTimeModalVisible(true);
+  };
+
+  const exitCreateGameMode = () => {
+    setIsCreateGameDateTimeModalVisible(false);
+    setIsSelectEventTypeModalVisible(false);
+    setIsInviteFriendsToEventModalVisible(false);
+    setIsCreateEventDetailsModalVisible(false);
+    setCreateGameContext({});
+    setIsCreateGameMode(false);
+  };
+
+  const handleCreateGameDateTimeModalSubmitButtonClick = () => {
+    setIsCreateGameDateTimeModalVisible(false);
+    setIsSelectEventTypeModalVisible(true);
+  };
+
+  const handleCreateGameEventTypeModalSubmitButtonClick = () => {
+    setIsSelectEventTypeModalVisible(false);
+    setIsInviteFriendsToEventModalVisible(true);
+  };
+
   return (
     <>
       <div style={common_styles.container}>
         <Toolbar
           onLeftButtonClick={handleFindGamesButtonClick}
-          setToolbarHeight={setToolbarHeight}
+          onRightButtonClick={handleCreateGameButtonClick}
         />
       </div>
-        
       <div style={common_styles.fullScreen}>
         <Map
           findGameSelectedDate={findGameSelectedDate}
@@ -63,7 +96,6 @@ export function HomePage() {
         />
         <LeftSidePanel
           isVisible={isLeftPanelVisible}
-          toolbarHeight={toolbarHeight}
           findGameSelectedDate={findGameSelectedDate}
           setFindGameSelectedDate={setFindGameSelectedDate}
           findGameStartTime={findGameStartTime}
@@ -72,6 +104,16 @@ export function HomePage() {
           setFindGameEndTime={setFindGameEndTime}
           eventTypesSelected={event_types_selected}
           setEventTypesSelected={setEventTypesSelected}
+        />
+        <CreateEventDatetimeModal
+          isVisible={isCreateGameDateTimeModalVisible}
+          onRequestClose={exitCreateGameMode}
+          onSubmitButtonClick={handleCreateGameDateTimeModalSubmitButtonClick}
+        />
+        <SelectEventTypeModal
+          isVisible={isSelectEventTypeModalVisible}
+          onRequestClose={exitCreateGameMode}
+          onSubmitButtonClick={handleCreateGameEventTypeModalSubmitButtonClick}
         />
       </div>
     </>

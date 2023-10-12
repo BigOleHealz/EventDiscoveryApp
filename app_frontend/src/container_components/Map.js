@@ -132,10 +132,3 @@ export const Map = ({
     </>
   );
 };
-
-
-// const [createGameData, setCreateGameData] = useState({});
-// const [ isCreateGameDateTimeModalVisible, setIsCreateGameDateTimeModalVisible ] = useState(false);
-// const [ isSelectEventTypeModalVisible, setIsSelectEventTypeModalVisible ] = useState(false);
-// const [ isCreateGameInviteFriendsModalVisible, setIsInviteFriendsToEventModalVisible ] = useState(false);
-// const [ isCreateEventDetailsModalVisible, setIsCreateEventDetailsModalVisible ] = useState(false);
