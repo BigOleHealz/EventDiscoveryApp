@@ -5,7 +5,7 @@ import TextField from '@mui/material/TextField';
 import { text_input_styles } from '../styles';
 // import '../css/TextInputComponentOverrides.css'
 
-export const TextInputComponent = ({ label, id, style, value, onChangeText, ...props }) => {
+export const TextInputComponent = ({ label, id, required=false, style, value, onChangeText, ...props }) => {
  
   
   return (
@@ -14,8 +14,9 @@ export const TextInputComponent = ({ label, id, style, value, onChangeText, ...p
     >
       <div style={text_input_styles.container}>
         <TextField
-          required
+          required={required}
           id={id}
+          data-testid={id}
           label={label}
           value={value}
           onChange={onChangeText}

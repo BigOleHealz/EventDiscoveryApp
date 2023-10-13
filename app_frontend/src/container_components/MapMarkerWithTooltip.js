@@ -6,7 +6,7 @@ import { ButtonComponent } from '../base_components/ButtonComponent'; // Assumin
 import { LoggerContext } from '../utils/Contexts';
 import { convertUTCDateToLocalDate } from '../utils/HelperFunctions';
 
-import { event_types_icon_map, icon_size } from '../utils/constants'
+import { icon_size, iconSvg } from '../utils/constants'
 import '../css/custom-infowindow.css';
 
 import { common_styles, tooltip_styles } from '../styles';
@@ -19,6 +19,7 @@ const MapMarkerWithTooltip = ({
 }) => {
   const [showTooltip, setShowTooltip] = useState(false);
   const { logger, setLogger } = React.useContext(LoggerContext);
+  const icon = iconSvg(event.PinColor);
 
   const position = { lat: event.Lat, lng: event.Lon };
 
@@ -82,22 +83,13 @@ const MapMarkerWithTooltip = ({
     );
   };
 
-  const iconSvg = {
-    path: 'M12,2C8.13,2,5,5.13,5,9c0,5.25,7,13,7,13s7-7.75,7-13c0-3.87-3.13-7-7-7z M12,11.5c-1.38,0-2.5-1.12-2.5-2.5s1.12-2.5,2.5-2.5s2.5,1.12,2.5,2.5 S13.38,11.5,12,11.5z',
-    fillColor: event.PinColor,
-    fillOpacity: 1,
-    strokeWeight: 1,
-    scale: 1.5
-  };
-
-
   return (
     <Marker
       position={position}
       onMouseOver={handleMouseOver}
       onMouseOut={handleMouseOut}
       onClick={handleMarkerClick}
-      icon={iconSvg}
+      icon={icon}
       // clusterer={clusterer}
     >
       {showTooltip && (

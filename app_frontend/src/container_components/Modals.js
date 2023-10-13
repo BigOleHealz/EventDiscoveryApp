@@ -1,17 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import { format } from 'date-fns';
-import { v4 as uuidv4 } from 'uuid';
 
 import { CalendarComponent } from '../base_components/CalendarComponent';
 import { ModalComponent } from '../base_components/ModalComponent';
 import { TextInputComponent } from '../base_components/TextInputComponent';
 import { TimeRangeSliderComponent } from '../base_components/TimeRangeSliderComponent';
 import { SelectInterestsScrollView } from '../composite_components/SelectInterestsScrollview';
+import { SwitchComponent } from '../composite_components/SwitchComponent';
 
 import { day_start_time, day_end_time, day_format } from '../utils/constants';
 import { CreateGameContext, CreateUserProfileContext, UserSessionContext } from '../utils/Contexts';
 import { convertUTCDateToLocalDate } from '../utils/HelperFunctions';
+import { useFetchUsername } from '../utils/Hooks';
 
 
 export const CreateEventDatetimeModal = ({
@@ -61,7 +62,7 @@ export const CreateEventDatetimeModal = ({
   )
 }
 
-export const SelectEventTypeModal = ({
+export const CreateGameSelectEventTypeModal = ({
   isVisible,
   onSubmitButtonClick,
   onRequestClose,
@@ -101,6 +102,129 @@ export const SelectEventTypeModal = ({
   );
 };
 
+
+export const CreateGameDetailsModal = ({
+  isVisible,
+  onSubmitButtonClick,
+  onRequestClose,
+}) => {
+  const { create_game_context, setCreateGameContext } = React.useContext(CreateGameContext);
+  const [event_name, setEventName] = useState('');
+  const [event_description, setEventDescription] = useState('');
+  const [private_event_flag, setPrivateEventFlag] = useState(false);
+  const [paid_event_flag, setPaidEventFlag] = useState(false);
+  const [event_price, setEventPrice] = useState('');
+
+  const resetCreateGameDetails = () => {
+    setEventName('');
+    setEventDescription('');
+    setPrivateEventFlag(false);
+    setPaidEventFlag(false);
+    setEventPrice('');
+  };
+
+  const addDetailsToCreateGameContext = () => {
+    const public_event_flag = !private_event_flag;
+    const free_event_flag = !paid_event_flag;
+    let event_price_string;
+    if (free_event_flag) {
+      event_price_string = 'Free'
+    } else {
+      if (!event_price) {
+        toast.error('Please enter an event price or make the event free.');
+        return;
+      } else {
+        const event_price_float = parseFloat(event_price);
+        if (isNaN(event_price_float)) {
+          toast.error('Event price must be a number.');
+          return;
+        }
+        if (Math.round(event_price_float * 100) / 100 !== event_price_float) {
+          toast.error('Event price can have a maximum of 2 decimal places.');
+          return;
+        }
+        event_price_string = `$${event_price_float.toFixed(2)}`
+      }
+    }
+
+    const new_data = {
+      ...create_game_context,
+      EventName: event_name,
+      EventDescription: event_description,
+      PublicEventFlag: public_event_flag,
+      FreeEventFlag: free_event_flag,
+      EventPrice: event_price_string
+    }
+    setCreateGameContext(new_data);
+    onSubmitButtonClick()
+    resetCreateGameDetails();
+  };
+
+  const handleEventNameChange = (text) => {
+    setEventName(text.target.value);
+  };
+
+  const handleEventDescriptionChange = (text) => {
+    setEventDescription(text.target.value);
+  };
+
+  const handlePrivateEventFlagChange = (value) => {
+    setPrivateEventFlag(!private_event_flag);
+  }
+
+  const handlePaidEventFlagChange = (value) => {
+    setPaidEventFlag(!paid_event_flag);
+  }
+
+  const handleEventPriceChange = (text) => {
+    setEventPrice(text.target.value);
+  };
+
+  return (
+    <ModalComponent
+      id="create-game-event-details-modal"
+      isVisible={isVisible}
+      onRequestClose={onRequestClose}
+      title="Event Details"
+      submitButtonText="Submit Event Details"
+      onSubmitButtonClick={addDetailsToCreateGameContext}
+    >
+      <TextInputComponent
+        id="input-event-name"
+        label="Event Name"
+        value={event_name}
+        onChangeText={handleEventNameChange}
+      />
+      <TextInputComponent
+        id="input-event-description"
+        label="Event Description"
+        value={event_description}
+        onChangeText={handleEventDescriptionChange}
+      />
+      <SwitchComponent
+        id="switch-private-event"
+        label="Private Event"
+        checked={private_event_flag}
+        onChange={handlePrivateEventFlagChange}
+      />
+      <SwitchComponent
+        id="switch-paid-event"
+        label="Paid Event"
+        checked={paid_event_flag}
+        onChange={handlePaidEventFlagChange}
+      />
+      { paid_event_flag &&
+        <TextInputComponent
+          id="input-event-price"
+          label="Event Price ($)"
+          value={event_price}
+          onChangeText={handleEventPriceChange}
+        />
+      }
+    </ModalComponent>
+  );
+};
+
 export const CreateUsernameModal = ({
   isVisible,
   onRequestClose,
@@ -111,6 +235,8 @@ export const CreateUsernameModal = ({
   const [fetching_username_is_taken, setFetchingUsernameExists] = useState(false);
   const { create_user_profile_context, setCreateUserProfileContext } = React.useContext(CreateUserProfileContext);
 
+  useFetchUsername(fetching_username_is_taken, username, setFetchingUsernameExists, setCreateUserProfileContext, create_user_profile_context, onUsernameAvailable);
+
   const handleUsernameChange = (event) => {
     console.log("event", event)
     setUsername(event.target.value);
@@ -120,44 +246,6 @@ export const CreateUsernameModal = ({
     console.log('Username:', username)
     setFetchingUsernameExists(true);
   };
-
-  useEffect(() => {
-    if (fetching_username_is_taken) {
-      fetch('/api/is_username_taken', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          username: username
-        }),
-      }).then(res => res.json())
-        .then(data => {
-          console.log(data);
-          if (data) {
-            if (data.usernameExists === true) {
-              const message = `Username is taken!`;
-              toast.error(message);
-              console.error(message);
-            } else {
-              const message = `Username is available!`;
-              toast.success(message);
-              console.log(message);
-              setCreateUserProfileContext({
-                ...create_user_profile_context,
-                Username: username,
-                UUID: uuidv4(),
-              });
-              onUsernameAvailable();
-            }
-          }
-        }).catch((error) => {
-          console.error('Error:', error);
-          toast.error('An error occurred while checking if username exists!');
-        });
-    }
-    setFetchingUsernameExists(false);
-  }, [fetching_username_is_taken]);
 
   return (
     <>
@@ -172,6 +260,7 @@ export const CreateUsernameModal = ({
       >
         <div>
           <TextInputComponent
+            required={true}
             id="input-username"
             label="Enter Username"
             value={username}
@@ -185,10 +274,10 @@ export const CreateUsernameModal = ({
 
 export const SelectInterestsModal = ({
   isVisible,
-  setIsSelectInterestsModalVisible,
+  // setIsSelectInterestsModalVisible,
   onRequestClose,
-  onInterestsSelected,
-  accountUUID,
+  // onInterestsSelected,
+  // accountUUID,
   onSubmitButtonClick,
   updateSelectedUUIDs
 }) => {
@@ -196,8 +285,8 @@ export const SelectInterestsModal = ({
   const [event_types_selected, setEventTypesSelected] = useState([]);
 
   const handleSubmitButtonClick = () => {
-    updateSelectedUUIDs(event_types_selected); // Update the selected UUIDs
-    onSubmitButtonClick(event_types_selected); // Call the original submit function with the latest selectedUUIDs
+    updateSelectedUUIDs(event_types_selected);
+    onSubmitButtonClick(event_types_selected);
   }
 
   return (
@@ -213,6 +302,7 @@ export const SelectInterestsModal = ({
     </ModalComponent>
   );
 };
+
 
 
 

@@ -6,6 +6,8 @@ import Typography from '@mui/material/Typography';
 import { toast } from 'react-toastify';
 
 import { TextComponent } from '../base_components/TextComponent'; // Assuming you also have a web version of this
+import { useFetchEventTypes } from '../utils/Hooks';
+
 import { select_interests_scrollview_styles } from '../styles'; // You might need to adjust styles
 
 export const SelectInterestsScrollView = ({
@@ -16,6 +18,8 @@ export const SelectInterestsScrollView = ({
   const [event_types, setEventTypes] = useState([]);
   const [first_run, setFirstRun] = useState(true);
   const [select_all_switch_toggled_flag, setSelectAllSwitchToggledFlag] = useState(false);
+
+  useFetchEventTypes(first_run, setFirstRun, setEventTypes, eventTypesSelected, setEventTypesSelected);
 
   const handleSelectAllSwitchToggledFlagChange = (newValue) => {
     setSelectAllSwitchToggledFlag(newValue);
@@ -64,44 +68,6 @@ export const SelectInterestsScrollView = ({
     }
   };
 
-  useEffect(() => {
-    if (first_run ) {
-      fetch('/api/get_event_type_mappings', {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-      })
-      .then(res => res.json())
-      .then(data => {
-        console.log('event_type_mappings:', data);
-        let eventTypeList;
-        if (eventTypesSelected) {
-          eventTypeList = data.map((eventType) => {
-            return {
-              ...eventType,
-              isChecked: eventTypesSelected.includes(eventType.UUID)
-            };
-          });
-        } else {
-          eventTypeList = data.map((eventType) => {
-            return {
-              ...eventType,
-              isChecked: false
-            };
-          });
-        }
-        setEventTypes(eventTypeList);
-        setFirstRun(false);
-      })
-      .catch((error) => {
-        toast.error(`Error Getting Event Types: ${error}`);
-        console.error(error);
-        setFirstRun(false);
-      });
-    }
-  }, [first_run]);
-
   const EventTypeChecklistItem = ({ name, isChecked, onValueChange, color }) => {
     return (
       <Box style={select_interests_scrollview_styles.itemContainer}>
@@ -119,15 +85,17 @@ export const SelectInterestsScrollView = ({
 
   return (
     <Box style={select_interests_scrollview_styles.parentContainer}>
-      <Box style={select_interests_scrollview_styles.switchContainer}>
-        <Switch
-          value={select_all_switch_toggled_flag}
-          onChange={(e) => handleSelectAllSwitchToggledFlagChange(e.target.checked)}
-        />
-        <TextComponent style={select_interests_scrollview_styles.switchLabel}>
-          Toggle All Event Types
-        </TextComponent>
-      </Box>
+      { singleSelect &&
+        <Box style={select_interests_scrollview_styles.switchContainer}>
+          <Switch
+            value={select_all_switch_toggled_flag}
+            onChange={(e) => handleSelectAllSwitchToggledFlagChange(e.target.checked)}
+          />
+          <TextComponent style={select_interests_scrollview_styles.switchLabel}>
+            Toggle All Event Types
+          </TextComponent>
+        </Box>
+      }
       <Box style={select_interests_scrollview_styles.scrollView}> 
         {event_types.map((eventType, index) => (
           <EventTypeChecklistItem
