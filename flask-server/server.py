@@ -1,6 +1,7 @@
 #! /usr/bin/python3
 import json, traceback
 from datetime import datetime
+from uuid import uuid4
 import boto3
 
 from flask import Flask, request, jsonify
@@ -182,4 +183,42 @@ def create_server():
         except Exception as e:
             return jsonify({"message": "An error occurred: " + str(e)}), 500
 
+    @app.route('/create_game_node', methods=["POST"])
+    def create_game_node():
+        try:
+            body = request.get_json()
+            if not body:
+                return jsonify({"message": "No input body provided"}), 400
+            event_name = body.get('EventName')
+            event_type_uuid = body.get('EventTypeUUID')
+            event_description = body.get('EventDescription')
+            event_start_timestamp = body.get('StartTimestamp')
+            event_end_timestamp = body.get('EndTimestamp')
+
+            if not event_name:
+                return jsonify({"message": "Missing event_name"}), 400
+            elif not event_type_uuid:
+                return jsonify({"message": "Missing event_type_uuid"}), 400
+            elif not event_description:
+                return jsonify({"message": "Missing event_description"}), 400
+            elif not event_start_timestamp:
+                return jsonify({"message": "Missing event_start_timestamp"}), 400
+            elif not event_end_timestamp:
+                return jsonify({"message": "Missing event_end_timestamp"}), 400
+
+            event_data = body
+            uuid = str(uuid4())
+            event_data['UUID'] = uuid
+            event_data['Source'] = 'user_created'
+            event_data['SourceEventID'] = uuid
+            event_data['Summary'] = event_description
+
+            try:
+                result = neo4j.execute_query_with_params(query=queries.CREATE_EVENT_IF_NOT_EXISTS, params=event_data)
+            except Exception as e:
+                return jsonify({"message": "An error occurred while executing the query: " + str(e)}), 500
+
+            return jsonify({"success": True, "UUID": uuid}), 200
+        except Exception as e:
+            return jsonify({"message": "An error occurred: " + str(e)}), 500
     return app

@@ -1,8 +1,51 @@
 import { useEffect } from 'react';
 import { GoogleLogin } from 'react-google-login';
 import { useNavigate } from 'react-router-dom';
-import { storeUserSession } from './SessionManager';
 import { toast } from 'react-toastify';
+import { v4 as uuidv4 } from 'uuid';
+
+import { storeUserSession } from './SessionManager';
+
+
+export const useFetchUsername = (fetching_username_is_taken, username, setFetchingUsernameExists, setCreateUserProfileContext, create_user_profile_context, onUsernameAvailable) => {
+  useEffect(() => {
+    if (fetching_username_is_taken) {
+      fetch('/api/is_username_taken', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: username
+        }),
+      }).then(res => res.json())
+        .then(data => {
+          console.log(data);
+          if (data) {
+            if (data.usernameExists === true) {
+              const message = `Username is taken!`;
+              toast.error(message);
+              console.error(message);
+            } else {
+              const message = `Username is available!`;
+              toast.success(message);
+              console.log(message);
+              setCreateUserProfileContext({
+                ...create_user_profile_context,
+                Username: username,
+                UUID: uuidv4(),
+              });
+              onUsernameAvailable();
+            }
+          }
+        }).catch((error) => {
+          console.error('Error:', error);
+          toast.error('An error occurred while checking if username exists!');
+        });
+    }
+    setFetchingUsernameExists(false);
+  }, [fetching_username_is_taken]);
+};
 
 export const useCreateUserProfile = (email, create_user_profile_context, setCreateUserProfileContext, setEmail, navigate) => {
   useEffect(() => {
@@ -45,6 +88,33 @@ export const useCreateUserProfile = (email, create_user_profile_context, setCrea
     }
     setEmail(false);
   }, [email]);
+};
+
+export const useCreateGameNode = (is_creating_game_node, create_game_context, setIsCreatingGameNode) => {
+  useEffect(() => {
+    if (is_creating_game_node) {
+      console.log('create_game_context:', create_game_context)
+      fetch('/api/create_game_node', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({...create_game_context})
+      }).then(res => res.json())
+        .then(data => {
+          console.log(data);
+          if (data.success) {
+            toast.success('Game Created Successfully!');
+          } else {
+            toast.error('Failed to create Game: ' + (data.message || 'Unknown error'));
+          }
+        }).catch((error) => {
+          console.error('Error:', error);
+          toast.error('An error occurred while creating Game!');
+        });
+    }
+    setIsCreatingGameNode(false);
+  }, [is_creating_game_node]);
 };
 
 export const useCreatePersonNode = (is_creating_person_node, create_user_profile_context, setIsCreatingPersonNode, navigate) => {
@@ -105,6 +175,45 @@ export const useFetchEvents = (fetching_events, start_timestamp, end_timestamp, 
   }, [fetching_events, start_timestamp, end_timestamp, setMapEventsFullDay, setFetchingEvents]);
 };
 
+export const useFetchEventTypes = (first_run, setFirstRun, setEventTypes, eventTypesSelected, setEventTypesSelected) => {
+  useEffect(() => {
+    if (first_run ) {
+      fetch('/api/get_event_type_mappings', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+      })
+      .then(res => res.json())
+      .then(data => {
+        console.log('event_type_mappings:', data);
+        let eventTypeList;
+        if (eventTypesSelected) {
+          eventTypeList = data.map((eventType) => {
+            return {
+              ...eventType,
+              isChecked: eventTypesSelected.includes(eventType.UUID)
+            };
+          });
+        } else {
+          eventTypeList = data.map((eventType) => {
+            return {
+              ...eventType,
+              isChecked: false
+            };
+          });
+        }
+        setEventTypes(eventTypeList);
+        setFirstRun(false);
+      })
+      .catch((error) => {
+        toast.error(`Error Getting Event Types: ${error}`);
+        console.error(error);
+        setFirstRun(false);
+      });
+    }
+  }, [first_run]);
+};
 export const useFetchGoogleMapsApiKey = (fetching_google_maps_api_key, setGoogleMapsApiKey, setFetchingGoogleMapsApiKey, setFetchingEvents) => {
   useEffect(() => {
     if (fetching_google_maps_api_key) {
