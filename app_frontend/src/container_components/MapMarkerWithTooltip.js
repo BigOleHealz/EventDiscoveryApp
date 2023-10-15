@@ -6,7 +6,7 @@ import { ButtonComponent } from '../base_components/ButtonComponent'; // Assumin
 import { LoggerContext } from '../utils/Contexts';
 import { convertUTCDateToLocalDate } from '../utils/HelperFunctions';
 
-import { icon_size, iconSvg } from '../utils/constants'
+import { icon_size, iconSvgObject } from '../utils/constants'
 import '../css/custom-infowindow.css';
 
 import { common_styles, tooltip_styles } from '../styles';
@@ -19,7 +19,7 @@ const MapMarkerWithTooltip = ({
 }) => {
   const [showTooltip, setShowTooltip] = useState(false);
   const { logger, setLogger } = React.useContext(LoggerContext);
-  const icon = iconSvg(event.PinColor);
+  const icon = iconSvgObject(event.PinColor);
 
   const position = { lat: event.Lat, lng: event.Lon };
 

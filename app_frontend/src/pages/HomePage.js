@@ -8,7 +8,7 @@ import { Map } from '../container_components/Map';
 import { LeftSidePanel } from '../container_components/LeftSidePanel';
 import { CreateEventDatetimeModal, CreateGameSelectEventTypeModal, CreateGameDetailsModal } from '../container_components/Modals';
 
-import { day_start_time, day_end_time, day_format, iconSvg } from '../utils/constants';
+import { day_start_time, day_end_time, day_format } from '../utils/constants';
 import { LoggerContext, UserSessionContext, CreateGameContext } from '../utils/Contexts';
 import { useCreateGameNode } from '../utils/Hooks';
 import { common_styles }  from '../styles';
@@ -33,7 +33,6 @@ export function HomePage() {
   }
 
 
-  // const [createGameData, setCreateGameData] = useState({});
   const [ isCreateGameDateTimeModalVisible, setIsCreateGameDateTimeModalVisible ] = useState(false);
   const [ isCreateGameSelectEventTypeModalVisible, setIsCreateGameSelectEventTypeModalVisible ] = useState(false);
   // const [ isCreateGameInviteFriendsModalVisible, setIsInviteFriendsToEventModalVisible ] = useState(false);
@@ -97,7 +96,6 @@ export function HomePage() {
     setIsCreatingGameNode(true);
   };
 
-  
   return (
     <>
       <div style={common_styles.container}>

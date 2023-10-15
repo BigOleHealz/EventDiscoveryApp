@@ -1,3 +1,4 @@
+import '../css/common.css';
 // import arts_and_crafts_icon from '../assets/event_type_icons/Arts&Crafts.png';
 // import book_club_icon from '../assets/event_type_icons/BookClub.png';
 // import comedy_icon from '../assets/event_type_icons/Comedy.png';
@@ -24,6 +25,7 @@
 // import trivia_icon from '../assets/event_type_icons/Trivia.png';
 // import volunteering_icon from '../assets/event_type_icons/Volunteering.png';
 // import yoga_icon from '../assets/event_type_icons/Yoga.png';
+
 
 export const day_start_time = '00:00:00';
 export const day_end_time = '23:59:59';
@@ -69,12 +71,46 @@ export const icon_size = {
     width: 30
 };
 
-export const iconSvg = (fillColor) => {
+export const iconSvgObject = (fillColor) => {
     return {
       path: 'M12,2C8.13,2,5,5.13,5,9c0,5.25,7,13,7,13s7-7.75,7-13c0-3.87-3.13-7-7-7z M12,11.5c-1.38,0-2.5-1.12-2.5-2.5s1.12-2.5,2.5-2.5s2.5,1.12,2.5,2.5 S13.38,11.5,12,11.5z',
       fillColor: fillColor,
       fillOpacity: 1,
-      strokeWeight: 1,
+      // strokeWeight: 1,
       scale: 1.5
     };
   };
+
+export const iconSvgClass = (fillColor) => {
+  return (
+    <svg height="50" width="30">
+      <path 
+        d='M12,2C8.13,2,5,5.13,5,9c0,5.25,7,13,7,13s7-7.75,7-13c0-3.87-3.13-7-7-7z M12,11.5c-1.38,0-2.5-1.12-2.5-2.5s1.12-2.5,2.5-2.5s2.5,1.12,2.5,2.5 S13.38,11.5,12,11.5z'
+        fill={fillColor}
+        fillOpacity={1}
+        strokeWeight={1}
+        scale={1.5}
+      />
+    </svg>
+  );
+};
+
+export const iconSvgDataUrl = (fillColor) => {
+  const svgStr = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" height="100" width="60">
+    <path 
+      d='M12,2C8.13,2,5,5.13,5,9c0,5.25,7,13,7,13s7-7.75,7-13c0-3.87-3.13-7-7-7z M12,11.5c-1.38,0-2.5-1.12-2.5-2.5s1.12-2.5,2.5-2.5s2.5,1.12,2.5,2.5 S13.38,11.5,12,11.5z'
+      fill="${fillColor}"
+      fillOpacity="1"
+      strokeWeight="1"
+      scale="1.5"
+    />
+  </svg>`;
+  return 'data:image/svg+xml;utf8,' + encodeURIComponent(svgStr);
+};
+export function SvgOverlay() {
+  return (
+    <div className="svg-overlay">
+      {iconSvgClass('red')}
+    </div>
+  );
+}
