@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { GoogleMap, LoadScript, MarkerClusterer } from '@react-google-maps/api';
+import { GoogleMap, LoadScript, MarkerClusterer, OverlayView } from '@react-google-maps/api';
 
 import { ButtonComponent } from '../base_components/ButtonComponent'; // Assuming you also have a web version of this
 import MapMarkerWithTooltip from './MapMarkerWithTooltip';
 
 import { CreateGameContext, LoggerContext, UserSessionContext } from '../utils/Contexts';
-import { day_start_time, day_end_time, defaultCenter } from '../utils/constants';
+import { day_start_time, day_end_time, defaultCenter, iconSvgObject, iconSvgClass, SvgOverlay, iconSvgDataUrl } from '../utils/constants';
 import { convertUTCDateToLocalDate, getAddressFromCoordinates } from '../utils/HelperFunctions';
 import { setUserLocation, useFetchEvents, useFetchGoogleMapsApiKey, useFilterEvents, useSetUserLocation } from '../utils/Hooks';
 
@@ -33,6 +33,7 @@ export const Map = ({
   const [googleMapsApiKey, setGoogleMapsApiKey] = useState(null);
   const [map_events_full_day, setMapEventsFullDay] = useState([]);
   const [map_events_filtered, setMapEventsFiltered] = useState([]);
+  const [showSvg, setShowSvg] = useState(false);
 
   const [activePopup, setActivePopup] = useState(null);
   const [fetching_google_maps_api_key, setFetchingGoogleMapsApiKey] = useState(true);
@@ -69,6 +70,15 @@ export const Map = ({
     removeUserSession(setUserSession);
   };
 
+  const handleButtonClick = () => {
+    setShowSvg(!showSvg);
+  };
+
+  const handleGetCenterCoordinates = () => {
+    const center = mapRef.current.getCenter();
+    console.log('Center coordinates:', center.lat(), center.lng());
+  };
+
   if (!googleMapsApiKey) {
     logger.warning("Google Maps API key not found, rendering loading screen...");
     return (
@@ -101,6 +111,12 @@ export const Map = ({
             ],
           }}
         >
+           <img
+            id="create-game-pin-marker"
+            src={iconSvgDataUrl('#000')}
+            alt="Pin"
+            style={map_styles.pinStyle}
+          />
           {/* <MarkerClusterer
             options={{ imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m' }}
             maxZoom={20}
@@ -120,11 +136,17 @@ export const Map = ({
             }
           {/* </MarkerClusterer> */}
 
+
         </GoogleMap>
       </LoadScript>
       <ButtonComponent
-        title="Logout"  // Use title prop to set the button text
-        onPress={() => logoutUser()}  // Use onPress prop for click handler
+        title="Get Center Coordinates"
+        onPress={handleGetCenterCoordinates}
+        style={map_styles.submitCoordinatesButtonStyle}
+      />
+      <ButtonComponent
+        title="Logout"
+        onPress={() => logoutUser()}
         style={map_styles.logoutButtonStyle}
       />
 
