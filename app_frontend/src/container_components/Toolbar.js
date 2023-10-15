@@ -12,7 +12,7 @@ export const Toolbar = ({ onLeftButtonClick, onRightButtonClick }) => {
       style={toolbar_styles.toolbar}
     >
       <ButtonComponent
-        id="FindGamesButton"
+        id="FindEventsButton"
         title="Find Events" 
         onPress={onLeftButtonClick} 
         style={toolbar_styles.toolbarButtonLeft} 

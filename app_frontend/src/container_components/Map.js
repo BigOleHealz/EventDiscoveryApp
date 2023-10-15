@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { GoogleMap, LoadScript, MarkerClusterer, OverlayView } from '@react-google-maps/api';
+import { GoogleMap, LoadScript, MarkerClusterer } from '@react-google-maps/api';
 
 import { ButtonComponent } from '../base_components/ButtonComponent'; // Assuming you also have a web version of this
 import MapMarkerWithTooltip from './MapMarkerWithTooltip';
 
-import { CreateGameContext, LoggerContext, UserSessionContext } from '../utils/Contexts';
+import { LoggerContext, UserSessionContext } from '../utils/Contexts';
 import { day_start_time, day_end_time, defaultCenter, iconSvgObject, iconSvgClass, SvgOverlay, iconSvgDataUrl } from '../utils/constants';
 import { convertUTCDateToLocalDate, getAddressFromCoordinates } from '../utils/HelperFunctions';
 import { setUserLocation, useFetchEvents, useFetchGoogleMapsApiKey, useFilterEvents, useSetUserLocation } from '../utils/Hooks';
@@ -16,9 +16,9 @@ import { removeUserSession } from '../utils/SessionManager';
 import { map_styles } from '../styles';
 
 export const Map = ({
-  findGameSelectedDate,
-  findGameStartTime,
-  findGameEndTime,
+  findEventSelectedDate,
+  findEventStartTime,
+  findEventEndTime,
   eventTypesSelected
 }) => {
   const { userSession, setUserSession } = React.useContext(UserSessionContext);
@@ -39,13 +39,13 @@ export const Map = ({
   const [fetching_google_maps_api_key, setFetchingGoogleMapsApiKey] = useState(true);
   const [fetching_events, setFetchingEvents] = useState(false);
 
-  const start_timestamp = convertUTCDateToLocalDate(new Date(`${findGameSelectedDate}T${day_start_time}`));
-  const end_timestamp = convertUTCDateToLocalDate(new Date(`${findGameSelectedDate}T${day_end_time}`));
+  const start_timestamp = convertUTCDateToLocalDate(new Date(`${findEventSelectedDate}T${day_start_time}`));
+  const end_timestamp = convertUTCDateToLocalDate(new Date(`${findEventSelectedDate}T${day_end_time}`));
 
   useFetchGoogleMapsApiKey(fetching_google_maps_api_key, setGoogleMapsApiKey, setFetchingGoogleMapsApiKey, setFetchingEvents);
   useSetUserLocation(setMapCenter);
   useFetchEvents(fetching_events, start_timestamp, end_timestamp, setMapEventsFullDay, setFetchingEvents);
-  useFilterEvents(findGameSelectedDate, findGameStartTime, findGameEndTime, map_events_full_day, eventTypesSelected, setMapEventsFiltered, logger);
+  useFilterEvents(findEventSelectedDate, findEventStartTime, findEventEndTime, map_events_full_day, eventTypesSelected, setMapEventsFiltered, logger);
   
   const onLoad = (map) => {
     mapRef.current = map;
@@ -63,7 +63,7 @@ export const Map = ({
 
   useEffect(() => {
     setFetchingEvents(true);
-  }, [findGameSelectedDate]);
+  }, [findEventSelectedDate]);
 
   const logoutUser = () => {
     logger.info("User logging out...");
@@ -112,7 +112,7 @@ export const Map = ({
           }}
         >
            <img
-            id="create-game-pin-marker"
+            id="create-event-pin-marker"
             src={iconSvgDataUrl('#000')}
             alt="Pin"
             style={map_styles.pinStyle}

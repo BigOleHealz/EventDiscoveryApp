@@ -90,31 +90,31 @@ export const useCreateUserProfile = (email, create_user_profile_context, setCrea
   }, [email]);
 };
 
-export const useCreateGameNode = (is_creating_game_node, create_game_context, setIsCreatingGameNode) => {
+export const useCreateEventNode = (is_creating_event_node, create_event_context, setIsCreatingEventNode) => {
   useEffect(() => {
-    if (is_creating_game_node) {
-      console.log('create_game_context:', create_game_context)
-      fetch('/api/create_game_node', {
+    if (is_creating_event_node) {
+      console.log('create_event_context:', create_event_context)
+      fetch('/api/create_event_node', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({...create_game_context})
+        body: JSON.stringify({...create_event_context})
       }).then(res => res.json())
         .then(data => {
           console.log(data);
           if (data.success) {
-            toast.success('Game Created Successfully!');
+            toast.success('Event Created Successfully!');
           } else {
-            toast.error('Failed to create Game: ' + (data.message || 'Unknown error'));
+            toast.error('Failed to create Event: ' + (data.message || 'Unknown error'));
           }
         }).catch((error) => {
           console.error('Error:', error);
-          toast.error('An error occurred while creating Game!');
+          toast.error('An error occurred while creating Event!');
         });
     }
-    setIsCreatingGameNode(false);
-  }, [is_creating_game_node]);
+    setIsCreatingEventNode(false);
+  }, [is_creating_event_node]);
 };
 
 export const useCreatePersonNode = (is_creating_person_node, create_user_profile_context, setIsCreatingPersonNode, navigate) => {
@@ -258,7 +258,6 @@ export const useSetGoogleClientId = (fetching_google_client_id, setFetchingGoogl
       }).catch((error) => {
           console.error('Error:', error);
       });
-
       setFetchingGoogleClientId(false);
     }
   }, [fetching_google_client_id]);
@@ -332,10 +331,10 @@ export const useInitializeGoogleLoginButton = (googleClientId, handleCallbackRes
   }, [googleClientId]);
 }
 
-export const useFilterEvents = (findGameSelectedDate, findGameStartTime, findGameEndTime, map_events_full_day, eventTypesSelected, setMapEventsFiltered, logger) => {
+export const useFilterEvents = (findEventSelectedDate, findEventStartTime, findEventEndTime, map_events_full_day, eventTypesSelected, setMapEventsFiltered, logger) => {
   useEffect(() => {
-    const start_time_raw_string = `${findGameSelectedDate}T${findGameStartTime}`;
-    const end_time_raw_string = `${findGameSelectedDate}T${findGameEndTime}`;
+    const start_time_raw_string = `${findEventSelectedDate}T${findEventStartTime}`;
+    const end_time_raw_string = `${findEventSelectedDate}T${findEventEndTime}`;
     logger.info(`Datetime changed - startTime: ${start_time_raw_string} endTime: ${end_time_raw_string}`);
     
     const startTime = new Date(start_time_raw_string);
@@ -349,10 +348,9 @@ export const useFilterEvents = (findGameSelectedDate, findGameStartTime, findGam
         eventTypesSelected.includes(event.EventTypeUUID)
       );
     });
-    
     logger.info('filteredEvents:', filteredEvents);
     setMapEventsFiltered(filteredEvents);
-  }, [findGameSelectedDate, findGameStartTime, findGameEndTime, map_events_full_day, eventTypesSelected, setMapEventsFiltered, logger]);
+  }, [findEventSelectedDate, findEventStartTime, findEventEndTime, map_events_full_day, eventTypesSelected, setMapEventsFiltered, logger]);
 };
 
 export const useSetUserLocation = (setMapCenter) => {

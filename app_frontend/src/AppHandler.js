@@ -5,7 +5,7 @@ import { ToastContainer } from 'react-toastify';
 import { LoginPage } from './pages/LoginPage';
 import { HomePage } from './pages/HomePage';
 import { CreateAccountPage } from './pages/CreateAccountPage';
-import { CreateGameProvider, CreateUserProfileContext, LoggerContext, UserSessionContext } from './utils/Contexts';
+import { CreateEventProvider, CreateUserProfileContext, LoggerContext, UserSessionContext } from './utils/Contexts';
 import { formatLogStreamNameDate } from './utils/HelperFunctions';
 import { Logger } from './utils/Logger'; 
 import { getUserSession } from './utils/SessionManager';
@@ -48,13 +48,13 @@ export function AppHandler() {
       <UserSessionContext.Provider value={{ userSession, setUserSession }}>
         <LoggerContext.Provider value={{ logger, setLogger }}>
           <CreateUserProfileContext.Provider value={{ create_user_profile_context, setCreateUserProfileContext }}>
-            <CreateGameProvider>
+            <CreateEventProvider>
               <Routes>
                 <Route path="/" element={<HomePage />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/create-account" element={<CreateAccountPage />} />
               </Routes>
-            </CreateGameProvider>
+            </CreateEventProvider>
           </CreateUserProfileContext.Provider>
         </LoggerContext.Provider>
       </UserSessionContext.Provider>

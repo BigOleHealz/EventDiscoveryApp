@@ -10,20 +10,20 @@ import { side_panel_styles } from '../styles';
 
 export const LeftSidePanel = ({
   isVisible,
-  findGameSelectedDate,
-  setFindGameSelectedDate,
-  findGameStartTime,
-  setFindGameStartTime,
-  findGameEndTime,
-  setFindGameEndTime,
+  findEventSelectedDate,
+  setFindEventSelectedDate,
+  findEventStartTime,
+  setFindEventStartTime,
+  findEventEndTime,
+  setFindEventEndTime,
   eventTypesSelected,
   setEventTypesSelected
 }) => {
 
   const handleDateSelected = (date) => {
-    setFindGameSelectedDate(date);
-    setFindGameStartTime(day_start_time);
-    setFindGameEndTime(day_end_time);
+    setFindEventSelectedDate(date);
+    setFindEventStartTime(day_start_time);
+    setFindEventEndTime(day_end_time);
   };
 
   return (
@@ -36,14 +36,14 @@ export const LeftSidePanel = ({
     >
       <CalendarComponent
         testid="left-calendar"
-        selected={findGameSelectedDate}
+        selected={findEventSelectedDate}
         onDateSelected={handleDateSelected}
       />
       <TimeRangeSliderComponent
-        startTime={findGameStartTime}
-        setStartTime={setFindGameStartTime}
-        endTime={findGameEndTime}
-        setEndTime={setFindGameEndTime}
+        startTime={findEventStartTime}
+        setStartTime={setFindEventStartTime}
+        endTime={findEventEndTime}
+        setEndTime={setFindEventEndTime}
       />
       <SelectInterestsScrollView
         eventTypesSelected={eventTypesSelected}
