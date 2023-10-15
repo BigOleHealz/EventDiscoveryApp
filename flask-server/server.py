@@ -183,8 +183,8 @@ def create_server():
         except Exception as e:
             return jsonify({"message": "An error occurred: " + str(e)}), 500
 
-    @app.route('/create_game_node', methods=["POST"])
-    def create_game_node():
+    @app.route('/create_event_node', methods=["POST"])
+    def create_event_node():
         try:
             body = request.get_json()
             if not body:

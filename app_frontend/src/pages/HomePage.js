@@ -6,25 +6,25 @@ import { format } from 'date-fns';
 import { Toolbar } from '../container_components/Toolbar';
 import { Map } from '../container_components/Map';
 import { LeftSidePanel } from '../container_components/LeftSidePanel';
-import { CreateEventDatetimeModal, CreateGameSelectEventTypeModal, CreateGameDetailsModal } from '../container_components/Modals';
+import { CreateEventDatetimeModal, CreateEventSelectEventTypeModal, CreateEventDetailsModal } from '../container_components/Modals';
 
 import { day_start_time, day_end_time, day_format } from '../utils/constants';
-import { LoggerContext, UserSessionContext, CreateGameContext } from '../utils/Contexts';
-import { useCreateGameNode } from '../utils/Hooks';
+import { LoggerContext, UserSessionContext, CreateEventContext } from '../utils/Contexts';
+import { useCreateEventNode } from '../utils/Hooks';
 import { common_styles }  from '../styles';
 
 export function HomePage() {
 
-  const { create_game_context, setCreateGameContext } = React.useContext(CreateGameContext);
+  const { create_event_context, setCreateEventContext } = React.useContext(CreateEventContext);
   const { userSession, setUserSession } = React.useContext(UserSessionContext);
   const [event_types_selected, setEventTypesSelected] = useState(userSession ? userSession.Interests : []);
-  const [is_creating_game_node, setIsCreatingGameNode] = useState(false);
+  const [is_creating_event_node, setIsCreatingEventNode] = useState(false);
 
-  useCreateGameNode(is_creating_game_node, create_game_context, setIsCreatingGameNode);
+  useCreateEventNode(is_creating_event_node, create_event_context, setIsCreatingEventNode);
 
   // Handle left side panel
   const [isLeftPanelVisible, setIsLeftPanelVisible] = useState(false);
-  const [isCreateGameMode, setIsCreateGameMode] = useState(false);
+  const [isCreateEventMode, setIsCreateEventMode] = useState(false);
   const [isEventInvitesPanelVisible, setIsEventInvitesPanelVisible] = useState(false);
   const [isFriendRequestsPanelVisible, setIsFriendRequestsPanelVisible] = useState(false);
 
@@ -32,113 +32,111 @@ export function HomePage() {
     return null;
   }
 
-
-  const [ isCreateGameDateTimeModalVisible, setIsCreateGameDateTimeModalVisible ] = useState(false);
-  const [ isCreateGameSelectEventTypeModalVisible, setIsCreateGameSelectEventTypeModalVisible ] = useState(false);
-  // const [ isCreateGameInviteFriendsModalVisible, setIsInviteFriendsToEventModalVisible ] = useState(false);
+  const [ isCreateEventDateTimeModalVisible, setIsCreateEventDateTimeModalVisible ] = useState(false);
+  const [ isCreateEventSelectEventTypeModalVisible, setIsCreateEventSelectEventTypeModalVisible ] = useState(false);
+  // const [ isCreateEventInviteFriendsModalVisible, setIsInviteFriendsToEventModalVisible ] = useState(false);
   const [ isCreateEventDetailsModalVisible, setIsCreateEventDetailsModalVisible ] = useState(false);
 
 
   const resetAllStates = () => {
     setIsLeftPanelVisible(false);
-    setIsCreateGameMode(false);
+    setIsCreateEventMode(false);
     setIsEventInvitesPanelVisible(false);
     setIsFriendRequestsPanelVisible(false);
   };
 
   const currentDateTime = new Date();
-  const [findGameStartTime, setFindGameStartTime] = useState(day_start_time);
-  const [findGameEndTime, setFindGameEndTime] = useState(day_end_time);
-  const [findGameSelectedDate, setFindGameSelectedDate] = useState(format(currentDateTime, day_format));
+  const [findEventStartTime, setFindEventStartTime] = useState(day_start_time);
+  const [findEventEndTime, setFindEventEndTime] = useState(day_end_time);
+  const [findEventSelectedDate, setFindEventSelectedDate] = useState(format(currentDateTime, day_format));
 
-  const handleFindGamesButtonClick = () => {
-    console.log('Find Games button clicked')
+  const handleFindEventsButtonClick = () => {
+    console.log('Find Events button clicked')
     resetAllStates();
     setIsLeftPanelVisible(!isLeftPanelVisible);
   };
 
-  const handleCreateGameButtonClick = () => {
-    console.log('Create Game button clicked')
+  const handleCreateEventButtonClick = () => {
+    console.log('Create Event button clicked')
     resetAllStates();
-    setIsCreateGameDateTimeModalVisible(true);
+    setIsCreateEventDateTimeModalVisible(true);
   };
 
-  const exitCreateGameMode = () => {
-    setIsCreateGameDateTimeModalVisible(false);
-    setIsCreateGameSelectEventTypeModalVisible(false);
+  const exitCreateEventMode = () => {
+    setIsCreateEventDateTimeModalVisible(false);
+    setIsCreateEventSelectEventTypeModalVisible(false);
     // setIsInviteFriendsToEventModalVisible(false);
     setIsCreateEventDetailsModalVisible(false);
-    setCreateGameContext({});
-    setIsCreateGameMode(false);
+    setCreateEventContext({});
+    setIsCreateEventMode(false);
   };
 
-  const handleCreateGameDateTimeModalSubmitButtonClick = () => {
-    setIsCreateGameDateTimeModalVisible(false);
-    setIsCreateGameSelectEventTypeModalVisible(true);
+  const handleCreateEventDateTimeModalSubmitButtonClick = () => {
+    setIsCreateEventDateTimeModalVisible(false);
+    setIsCreateEventSelectEventTypeModalVisible(true);
   };
 
-  const handleCreateGameEventTypeModalSubmitButtonClick = () => {
-    setIsCreateGameSelectEventTypeModalVisible(false);
+  const handleCreateEventEventTypeModalSubmitButtonClick = () => {
+    setIsCreateEventSelectEventTypeModalVisible(false);
     setIsCreateEventDetailsModalVisible(true);
   };
 
-  const handleCreateGameDetailsModalSubmitButtonClick = () => {
-    createGame();
+  const handleCreateEventDetailsModalSubmitButtonClick = () => {
+    createEvent();
     setIsCreateEventDetailsModalVisible(false);
     // setIsInviteFriendsToEventModalVisible(true);
   };
 
-  const createGame = () => {
-    setCreateGameContext({
-      ...create_game_context,
+  const createEvent = () => {
+    setCreateEventContext({
+      ...create_event_context,
       CreatedByUUID: userSession.UUID
     });
-    setIsCreatingGameNode(true);
+    setIsCreatingEventNode(true);
   };
 
   return (
     <>
       <div style={common_styles.container}>
         <Toolbar
-          onLeftButtonClick={handleFindGamesButtonClick}
-          onRightButtonClick={handleCreateGameButtonClick}
+          onLeftButtonClick={handleFindEventsButtonClick}
+          onRightButtonClick={handleCreateEventButtonClick}
         />
       </div>
       <div style={common_styles.fullScreen}>
         <Map
-          findGameSelectedDate={findGameSelectedDate}
-          findGameStartTime={findGameStartTime}
-          findGameEndTime={findGameEndTime}
+          findEventSelectedDate={findEventSelectedDate}
+          findEventStartTime={findEventStartTime}
+          findEventEndTime={findEventEndTime}
           eventTypesSelected={event_types_selected}
         />
         <LeftSidePanel
           isVisible={isLeftPanelVisible}
-          findGameSelectedDate={findGameSelectedDate}
-          setFindGameSelectedDate={setFindGameSelectedDate}
-          findGameStartTime={findGameStartTime}
-          setFindGameStartTime={setFindGameStartTime}
-          findGameEndTime={findGameEndTime}
-          setFindGameEndTime={setFindGameEndTime}
+          findEventSelectedDate={findEventSelectedDate}
+          setFindEventSelectedDate={setFindEventSelectedDate}
+          findEventStartTime={findEventStartTime}
+          setFindEventStartTime={setFindEventStartTime}
+          findEventEndTime={findEventEndTime}
+          setFindEventEndTime={setFindEventEndTime}
           eventTypesSelected={event_types_selected}
           setEventTypesSelected={setEventTypesSelected}
         />
         <CreateEventDatetimeModal
-          isVisible={isCreateGameDateTimeModalVisible}
-          onRequestClose={exitCreateGameMode}
-          onSubmitButtonClick={handleCreateGameDateTimeModalSubmitButtonClick}
+          isVisible={isCreateEventDateTimeModalVisible}
+          onRequestClose={exitCreateEventMode}
+          onSubmitButtonClick={handleCreateEventDateTimeModalSubmitButtonClick}
         />
-        <CreateGameSelectEventTypeModal
-          isVisible={isCreateGameSelectEventTypeModalVisible}
-          onRequestClose={exitCreateGameMode}
-          onSubmitButtonClick={handleCreateGameEventTypeModalSubmitButtonClick}
+        <CreateEventSelectEventTypeModal
+          isVisible={isCreateEventSelectEventTypeModalVisible}
+          onRequestClose={exitCreateEventMode}
+          onSubmitButtonClick={handleCreateEventEventTypeModalSubmitButtonClick}
         />
-        <CreateGameDetailsModal
+        <CreateEventDetailsModal
           isVisible={isCreateEventDetailsModalVisible}
-          onRequestClose={exitCreateGameMode}
-          onSubmitButtonClick={handleCreateGameDetailsModalSubmitButtonClick}
+          onRequestClose={exitCreateEventMode}
+          onSubmitButtonClick={handleCreateEventDetailsModalSubmitButtonClick}
         />
       </div>
     </>
-        
   );
 }

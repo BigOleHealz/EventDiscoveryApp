@@ -10,7 +10,7 @@ import { SelectInterestsScrollView } from '../composite_components/SelectInteres
 import { SwitchComponent } from '../composite_components/SwitchComponent';
 
 import { day_start_time, day_end_time, day_format } from '../utils/constants';
-import { CreateGameContext, CreateUserProfileContext, UserSessionContext } from '../utils/Contexts';
+import { CreateEventContext, CreateUserProfileContext, UserSessionContext } from '../utils/Contexts';
 import { convertUTCDateToLocalDate } from '../utils/HelperFunctions';
 import { useFetchUsername } from '../utils/Hooks';
 
@@ -21,18 +21,18 @@ export const CreateEventDatetimeModal = ({
   onSubmitButtonClick,
   onRequestClose
 }) => {
-  const { create_game_context, setCreateGameContext } = React.useContext(CreateGameContext);
+  const { create_event_context, setCreateEventContext } = React.useContext(CreateEventContext);
 
   const currentDateTime = new Date();
   const [selected_date, setSelectedDate] = useState(format(currentDateTime, day_format));
   const [start_time, setStartTime] = useState(day_start_time);
   const [end_time, setEndTime] = useState(day_end_time);
 
-  const addDateTimesToCreateGameContext = () => {
+  const addDateTimesToCreateEventContext = () => {
     const start_timestamp = convertUTCDateToLocalDate(new Date(`${selected_date}T${start_time}`));
     const end_timestamp = convertUTCDateToLocalDate(new Date(`${selected_date}T${end_time}`));
-    setCreateGameContext({
-      ...create_game_context,
+    setCreateEventContext({
+      ...create_event_context,
       StartTimestamp: start_timestamp,
       EndTimestamp: end_timestamp
     })
@@ -45,7 +45,7 @@ export const CreateEventDatetimeModal = ({
       onRequestClose={onRequestClose}
       title="When is the Event?"
       submitButtonText="Submit Datetime"
-      onSubmitButtonClick={addDateTimesToCreateGameContext}
+      onSubmitButtonClick={addDateTimesToCreateEventContext}
     >
       <CalendarComponent
         testid="left-calendar"
@@ -62,23 +62,23 @@ export const CreateEventDatetimeModal = ({
   )
 }
 
-export const CreateGameSelectEventTypeModal = ({
+export const CreateEventSelectEventTypeModal = ({
   isVisible,
   onSubmitButtonClick,
   onRequestClose,
 }) => {
-  const { create_game_context, setCreateGameContext } = React.useContext(CreateGameContext);
+  const { create_event_context, setCreateEventContext } = React.useContext(CreateEventContext);
   const [event_type, setEventType] = useState(null);
 
-  const addEventTypeToCreateGameContext = () => {
+  const addEventTypeToCreateEventContext = () => {
     if (!event_type) {
       toast.error('Please select an event type.');
       return;
     } else {
-      const new_data = {...create_game_context, ...event_type}
+      const new_data = {...create_event_context, ...event_type}
       console.log("new_data", new_data)
-      setCreateGameContext({
-        ...create_game_context,
+      setCreateEventContext({
+        ...create_event_context,
         ...event_type
       });
       onSubmitButtonClick()
@@ -87,12 +87,12 @@ export const CreateGameSelectEventTypeModal = ({
 
   return (
     <ModalComponent
-      id="create-game-select-event-type-modal"
+      id="create-event-select-event-type-modal"
       isVisible={isVisible}
       onRequestClose={onRequestClose}
       title="What Type of Event is This?"
       submitButtonText="Submit Event Type"
-      onSubmitButtonClick={addEventTypeToCreateGameContext}
+      onSubmitButtonClick={addEventTypeToCreateEventContext}
     >
       <SelectInterestsScrollView
         setEventTypesSelected={setEventType}
@@ -103,19 +103,19 @@ export const CreateGameSelectEventTypeModal = ({
 };
 
 
-export const CreateGameDetailsModal = ({
+export const CreateEventDetailsModal = ({
   isVisible,
   onSubmitButtonClick,
   onRequestClose,
 }) => {
-  const { create_game_context, setCreateGameContext } = React.useContext(CreateGameContext);
+  const { create_event_context, setCreateEventContext } = React.useContext(CreateEventContext);
   const [event_name, setEventName] = useState('');
   const [event_description, setEventDescription] = useState('');
   const [private_event_flag, setPrivateEventFlag] = useState(false);
   const [paid_event_flag, setPaidEventFlag] = useState(false);
   const [event_price, setEventPrice] = useState('');
 
-  const resetCreateGameDetails = () => {
+  const resetCreateEventDetails = () => {
     setEventName('');
     setEventDescription('');
     setPrivateEventFlag(false);
@@ -123,7 +123,7 @@ export const CreateGameDetailsModal = ({
     setEventPrice('');
   };
 
-  const addDetailsToCreateGameContext = () => {
+  const addDetailsToCreateEventContext = () => {
     const public_event_flag = !private_event_flag;
     const free_event_flag = !paid_event_flag;
     let event_price_string;
@@ -148,16 +148,16 @@ export const CreateGameDetailsModal = ({
     }
 
     const new_data = {
-      ...create_game_context,
+      ...create_event_context,
       EventName: event_name,
       EventDescription: event_description,
       PublicEventFlag: public_event_flag,
       FreeEventFlag: free_event_flag,
       EventPrice: event_price_string
     }
-    setCreateGameContext(new_data);
+    setCreateEventContext(new_data);
     onSubmitButtonClick()
-    resetCreateGameDetails();
+    resetCreateEventDetails();
   };
 
   const handleEventNameChange = (text) => {
@@ -182,12 +182,12 @@ export const CreateGameDetailsModal = ({
 
   return (
     <ModalComponent
-      id="create-game-event-details-modal"
+      id="create-event-event-details-modal"
       isVisible={isVisible}
       onRequestClose={onRequestClose}
       title="Event Details"
       submitButtonText="Submit Event Details"
-      onSubmitButtonClick={addDetailsToCreateGameContext}
+      onSubmitButtonClick={addDetailsToCreateEventContext}
     >
       <TextInputComponent
         id="input-event-name"
@@ -306,35 +306,6 @@ export const SelectInterestsModal = ({
 
 
 
-  // const createEvent = async () => {
-  //   const address = await getAddressFromCoordinates(
-  //     location.lat,
-  //     location.lng,
-  //     googleMapsApiKey
-  //   );
-  //   const create_game_date_time = new Date(`${date_selected}T${time_selected}`);
-
-  //   const params = {
-  //     CreatedByID: userSession.UUID,
-  //     Address: address,
-  //     StartTimestamp: format(create_game_date_time, date_time_format),
-  //     Host: userSession.Username,
-  //     EventCreatedAt: format(new Date(), date_time_format),
-  //     Lon: location.lng,
-  //     PublicEventFlag: true,
-  //     EndTimestamp: format(
-  //       add(new Date(create_game_date_time), { hours: 1 }),
-  //       date_time_format
-  //     ),
-  //     EventName: 'Pickup Basketball',
-  //     Lat: location.lat,
-  //   };
-  //   console.log('Create Game params:', params);
-  //   run_create_event(params);
-  // };
-
-
-
 
 
 
@@ -371,7 +342,7 @@ export const SelectInterestsModal = ({
   //   if (create_event_status.STATUS === 'ERROR') {
   //     toast.error(`Error Creating Event: ${create_event_status.RESPONSE}`);
   //     console.log(create_event_status.RESPONSE);
-  //     setIsCreateGameMode(false);
+  //     setIsCreateEventMode(false);
   //   } else if (create_event_status.STATUS === 'SUCCESS') {
   //     console.log(
   //       'create_event_status.RESPONSE: ',
@@ -381,9 +352,9 @@ export const SelectInterestsModal = ({
   //     setEventUUID(event.UUID);
   //     toast.success('You Created an Event!');
   //     reset_create_event_transaction_status();
-  //     resetCreateGameDetails();
+  //     resetCreateEventDetails();
   //     setIsInviteFriendsToEventModalVisible(true);
-  //     setIsCreateGameMode(false);
+  //     setIsCreateEventMode(false);
   //   }
   // }, [create_event_status]);
 
@@ -394,11 +365,11 @@ export const SelectInterestsModal = ({
 //   setIsInviteFriendsToEventModalVisible,
 //   setIsCreateEventDetailsModalVisible,
 //   onRequestClose,
-//   isCreateGameMode,
+//   isCreateEventMode,
 //   event_uuid
 // }) => {
 // 	const { userSession, setUserSession } = React.useContext(UserSessionContext);
-//   const { createGameData, setCreateGameData } = React.useContext(CreateGameContext);
+//   const { createEventData, setCreateEventData } = React.useContext(CreateEventContext);
 
 //   const initialFriends = userSession.Friends.map((friend) => {
 //     return {
@@ -450,9 +421,9 @@ export const SelectInterestsModal = ({
 //       .map((friend) => friend.friendUUID);
 //     console.log('Selected friends:', selectedFriendUUIDs);
 
-//     if (isCreateGameMode) {
-//       setCreateGameData({
-//         ...createGameData,
+//     if (isCreateEventMode) {
+//       setCreateEventData({
+//         ...createEventData,
 //         InvitedFriends: selectedFriendUUIDs
 //       });
 //       setIsInviteFriendsToEventModalVisible(false);
@@ -483,15 +454,15 @@ export const SelectInterestsModal = ({
 
 //   return (
 //     <ModalComponent
-//       id="create-game-invite-friend-modal"
+//       id="create-event-invite-friend-modal"
 //       isVisible={isVisible}
 //       onRequestClose={onRequestClose}
 //       title="Invite Friends"
 //       menuButton={
 //         <ButtonComponent
-//           id="create-game-invite-friends-button"
+//           id="create-event-invite-friends-button"
 //           title={
-//             anyChecked ? 'Send Invites & Create Game' : 'Skip & Create Game'
+//             anyChecked ? 'Send Invites & Create Event' : 'Skip & Create Event'
 //           }
 //           onPress={handleSubmitButtonClick}
 //           // style={styles.buttons.menu_button_styles}
@@ -509,119 +480,6 @@ export const SelectInterestsModal = ({
 //           />
 //         ))}
 //       </ScrollView>
-//     </ModalComponent>
-//   );
-// };
-
-// export const CreateEventDetailsModal = ({
-//   isVisible,
-//   onRequestClose,
-// }) => {
-//   const { userSession, setUserSession } = React.useContext(UserSessionContext);
-//   const { createGameData, setCreateGameData } = React.useContext(CreateGameContext);
-
-//   const [ event_name, setEventName ] = useState('');
-//   const [ event_description, setEventDescription ] = useState('');
-//   const [ public_event_flag, setPublicEventFlag ] = useState(false);
-
-//   const handleEventNameChange = (text) => {
-//     setEventName(text);
-//   };
-//   const handleEventDescriptionChange = (text) => {
-//     setEventDescription(text);
-//   };
-//   const handlePublicEventFlagChange = (value) => {
-//     console.log('Public Event Flag:', value);
-//     setPublicEventFlag(!public_event_flag);
-//   };
-
-// 	const {
-// 		transactionStatus: create_event_status,
-// 		executeQuery: run_create_event,
-// 		resetTransactionStatus: reset_create_event_transaction_status
-// 	} = useCustomCypherWrite(CREATE_EVENT);
-
-//   const create_event = (event_data) => {
-// 		console.log("Creating Event: ", event_data);
-// 		run_create_event(event_data);
-// 	};
-
-//   useEffect(() => {
-// 		if (create_event_status.STATUS === 'ERROR') {
-//       const error_message = `Error Creating Event: ${create_event_status.RESPONSE}`;
-// 			toast.error(error_message);
-// 			console.log(error_message);
-// 			reset_create_event_transaction_status();
-// 		} else if (create_event_status.STATUS === 'SUCCESS') {
-// 			toast.success(`Event Created Successfully!`);
-// 			reset_create_event_transaction_status();
-// 		}
-// 	}, [create_event_status]);
-
-
-//   const handleSubmitButtonClick = () => {
-//     if (event_name === '') {
-//       toast.error('Please Input a Name for This Event');
-//       return;
-//     } else {
-//       const newCreateGameData = {
-//         ...createGameData,
-//         EventName: event_name,
-//         EventDescription: event_description,
-//         PublicEventFlag: public_event_flag,
-//         CreatedByUUID: userSession.UUID,
-//         Host: userSession.Username,
-//         UUID: uuidv4(),
-//       };
-//       console.log('Create Game Data:', newCreateGameData)
-//       setCreateGameData(newCreateGameData);
-//       create_event(newCreateGameData)
-//       onRequestClose();
-//     }
-//   };
-
-//   return (
-//     <ModalComponent
-//       id="create-game-event-details-modal"
-//       isVisible={isVisible}
-//       onRequestClose={onRequestClose}
-//       title="Fill Out Event Details"
-//       menuButton={
-//         <ButtonComponent
-//           id="create-game-event-details-button"
-//           title="Create Event"
-//           onPress={handleSubmitButtonClick}
-//           // style={styles.buttons.menu_button_styles}
-//           isMenuButton={true}
-//         />
-//       }
-//     >
-//       <View>
-//         <TextInputComponent
-//           id="create-game-event-name"
-//           placeholder="Event Name"
-//           value={event_name}
-//           onChangeText={handleEventNameChange}
-//           style={modal_styles.componentStyle}
-//         />
-//         <TextInputComponent
-//           id="create-game-event-description"
-//           placeholder="Event Description"
-//           value={event_description}
-//           onChangeText={handleEventDescriptionChange}
-//           style={modal_styles.componentStyle}
-//         />
-//         <View style={modal_styles.componentStyle}>
-//           <TextComponent>
-//             Public Event?
-//           </TextComponent>
-//           <Switch
-//             id="create-game-public-event-flag"
-//             value={public_event_flag}
-//             onValueChange={handlePublicEventFlagChange}
-//           />
-//         </View>
-//       </View>
 //     </ModalComponent>
 //   );
 // };

@@ -5,25 +5,25 @@ export const UserSessionContext = React.createContext({
   setUserSession: () => { }
 });
 
-export const CreateGameContext = React.createContext();
+export const CreateEventContext = React.createContext();
 
 export const LoggerContext = React.createContext();
 
 export const CreateUserProfileContext = React.createContext();
 
-export const CreateGameProvider = ({ children }) => {
-  const [create_game_context, setCreateGameContextState] = useState({});
+export const CreateEventProvider = ({ children }) => {
+  const [create_event_context, setCreateEventContextState] = useState({});
 
-  const setCreateGameContext = (newValues) => {
-    setCreateGameContextState(prevState => ({
+  const setCreateEventContext = (newValues) => {
+    setCreateEventContextState(prevState => ({
       ...prevState,
       ...newValues
     }));
   };
 
   return (
-    <CreateGameContext.Provider value={{ create_game_context, setCreateGameContext }}>
+    <CreateEventContext.Provider value={{ create_event_context, setCreateEventContext }}>
       {children}
-    </CreateGameContext.Provider>
+    </CreateEventContext.Provider>
   );
 };
