@@ -7,7 +7,7 @@ import { ButtonComponent } from '../base_components/ButtonComponent'; // Assumin
 import MapMarkerWithTooltip from './MapMarkerWithTooltip';
 
 import { LoggerContext, UserSessionContext } from '../utils/Contexts';
-import { day_start_time, day_end_time, defaultCenter, iconSvgObject, iconSvgClass, SvgOverlay, iconSvgDataUrl } from '../utils/constants';
+import { day_start_time, day_end_time, defaultCenter } from '../utils/constants';
 import { convertUTCDateToLocalDate, getAddressFromCoordinates } from '../utils/HelperFunctions';
 import { setUserLocation, useFetchEvents, useFetchGoogleMapsApiKey, useFilterEvents, useSetUserLocation } from '../utils/Hooks';
 
@@ -16,6 +16,7 @@ import { removeUserSession } from '../utils/SessionManager';
 import { map_styles } from '../styles';
 
 export const Map = ({
+  mapRef,
   findEventSelectedDate,
   findEventStartTime,
   findEventEndTime,
@@ -28,7 +29,6 @@ export const Map = ({
   logger.info("Map component is initializing...");
 
   // Handle Map Events
-  const mapRef = React.useRef();
   const [mapCenter, setMapCenter] = useState(defaultCenter);
   const [googleMapsApiKey, setGoogleMapsApiKey] = useState(null);
   const [map_events_full_day, setMapEventsFullDay] = useState([]);
@@ -70,14 +70,6 @@ export const Map = ({
     removeUserSession(setUserSession);
   };
 
-  const handleButtonClick = () => {
-    setShowSvg(!showSvg);
-  };
-
-  const handleGetCenterCoordinates = () => {
-    const center = mapRef.current.getCenter();
-    console.log('Center coordinates:', center.lat(), center.lng());
-  };
 
   if (!googleMapsApiKey) {
     logger.warning("Google Maps API key not found, rendering loading screen...");
@@ -111,12 +103,7 @@ export const Map = ({
             ],
           }}
         >
-           <img
-            id="create-event-pin-marker"
-            src={iconSvgDataUrl('#000')}
-            alt="Pin"
-            style={map_styles.pinStyle}
-          />
+       
           {/* <MarkerClusterer
             options={{ imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m' }}
             maxZoom={20}
@@ -139,11 +126,7 @@ export const Map = ({
 
         </GoogleMap>
       </LoadScript>
-      <ButtonComponent
-        title="Get Center Coordinates"
-        onPress={handleGetCenterCoordinates}
-        style={map_styles.submitCoordinatesButtonStyle}
-      />
+    
       <ButtonComponent
         title="Logout"
         onPress={() => logoutUser()}

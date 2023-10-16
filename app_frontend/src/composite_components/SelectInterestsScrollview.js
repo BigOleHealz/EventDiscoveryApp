@@ -85,7 +85,7 @@ export const SelectInterestsScrollView = ({
 
   return (
     <Box style={select_interests_scrollview_styles.parentContainer}>
-      { singleSelect &&
+      { !singleSelect &&
         <Box style={select_interests_scrollview_styles.switchContainer}>
           <Switch
             value={select_all_switch_toggled_flag}
