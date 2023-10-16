@@ -350,7 +350,7 @@ export const useFilterEvents = (findEventSelectedDate, findEventStartTime, findE
     });
     logger.info('filteredEvents:', filteredEvents);
     setMapEventsFiltered(filteredEvents);
-  }, [findEventSelectedDate, findEventStartTime, findEventEndTime, map_events_full_day, eventTypesSelected, setMapEventsFiltered, logger]);
+  }, [findEventSelectedDate, findEventStartTime, findEventEndTime, map_events_full_day, eventTypesSelected, setMapEventsFiltered]);
 };
 
 export const useSetUserLocation = (setMapCenter) => {

@@ -147,7 +147,7 @@ export const create_account_styles = {
 export const button_styles = {
   standardButton: {
     height: '100%',
-    borderColor: 'rgba(0, 0, 0, 0.0)', // Set border color to transparent to avoid overlapping
+    borderColor: 'rgba(0, 0, 0, 0.0)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -155,12 +155,9 @@ export const button_styles = {
   menu_button_styles: {
     backgroundColor: brightBlueColor,
     borderRadius: defaultBorderRadius,
-    marginBottom: 20,
     height: '50px',
     alignItems: 'center',
-    justifyContent: 'center',
-    margin: '10px auto',
-    padding: '10px auto',
+    justifyContent: 'center'
   },
   clear_button_styles: {
     backgroundColor: defaultBackgroundColor,
@@ -169,6 +166,7 @@ export const button_styles = {
     color: defaultFontColor,
     fontSize: '20px',
     fontWeight: 'bold',
+    padding: '10px 10px',
   },
   icon: {
     height: '30px',
@@ -196,18 +194,33 @@ export const calendar_styles = {
   }
 };
 
+export const create_event_location_selector_styles = {
+  pinStyle: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -100%)',
+  },
+  submitCoordinatesButtonStyle: {
+    ...button_styles.menu_button_styles,
+    position: 'absolute',
+    bottom: '20px',
+    left: '50%',
+    transform: 'translateX(-50%)',
+    width: '20%',
+    height: '50px',
+    borderRadius: '8px',
+    display: 'flex',
+    color: defaultFontColor
+  }
+};
+
 export const map_styles = {
   mapContainerStyle: {
     display: 'flex',
     width: '100vw',
     height: `${display_container_top}vh`,
     flexDirection: 'column',
-  },
-  pinStyle: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -100%)',
   },
   logoutButtonStyle: {
     position: 'absolute',
@@ -220,7 +233,7 @@ export const map_styles = {
     alignItems: 'center',
     justifyContent: 'center',
     color: defaultFontColor
-  },
+  }
 };
 
 export const modal_component_styles = {

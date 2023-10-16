@@ -46,8 +46,10 @@
 }
 
 .content-child {
-  margin-left: 7rem;
-  margin-right: 7rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+
+  left: 50%;
 }
 
 @media screen and (max-width: 500px) {
