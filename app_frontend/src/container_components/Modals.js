@@ -153,7 +153,7 @@ export const CreateEventDetailsModal = ({
       EventDescription: event_description,
       PublicEventFlag: public_event_flag,
       FreeEventFlag: free_event_flag,
-      EventPrice: event_price_string
+      Price: event_price_string
     }
     setCreateEventContext(new_data);
     onSubmitButtonClick()

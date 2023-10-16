@@ -16,7 +16,7 @@ export const CalendarComponent = ({ selected, onDateSelected, style }) => {
     <div style={calendar_styles.view}>
       <Calendar
         onChange={onChange}
-        calendarType="US"
+        calendarType="gregory"
       />
     </div>
   );
