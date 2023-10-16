@@ -8,7 +8,7 @@ import MapMarkerWithTooltip from './MapMarkerWithTooltip';
 
 import { LoggerContext, UserSessionContext } from '../utils/Contexts';
 import { day_start_time, day_end_time, defaultCenter } from '../utils/constants';
-import { convertUTCDateToLocalDate, getAddressFromCoordinates } from '../utils/HelperFunctions';
+import { convertUTCDateToLocalDate } from '../utils/HelperFunctions';
 import { setUserLocation, useFetchEvents, useFetchGoogleMapsApiKey, useFilterEvents, useSetUserLocation } from '../utils/Hooks';
 
 import { removeUserSession } from '../utils/SessionManager';
@@ -17,6 +17,9 @@ import { map_styles } from '../styles';
 
 export const Map = ({
   mapRef,
+  googleMapsApiKey,
+  fetching_events,
+  setFetchingEvents,
   findEventSelectedDate,
   findEventStartTime,
   findEventEndTime,
@@ -30,19 +33,14 @@ export const Map = ({
 
   // Handle Map Events
   const [mapCenter, setMapCenter] = useState(defaultCenter);
-  const [googleMapsApiKey, setGoogleMapsApiKey] = useState(null);
   const [map_events_full_day, setMapEventsFullDay] = useState([]);
   const [map_events_filtered, setMapEventsFiltered] = useState([]);
-  const [showSvg, setShowSvg] = useState(false);
 
   const [activePopup, setActivePopup] = useState(null);
-  const [fetching_google_maps_api_key, setFetchingGoogleMapsApiKey] = useState(true);
-  const [fetching_events, setFetchingEvents] = useState(false);
 
   const start_timestamp = convertUTCDateToLocalDate(new Date(`${findEventSelectedDate}T${day_start_time}`));
   const end_timestamp = convertUTCDateToLocalDate(new Date(`${findEventSelectedDate}T${day_end_time}`));
 
-  useFetchGoogleMapsApiKey(fetching_google_maps_api_key, setGoogleMapsApiKey, setFetchingGoogleMapsApiKey, setFetchingEvents);
   useSetUserLocation(setMapCenter);
   useFetchEvents(fetching_events, start_timestamp, end_timestamp, setMapEventsFullDay, setFetchingEvents);
   useFilterEvents(findEventSelectedDate, findEventStartTime, findEventEndTime, map_events_full_day, eventTypesSelected, setMapEventsFiltered, logger);

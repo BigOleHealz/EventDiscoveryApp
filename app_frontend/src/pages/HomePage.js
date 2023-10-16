@@ -11,7 +11,8 @@ import { Toolbar } from '../container_components/Toolbar';
 
 import { day_start_time, day_end_time, day_format, iconSvgDataUrl } from '../utils/constants';
 import { LoggerContext, UserSessionContext, CreateEventContext } from '../utils/Contexts';
-import { useCreateEventNode } from '../utils/Hooks';
+import { getAddressFromCoordinates } from '../utils/HelperFunctions';
+import { useCreateEventNode, useFetchGoogleMapsApiKey } from '../utils/Hooks';
 import { common_styles, map_styles }  from '../styles';
 
 export function HomePage() {
@@ -21,7 +22,13 @@ export function HomePage() {
   const [event_types_selected, setEventTypesSelected] = useState(userSession ? userSession.Interests : []);
   const [is_creating_event_node, setIsCreatingEventNode] = useState(false);
 
+  const [googleMapsApiKey, setGoogleMapsApiKey] = useState(null);
+  const [fetching_google_maps_api_key, setFetchingGoogleMapsApiKey] = useState(true);
+  const [fetching_events, setFetchingEvents] = useState(false);
+
+
   useCreateEventNode(is_creating_event_node, create_event_context, setIsCreatingEventNode);
+  useFetchGoogleMapsApiKey(fetching_google_maps_api_key, setGoogleMapsApiKey, setFetchingGoogleMapsApiKey, setFetchingEvents);
 
   // Handle left side panel
   const [isLeftPanelVisible, setIsLeftPanelVisible] = useState(false);
@@ -32,14 +39,22 @@ export function HomePage() {
   if (!userSession) {
     return null;
   }
-  // const [ isCreateEventInviteFriendsModalVisible, setIsInviteFriendsToEventModalVisible ] = useState(false);
 
+  const exitCreateEventMode = () => {
+    setCreateEventContext({});
+    setCreateEventStage(0);
+  };
 
   const resetAllStates = () => {
+    exitCreateEventMode();
     setIsLeftPanelVisible(false);
-    // setCreateEventStage(0);
     setIsEventInvitesPanelVisible(false);
     setIsFriendRequestsPanelVisible(false);
+  };
+
+  const initializeCreateEventMode = () => {
+    resetAllStates();
+    setCreateEventStage(1);
   };
 
   const currentDateTime = new Date();
@@ -48,33 +63,29 @@ export function HomePage() {
   const [findEventSelectedDate, setFindEventSelectedDate] = useState(format(currentDateTime, day_format));
 
   const handleFindEventsButtonClick = () => {
-    console.log('Find Events button clicked')
     resetAllStates();
-    setIsLeftPanelVisible(!isLeftPanelVisible);
+    setIsLeftPanelVisible(true);
   };
 
   const handleCreateEventButtonClick = () => {
-    resetAllStates();
-    // setIsCreateEventDateTimeModalVisible(true);
-    setCreateEventStage(1);
-    console.log('Create Event button clicked')
-  };
-
-  const exitCreateEventMode = () => {
-    setCreateEventContext({});
-    setCreateEventStage(0);
+    initializeCreateEventMode();
   };
 
 
-  const handleGetLocationCoordinates = () => {
+
+  const handleGetLocationCoordinates = async () => {
     const center = mapRef.current.getCenter();
+    const lat = center.lat();
+    const lng = center.lng();
+    const address = await getAddressFromCoordinates(lat, lng, googleMapsApiKey);
     setCreateEventContext({
       ...create_event_context,
-      Lat: center.lat(),
-      Lon: center.lng()
+      Lat: lat,
+      Lon: lng,
+      Address: address
     });
     setCreateEventStage(2);
-    console.log('Center coordinates:', center.lat(), center.lng());
+    console.log('Center coordinates:', lat, lng, 'Address:', address);
   };
 
   const handleCreateEventDateTimeModalSubmitButtonClick = () => {
@@ -109,6 +120,9 @@ export function HomePage() {
       <div style={common_styles.fullScreen}>
         <Map
           mapRef={mapRef}
+          googleMapsApiKey={googleMapsApiKey}
+          fetching_events={fetching_events}
+          setFetchingEvents={setFetchingEvents}
           findEventSelectedDate={findEventSelectedDate}
           findEventStartTime={findEventStartTime}
           findEventEndTime={findEventEndTime}
