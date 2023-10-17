@@ -200,6 +200,7 @@ export const CreateEventDetailsModal = ({
         label="Event Description"
         value={event_description}
         onChangeText={handleEventDescriptionChange}
+        multiline={true}
       />
       <SwitchComponent
         id="switch-private-event"
