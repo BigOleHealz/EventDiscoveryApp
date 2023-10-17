@@ -264,7 +264,15 @@ export const useSetGoogleClientId = (fetching_google_client_id, setFetchingGoogl
   }, [fetching_google_client_id]);
 };
 
-export const useSetUserProfile = (email, setCreateUserProfileContext, setUserSession, first_name, last_name, resetLoginInfo, logger) => {
+export const useSetUserProfile = (
+  email, 
+  setCreateUserProfileContext, 
+  setUserSession, 
+  first_name, 
+  last_name, 
+  resetLoginInfo,
+  // logger
+) => {
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -294,14 +302,20 @@ export const useSetUserProfile = (email, setCreateUserProfileContext, setUserSes
           user.TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
           storeUserSession(user, setUserSession);
           toast.success('Login Successful!');
-          logger.info(`Login Successful for email: ${email}`);
+          // logger.info(`Login Successful for email: ${email}`);
           resetLoginInfo();
         }).catch((error) => {
           console.error('Error:', error);
           toast.error('An error occurred while fetching user profile!');
         });
     }
-  }, [email, setCreateUserProfileContext, setUserSession, first_name, last_name, logger]);
+  }, [email,
+    setCreateUserProfileContext,
+    setUserSession,
+    first_name,
+    last_name,
+    // logger
+  ]);
 };
 
 export const useBypassLoginIfInDebugMode = (setEmail, setFirstName, setLastName) => {
@@ -335,11 +349,19 @@ export const useInitializeGoogleLoginButton = (googleClientId, handleCallbackRes
   }, [googleClientId]);
 }
 
-export const useFilterEvents = (findEventSelectedDate, findEventStartTime, findEventEndTime, map_events_full_day, eventTypesSelected, setMapEventsFiltered, logger) => {
+export const useFilterEvents = (
+  findEventSelectedDate,
+  findEventStartTime,
+  findEventEndTime,
+  map_events_full_day,
+  eventTypesSelected,
+  setMapEventsFiltered,
+  // logger
+) => {
   useEffect(() => {
     const start_time_raw_string = `${findEventSelectedDate}T${findEventStartTime}`;
     const end_time_raw_string = `${findEventSelectedDate}T${findEventEndTime}`;
-    logger.info(`Datetime changed - startTime: ${start_time_raw_string} endTime: ${end_time_raw_string}`);
+    // logger.info(`Datetime changed - startTime: ${start_time_raw_string} endTime: ${end_time_raw_string}`);
     
     const startTime = new Date(start_time_raw_string);
     const endTime = new Date(end_time_raw_string);
@@ -352,9 +374,17 @@ export const useFilterEvents = (findEventSelectedDate, findEventStartTime, findE
         eventTypesSelected.includes(event.EventTypeUUID)
       );
     });
-    logger.info('filteredEvents:', filteredEvents);
+    // logger.info('filteredEvents:', filteredEvents);
     setMapEventsFiltered(filteredEvents);
-  }, [findEventSelectedDate, findEventStartTime, findEventEndTime, map_events_full_day, eventTypesSelected, setMapEventsFiltered, logger]);
+  }, [
+    findEventSelectedDate,
+    findEventStartTime,
+    findEventEndTime,
+    map_events_full_day,
+    eventTypesSelected,
+    setMapEventsFiltered,
+    // logger
+  ]);
 };
 
 export const useSetUserLocation = (setMapCenter) => {
