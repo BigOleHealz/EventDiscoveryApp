@@ -126,6 +126,7 @@ export const Map = ({
       </LoadScript>
     
       <ButtonComponent
+        id="button-logout"
         title="Logout"
         onPress={() => logoutUser()}
         style={map_styles.logoutButtonStyle}
