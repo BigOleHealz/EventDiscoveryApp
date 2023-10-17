@@ -33,13 +33,9 @@ export function AppHandler() {
     else {
       const newLogger = new Logger({ logGroupName: 'ui/app_handler', logStreamName: `no_user_session/${formatLogStreamNameDate()}` });
       setLogger(newLogger);
-      if (redirectRoute) {
-        navigate(redirectRoute);
-      } else {
-        navigate('/login');
-      }
+      navigate('/login');
     }
-  }, [userSession, redirectRoute]);
+  }, [userSession]);
 
   return (
     <>

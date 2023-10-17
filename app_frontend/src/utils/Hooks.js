@@ -47,7 +47,7 @@ export const useFetchUsername = (fetching_username_is_taken, username, setFetchi
   }, [fetching_username_is_taken]);
 };
 
-export const useCreateUserProfile = (email, create_user_profile_context, setCreateUserProfileContext, setEmail, navigate) => {
+export const useCreateUserProfile = (email, create_user_profile_context, setCreateUserProfileContext, setEmail, navigate, logger) => {
   useEffect(() => {
     if (email) {
       fetch('/api/get_user_profile', {
@@ -214,6 +214,7 @@ export const useFetchEventTypes = (first_run, setFirstRun, setEventTypes, eventT
     }
   }, [first_run]);
 };
+
 export const useFetchGoogleMapsApiKey = (fetching_google_maps_api_key, setGoogleMapsApiKey, setFetchingGoogleMapsApiKey, setFetchingEvents) => {
   useEffect(() => {
     if (fetching_google_maps_api_key) {
@@ -300,7 +301,7 @@ export const useSetUserProfile = (email, setCreateUserProfileContext, setUserSes
           toast.error('An error occurred while fetching user profile!');
         });
     }
-  }, [email, setCreateUserProfileContext, setUserSession, first_name, last_name, logger, navigate]);
+  }, [email, setCreateUserProfileContext, setUserSession, first_name, last_name, logger]);
 };
 
 export const useBypassLoginIfInDebugMode = (setEmail, setFirstName, setLastName) => {
@@ -315,14 +316,17 @@ export const useBypassLoginIfInDebugMode = (setEmail, setFirstName, setLastName)
   }, []);
 };
 
-export const useInitializeGoogleLoginButton = (googleClientId, handleCallbackResponse) => {
+export const useInitializeGoogleLoginButton = (googleClientId, handleCallbackResponse, firstLoginRenderRef) => {
   useEffect(() => {
     if (googleClientId) {
-    /* global google */
-      google.accounts.id.initialize({
-        client_id: googleClientId,
-        callback: handleCallbackResponse
-      });
+      /* global google */
+      if (firstLoginRenderRef.current) {  // Use .current to access the ref's value
+        google.accounts.id.initialize({
+          client_id: googleClientId,
+          callback: handleCallbackResponse
+        });
+        firstLoginRenderRef.current = false;  // Update the ref's value
+      }
       google.accounts.id.renderButton(
         document.getElementById("signInDiv"),
         { theme: "outline", size: "large" }
@@ -350,7 +354,7 @@ export const useFilterEvents = (findEventSelectedDate, findEventStartTime, findE
     });
     logger.info('filteredEvents:', filteredEvents);
     setMapEventsFiltered(filteredEvents);
-  }, [findEventSelectedDate, findEventStartTime, findEventEndTime, map_events_full_day, eventTypesSelected, setMapEventsFiltered]);
+  }, [findEventSelectedDate, findEventStartTime, findEventEndTime, map_events_full_day, eventTypesSelected, setMapEventsFiltered, logger]);
 };
 
 export const useSetUserLocation = (setMapCenter) => {

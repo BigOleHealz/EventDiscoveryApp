@@ -20,13 +20,15 @@ export const getUserSession = () => {
     return null;
   }
 };
-
-// Remove user session data (for logout)
-export const removeUserSession = (setUserSession) => {
-  try {
-    localStorage.removeItem('userSession');
-    setUserSession(null);
-  } catch (error) {
-    console.error('Error removing user session:', error);
+// SessionManager.js
+export const removeUserSession = () => {
+  return () => {
+    try {
+      localStorage.removeItem('userSession');
+      console.log('User session removed');
+    } catch (error) {
+      console.error('Error removing user session:', error);
+    }
   }
 };
+

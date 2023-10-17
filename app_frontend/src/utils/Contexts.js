@@ -1,9 +1,6 @@
 import React, { useState } from 'react';
 
-export const UserSessionContext = React.createContext({
-  userSession: null,
-  setUserSession: () => { }
-});
+export const UserSessionContext = React.createContext();
 
 export const CreateEventContext = React.createContext();
 

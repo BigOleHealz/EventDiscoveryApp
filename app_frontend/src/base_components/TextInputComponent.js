@@ -3,29 +3,27 @@ import React from 'react';
 import TextField from '@mui/material/TextField';
 
 import { text_input_styles } from '../styles';
-// import '../css/TextInputComponentOverrides.css'
 
 export const TextInputComponent = ({ label, id, required=false, style, value, onChangeText, ...props }) => {
- 
-  
+
+  // Merge default styles with any additional styles passed as a parameter
+  const mergedStyles = { ...text_input_styles.container, ...style };
   return (
-    <div
-      // style={{ ...style, position: 'relative', padding: '16px'}}
-    >
-      <div style={text_input_styles.container}>
-        <TextField
-          required={required}
-          id={id}
-          data-testid={id}
-          label={label}
-          value={value}
-          onChange={onChangeText}
-          inputProps={{ style: text_input_styles.input }}
-          InputLabelProps={{
-            style: text_input_styles.inputLabel
-          }}
-        />
-      </div>
+    <div style={mergedStyles} id="text-input-container">
+      <TextField
+        required={required}
+        id={id}
+        data-testid={id}
+        label={label}
+        value={value}
+        onChange={onChangeText}
+        inputProps={{ style: text_input_styles.input }}
+        InputLabelProps={{
+          style: text_input_styles.inputLabel
+        }}
+        props={props}
+      />
     </div>
   );
 };
+
