@@ -25,10 +25,10 @@ export const Map = ({
   findEventEndTime,
   eventTypesSelected
 }) => {
-  const { logger, setLogger } = React.useContext(LoggerContext);
+  // const { logger, setLogger } = React.useContext(LoggerContext);
 
   // Start logging
-  logger.info("Map component is initializing...");
+  // logger.info("Map component is initializing...");
 
   // Handle Map Events
   const [mapCenter, setMapCenter] = useState(defaultCenter);
@@ -42,7 +42,14 @@ export const Map = ({
 
   useSetUserLocation(setMapCenter);
   useFetchEvents(fetching_events, start_timestamp, end_timestamp, setMapEventsFullDay, setFetchingEvents);
-  useFilterEvents(findEventSelectedDate, findEventStartTime, findEventEndTime, map_events_full_day, eventTypesSelected, setMapEventsFiltered, logger);
+  useFilterEvents(findEventSelectedDate,
+    findEventStartTime,
+    findEventEndTime,
+    map_events_full_day,
+    eventTypesSelected,
+    setMapEventsFiltered,
+    // logger
+    );
   
   const onLoad = (map) => {
     mapRef.current = map;

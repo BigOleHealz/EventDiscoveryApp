@@ -18,7 +18,7 @@ const MapMarkerWithTooltip = ({
   clusterer
 }) => {
   const [showTooltip, setShowTooltip] = useState(false);
-  const { logger, setLogger } = React.useContext(LoggerContext);
+  // const { logger, setLogger } = React.useContext(LoggerContext);
   const icon = iconSvgObject(event.PinColor);
 
   const position = { lat: event.Lat, lng: event.Lon };
