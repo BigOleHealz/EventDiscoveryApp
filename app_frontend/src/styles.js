@@ -74,13 +74,19 @@ export const login_page_styles = {
     justifyContent: 'center',
     alignItems: 'center',
   },
-  container: {
+  verticalContainer: {
     ...common_styles.appTheme,
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
     height: '100vh',
+  },
+  horizontalContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   title: {
     ...common_styles.h1,
@@ -194,7 +200,39 @@ export const calendar_styles = {
   }
 };
 
+const select_event_location_styles = {
+  position: 'absolute',
+  left: '50%',
+  transform: 'translateX(-50%)',
+  width: '20%',
+  height: '50px',
+  borderRadius: '8px',
+  display: 'flex'
+};
+
+
 export const create_event_location_selector_styles = {
+  container: {
+    display: 'flex',
+    flexDirection: 'row',  // make sure the flex direction is column
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: `${display_container_top}vh`
+  },
+  input_location_text_component_styles: {
+    position: 'relative',
+    left: '50%',
+    transform: 'translateX(-50%)',
+    width: '20%',
+    height: '50px',
+    borderRadius: '8px',
+    backgroundColor: defaultBackgroundColor,
+    color: defaultFontColor,
+    margin: '10px auto',
+    padding: '10px auto',
+    // ...select_event_location_styles,
+    top: '20px'
+  },
   pinStyle: {
     position: 'absolute',
     top: '50%',
@@ -203,15 +241,9 @@ export const create_event_location_selector_styles = {
   },
   submitCoordinatesButtonStyle: {
     ...button_styles.menu_button_styles,
-    position: 'absolute',
+    ...select_event_location_styles,
+    color: defaultFontColor,
     bottom: '20px',
-    left: '50%',
-    transform: 'translateX(-50%)',
-    width: '20%',
-    height: '50px',
-    borderRadius: '8px',
-    display: 'flex',
-    color: defaultFontColor
   }
 };
 
@@ -345,8 +377,12 @@ export const text_input_styles = {
     borderRadius: 8,
     paddingHorizontal: 20,
     paddingVertical: 10,
-    padding: 0,
-    margin: 10
+    padding: '16px auto',
+    margin: '10px auto',
+    position: 'relative',
+    display: 'flex',
+    justifyContent: 'center',
+
   },
   input: {
     fontSize: 16,

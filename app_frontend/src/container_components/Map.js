@@ -3,7 +3,6 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { GoogleMap, LoadScript, MarkerClusterer } from '@react-google-maps/api';
 
-import { ButtonComponent } from '../base_components/ButtonComponent'; // Assuming you also have a web version of this
 import MapMarkerWithTooltip from './MapMarkerWithTooltip';
 
 import { LoggerContext, UserSessionContext } from '../utils/Contexts';
@@ -11,13 +10,14 @@ import { day_start_time, day_end_time, defaultCenter } from '../utils/constants'
 import { convertUTCDateToLocalDate } from '../utils/HelperFunctions';
 import { setUserLocation, useFetchEvents, useFetchGoogleMapsApiKey, useFilterEvents, useSetUserLocation } from '../utils/Hooks';
 
-import { removeUserSession } from '../utils/SessionManager';
 
 import { map_styles } from '../styles';
 
 export const Map = ({
   mapRef,
   googleMapsApiKey,
+  userSession,
+  setUserSession,
   fetching_events,
   setFetchingEvents,
   findEventSelectedDate,
@@ -25,7 +25,6 @@ export const Map = ({
   findEventEndTime,
   eventTypesSelected
 }) => {
-  const { userSession, setUserSession } = React.useContext(UserSessionContext);
   const { logger, setLogger } = React.useContext(LoggerContext);
 
   // Start logging
@@ -63,14 +62,10 @@ export const Map = ({
     setFetchingEvents(true);
   }, [findEventSelectedDate]);
 
-  const logoutUser = () => {
-    logger.info("User logging out...");
-    removeUserSession(setUserSession);
-  };
 
 
   if (!googleMapsApiKey) {
-    logger.warning("Google Maps API key not found, rendering loading screen...");
+    // logger.warning("Google Maps API key not found, rendering loading screen...");
     return (
       <div>
         <p>Loading...</p>
@@ -125,12 +120,6 @@ export const Map = ({
         </GoogleMap>
       </LoadScript>
     
-      <ButtonComponent
-        id="button-logout"
-        title="Logout"
-        onPress={() => logoutUser()}
-        style={map_styles.logoutButtonStyle}
-      />
 
       <ToastContainer />
     </>

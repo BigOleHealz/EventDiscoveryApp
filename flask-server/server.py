@@ -1,7 +1,9 @@
 #! /usr/bin/python3
-import json, traceback
+import json, traceback, logging
 from datetime import datetime
 from uuid import uuid4
+
+import requests
 import boto3
 
 from flask import Flask, request, jsonify
@@ -99,6 +101,33 @@ def create_server():
                 return jsonify([]), 200
 
             return jsonify(result[0])
+
+        except Exception as e:
+            return jsonify({"message": "An error occurred: " + str(e)}), 500
+    
+    @app.route("/get_google_profile", methods=["POST"])
+    def get_google_profile():
+        try:
+            body = request.get_json()
+            print(body)
+            if not body:
+                return jsonify({"message": "No input body provided"}), 400
+            access_token = body.get('access_token')
+
+            if not access_token:
+                return jsonify({"message": "Missing access_token"}), 400
+            
+            url = f"https://www.googleapis.com/oauth2/v1/userinfo?access_token={access_token}"
+            headers = {
+                "Authorization": f"Bearer {access_token}",
+                "Accept": "application/json",
+                "Content-Type": "application/json"
+            }
+
+            response = requests.get(url, headers=headers)
+            response.raise_for_status()  # This will raise an HTTPError if the HTTP request returned an unsuccessful status code
+            profile = response.json()
+            return profile, 200
 
         except Exception as e:
             return jsonify({"message": "An error occurred: " + str(e)}), 500

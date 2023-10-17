@@ -1,8 +1,10 @@
 // HomePage.js
 
 import React, { useState, useEffect, useRef } from 'react';
+import { Route, Routes, useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 
+import { ButtonComponent } from '../base_components/ButtonComponent'; // Assuming you also have a web version of this
 import { CreateEventLocationSelector } from '../composite_components/CreateEventLocationSelector';
 import { LeftSidePanel } from '../container_components/LeftSidePanel';
 import { Map } from '../container_components/Map';
@@ -13,11 +15,14 @@ import { day_start_time, day_end_time, day_format, iconSvgDataUrl } from '../uti
 import { LoggerContext, UserSessionContext, CreateEventContext } from '../utils/Contexts';
 import { getAddressFromCoordinates } from '../utils/HelperFunctions';
 import { useCreateEventNode, useFetchGoogleMapsApiKey } from '../utils/Hooks';
-import { common_styles, map_styles }  from '../styles';
+import { removeUserSession } from '../utils/SessionManager';
+import { common_styles, map_styles } from '../styles';
 
 export function HomePage() {
   const mapRef = useRef();
+  const navigate = useNavigate();
   const { create_event_context, setCreateEventContext } = React.useContext(CreateEventContext);
+  const { logger, setLogger } = React.useContext(LoggerContext);
   const { userSession, setUserSession } = React.useContext(UserSessionContext);
   const [event_types_selected, setEventTypesSelected] = useState(userSession ? userSession.Interests : []);
   const [is_creating_event_node, setIsCreatingEventNode] = useState(false);
@@ -26,6 +31,9 @@ export function HomePage() {
   const [fetching_google_maps_api_key, setFetchingGoogleMapsApiKey] = useState(true);
   const [fetching_events, setFetchingEvents] = useState(false);
 
+  const removeSession = removeUserSession();
+
+  logger.info("HomePage component is initializing...");
 
   useCreateEventNode(is_creating_event_node, create_event_context, setIsCreatingEventNode);
   useFetchGoogleMapsApiKey(fetching_google_maps_api_key, setGoogleMapsApiKey, setFetchingGoogleMapsApiKey, setFetchingEvents);
@@ -36,9 +44,13 @@ export function HomePage() {
   const [isEventInvitesPanelVisible, setIsEventInvitesPanelVisible] = useState(false);
   const [isFriendRequestsPanelVisible, setIsFriendRequestsPanelVisible] = useState(false);
 
-  if (!userSession) {
-    return null;
-  }
+  useEffect(() => {
+    if (!userSession) {
+      navigate('/login');
+      console.log('userSession is null');
+    }
+  }, [userSession, navigate]);
+
 
   const exitCreateEventMode = () => {
     setCreateEventContext({});
@@ -63,8 +75,8 @@ export function HomePage() {
   const [findEventSelectedDate, setFindEventSelectedDate] = useState(format(currentDateTime, day_format));
 
   const handleFindEventsButtonClick = () => {
-    resetAllStates();
-    setIsLeftPanelVisible(true);
+    // resetAllStates();
+    setIsLeftPanelVisible(!isLeftPanelVisible);
   };
 
   const handleCreateEventButtonClick = () => {
@@ -109,6 +121,7 @@ export function HomePage() {
     setIsCreatingEventNode(true);
   };
 
+
   return (
     <>
       <div style={common_styles.container}>
@@ -121,6 +134,8 @@ export function HomePage() {
         <Map
           mapRef={mapRef}
           googleMapsApiKey={googleMapsApiKey}
+          userSession={userSession}
+          setUserSession={setUserSession}
           fetching_events={fetching_events}
           setFetchingEvents={setFetchingEvents}
           findEventSelectedDate={findEventSelectedDate}
@@ -128,6 +143,17 @@ export function HomePage() {
           findEventEndTime={findEventEndTime}
           eventTypesSelected={event_types_selected}
         />
+
+        <ButtonComponent
+          id="button-logout"
+          title="Logout"
+          onPress={() => {
+            removeSession();
+            setUserSession(null);  // Now you're calling setUserSession directly in the component
+          }}
+          style={map_styles.logoutButtonStyle}
+        />
+
         <LeftSidePanel
           isVisible={isLeftPanelVisible}
           findEventSelectedDate={findEventSelectedDate}

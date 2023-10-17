@@ -8,7 +8,7 @@ export const ButtonComponent = ({
   onPress,
   style,
   icon,
-  isMenuButton,
+  isMenuButton=false,
 }) => {
   const thisButtonStyle = isMenuButton
     ? button_styles.menu_button_styles
