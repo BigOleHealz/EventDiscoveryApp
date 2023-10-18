@@ -1,6 +1,5 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import './css/bootstrap.min.css';
 
 import { GoogleOAuthProvider } from '@react-oauth/google';
 

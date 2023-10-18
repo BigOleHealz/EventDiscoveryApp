@@ -1,5 +1,4 @@
 import { useEffect } from 'react';
-import { GoogleLogin } from 'react-google-login';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { v4 as uuidv4 } from 'uuid';
