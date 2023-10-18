@@ -212,17 +212,25 @@ const select_event_location_styles = {
 
 
 export const create_event_location_selector_styles = {
-  container: {
+  verticalContainer: {
     display: 'flex',
-    flexDirection: 'row',  // make sure the flex direction is column
+    flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    height: `${display_container_top}vh`
+    height: '100vh',
+    padding: `${defaultPadding}px`,
+    // height: `${display_container_top}vh`
+  },
+  horizontalContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   input_location_text_component_styles: {
     position: 'relative',
-    left: '50%',
-    transform: 'translateX(-50%)',
+    // left: '50%',
+    // transform: 'translateX(-50%)',
     width: '20%',
     height: '50px',
     borderRadius: '8px',
@@ -377,8 +385,8 @@ export const text_input_styles = {
     borderRadius: 8,
     paddingHorizontal: 20,
     paddingVertical: 10,
-    padding: '16px auto',
-    margin: '10px auto',
+    // padding: '16px auto',
+    // margin: '10px auto',
     position: 'relative',
     display: 'flex',
     justifyContent: 'center',
