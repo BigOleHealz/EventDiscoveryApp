@@ -1,9 +1,11 @@
 import React from 'react';
-import { text_component_styles } from '../styles';
 
-export const TextComponent = ({ children, style, align = 'center' }) => {
+export const TextComponent = ({ children, className = '', align = 'center' }) => {
+  // Combine Tailwind CSS classes with any custom classes passed via the 'className' prop
+  const combinedClassName = `text-component ${className}`;
+
   return (
-    <div style={{ textAlign: align, ...text_component_styles.view, ...style }}>
+    <div className={`text-${align} ${combinedClassName}`}>
       {children}
     </div>
   );

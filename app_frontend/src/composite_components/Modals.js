@@ -6,8 +6,8 @@ import { CalendarComponent } from '../base_components/CalendarComponent';
 import { ModalComponent } from '../base_components/ModalComponent';
 import { TextInputComponent } from '../base_components/TextInputComponent';
 import { TimeRangeSliderComponent } from '../base_components/TimeRangeSliderComponent';
-import { SelectInterestsScrollView } from '../composite_components/SelectInterestsScrollview';
-import { SwitchComponent } from '../composite_components/SwitchComponent';
+import { SelectInterestsScrollView } from './SelectInterestsScrollview';
+import { SwitchComponent } from './SwitchComponent';
 
 import { day_start_time, day_end_time, day_format } from '../utils/constants';
 import { CreateEventContext, CreateUserProfileContext, UserSessionContext } from '../utils/Contexts';

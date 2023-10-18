@@ -9,8 +9,7 @@ export const TextInputComponent = ({ label, id, required=false, style, value, on
   // Merge default styles with any additional styles passed as a parameter
   const mergedStyles = { ...text_input_styles.container, ...style };
   return (
-    <div style={mergedStyles} id="text-input-container">
-    {/* // <div> */}
+    <div style={mergedStyles}>
       <TextField
         required={required}
         id={id}

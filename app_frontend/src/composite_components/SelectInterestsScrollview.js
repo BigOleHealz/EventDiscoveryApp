@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import Checkbox from '@mui/material/Checkbox';
 import Switch from '@mui/material/Switch';
-import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import { toast } from 'react-toastify';
 
+import BoxComponent from '../base_components/BoxComponent';
 import { TextComponent } from '../base_components/TextComponent'; // Assuming you also have a web version of this
 import { useFetchEventTypes } from '../utils/Hooks';
 
@@ -70,7 +69,7 @@ export const SelectInterestsScrollView = ({
 
   const EventTypeChecklistItem = ({ name, isChecked, onValueChange, color }) => {
     return (
-      <Box style={select_interests_scrollview_styles.itemContainer}>
+      <BoxComponent style={select_interests_scrollview_styles.itemContainer}>
         <Checkbox 
           checked={isChecked}
           onChange={onValueChange}
@@ -79,14 +78,14 @@ export const SelectInterestsScrollView = ({
         <Typography style={select_interests_scrollview_styles.itemText}>
           {name}
         </Typography>
-      </Box>
+      </BoxComponent>
     );
   };
 
   return (
-    <Box style={select_interests_scrollview_styles.parentContainer}>
+    <BoxComponent style={select_interests_scrollview_styles.parentContainer}>
       { !singleSelect &&
-        <Box style={select_interests_scrollview_styles.switchContainer}>
+        <BoxComponent style={select_interests_scrollview_styles.switchContainer}>
           <Switch
             value={select_all_switch_toggled_flag}
             onChange={(e) => handleSelectAllSwitchToggledFlagChange(e.target.checked)}
@@ -94,9 +93,9 @@ export const SelectInterestsScrollView = ({
           <TextComponent style={select_interests_scrollview_styles.switchLabel}>
             Toggle All Event Types
           </TextComponent>
-        </Box>
+        </BoxComponent>
       }
-      <Box style={select_interests_scrollview_styles.scrollView}> 
+      <BoxComponent style={select_interests_scrollview_styles.scrollView}> 
         {event_types.map((eventType, index) => (
           <EventTypeChecklistItem
             key={eventType.UUID}
@@ -106,8 +105,7 @@ export const SelectInterestsScrollView = ({
             onValueChange={() => handleValueChange(index, !eventType.isChecked)}
           />
         ))}
-      </Box>
-    </Box>
-  
+      </BoxComponent>
+    </BoxComponent>
   );
 }

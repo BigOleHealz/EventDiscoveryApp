@@ -1,43 +1,38 @@
-import React, { useRef, useEffect } from 'react';
-import { common_styles } from '../styles';
 
-export const PanelComponent = ({ isVisible, position, title, type, children, style }) => {
-	const slideAnim = useRef(0);
+import * as React from 'react';
+import Box from '@mui/material/Box';
+import SwipeableDrawer from '@mui/material/SwipeableDrawer';
+import CssBaseline from '@mui/material/CssBaseline';
+import Button from '@mui/material/Button';
+import List from '@mui/material/List';
+import Divider from '@mui/material/Divider';
+import ListItem from '@mui/material/ListItem';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import InboxIcon from '@mui/icons-material/MoveToInbox';
+import MailIcon from '@mui/icons-material/Mail';
 
-	useEffect(() => {
-		// You might consider using a library like 'react-spring' or 'framer-motion' for smoother animations
-		slideAnim.current = isVisible ? 1 : 0;
-	}, [isVisible]);
+export default function PanelComponent({ children, anchor, isVisible, ...props }) {
+  const [state, setState] = React.useState({
+    [anchor]: isVisible,
+  });
 
-	// Calculating position for the panel
-	const panelPosition = type === 'top'
-		? { top: `${slideAnim.current * position}px` }
-		: { left: `${slideAnim.current * position}px` };
+  React.useEffect(() => {
+    setState({ ...state, [anchor]: isVisible });
+  }, [isVisible]);
 
-	return isVisible ? (
-		<div style={{ ...panelPosition, ...panel_styles.panelsContainer, ...style }}>
-			<div style={panel_styles.panelsContainer}>
-				{title && (<h2 style={panel_styles.panelTitleStyle}>{title}</h2>)}
-				{children}
-			</div>
-		</div>
-	) : null;
-};
-
-const panel_styles = {
-	panelsContainer: {
-		backgroundColor: common_styles.appTheme.backgroundColor,
-		display: 'flex',
-		flexDirection: 'column',
-		justifyContent: 'flex-start',
-		alignItems: 'stretch',
-		width: '100%',
-	},
-	panelTitleStyle: {
-		fontSize: '24px',
-		fontWeight: 'bold',
-		textAlign: 'center',
-		marginBottom: '10px',
-		color: common_styles.appTheme.color
-	},
-};
+  return (
+    <Box sx={{ display: 'flex' }}>
+      <CssBaseline />
+      <SwipeableDrawer
+        anchor={anchor}
+        open={state[anchor]}
+        onClose={() => setState({ ...state, [anchor]: false })}
+        onOpen={() => setState({ ...state, [anchor]: true })}
+      >
+        {children}
+      </SwipeableDrawer>
+    </Box>
+  );
+}
