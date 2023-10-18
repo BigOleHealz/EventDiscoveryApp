@@ -1,5 +1,4 @@
 import { useEffect } from 'react';
-import { GoogleLogin } from 'react-google-login';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { v4 as uuidv4 } from 'uuid';
@@ -350,17 +349,17 @@ export const useInitializeGoogleLoginButton = (googleClientId, handleCallbackRes
 }
 
 export const useFilterEvents = (
-  findEventSelectedDate,
-  findEventStartTime,
-  findEventEndTime,
+  find_event_selected_date,
+  find_event_start_time,
+  find_event_end_time,
   map_events_full_day,
-  eventTypesSelected,
+  event_types_selected,
   setMapEventsFiltered,
   // logger
 ) => {
   useEffect(() => {
-    const start_time_raw_string = `${findEventSelectedDate}T${findEventStartTime}`;
-    const end_time_raw_string = `${findEventSelectedDate}T${findEventEndTime}`;
+    const start_time_raw_string = `${find_event_selected_date}T${find_event_start_time}`;
+    const end_time_raw_string = `${find_event_selected_date}T${find_event_end_time}`;
     // logger.info(`Datetime changed - startTime: ${start_time_raw_string} endTime: ${end_time_raw_string}`);
     
     const startTime = new Date(start_time_raw_string);
@@ -371,17 +370,17 @@ export const useFilterEvents = (
       return (
         eventTimestamp >= startTime &&
         eventTimestamp <= endTime &&
-        eventTypesSelected.includes(event.EventTypeUUID)
+        event_types_selected.includes(event.EventTypeUUID)
       );
     });
     // logger.info('filteredEvents:', filteredEvents);
     setMapEventsFiltered(filteredEvents);
   }, [
-    findEventSelectedDate,
-    findEventStartTime,
-    findEventEndTime,
+    find_event_selected_date,
+    find_event_start_time,
+    find_event_end_time,
     map_events_full_day,
-    eventTypesSelected,
+    event_types_selected,
     setMapEventsFiltered,
     // logger
   ]);

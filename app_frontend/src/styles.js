@@ -2,7 +2,7 @@
 const windowWidth = window.innerWidth;
 
 const defaultBackgroundColor = '#333333';
-const defaultFontColor = '#ffffff';
+const defaultFontColor = '#dddddd';
 const defaultPadding = 10;
 const defaultMargin = 10;
 const defaultBorderRadius = 8;
@@ -17,10 +17,14 @@ export const common_styles = {
     color: defaultFontColor,
     padding: `${defaultPadding}px`,
   },
+  basicComponent: {
+    backgroundColor: defaultBackgroundColor,
+    color: defaultFontColor,
+    padding: { xs: 0, sm: "5px", md: "10px"}
+  },
   container: {
     display: 'flex',
     flex: '1',
-    // padding: `${defaultPadding}px`,
     padding: '0',
     backgroundColor: defaultBackgroundColor,
   },
@@ -180,25 +184,6 @@ export const button_styles = {
   },
 };
 
-export const calendar_styles = {
-  view: {
-    boxSizing: 'border-box',
-    padding: '10px',
-    overflowX: 'hidden', // Prevent horizontal overflow
-  },
-
-  theme: {
-    backgroundColor: '#222222',
-    calendarBackground: '#222222',
-    textSectionTitleColor: '#b6c1cd',
-    selectedDayBackgroundColor: '#00adf5',
-    selectedDayTextColor: '#ffffff',
-    todayTextColor: '#00adf5',
-    dayTextColor: '#ddd',
-    textDisabledColor: '#888',
-    monthTextColor: '#ddd'
-  }
-};
 
 const select_event_location_styles = {
   position: 'absolute',
@@ -322,7 +307,6 @@ export const modal_component_styles = {
 
 export const select_interests_scrollview_styles = {
   parentContainer: {
-    paddingTop: '20px',
     display: 'flex',
     flexDirection: 'column', // Make sure children are stacked vertically
     flex: 1,
@@ -341,6 +325,7 @@ export const select_interests_scrollview_styles = {
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
+    padding: 0,
     // marginTop: '10px',
     // marginBottom: '10px',
   },
@@ -350,7 +335,8 @@ export const select_interests_scrollview_styles = {
     color: common_styles.appTheme.color,
   },
   scrollView: {
-    margin: '20px',
+    marginLeft: "15px",
+    marginRight: "15px",
     boxShadow: '10px 10px 10px 0px rgba(0, 0, 0, 0.5)',
   },
 };
@@ -411,73 +397,15 @@ export const text_input_styles = {
 };
 
 export const time_range_slider_styles = {
-  view: {
-    padding: '20px',
+  container: {
+    marginLeft: { xs: "10px", sm: "15px", md: "20px"},
+    marginRight: { xs: "10px", sm: "15px", md: "20px"}
   },
-  text: {
-    color: common_styles.appTheme.color
-  },
-  timeSliderView: {
-    padding: '0px',
+  text_labels: {
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
-  container_style: {
-    paddingTop: '0px',
-    paddingBottom: '0px',
-    height: 'auto'
-  },
-  handle_label_style: {
-    backgroundColor: 'transparent',
-    color: '#000'
-  },
-  label_style: {
-    fontSize: '16px',
-    color: '#000'
-  }
-};
-
-export const toolbar_styles = {
-  toolbar: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    height: `${toolbar_height}vh`,
-    width: '100%',
-  },
-  toolbarComponent: {
-    ...button_styles.standardButton,
-    padding: '20px auto',
-  },
-  toolbarButtonLeft: {
-   ...button_styles.standardButton,
-   padding: '20px auto',
-
-  },
-  toolbarButtonRight: {
-    ...button_styles.standardButton,
-    padding: '20px auto',
-  },
-  centerView: {
-    flex: '1',
-    display: 'flex',
-    alignItems: 'center',
-  },
-  centeredButtonsContainer: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'center',
-  },
-  centerButton: {
-    paddingLeft: '10px',
-    paddingRight: '10px',
-  },
-  icon: {
-    height: '35px',
-    width: '35px'
-  }
 };
 
 export const tooltip_styles = {
