@@ -27,7 +27,8 @@ export function HomePage() {
   const [event_types_selected, setEventTypesSelected] = useState(userSession ? userSession.Interests : []);
   // const [is_creating_event_node, setIsCreatingEventNode] = useState(false);
 
-  const [googleMapsApiKey, setGoogleMapsApiKey] = useState(null);
+  // const [googleMapsApiKey, setGoogleMapsApiKey] = useState(null);
+  const googleMapsApiKey = '';
   const [fetching_google_maps_api_key, setFetchingGoogleMapsApiKey] = useState(true);
   const [fetching_events, setFetchingEvents] = useState(false);
 
@@ -36,7 +37,7 @@ export function HomePage() {
   // logger.info("HomePage component is initializing...");
 
   // useCreateEventNode(is_creating_event_node, create_event_context, setIsCreatingEventNode);
-  useFetchGoogleMapsApiKey(fetching_google_maps_api_key, setGoogleMapsApiKey, setFetchingGoogleMapsApiKey, setFetchingEvents);
+  // useFetchGoogleMapsApiKey(fetching_google_maps_api_key, setGoogleMapsApiKey, setFetchingGoogleMapsApiKey, setFetchingEvents);
 
   // Handle left side panel
   const [isLeftPanelVisible, setIsLeftPanelVisible] = useState(false);
