@@ -4,53 +4,48 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Route, Routes, useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 
-// import { ButtonComponent } from '../base_components/ButtonComponent'; // Assuming you also have a web version of this
-import { CreateEventLocationSelector } from '../composite_components/CreateEventLocationSelector';
-import { LeftSidePanel } from '../container_components/LeftSidePanel';
-import { Map } from '../container_components/Map';
-import { CreateEventDatetimeModal, CreateEventSelectEventTypeModal, CreateEventDetailsModal } from '../container_components/Modals';
-import { Toolbar } from '../container_components/Toolbar';
+import Layout from '../container_components/Layout';
 
 import { day_start_time, day_end_time, day_format, iconSvgDataUrl } from '../utils/constants';
 import { LoggerContext, UserSessionContext, CreateEventContext } from '../utils/Contexts';
-import { getAddressFromCoordinates } from '../utils/HelperFunctions';
-import { useCreateEventNode, useFetchGoogleMapsApiKey } from '../utils/Hooks';
-import { removeUserSession } from '../utils/SessionManager';
-import { common_styles, map_styles } from '../styles';
+import { convertUTCDateToLocalDate, getAddressFromCoordinates } from '../utils/HelperFunctions';
+import { useCreateEventNode, useFetchEvents, useFetchGoogleMapsApiKey, useFilterEvents } from '../utils/Hooks';
 
 export function HomePage() {
   const mapRef = useRef();
-  const navigate = useNavigate();
   const { create_event_context, setCreateEventContext } = React.useContext(CreateEventContext);
   // const { logger, setLogger } = React.useContext(LoggerContext);
   const { userSession, setUserSession } = React.useContext(UserSessionContext);
   const [event_types_selected, setEventTypesSelected] = useState(userSession ? userSession.Interests : []);
+  const [fetching_events, setFetchingEvents] = useState(false);
+  const [map_events_full_day, setMapEventsFullDay] = useState([]);
+  const [map_events_filtered, setMapEventsFiltered] = useState([]);
   // const [is_creating_event_node, setIsCreatingEventNode] = useState(false);
 
-  // const [googleMapsApiKey, setGoogleMapsApiKey] = useState(null);
-  const googleMapsApiKey = '';
+  const [googleMapsApiKey, setGoogleMapsApiKey] = useState(null);
   const [fetching_google_maps_api_key, setFetchingGoogleMapsApiKey] = useState(true);
-  const [fetching_events, setFetchingEvents] = useState(false);
 
-  // const removeSession = removeUserSession();
+  const currentDateTime = new Date();
+  const [find_event_start_time, setFindEventStartTime] = useState(day_start_time);
+  const [find_event_end_time, setFindEventEndTime] = useState(day_end_time);
+  const [find_event_selected_date, setFindEventSelectedDate] = useState(format(currentDateTime, day_format));
+  const start_timestamp = convertUTCDateToLocalDate(new Date(`${find_event_selected_date}T${day_start_time}`));
+  const end_timestamp = convertUTCDateToLocalDate(new Date(`${find_event_selected_date}T${day_end_time}`));
 
-  // logger.info("HomePage component is initializing...");
+  useEffect(() => {
+    setFetchingEvents(true);
+  }, [find_event_selected_date]);
 
-  // useCreateEventNode(is_creating_event_node, create_event_context, setIsCreatingEventNode);
-  // useFetchGoogleMapsApiKey(fetching_google_maps_api_key, setGoogleMapsApiKey, setFetchingGoogleMapsApiKey, setFetchingEvents);
+
+  useFetchGoogleMapsApiKey(fetching_google_maps_api_key, setGoogleMapsApiKey, setFetchingGoogleMapsApiKey, setFetchingEvents);
+  useFetchEvents(fetching_events, start_timestamp, end_timestamp, setMapEventsFullDay, setFetchingEvents);
+  useFilterEvents(find_event_selected_date, find_event_start_time, find_event_end_time, map_events_full_day, event_types_selected, setMapEventsFiltered);
 
   // Handle left side panel
   const [isLeftPanelVisible, setIsLeftPanelVisible] = useState(false);
-  const [create_event_stage, setCreateEventStage] = useState(0);
+  const [create_event_stage, setCreateEventStage] = useState(1);
   const [isEventInvitesPanelVisible, setIsEventInvitesPanelVisible] = useState(false);
   const [isFriendRequestsPanelVisible, setIsFriendRequestsPanelVisible] = useState(false);
-
-  // useEffect(() => {
-  //   if (!userSession) {
-  //     navigate('/login');
-  //     console.log('userSession is null');
-  //   }
-  // }, [userSession, navigate]);
 
 
   const exitCreateEventMode = () => {
@@ -70,20 +65,14 @@ export function HomePage() {
     setCreateEventStage(1);
   };
 
-  const currentDateTime = new Date();
-  const [findEventStartTime, setFindEventStartTime] = useState(day_start_time);
-  const [findEventEndTime, setFindEventEndTime] = useState(day_end_time);
-  const [findEventSelectedDate, setFindEventSelectedDate] = useState(format(currentDateTime, day_format));
 
   const handleFindEventsButtonClick = () => {
-    // resetAllStates();
     setIsLeftPanelVisible(!isLeftPanelVisible);
   };
 
   const handleCreateEventButtonClick = () => {
     initializeCreateEventMode();
   };
-
 
 
   const handleGetLocationCoordinates = async () => {
@@ -114,77 +103,38 @@ export function HomePage() {
     exitCreateEventMode();
   };
 
-  // const createEvent = () => {
-  //   setCreateEventContext({
-  //     ...create_event_context,
-  //     CreatedByUUID: userSession.UUID
-  //   });
-  //   setIsCreatingEventNode(true);
-  // };
-
-
   return (
-    <>
-      <div style={common_styles.container}>
-        <Toolbar
-          onLeftButtonClick={handleFindEventsButtonClick}
-          onRightButtonClick={handleCreateEventButtonClick}
-        />
-      </div>
-      <div style={common_styles.fullScreen}>
-        <Map
-          mapRef={mapRef}
-          googleMapsApiKey={googleMapsApiKey}
-          userSession={userSession}
-          setUserSession={setUserSession}
-          fetching_events={fetching_events}
-          setFetchingEvents={setFetchingEvents}
-          findEventSelectedDate={findEventSelectedDate}
-          findEventStartTime={findEventStartTime}
-          findEventEndTime={findEventEndTime}
-          eventTypesSelected={event_types_selected}
-        />
+    <Layout
+      onFindEventsButtonClick={handleFindEventsButtonClick}
+      onCreateEventButtonClick={handleCreateEventButtonClick}
 
-        {/* <ButtonComponent
-          id="button-logout"
-          title="Logout"
-          onPress={() => {
-            removeSession();
-            setUserSession(null);  // Now you're calling setUserSession directly in the component
-          }}
-          style={map_styles.logoutButtonStyle}
-        /> */}
+      // LeftSidePanel props
+      isLeftPanelVisible={isLeftPanelVisible}
+      setIsLeftPanelVisible={setIsLeftPanelVisible}
+      find_event_selected_date={find_event_selected_date}
+      setFindEventSelectedDate={setFindEventSelectedDate}
+      find_event_start_time={find_event_start_time}
+      setFindEventStartTime={setFindEventStartTime}
+      find_event_end_time={find_event_end_time}
+      setFindEventEndTime={setFindEventEndTime}
+      event_types_selected={event_types_selected}
+      setEventTypesSelected={setEventTypesSelected}
 
-        <LeftSidePanel
-          isVisible={isLeftPanelVisible}
-          findEventSelectedDate={findEventSelectedDate}
-          setFindEventSelectedDate={setFindEventSelectedDate}
-          findEventStartTime={findEventStartTime}
-          setFindEventStartTime={setFindEventStartTime}
-          findEventEndTime={findEventEndTime}
-          setFindEventEndTime={setFindEventEndTime}
-          eventTypesSelected={event_types_selected}
-          setEventTypesSelected={setEventTypesSelected}
-        />
-        { create_event_stage === 1 &&
-          <CreateEventLocationSelector handleGetLocationCoordinates={handleGetLocationCoordinates} />
-        }
-        <CreateEventDatetimeModal
-          isVisible={create_event_stage === 2}
-          onRequestClose={exitCreateEventMode}
-          onSubmitButtonClick={handleCreateEventDateTimeModalSubmitButtonClick}
-        />
-        <CreateEventSelectEventTypeModal
-          isVisible={create_event_stage === 3}
-          onRequestClose={exitCreateEventMode}
-          onSubmitButtonClick={handleCreateEventEventTypeModalSubmitButtonClick}
-        />
-        <CreateEventDetailsModal
-          isVisible={create_event_stage === 4}
-          onRequestClose={exitCreateEventMode}
-          onSubmitButtonClick={handleCreateEventDetailsModalSubmitButtonClick}
-        />
-      </div>
-    </>
+      // Map props
+      mapRef={mapRef}
+      googleMapsApiKey={googleMapsApiKey}
+
+      // CreateEvent props
+      create_event_stage={create_event_stage}
+      setCreateEventStage={setCreateEventStage}
+      handleGetLocationCoordinates={handleGetLocationCoordinates}
+      handleCreateEventDateTimeModalSubmitButtonClick={handleCreateEventDateTimeModalSubmitButtonClick}
+      handleCreateEventEventTypeModalSubmitButtonClick={handleCreateEventEventTypeModalSubmitButtonClick}
+      handleCreateEventDetailsModalSubmitButtonClick={handleCreateEventDetailsModalSubmitButtonClick}
+      exitCreateEventMode={exitCreateEventMode}
+
+    >
+    </Layout>
   );
 }
+

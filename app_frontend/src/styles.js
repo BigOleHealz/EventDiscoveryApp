@@ -12,6 +12,12 @@ const toolbar_height = 6;
 const display_container_top = 100 - toolbar_height;
 
 export const common_styles = {
+  defaultBackgroundColor: defaultBackgroundColor,
+  defaultFontColor: defaultFontColor,
+  defaultPadding: defaultPadding,
+  defaultMargin: defaultMargin,
+  defaultBorderRadius: defaultBorderRadius,
+  brightBlueColor: brightBlueColor,
   appTheme: {
     backgroundColor: defaultBackgroundColor,
     color: defaultFontColor,
@@ -367,7 +373,6 @@ export const text_component_styles = {
 export const text_input_styles = {
   container: {
     width: '100%',
-    borderWidth: 1,
     borderRadius: 8,
     paddingHorizontal: 20,
     paddingVertical: 10,
@@ -384,7 +389,6 @@ export const text_input_styles = {
     // height: 40,
     color: common_styles.appTheme.color,
     borderColor: common_styles.appTheme.color, // Set border color to transparent to avoid overlapping
-    outlineWidth: 1, // Remove outline 
   },
   inputLabel: {
     color: common_styles.appTheme.color,
