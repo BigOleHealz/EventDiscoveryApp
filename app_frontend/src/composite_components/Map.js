@@ -17,7 +17,7 @@ import { map_styles } from '../styles';
 export default function Map({
   mapRef,
   google_maps_api_key,
-  mapEventsFiltered,
+  map_events_filtered,
   // ...props
 }) {
   // const { logger, setLogger } = React.useContext(LoggerContext);
@@ -34,6 +34,8 @@ export default function Map({
   const onLoad = (map) => {
     mapRef.current = map;
   };
+
+  // console.log('map_events_filtered = ', map_events_filtered)
 
   const handleSetActivePopup = (uuid) => {
     if (activePopup === uuid) {
@@ -82,7 +84,7 @@ export default function Map({
           > */}
           {
             // (clusterer) => (
-            Array.isArray(mapEventsFiltered) && mapEventsFiltered.map((event) => (
+            Array.isArray(map_events_filtered) && map_events_filtered.map((event) => (
               <MapMarkerWithTooltip
                 key={event.UUID}
                 event={event}
