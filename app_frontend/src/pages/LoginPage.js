@@ -11,7 +11,7 @@ import { login_page_styles } from '../styles';
 
 export function LoginPage() {
 
-  const { userSession, setUserSession } = React.useContext(UserSessionContext);
+  const { user_session, setUserSession } = React.useContext(UserSessionContext);
   const { logger, setLogger } = React.useContext(LoggerContext);
   const { create_user_profile_context, setCreateUserProfileContext } = React.useContext(CreateUserProfileContext);
 

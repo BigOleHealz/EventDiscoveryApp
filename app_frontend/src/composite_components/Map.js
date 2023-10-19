@@ -5,31 +5,19 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { GoogleMap, LoadScript, MarkerClusterer } from '@react-google-maps/api';
 
-// import MapMarkerWithTooltip from './MapMarkerWithTooltip';
+import MapMarkerWithTooltip from './MapMarkerWithTooltip';
 
 import { LoggerContext, UserSessionContext } from '../utils/Contexts';
 import { day_start_time, day_end_time, defaultCenter } from '../utils/constants';
-import { setUserLocation, useFetchEvents, useFetchGoogleMapsApiKey, useFilterEvents, useSetUserLocation } from '../utils/Hooks';
+import { useFetchEvents, useFetchGoogleMapsApiKey, useFilterEvents, useSetUserLocation } from '../utils/Hooks';
 
 
 import { map_styles } from '../styles';
 
-const theme = createTheme({
-  components: {
-    MuiContainer: {
-      styleOverrides: {
-        root: {
-          margin: 0,
-          padding: 0,
-        },
-      },
-    },
-  }
-});
-
 export default function Map({
   mapRef,
-  googleMapsApiKey
+  google_maps_api_key,
+  mapEventsFiltered,
   // ...props
 }) {
   // const { logger, setLogger } = React.useContext(LoggerContext);
@@ -42,9 +30,7 @@ export default function Map({
 
   const [activePopup, setActivePopup] = useState(null);
 
-
   useSetUserLocation(setMapCenter);
-
   const onLoad = (map) => {
     mapRef.current = map;
   };
@@ -57,7 +43,7 @@ export default function Map({
     }
   };
 
-  if (!googleMapsApiKey) {
+  if (!google_maps_api_key) {
     return (
       <div>
         <p>Loading...</p>
@@ -66,14 +52,11 @@ export default function Map({
   }
 
   return (
-    // <ThemeProvider theme={theme}>
-
-    // {/* <Container id="map-container"> */}
     <>
       <ToastContainer />
       <LoadScript
         id="script-loader"
-        googleMapsApiKey={googleMapsApiKey}
+        googleMapsApiKey={google_maps_api_key}
         language="en"
       >
         <GoogleMap
@@ -99,15 +82,15 @@ export default function Map({
           > */}
           {
             // (clusterer) => (
-            // Array.isArray(map_events_filtered) && map_events_filtered.map((event) => (
-            //   <MapMarkerWithTooltip
-            //     key={event.UUID}
-            //     event={event}
-            //     activePopup={activePopup}
-            //     onSetActivePopup={handleSetActivePopup}
-            //     // Removed clusterer prop
-            //   />
-            // ))
+            Array.isArray(mapEventsFiltered) && mapEventsFiltered.map((event) => (
+              <MapMarkerWithTooltip
+                key={event.UUID}
+                event={event}
+                activePopup={activePopup}
+                onSetActivePopup={handleSetActivePopup}
+                // Removed clusterer prop
+              />
+            ))
             // )
           }
           {/* </MarkerClusterer> */}
@@ -117,7 +100,5 @@ export default function Map({
       </LoadScript>
 
     </>
-    // {/* </Container> */}
-    // </ThemeProvider>
   );
 };

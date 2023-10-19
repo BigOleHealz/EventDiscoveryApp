@@ -10,7 +10,7 @@ import { useFetchEventTypes } from '../utils/Hooks';
 import { select_interests_scrollview_styles } from '../styles'; // You might need to adjust styles
 
 export const SelectInterestsScrollView = ({
-  eventTypesSelected = [],
+  event_types_selected = [],
   setEventTypesSelected,
   singleSelect = false
 }) => {
@@ -18,7 +18,7 @@ export const SelectInterestsScrollView = ({
   const [first_run, setFirstRun] = useState(true);
   const [select_all_switch_toggled_flag, setSelectAllSwitchToggledFlag] = useState(false);
 
-  useFetchEventTypes(first_run, setFirstRun, setEventTypes, eventTypesSelected, setEventTypesSelected);
+  useFetchEventTypes(first_run, setFirstRun, setEventTypes, event_types_selected, setEventTypesSelected);
 
   const handleSelectAllSwitchToggledFlagChange = (newValue) => {
     setSelectAllSwitchToggledFlag(newValue);
@@ -31,7 +31,7 @@ export const SelectInterestsScrollView = ({
   };
 
   const handleValueChange = (index, newValue) => {
-    console.log('eventTypesSelected:', eventTypesSelected);
+    console.log('event_types_selected:', event_types_selected);
     if(singleSelect && newValue) {
       let uncheckedEventTypes = event_types.map((eventType) => {
         return { ...eventType, isChecked: false };
