@@ -31,12 +31,11 @@ export function HomePage() {
   useEffect(() => {
     if (user_session && user_session.Interests) {
       setEventTypesSelected(user_session.Interests);
-      console.log('useEffect: user_session.Interests = ', user_session.Interests)
     }
   }, [user_session]);
 
 
-  const [fetching_events, setFetchingEvents] = useState(false);
+  const [fetching_events, setFetchingEvents] = useState(true);
   const [map_events_full_day, setMapEventsFullDay] = useState([]);
   const [map_events_filtered, setMapEventsFiltered] = useState([]);
   
@@ -105,7 +104,7 @@ export function HomePage() {
       // Map props
       mapRef={mapRef}
       google_maps_api_key={google_maps_api_key}
-      mapEventsFiltered={map_events_filtered}
+      map_events_filtered={map_events_filtered}
 
       // CreateEvent props
       create_event_stage={create_event_stage}

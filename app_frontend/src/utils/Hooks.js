@@ -98,7 +98,7 @@ export const useCreateEventNode = (is_creating_event_node, create_event_context,
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({...create_event_context})
+        body: JSON.stringify({ ...create_event_context })
       }).then(res => res.json())
         .then(data => {
           console.log(data);
@@ -156,62 +156,49 @@ export const useFetchEvents = (fetching_events, start_timestamp, end_timestamp, 
   useEffect(() => {
     if (fetching_events) {
       fetch('/api/events', {
-          method: 'POST',
-          headers: {
-              'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-              start_timestamp: start_timestamp,
-              end_timestamp: end_timestamp,
-          }),
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          start_timestamp: start_timestamp,
+          end_timestamp: end_timestamp,
+        }),
       }).then(res => res.json())
-      .then(data => {
-          console.log('events:', data);
+        .then(data => {
           setMapEventsFullDay(data);
-      }).catch((error) => {
+        }).catch((error) => {
           console.error('Error:', error);
-      });
+        });
       setFetchingEvents(false);
     }
   }, [fetching_events, start_timestamp, end_timestamp, setMapEventsFullDay, setFetchingEvents]);
 };
 
-export const useFetchEventTypes = (first_run, setFirstRun, setEventTypes, event_types_selected, setEventTypesSelected) => {
+export const useFetchEventTypes = (first_run, setFirstRun, setEventTypes) => {
   useEffect(() => {
-    if (first_run ) {
+    if (first_run) {
       fetch('/api/get_event_type_mappings', {
         method: 'GET',
         headers: {
-            'Content-Type': 'application/json',
+          'Content-Type': 'application/json',
         },
       })
-      .then(res => res.json())
-      .then(data => {
-        console.log('event_type_mappings:', data);
-        let eventTypeList;
-        if (event_types_selected) {
-          eventTypeList = data.map((eventType) => {
+        .then(res => res.json())
+        .then(data => {
+          const eventTypeList = data.map((eventType) => {
             return {
-              ...eventType,
-              isChecked: event_types_selected.includes(eventType.UUID)
-            };
+              ...eventType
+            }
           });
-        } else {
-          eventTypeList = data.map((eventType) => {
-            return {
-              ...eventType,
-              isChecked: false
-            };
-          });
-        }
-        setEventTypes(eventTypeList);
-        setFirstRun(false);
-      })
-      .catch((error) => {
-        toast.error(`Error Getting Event Types: ${error}`);
-        console.error(error);
-        setFirstRun(false);
-      });
+          setEventTypes(eventTypeList);
+          setFirstRun(false);
+        })
+        .catch((error) => {
+          toast.error(`Error Getting Event Types: ${error}`);
+          console.error(error);
+          setFirstRun(false);
+        });
     }
   }, [first_run]);
 };
@@ -228,13 +215,13 @@ export const useFetchGoogleMapsApiKey = (fetching_google_maps_api_key, setGoogle
           secret_id: 'google_maps_api_key',
         }),
       }).then(res => res.json())
-      .then(data => {
-        if (data) {
-          setGoogleMapsApiKey(data.GOOGLE_MAPS_API_KEY);
-        }
-      }).catch((error) => {
-        console.error('Error:', error);
-      });
+        .then(data => {
+          if (data) {
+            setGoogleMapsApiKey(data.GOOGLE_MAPS_API_KEY);
+          }
+        }).catch((error) => {
+          console.error('Error:', error);
+        });
       setFetchingGoogleMapsApiKey(false);
       setFetchingEvents(true);
     }
@@ -247,30 +234,30 @@ export const useSetGoogleClientId = (fetching_google_client_id, setFetchingGoogl
       fetch('/api/get_aws_secret', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-            secret_id: 'google_oauth_credentials',
+          secret_id: 'google_oauth_credentials',
         }),
       }).then(res => res.json())
-      .then(data => {
+        .then(data => {
           if (data) {
             setGoogleClientId(data.client_id);
           }
-      }).catch((error) => {
+        }).catch((error) => {
           console.error('Error:', error);
-      });
+        });
       setFetchingGoogleClientId(false);
     }
   }, [fetching_google_client_id]);
 };
 
 export const useSetUserProfile = (
-  email, 
-  setCreateUserProfileContext, 
-  setUserSession, 
-  first_name, 
-  last_name, 
+  email,
+  setCreateUserProfileContext,
+  setUserSession,
+  first_name,
+  last_name,
   resetLoginInfo,
   // logger
 ) => {
@@ -363,7 +350,7 @@ export const useFilterEvents = (
     const start_time_raw_string = `${find_event_selected_date}T${find_event_start_time}`;
     const end_time_raw_string = `${find_event_selected_date}T${find_event_end_time}`;
     // logger.info(`Datetime changed - startTime: ${start_time_raw_string} endTime: ${end_time_raw_string}`);
-    
+
     const startTime = new Date(start_time_raw_string);
     const endTime = new Date(end_time_raw_string);
 
