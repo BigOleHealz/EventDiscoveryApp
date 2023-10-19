@@ -17,8 +17,7 @@ import { useFetchUsername } from '../utils/Hooks';
 
 export const CreateEventDatetimeModal = ({
   isVisible,
-  // onRequestClose,
-  onSubmitButtonClick,
+  handleSubmitButtonClick,
   onRequestClose
 }) => {
   const { create_event_context, setCreateEventContext } = React.useContext(CreateEventContext);
@@ -36,7 +35,7 @@ export const CreateEventDatetimeModal = ({
       StartTimestamp: start_timestamp,
       EndTimestamp: end_timestamp
     })
-    onSubmitButtonClick();
+    handleSubmitButtonClick();
   }
   return (
     <ModalComponent
@@ -64,7 +63,7 @@ export const CreateEventDatetimeModal = ({
 
 export const CreateEventSelectEventTypeModal = ({
   isVisible,
-  onSubmitButtonClick,
+  handleSubmitButtonClick,
   onRequestClose,
 }) => {
   const { create_event_context, setCreateEventContext } = React.useContext(CreateEventContext);
@@ -81,7 +80,7 @@ export const CreateEventSelectEventTypeModal = ({
         ...create_event_context,
         ...event_type
       });
-      onSubmitButtonClick()
+      handleSubmitButtonClick();
     }
   };
 
@@ -105,7 +104,7 @@ export const CreateEventSelectEventTypeModal = ({
 
 export const CreateEventDetailsModal = ({
   isVisible,
-  onSubmitButtonClick,
+  handleSubmitButtonClick,
   onRequestClose,
 }) => {
   const { create_event_context, setCreateEventContext } = React.useContext(CreateEventContext);
@@ -156,7 +155,7 @@ export const CreateEventDetailsModal = ({
       Price: event_price_string
     }
     setCreateEventContext(new_data);
-    onSubmitButtonClick()
+    handleSubmitButtonClick()
     resetCreateEventDetails();
   };
 
@@ -369,10 +368,10 @@ export const SelectInterestsModal = ({
 //   isCreateEventMode,
 //   event_uuid
 // }) => {
-// 	const { userSession, setUserSession } = React.useContext(UserSessionContext);
+// 	const { user_session, setUserSession } = React.useContext(UserSessionContext);
 //   const { createEventData, setCreateEventData } = React.useContext(CreateEventContext);
 
-//   const initialFriends = userSession.Friends.map((friend) => {
+//   const initialFriends = user_session.Friends.map((friend) => {
 //     return {
 //       ...friend,
 //       isChecked: false,
@@ -437,7 +436,7 @@ export const SelectInterestsModal = ({
 //     } else {
 //       invite_friends_to_event({
 //         "event_uuid" : event_uuid,
-//         "inviter_uuid" : userSession.UUID,
+//         "inviter_uuid" : user_session.UUID,
 //         "friend_invite_list" : selectedFriendUUIDs,
 //       });
 //       setIsInviteFriendsToEventModalVisible(false);

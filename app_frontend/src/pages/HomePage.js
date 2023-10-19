@@ -13,37 +13,46 @@ import { useCreateEventNode, useFetchEvents, useFetchGoogleMapsApiKey, useFilter
 
 export function HomePage() {
   const mapRef = useRef();
-  const { create_event_context, setCreateEventContext } = React.useContext(CreateEventContext);
   // const { logger, setLogger } = React.useContext(LoggerContext);
-  const { userSession, setUserSession } = React.useContext(UserSessionContext);
-  const [event_types_selected, setEventTypesSelected] = useState(userSession ? userSession.Interests : []);
-  const [fetching_events, setFetchingEvents] = useState(false);
-  const [map_events_full_day, setMapEventsFullDay] = useState([]);
-  const [map_events_filtered, setMapEventsFiltered] = useState([]);
-  // const [is_creating_event_node, setIsCreatingEventNode] = useState(false);
-
-  const [googleMapsApiKey, setGoogleMapsApiKey] = useState(null);
+  const { user_session, setUserSession } = React.useContext(UserSessionContext);
+  
+  const [google_maps_api_key, setGoogleMapsApiKey] = useState(null);
   const [fetching_google_maps_api_key, setFetchingGoogleMapsApiKey] = useState(true);
-
+  
   const currentDateTime = new Date();
   const [find_event_start_time, setFindEventStartTime] = useState(day_start_time);
   const [find_event_end_time, setFindEventEndTime] = useState(day_end_time);
   const [find_event_selected_date, setFindEventSelectedDate] = useState(format(currentDateTime, day_format));
   const start_timestamp = convertUTCDateToLocalDate(new Date(`${find_event_selected_date}T${day_start_time}`));
   const end_timestamp = convertUTCDateToLocalDate(new Date(`${find_event_selected_date}T${day_end_time}`));
+  
+  const [event_types_selected, setEventTypesSelected] = useState([]);
+  
+  useEffect(() => {
+    if (user_session && user_session.Interests) {
+      setEventTypesSelected(user_session.Interests);
+      console.log('useEffect: user_session.Interests = ', user_session.Interests)
+    }
+  }, [user_session]);
 
+
+  const [fetching_events, setFetchingEvents] = useState(false);
+  const [map_events_full_day, setMapEventsFullDay] = useState([]);
+  const [map_events_filtered, setMapEventsFiltered] = useState([]);
+  
   useEffect(() => {
     setFetchingEvents(true);
   }, [find_event_selected_date]);
-
+  
+  const { create_event_context, setCreateEventContext } = React.useContext(CreateEventContext);
 
   useFetchGoogleMapsApiKey(fetching_google_maps_api_key, setGoogleMapsApiKey, setFetchingGoogleMapsApiKey, setFetchingEvents);
   useFetchEvents(fetching_events, start_timestamp, end_timestamp, setMapEventsFullDay, setFetchingEvents);
   useFilterEvents(find_event_selected_date, find_event_start_time, find_event_end_time, map_events_full_day, event_types_selected, setMapEventsFiltered);
 
   // Handle left side panel
-  const [isLeftPanelVisible, setIsLeftPanelVisible] = useState(false);
-  const [create_event_stage, setCreateEventStage] = useState(1);
+  const [is_left_panel_visible, setIsLeftPanelVisible] = useState(false);
+  const [create_event_stage, setCreateEventStage] = useState(0);
   const [isEventInvitesPanelVisible, setIsEventInvitesPanelVisible] = useState(false);
   const [isFriendRequestsPanelVisible, setIsFriendRequestsPanelVisible] = useState(false);
 
@@ -56,8 +65,8 @@ export function HomePage() {
   const resetAllStates = () => {
     exitCreateEventMode();
     setIsLeftPanelVisible(false);
-    setIsEventInvitesPanelVisible(false);
-    setIsFriendRequestsPanelVisible(false);
+    // setIsEventInvitesPanelVisible(false);
+    // setIsFriendRequestsPanelVisible(false);
   };
 
   const initializeCreateEventMode = () => {
@@ -65,43 +74,16 @@ export function HomePage() {
     setCreateEventStage(1);
   };
 
-
   const handleFindEventsButtonClick = () => {
-    setIsLeftPanelVisible(!isLeftPanelVisible);
+    setIsLeftPanelVisible(!is_left_panel_visible);
+    console.log('handleFindEventsButtonClick: is_left_panel_visible = ', is_left_panel_visible);
   };
 
   const handleCreateEventButtonClick = () => {
     initializeCreateEventMode();
+    console.log('handleCreateEventButtonClick: create_event_stage = ', create_event_stage);
   };
 
-
-  const handleGetLocationCoordinates = async () => {
-    const center = mapRef.current.getCenter();
-    const lat = center.lat();
-    const lng = center.lng();
-    const address = await getAddressFromCoordinates(lat, lng, googleMapsApiKey);
-    setCreateEventContext({
-      ...create_event_context,
-      Lat: lat,
-      Lon: lng,
-      Address: address
-    });
-    setCreateEventStage(2);
-    console.log('Center coordinates:', lat, lng, 'Address:', address);
-  };
-
-  const handleCreateEventDateTimeModalSubmitButtonClick = () => {
-    setCreateEventStage(3);
-  };
-
-  const handleCreateEventEventTypeModalSubmitButtonClick = () => {
-    setCreateEventStage(4);
-  };
-
-  const handleCreateEventDetailsModalSubmitButtonClick = () => {
-    createEvent();
-    exitCreateEventMode();
-  };
 
   return (
     <Layout
@@ -109,7 +91,7 @@ export function HomePage() {
       onCreateEventButtonClick={handleCreateEventButtonClick}
 
       // LeftSidePanel props
-      isLeftPanelVisible={isLeftPanelVisible}
+      is_left_panel_visible={is_left_panel_visible}
       setIsLeftPanelVisible={setIsLeftPanelVisible}
       find_event_selected_date={find_event_selected_date}
       setFindEventSelectedDate={setFindEventSelectedDate}
@@ -122,15 +104,12 @@ export function HomePage() {
 
       // Map props
       mapRef={mapRef}
-      googleMapsApiKey={googleMapsApiKey}
+      google_maps_api_key={google_maps_api_key}
+      mapEventsFiltered={map_events_filtered}
 
       // CreateEvent props
       create_event_stage={create_event_stage}
       setCreateEventStage={setCreateEventStage}
-      handleGetLocationCoordinates={handleGetLocationCoordinates}
-      handleCreateEventDateTimeModalSubmitButtonClick={handleCreateEventDateTimeModalSubmitButtonClick}
-      handleCreateEventEventTypeModalSubmitButtonClick={handleCreateEventEventTypeModalSubmitButtonClick}
-      handleCreateEventDetailsModalSubmitButtonClick={handleCreateEventDetailsModalSubmitButtonClick}
       exitCreateEventMode={exitCreateEventMode}
 
     >
@@ -138,3 +117,12 @@ export function HomePage() {
   );
 }
 
+   {/* <ButtonComponent
+          id="button-logout"
+          title="Logout"
+          onPress={() => {
+            removeSession();
+            setUserSession(null);  // Now you're calling setUserSession directly in the component
+          }}
+          style={map_styles.logoutButtonStyle}
+        /> */}

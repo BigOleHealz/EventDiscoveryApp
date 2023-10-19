@@ -16,8 +16,8 @@ import {
 // import { getUserSession } from './utils/SessionManager';
 
 export function AppHandler() {
-  const [userSession, setUserSession] = useState(null);
-  // const [logger, setLogger] = useState(null);
+  const [user_session, setUserSession] = useState(null);
+  const [logger, setLogger] = useState(null);
   // const [create_user_profile_context, setCreateUserProfileContext] = useState(null);
   // const [redirectRoute, setRedirectRoute] = useState(null);
   const navigate = useNavigate();
@@ -29,7 +29,6 @@ export function AppHandler() {
         Username: "yaboi",
         FirstName: "Matt",
         LastName: "Healy",
-        UUID: "621df10d-3d8e-417b-a259-bdbcd0de64fd",
         Friends: [{
           "friendUUID": null,
           "friendUsername": null,
@@ -42,9 +41,9 @@ export function AppHandler() {
   }, []);
 
   useEffect(() => {
-    if (userSession) {
-      console.log(userSession)
-    //   const newLogger = new Logger({ logGroupName: 'ui/app_handler', logStreamName: `${userSession.Email}/${formatLogStreamNameDate()}` });
+    if (user_session) {
+      console.log(user_session)
+    //   const newLogger = new Logger({ logGroupName: 'ui/app_handler', logStreamName: `${user_session.Email}/${formatLogStreamNameDate()}` });
     //   setLogger(newLogger);
       navigate('/');
     }
@@ -53,13 +52,13 @@ export function AppHandler() {
       // setLogger(newLogger);
       // navigate('/login');
     // }
-  }, [userSession]);
+  }, [user_session]);
 
   return (
     <>
       <ToastContainer />
     
-      <UserSessionContext.Provider value={{ userSession, setUserSession }}>
+      <UserSessionContext.Provider value={{ user_session, setUserSession }}>
         {/* <LoggerContext.Provider value={{ logger, setLogger }}> */}
           {/* <CreateUserProfileContext.Provider value={{ create_user_profile_context, setCreateUserProfileContext }}> */}
             <CreateEventProvider>

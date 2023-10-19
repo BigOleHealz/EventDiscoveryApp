@@ -5,6 +5,8 @@ import Button from "@mui/material/Button";
 
 import { TextInputComponent } from '../base_components/TextInputComponent';
 import { iconSvgDataUrl } from '../utils/constants';
+import { LoggerContext, CreateEventContext } from '../utils/Contexts';
+import { getAddressFromCoordinates } from '../utils/HelperFunctions';
 
 import { common_styles } from '../styles';
 
@@ -15,19 +17,37 @@ const border_radius = { xs: "5px", sm: "10px", md: "15px" }
 
 const icon_width = { xs: "48px", sm: "60px", md: "80px" }
 const icon_height = { xs: "72px", sm: "90px", md: "120px" }
+
 export const CreateEventLocationSelector = ({
   isVisible,
-  handleGetLocationCoordinates,
-  style,
+  mapRef,
+  setCreateEventStage,
+  google_maps_api_key,
   ...props
 }) => {
   if (!isVisible) return null;
   const [location_text_input_value, setLocationTextInputValue] = useState('');
+  const { create_event_context, setCreateEventContext } = React.useContext(CreateEventContext);
 
   const handleLocationTextInputChange = (event) => {
     console.log('handleLocationTextInputChange: event.target.value = ', event.target.value);
     setLocationTextInputValue(event.target.value);
   }
+
+  const handleSetEventLocation = async () => {
+    const center = mapRef.current.getCenter();
+    const lat = center.lat();
+    const lng = center.lng();
+    const address = await getAddressFromCoordinates(lat, lng, google_maps_api_key);
+    setCreateEventContext({
+      ...create_event_context,
+      Lat: lat,
+      Lon: lng,
+      Address: address
+    });
+    setCreateEventStage(2);
+    console.log('Center coordinates:', lat, lng, 'Address:', address);
+  };
 
   return (
     <Box
@@ -48,7 +68,7 @@ export const CreateEventLocationSelector = ({
         paddingBottom: { xs: "20px", sm: "25px", md: "35px" },
       }}
     >
-      <TextInputComponent
+      {/* <TextInputComponent
         id="text-input-create-event-location-selector"
         label="Location"
         value={location_text_input_value}
@@ -60,7 +80,7 @@ export const CreateEventLocationSelector = ({
           height: component_height,
           ...common_styles.basicComponent,
         }}
-      />
+      /> */}
       <Avatar
         id="create-event-pin-marker"
         src={iconSvgDataUrl('#000')}
@@ -73,8 +93,8 @@ export const CreateEventLocationSelector = ({
         }}
       />
       <Button
-        id="button-create-event-set-location-coordinates"
-        onClick={handleGetLocationCoordinates}
+        id="button-create-event-set-location"
+        onClick={handleSetEventLocation}
         sx={{
           pointerEvents: 'auto',
           borderRadius: border_radius,

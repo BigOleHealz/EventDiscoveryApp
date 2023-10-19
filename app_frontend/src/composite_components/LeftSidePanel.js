@@ -9,7 +9,7 @@ import { day_start_time, day_end_time } from '../utils/constants';
 
 
 export default function LeftSidePanel({
-  isLeftPanelVisible,
+  is_left_panel_visible,
   setIsLeftPanelVisible,
   find_event_selected_date,
   setFindEventSelectedDate,
@@ -17,19 +17,19 @@ export default function LeftSidePanel({
   setFindEventStartTime,
   find_event_end_time,
   setFindEventEndTime,
-  eventTypesSelected,
+  event_types_selected,
   setEventTypesSelected,
   ...props
 }) {
   const anchor = 'left';
 
   const [state, setState] = React.useState({
-    [anchor]: isLeftPanelVisible,
+    [anchor]: is_left_panel_visible,
   });
 
   React.useEffect(() => {
-    setState({ ...state, [anchor]: isLeftPanelVisible });
-  }, [isLeftPanelVisible]);
+    setState({ ...state, [anchor]: is_left_panel_visible });
+  }, [is_left_panel_visible]);
 
   const handleDateSelected = (date) => {
     console.log('handleDateSelected: date = ', date);
@@ -65,7 +65,7 @@ export default function LeftSidePanel({
             setEndTime={setFindEventEndTime}
           />
           <SelectInterestsScrollView
-            eventTypesSelected={eventTypesSelected}
+            event_types_selected={event_types_selected}
             setEventTypesSelected={setEventTypesSelected}
           />
         </BoxComponent>

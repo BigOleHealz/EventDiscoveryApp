@@ -89,7 +89,7 @@ export const useCreateUserProfile = (email, create_user_profile_context, setCrea
   }, [email]);
 };
 
-export const useCreateEventNode = (is_creating_event_node, create_event_context, setIsCreatingEventNode) => {
+export const useCreateEventNode = (is_creating_event_node, create_event_context, setIsCreatingEventNode, setCreateEventStage) => {
   useEffect(() => {
     if (is_creating_event_node) {
       console.log('create_event_context:', create_event_context)
@@ -104,6 +104,7 @@ export const useCreateEventNode = (is_creating_event_node, create_event_context,
           console.log(data);
           if (data.success) {
             toast.success('Event Created Successfully!');
+            setCreateEventStage(0);
           } else {
             toast.error('Failed to create Event: ' + (data.message || 'Unknown error'));
           }
@@ -165,6 +166,7 @@ export const useFetchEvents = (fetching_events, start_timestamp, end_timestamp, 
           }),
       }).then(res => res.json())
       .then(data => {
+          console.log('events:', data);
           setMapEventsFullDay(data);
       }).catch((error) => {
           console.error('Error:', error);
@@ -174,7 +176,7 @@ export const useFetchEvents = (fetching_events, start_timestamp, end_timestamp, 
   }, [fetching_events, start_timestamp, end_timestamp, setMapEventsFullDay, setFetchingEvents]);
 };
 
-export const useFetchEventTypes = (first_run, setFirstRun, setEventTypes, eventTypesSelected, setEventTypesSelected) => {
+export const useFetchEventTypes = (first_run, setFirstRun, setEventTypes, event_types_selected, setEventTypesSelected) => {
   useEffect(() => {
     if (first_run ) {
       fetch('/api/get_event_type_mappings', {
@@ -187,11 +189,11 @@ export const useFetchEventTypes = (first_run, setFirstRun, setEventTypes, eventT
       .then(data => {
         console.log('event_type_mappings:', data);
         let eventTypeList;
-        if (eventTypesSelected) {
+        if (event_types_selected) {
           eventTypeList = data.map((eventType) => {
             return {
               ...eventType,
-              isChecked: eventTypesSelected.includes(eventType.UUID)
+              isChecked: event_types_selected.includes(eventType.UUID)
             };
           });
         } else {
