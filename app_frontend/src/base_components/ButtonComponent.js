@@ -9,7 +9,7 @@ export const ButtonComponent = ({
   style,
   icon,
   isMenuButton=false,
-  props
+  ...props
 }) => {
   const thisButtonStyle = isMenuButton
     ? button_styles.menu_button_styles
