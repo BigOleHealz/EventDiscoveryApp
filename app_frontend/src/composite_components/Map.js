@@ -1,15 +1,14 @@
-import React, { useState, useEffect, useRef, useContext } from 'react';
+import React, { useState } from 'react';
 import Button from '@mui/material/Button';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { toast, ToastContainer } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { GoogleMap, LoadScript, MarkerClusterer } from '@react-google-maps/api';
+import { GoogleMap, MarkerClusterer } from '@react-google-maps/api';
 
 import MapMarkerWithTooltip from './MapMarkerWithTooltip';
 
 import { LoggerContext, UserSessionContext } from '../utils/Contexts';
-import { day_start_time, day_end_time, defaultCenter } from '../utils/constants';
-import { useFetchEvents, useFetchGoogleMapsApiKey, useFilterEvents, useSetUserLocation } from '../utils/Hooks';
+import { defaultCenter } from '../utils/constants';
+import { useSetUserLocation } from '../utils/Hooks';
 import { removeUserSession } from '../utils/SessionManager';
 
 
@@ -59,7 +58,6 @@ export default function Map({
             ],
           }}
         >
-
              {/* <MarkerClusterer
             options={{ imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m' }}
             maxZoom={20}
@@ -79,17 +77,15 @@ export default function Map({
           {/* </MarkerClusterer> */}
           <Button
             id="button-logout"
-            title="Logout"
             onClick={() => {
               removeUserSession();
               setUserSession(null);
             }}
             sx={map_styles.logoutButtonStyle}
-          />
-
+          >
+            Logout
+          </Button>
         </GoogleMap>
-
-
     </>
   );
 };

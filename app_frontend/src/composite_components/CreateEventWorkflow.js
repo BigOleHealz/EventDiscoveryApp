@@ -2,14 +2,13 @@ import React, { useState } from 'react';
 import { CreateEventLocationSelector } from './CreateEventLocationSelector';
 import { CreateEventDatetimeModal, CreateEventSelectEventTypeModal, CreateEventDetailsModal } from './Modals';
 
-import { LoggerContext, UserSessionContext, CreateEventContext } from '../utils/Contexts';
+import { CreateEventContext, LoggerContext, UserSessionContext } from '../utils/Contexts';
 import { useCreateEventNode } from '../utils/Hooks';
 
 export const CreateEventWorkflow = ({
   create_event_stage,
   setCreateEventStage,
   mapRef,
-  google_maps_api_key,
   exitCreateEventMode,
   ...props
 
@@ -36,7 +35,6 @@ export const CreateEventWorkflow = ({
         isVisible={create_event_stage === 1}
         mapRef={mapRef}
         setCreateEventStage={setCreateEventStage}
-        google_maps_api_key={google_maps_api_key}
       />
       <CreateEventDatetimeModal
         isVisible={create_event_stage === 2}

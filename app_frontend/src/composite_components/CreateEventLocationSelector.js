@@ -5,7 +5,7 @@ import Button from "@mui/material/Button";
 
 import { TextInputComponent } from '../base_components/TextInputComponent';
 import { iconSvgDataUrl } from '../utils/constants';
-import { LoggerContext, CreateEventContext } from '../utils/Contexts';
+import { CreateEventContext, GoogleMapsApiKeyContext, LoggerContext } from '../utils/Contexts';
 import { getAddressFromCoordinates } from '../utils/HelperFunctions';
 
 import { common_styles } from '../styles';
@@ -22,12 +22,13 @@ export const CreateEventLocationSelector = ({
   isVisible,
   mapRef,
   setCreateEventStage,
-  google_maps_api_key,
   ...props
 }) => {
   if (!isVisible) return null;
   const [location_text_input_value, setLocationTextInputValue] = useState('');
   const { create_event_context, setCreateEventContext } = React.useContext(CreateEventContext);
+  const google_maps_api_key = React.useContext(GoogleMapsApiKeyContext);
+
 
   const handleLocationTextInputChange = (event) => {
     console.log('handleLocationTextInputChange: event.target.value = ', event.target.value);

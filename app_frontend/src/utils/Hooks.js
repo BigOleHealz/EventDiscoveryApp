@@ -249,6 +249,47 @@ export const useFetchGoogleMapsApiKey = (
   ]);
 };
 
+export const useFetchGoogleProfile = (
+  fetching_google_profile,
+  setFetchingGoogleProfile,
+  google_access_token,
+  setCreateUserProfileContext
+) => {
+  useEffect(() => {
+    if (fetching_google_profile) {
+      fetch('/api/get_google_profile', {
+        method: 'POST',
+        headers: {
+          "Authorization": `Bearer ${google_access_token}`,
+          "Accept": "application/json",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          access_token: google_access_token
+        })
+      }).then(res => res.json())
+        .then(data => {
+          if (data) {
+            toast.success('google account retrieved!');
+            setCreateUserProfileContext({
+              FirstName: data.given_name,
+              LastName: data.family_name,
+              Email: data.email
+            });
+            console.log(data)
+          } else {
+            toast.error('failed to retrieve google account' + (data.message || 'Unknown error'));
+          }
+        }).catch((error) => {
+          console.error('Error:', error);
+          toast.error('An error occurred while retrieving google account!');
+        });
+    }
+    setFetchingGoogleProfile(false);
+  }, [fetching_google_profile]);
+};
+
+
 export const useSetGoogleClientId = (fetching_google_client_id, setFetchingGoogleClientId, setGoogleClientId) => {
   useEffect(() => {
     if (fetching_google_client_id) {
@@ -274,17 +315,15 @@ export const useSetGoogleClientId = (fetching_google_client_id, setFetchingGoogl
 };
 
 export const useSetUserProfile = (
-  email,
-  setCreateUserProfileContext,
+  create_user_profile_context,
   setUserSession,
-  first_name,
-  last_name,
   resetLoginInfo,
   // logger
 ) => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    const email = create_user_profile_context.Email;
     if (email) {
       fetch('/api/get_user_profile', {
         method: 'POST',
@@ -299,11 +338,6 @@ export const useSetUserProfile = (
           if (!data || data.length === 0) {
             toast.success('Welcome New User!');
             console.log('No user data returned for email:', email);
-            setCreateUserProfileContext({
-              FirstName: first_name,
-              LastName: last_name,
-              Email: email
-            });
             navigate('/create-account');
             return;
           }
@@ -318,12 +352,8 @@ export const useSetUserProfile = (
           toast.error('An error occurred while fetching user profile!');
         });
     }
-  }, [email,
-    setCreateUserProfileContext,
-    setUserSession,
-    first_name,
-    last_name,
-    // logger
+  }, [
+    create_user_profile_context
   ]);
 };
 
@@ -338,25 +368,6 @@ export const useBypassLoginIfInDebugMode = (setEmail, setFirstName, setLastName)
     }
   }, []);
 };
-
-export const useInitializeGoogleLoginButton = (googleClientId, handleCallbackResponse, firstLoginRenderRef) => {
-  useEffect(() => {
-    if (googleClientId) {
-      /* global google */
-      if (firstLoginRenderRef.current) {  // Use .current to access the ref's value
-        google.accounts.id.initialize({
-          client_id: googleClientId,
-          callback: handleCallbackResponse
-        });
-        firstLoginRenderRef.current = false;  // Update the ref's value
-      }
-      google.accounts.id.renderButton(
-        document.getElementById("signInDiv"),
-        { theme: "outline", size: "large" }
-      );
-    }
-  }, [googleClientId]);
-}
 
 export const useFilterEvents = (
   find_event_selected_date,

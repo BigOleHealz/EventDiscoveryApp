@@ -5,7 +5,7 @@ import { LoadScript } from '@react-google-maps/api';
 
 import { LoginPage } from './pages/LoginPage';
 import { HomePage } from './pages/HomePage';
-// import { CreateAccountPage } from './pages/CreateAccountPage';
+import { CreateAccountPage } from './pages/CreateAccountPage';
 import {
   CreateEventProvider,
   CreateUserProfileContext,
@@ -19,7 +19,7 @@ import { getUserSession } from './utils/SessionManager';
 export function AppHandler() {
   const [user_session, setUserSession] = useState(null);
   const [logger, setLogger] = useState(null);
-  const [create_user_profile_context, setCreateUserProfileContext] = useState(null);
+  const [create_user_profile_context, setCreateUserProfileContext] = useState({});
 
   const [fetching_google_maps_api_key, setFetchingGoogleMapsApiKey] = useState(true);
   const [google_maps_api_key, setGoogleMapsApiKey] = useState(null);
@@ -46,10 +46,10 @@ export function AppHandler() {
   }, [user_session]);
 
   useFetchGoogleMapsApiKey(fetching_google_maps_api_key, setGoogleMapsApiKey, setFetchingGoogleMapsApiKey);
-  
+
   return (
     <>
-      { google_maps_api_key && <LoadScript
+      {google_maps_api_key && <LoadScript
         id="script-loader"
         googleMapsApiKey={google_maps_api_key}
         language="en"
@@ -62,14 +62,14 @@ export function AppHandler() {
                 <Routes>
                   <Route path="/" element={<HomePage />} />
                   <Route path="/login" element={<LoginPage />} />
-                  {/* <Route path="/create-account" element={<CreateAccountPage />} /> */}
+                  <Route path="/create-account" element={<CreateAccountPage />} />
                 </Routes>
               </CreateEventProvider>
             </CreateUserProfileContext.Provider>
           </UserSessionContext.Provider>
         </GoogleMapsApiKeyContext.Provider>
       </LoadScript>
-}
+      }
     </>
   );
 };
