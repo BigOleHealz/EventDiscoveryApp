@@ -1,72 +1,43 @@
-// import React from 'react';
-// import { ButtonComponent } from '../base_components/ButtonComponent';
-// import { TextComponent } from '../base_components/TextComponent';
-
-// import { modal_component_styles } from '../styles';
-// import '../css/modalOverrides.css'
-
-// export const ModalComponent = ({
-//   isVisible,
-//   title,
-//   onRequestClose,
-//   submitButtonText,
-//   onSubmitButtonClick,
-//   children
-// }) => {
-//   if (!isVisible) return null;
-//   return (
-//     <div onClick={onRequestClose} className='overlay'>
-//       <div
-//         onClick={(e) => {
-//           e.stopPropagation();
-//         }}
-//         className='modalContainer'
-//       >
-//         <div className='modalRight'>
-//           <div id="modal-title-container" className="title-container">
-//             <TextComponent style={modal_component_styles.title} >
-//               {title}
-//             </TextComponent>
-//           </div>
-//           <div className='content-parent'>
-//             <div className='content-child'>
-//               {children}
-//             </div>
-//           </div>
-//           <div id="submit-button-container" className="submit-button-container">
-//             <ButtonComponent
-//               title={submitButtonText}
-//               onPress={onSubmitButtonClick}
-//               isMenuButton={true}
-//             />
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
 
 import React from 'react';
-import Box from '@mui/material/Box';
+import Divider from '@mui/material/Divider';
 import Modal from '@mui/material/Modal';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
 
-import { ButtonComponent } from '../base_components/ButtonComponent';
-import { TextComponent } from '../base_components/TextComponent';
+import BoxComponent from '../base_components/BoxComponent';
 
-// import '../css/modalOverrides.css';
+
+
+const theme = createTheme({
+  components: {
+    MuiBackdrop: {
+      styleOverrides: {
+        root: {
+          backgroundColor: 'rgba(0, 0, 0, 0.0)',
+        },
+      },
+    }
+  }
+});
 
 const modalStyle = {
   position: 'absolute',
   top: '50%',
+  height: { xs: '90%', sm: '85%', md: '80%', lg: '75%', xl: '75%' },
+  width: { xs: '95%', sm: '80%', md: '40%', lg: '30%', xl: '25%' },
+  borderRadius: '10px',
   left: '50%',
   transform: 'translate(-50%, -50%)',
   bgcolor: 'background.paper',
-  border: '2px solid #000',
   boxShadow: 24,
-  p: 4,
+  padding: 0,
 };
+
+const vertical_padding = { xs: "10px", sm: "15px", md: "20px", lg: "25px", xl: "30px" }
+const width = { xs: '95%', sm: '80%', md: '40%', lg: '30%', xl: '25%' }
+
 
 export const ModalComponent = ({
   isVisible,
@@ -77,30 +48,40 @@ export const ModalComponent = ({
   children
 }) => {
   return (
-    <Modal
-      open={isVisible}
-      onClose={onRequestClose}
-      aria-labelledby="modal-modal-title"
-      aria-describedby="modal-modal-description"
-    >
-      <Box sx={modalStyle}>
-        <Box sx={{ marginBottom: 2 }}>
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-            {title}
-          </Typography>
-        </Box>
-        <Box sx={{ marginBottom: 2 }}>
-          {children}
-        </Box>
-        <Box sx={{ textAlign: 'right' }}>
-          <Button
-            variant="contained"
-            onClick={onSubmitButtonClick}
-          >
-            {submitButtonText}
-          </Button>
-        </Box>
-      </Box>
-    </Modal>
+    <ThemeProvider theme={theme}>
+      <Modal
+        open={isVisible}
+        onClose={onRequestClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+        id="modal-parent"
+        sx={modalStyle}
+      >
+        <BoxComponent id="box-modal-parent" style={{ height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between", borderRadius: "10px" }}>
+          <BoxComponent id="box-modal-title" style={{ display: 'flex', justifyContent: 'center', paddingTop: vertical_padding, paddingBottom: vertical_padding, borderRadius: "10px" }}>
+            <Typography id="typography-modal-title" variant="h6" component="h2">
+              {title}
+            </Typography>
+          </BoxComponent>
+          <Divider style={{ backgroundColor: 'grey', height: '2px' }} />
+          <BoxComponent id="box-modal-content" style={{ flexGrow: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', paddingTop: vertical_padding, paddingBottom: vertical_padding, maxWidth: '100%' }}>
+            {children}
+          </BoxComponent>
+          <Divider style={{ backgroundColor: 'grey', height: '2px' }} />
+          <BoxComponent
+            id="box-modal-submit-button"
+            style={{ display: 'flex', justifyContent: 'center', paddingTop: vertical_padding, paddingBottom: vertical_padding, borderRadius: "10px"  }}>
+            <Button
+              id="button-modal-submit"
+              variant="contained"
+              onClick={onSubmitButtonClick}
+              sx={{ width: { xs: "80%", sm: "70%", md: "60%", lg: "50%", xl: "40%" }, height: { xs: "40px", sm: "50px", md: "60px", lg: "70px", xl: "80px" } }}
+            >
+              {submitButtonText}
+            </Button>
+          </BoxComponent>
+        </BoxComponent>
+      </Modal >
+    </ThemeProvider>
   );
 };

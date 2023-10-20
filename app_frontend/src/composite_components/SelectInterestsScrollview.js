@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import Checkbox from '@mui/material/Checkbox';
 import Switch from '@mui/material/Switch';
+import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 
-import BoxComponent from '../base_components/BoxComponent';
-import { TextComponent } from '../base_components/TextComponent';
+import { TextComponent } from '../base_components/TextComponent'; // Assuming you also have a web version of this
 import { useFetchEventTypes } from '../utils/Hooks';
 
-import { select_interests_scrollview_styles } from '../styles';
+import { select_interests_scrollview_styles } from '../styles'; // You might need to adjust styles
 
 export const SelectInterestsScrollView = ({
   event_types_selected = [],
@@ -18,46 +18,76 @@ export const SelectInterestsScrollView = ({
   const [first_run, setFirstRun] = useState(true);
   const [select_all_switch_toggled_flag, setSelectAllSwitchToggledFlag] = useState(false);
 
-  useFetchEventTypes(first_run, setFirstRun, setEventTypes);
+  console.log('SelectInterestsScrollView-event_types_selected:', event_types_selected);
 
-  const handleEventTypeSelection = (isChecked, uuid) => {
-    if (isChecked) {
-      setEventTypesSelected((prevSelected) => [...prevSelected, uuid]);
-    } else {
-      setEventTypesSelected((prevSelected) => prevSelected.filter(id => id !== uuid));
-    }
+  useFetchEventTypes(first_run, setFirstRun, setEventTypes, event_types_selected, setEventTypesSelected);
+
+  const handleSelectAllSwitchToggledFlagChange = (newValue) => {
+    setSelectAllSwitchToggledFlag(newValue);
+    const updatedEventTypes = event_types.map((eventType) => {
+      return { ...eventType, isChecked: newValue };
+    });
+    setEventTypes(updatedEventTypes);
+    let checkedUUIDs = updatedEventTypes.filter(item => item.isChecked).map(item => item.UUID);
+    setEventTypesSelected(checkedUUIDs);
   };
 
-  const handleSelectAllSwitchToggledFlagChange = (isChecked) => {
-    setSelectAllSwitchToggledFlag(isChecked);  // updating the switch toggle flag state
+  const handleValueChange = (index, newValue) => {
+    console.log('event_types_selected:', event_types_selected);
+    if(singleSelect && newValue) {
+      let uncheckedEventTypes = event_types.map((eventType) => {
+        return { ...eventType, isChecked: false };
+      });
+  
+      let updatedEventTypes = uncheckedEventTypes.map((eventType, i) => {
+        if (i === index) {
+          return { ...eventType, isChecked: true };
+        }
+        return eventType;
+      });
+      
+      setEventTypes(updatedEventTypes);
 
-    if (isChecked) {
-      const allUUIDs = event_types.map(eventType => eventType.UUID);
-      setEventTypesSelected(allUUIDs);
+      const event_type_object = {
+        "EventTypeUUID": updatedEventTypes[index].UUID,
+        "EventType": updatedEventTypes[index].EventType
+      }
+      console.log('event_type_object:', event_type_object)
+      setEventTypesSelected(event_type_object)
     } else {
-      setEventTypesSelected([]);
+      const updatedEventTypes = event_types.map((eventType, i) => {
+        if (i === index) {
+          return { ...eventType, isChecked: newValue };
+        }
+        return eventType;
+      });
+  
+      setEventTypes(updatedEventTypes);
+      let checkedUUIDs = updatedEventTypes.filter(item => item.isChecked).map(item => item.UUID);
+      setEventTypesSelected(checkedUUIDs);
+      console.log('updatedEventTypes:', updatedEventTypes);
     }
   };
 
   const EventTypeChecklistItem = ({ name, isChecked, onValueChange, color }) => {
     return (
-      <BoxComponent style={select_interests_scrollview_styles.itemContainer}>
-        <Checkbox
+      <Box style={select_interests_scrollview_styles.itemContainer}>
+        <Checkbox 
           checked={isChecked}
           onChange={onValueChange}
-          style={{ color: color }}
+          style={{color: color}}
         />
         <Typography style={select_interests_scrollview_styles.itemText}>
           {name}
         </Typography>
-      </BoxComponent>
+      </Box>
     );
   };
 
   return (
-    <BoxComponent style={select_interests_scrollview_styles.parentContainer}>
-      {!singleSelect &&
-        <BoxComponent style={select_interests_scrollview_styles.switchContainer}>
+    <Box style={select_interests_scrollview_styles.parentContainer}>
+      { !singleSelect &&
+        <Box style={select_interests_scrollview_styles.switchContainer}>
           <Switch
             value={select_all_switch_toggled_flag}
             onChange={(e) => handleSelectAllSwitchToggledFlagChange(e.target.checked)}
@@ -65,19 +95,20 @@ export const SelectInterestsScrollView = ({
           <TextComponent style={select_interests_scrollview_styles.switchLabel}>
             Toggle All Event Types
           </TextComponent>
-        </BoxComponent>
+        </Box>
       }
-      <BoxComponent style={select_interests_scrollview_styles.scrollView}>
+      <Box style={select_interests_scrollview_styles.scrollView}> 
         {event_types.map((eventType, index) => (
           <EventTypeChecklistItem
             key={eventType.UUID}
             name={eventType.EventType}
-            isChecked={event_types_selected.includes(eventType.UUID)}
+            isChecked={eventType.isChecked}
             color={eventType.PinColor}
-            onValueChange={(e) => handleEventTypeSelection(e.target.checked, eventType.UUID)}
+            onValueChange={() => handleValueChange(index, !eventType.isChecked)}
           />
         ))}
-      </BoxComponent>
-    </BoxComponent>
+      </Box>
+    </Box>
+  
   );
 }
