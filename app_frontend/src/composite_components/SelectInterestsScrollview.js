@@ -18,7 +18,7 @@ export const SelectInterestsScrollView = ({
   const [first_run, setFirstRun] = useState(true);
   const [select_all_switch_toggled_flag, setSelectAllSwitchToggledFlag] = useState(false);
 
-  console.log('SelectInterestsScrollView-event_types_selected:', event_types_selected);
+  // console.log('SelectInterestsScrollView-event_types_selected:', event_types_selected);
 
   useFetchEventTypes(first_run, setFirstRun, setEventTypes, event_types_selected, setEventTypesSelected);
 

@@ -1,8 +1,8 @@
-export const storeUserSession = async (user, setUserSession) => {
+export const storeUserSession = async (user_session_data, setUserSession) => {
   try {
-    localStorage.setItem('user_session', JSON.stringify(user));
-    setUserSession(user);
-    console.log('User session stored');
+    localStorage.setItem('user_session', JSON.stringify(user_session_data));
+    setUserSession(user_session_data);
+    console.log('User session stored: ', user_session_data);
   } catch (error) {
     console.error('Error storing user session:', error);
   }
@@ -30,4 +30,3 @@ export const removeUserSession = () => {
     }
   }
 };
-

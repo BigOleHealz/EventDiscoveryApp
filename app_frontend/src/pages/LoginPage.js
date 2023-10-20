@@ -10,16 +10,18 @@ import { TextComponent } from '../base_components/TextComponent';
 import {
   CreateUserProfileContext,
   // LoggerContext,
+  UserAuthContext,
   UserSessionContext
 } from '../utils/Contexts';
-import { useFetchGoogleProfile, useSetUserProfile } from '../utils/Hooks';
+import { useFetchGoogleProfile, useAuthenticateUser } from '../utils/Hooks';
 import { login_page_styles, button_styles, common_styles } from '../styles';
 
 export function LoginPage() {
 
+  const { create_user_profile_context, setCreateUserProfileContext } = React.useContext(CreateUserProfileContext);
   const { user_session, setUserSession } = React.useContext(UserSessionContext);
   // const { logger, setLogger } = React.useContext(LoggerContext);
-  const { create_user_profile_context, setCreateUserProfileContext } = React.useContext(CreateUserProfileContext);
+  const { user_auth_context, setUserAuthContext } = React.useContext(UserAuthContext);
 
 
   const [fetching_google_profile, setFetchingGoogleProfile] = useState(false);
@@ -27,7 +29,6 @@ export function LoginPage() {
 
 
   const get_google_profile = (response) => {
-    console.log(response.access_token)
     setGoogleAccessToken(response.access_token);
     setFetchingGoogleProfile(true);
   };
@@ -38,12 +39,13 @@ export function LoginPage() {
   });
 
   const resetLoginInfo = () => {
-    setCreateUserProfileContext({})
+    setUserAuthContext({})
   };
 
-  useFetchGoogleProfile(fetching_google_profile, setFetchingGoogleProfile, google_access_token, setCreateUserProfileContext);
-  useSetUserProfile(
-    create_user_profile_context,
+  useFetchGoogleProfile(fetching_google_profile, setFetchingGoogleProfile, google_access_token, setUserAuthContext);
+  useAuthenticateUser(
+    user_auth_context,
+    setCreateUserProfileContext,
     setUserSession,
     resetLoginInfo,
     // logger

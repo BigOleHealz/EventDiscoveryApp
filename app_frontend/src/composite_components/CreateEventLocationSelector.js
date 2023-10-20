@@ -55,6 +55,7 @@ export const CreateEventLocationSelector = ({
       id="div-location-selector-vertical-container"
       sx={{
         position: 'absolute',
+        height: "100%",
         top: 0,
         left: 0,
         right: 0,
@@ -63,13 +64,45 @@ export const CreateEventLocationSelector = ({
         pointerEvents: 'none',
         display: 'flex',
         flexDirection: 'column',
-        justifyContent: 'space-between',
+        justifyContent: 'center', // Vertically center child components
         alignItems: 'center',
         paddingTop: { xs: "10px", sm: "15px", md: "20px" },
         paddingBottom: { xs: "20px", sm: "25px", md: "35px" },
       }}
     >
-      {/* <TextInputComponent
+      <Avatar
+        id="create-event-pin-marker"
+        src={iconSvgDataUrl('#000')}
+        alt="Pin"
+        sx={{
+          pointerEvents: 'auto',
+          alignSelf: 'center',
+          // width: icon_width,
+          // height: icon_height,
+          marginTop: 'auto', // Push to the center
+          marginBottom: 'auto', // Align bottom with the center
+        }}
+      />
+      <Button
+        id="button-create-event-set-location"
+        onClick={handleSetEventLocation}
+        sx={{
+          pointerEvents: 'auto',
+          borderRadius: border_radius,
+          width: component_width,
+          height: component_height,
+          color: 'white',
+          backgroundColor: common_styles.brightBlueColor,
+          marginBottom: { xs: "10px", sm: "15px", md: "20px" },
+        }}
+      >
+        Set Location
+      </Button>
+    </Box>
+  );
+};
+
+{/* <TextInputComponent
         id="text-input-create-event-location-selector"
         label="Location"
         value={location_text_input_value}
@@ -82,32 +115,3 @@ export const CreateEventLocationSelector = ({
           ...common_styles.basicComponent,
         }}
       /> */}
-      <Avatar
-        id="create-event-pin-marker"
-        src={iconSvgDataUrl('#000')}
-        alt="Pin"
-        sx={{ 
-          pointerEvents: 'auto', 
-          alignSelf: 'center',
-          width: icon_width,
-          height: icon_height,
-        }}
-      />
-      <Button
-        id="button-create-event-set-location"
-        onClick={handleSetEventLocation}
-        sx={{
-          pointerEvents: 'auto',
-          borderRadius: border_radius,
-          width: component_width,
-          height: component_height,
-          color: 'white',
-          backgroundColor: common_styles.brightBlueColor
-        }}
-      >
-        Set Location
-      </Button>
-    </Box>
-  );
-};
-
