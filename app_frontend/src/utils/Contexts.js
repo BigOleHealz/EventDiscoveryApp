@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 
-export const UserSessionContext = React.createContext();
-
 export const CreateEventContext = React.createContext();
 
-export const LoggerContext = React.createContext();
-
 export const CreateUserProfileContext = React.createContext();
+
+export const GoogleMapsApiKeyContext = React.createContext();
+
+export const UserSessionContext = React.createContext();
+
+export const LoggerContext = React.createContext();
 
 export const CreateEventProvider = ({ children }) => {
   const [create_event_context, setCreateEventContextState] = useState({});

@@ -217,7 +217,11 @@ export const useFetchEventTypes = (first_run, setFirstRun, setEventTypes, event_
 };
 
 
-export const useFetchGoogleMapsApiKey = (fetching_google_maps_api_key, setGoogleMapsApiKey, setFetchingGoogleMapsApiKey, setFetchingEvents) => {
+export const useFetchGoogleMapsApiKey = (
+  fetching_google_maps_api_key,
+  setGoogleMapsApiKey,
+  setFetchingGoogleMapsApiKey,
+) => {
   useEffect(() => {
     if (fetching_google_maps_api_key) {
       fetch('/api/get_aws_secret', {
@@ -237,9 +241,12 @@ export const useFetchGoogleMapsApiKey = (fetching_google_maps_api_key, setGoogle
           console.error('Error:', error);
         });
       setFetchingGoogleMapsApiKey(false);
-      setFetchingEvents(true);
     }
-  }, [fetching_google_maps_api_key, setGoogleMapsApiKey, setFetchingGoogleMapsApiKey, setFetchingEvents]);
+  }, [
+    fetching_google_maps_api_key,
+    setGoogleMapsApiKey,
+    setFetchingGoogleMapsApiKey,
+  ]);
 };
 
 export const useSetGoogleClientId = (fetching_google_client_id, setFetchingGoogleClientId, setGoogleClientId) => {
