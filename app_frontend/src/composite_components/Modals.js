@@ -3,6 +3,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import { format } from 'date-fns';
 import Box from "@mui/material/Box";
 
+import BoxComponent from '../base_components/BoxComponent';
 import { CalendarComponent } from '../base_components/CalendarComponent';
 import { ModalComponent } from '../base_components/ModalComponent';
 import { TextInputComponent } from '../base_components/TextInputComponent';
@@ -47,6 +48,7 @@ export const CreateEventDatetimeModal = ({
       submitButtonText="Submit Datetime"
       onSubmitButtonClick={addDateTimesToCreateEventContext}
     >
+      <BoxComponent style={{ display: 'flex', flexDirection: 'column' }}>
         <CalendarComponent
           testid="left-calendar"
           selected={selected_date}
@@ -58,6 +60,7 @@ export const CreateEventDatetimeModal = ({
           endTime={end_time}
           setEndTime={setEndTime}
         />
+      </BoxComponent>
     </ModalComponent>
   )
 }
@@ -78,7 +81,8 @@ export const CreateEventSelectEventTypeModal = ({
     } else {
       const new_data = {
         ...create_event_context,
-        ...event_type}
+        ...event_type
+      }
       console.log("new_data", new_data)
       setCreateEventContext({
         ...create_event_context,
@@ -192,39 +196,41 @@ export const CreateEventDetailsModal = ({
       submitButtonText="Submit Event Details"
       onSubmitButtonClick={addDetailsToCreateEventContext}
     >
-      <TextInputComponent
-        id="input-event-name"
-        label="Event Name"
-        value={event_name}
-        onChangeText={handleEventNameChange}
-      />
-      <TextInputComponent
-        id="input-event-description"
-        label="Event Description"
-        value={event_description}
-        onChangeText={handleEventDescriptionChange}
-        multiline={true}
-      />
-      <SwitchComponent
-        id="switch-private-event"
-        label="Private Event"
-        checked={private_event_flag}
-        onChange={handlePrivateEventFlagChange}
-      />
-      <SwitchComponent
-        id="switch-paid-event"
-        label="Paid Event"
-        checked={paid_event_flag}
-        onChange={handlePaidEventFlagChange}
-      />
-      { paid_event_flag &&
+      <BoxComponent style={{ display: 'flex', flexDirection: 'column' }}>
         <TextInputComponent
-          id="input-event-price"
-          label="Event Price ($)"
-          value={event_price}
-          onChangeText={handleEventPriceChange}
+          id="input-event-name"
+          label="Event Name"
+          value={event_name}
+          onChangeText={handleEventNameChange}
         />
-      }
+        <TextInputComponent
+          id="input-event-description"
+          label="Event Description"
+          value={event_description}
+          onChangeText={handleEventDescriptionChange}
+          multiline={true}
+        />
+        <SwitchComponent
+          id="switch-private-event"
+          label="Private Event"
+          checked={private_event_flag}
+          onChange={handlePrivateEventFlagChange}
+        />
+        <SwitchComponent
+          id="switch-paid-event"
+          label="Paid Event"
+          checked={paid_event_flag}
+          onChange={handlePaidEventFlagChange}
+        />
+        {paid_event_flag &&
+          <TextInputComponent
+            id="input-event-price"
+            label="Event Price ($)"
+            value={event_price}
+            onChangeText={handleEventPriceChange}
+          />
+        }
+      </BoxComponent>
     </ModalComponent>
   );
 };
