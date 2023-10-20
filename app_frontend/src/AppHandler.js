@@ -46,7 +46,7 @@ export function AppHandler() {
     else {
       navigate('/login');
     }
-  }, [user_session]);
+  }, [user_session, navigate]);
 
   useEffect(() => {
     if (google_client_id === false) {
