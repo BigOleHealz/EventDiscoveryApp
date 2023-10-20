@@ -243,7 +243,7 @@ def create_server():
             event_data['Summary'] = body.get('EventDescription', '')
 
             try:
-                result = neo4j.execute_query_with_params(query=queries.CREATE_EVENT_IF_NOT_EXISTS, params=event_data)
+                result = neo4j.execute_query_with_params(query=queries.CREATE_USER_CREATED_EVENT, params=event_data)
             except Exception as e:
                 return jsonify({"message": "An error occurred while executing the query: " + str(e)}), 500
 
