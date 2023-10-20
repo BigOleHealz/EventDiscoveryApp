@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 
-import { CreateUsernameModal, SelectInterestsModal } from '../container_components/Modals';
+import { CreateUsernameModal, SelectInterestsModal } from '../composite_components/Modals';
 import { CreateUserProfileContext, LoggerContext } from '../utils/Contexts';
 import { useCreateUserProfile, useCreatePersonNode } from '../utils/Hooks';
 import { create_account_styles }  from '../styles';

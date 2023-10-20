@@ -13,34 +13,33 @@ export function HomePage() {
   const mapRef = useRef();
   // const { logger, setLogger } = React.useContext(LoggerContext);
   const { user_session, setUserSession } = React.useContext(UserSessionContext);
-  
+
   const [google_maps_api_key, setGoogleMapsApiKey] = useState(null);
   const [fetching_google_maps_api_key, setFetchingGoogleMapsApiKey] = useState(true);
-  
+
   const currentDateTime = new Date();
   const [find_event_start_time, setFindEventStartTime] = useState(day_start_time);
   const [find_event_end_time, setFindEventEndTime] = useState(day_end_time);
   const [find_event_selected_date, setFindEventSelectedDate] = useState(format(currentDateTime, day_format));
   const start_timestamp = convertUTCDateToLocalDate(new Date(`${find_event_selected_date}T${day_start_time}`));
   const end_timestamp = convertUTCDateToLocalDate(new Date(`${find_event_selected_date}T${day_end_time}`));
-  
+
   const [event_types_selected, setEventTypesSelected] = useState([]);
-  
+
   useEffect(() => {
     if (user_session && user_session.Interests) {
       setEventTypesSelected(user_session.Interests);
     }
   }, [user_session]);
 
-
   const [fetching_events, setFetchingEvents] = useState(true);
   const [map_events_full_day, setMapEventsFullDay] = useState([]);
   const [map_events_filtered, setMapEventsFiltered] = useState([]);
-  
+
   useEffect(() => {
     setFetchingEvents(true);
   }, [find_event_selected_date]);
-  
+
   const { create_event_context, setCreateEventContext } = React.useContext(CreateEventContext);
 
   useFetchGoogleMapsApiKey(fetching_google_maps_api_key, setGoogleMapsApiKey, setFetchingGoogleMapsApiKey, setFetchingEvents);
@@ -112,14 +111,4 @@ export function HomePage() {
     >
     </Layout>
   );
-}
-
-   {/* <ButtonComponent
-          id="button-logout"
-          title="Logout"
-          onPress={() => {
-            removeSession();
-            setUserSession(null);  // Now you're calling setUserSession directly in the component
-          }}
-          style={map_styles.logoutButtonStyle}
-        /> */}
+};

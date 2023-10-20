@@ -250,6 +250,7 @@ export const map_styles = {
   mapContainerStyle: {
     display: 'flex',
     width: '100vw',
+    // height: '100%',
     height: `${display_container_top}vh`,
     flexDirection: 'column',
   },
@@ -263,7 +264,8 @@ export const map_styles = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    color: defaultFontColor
+    color: defaultFontColor,
+    backgroundColor: defaultBackgroundColor,
   }
 };
 

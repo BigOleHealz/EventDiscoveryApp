@@ -1,51 +1,48 @@
-import React, { useState, useEffect, useRef } from 'react';
-import jwt_decode from "jwt-decode";
+import React, { useState, useEffect } from 'react';
 import { useGoogleLogin } from '@react-oauth/google';
 import { ToastContainer, toast } from 'react-toastify';
 
 import { ButtonComponent } from '../base_components/ButtonComponent';
 import { TextComponent } from '../base_components/TextComponent';
-import { CreateUserProfileContext, LoggerContext, UserSessionContext } from '../utils/Contexts';
-import { useBypassLoginIfInDebugMode, useInitializeGoogleLoginButton, useSetGoogleClientId, useSetUserProfile } from '../utils/Hooks';
+import { CreateUserProfileContext,
+  // LoggerContext,
+  UserSessionContext
+} from '../utils/Contexts';
+import { useSetGoogleClientId, useSetUserProfile } from '../utils/Hooks';
 import { login_page_styles } from '../styles';
 
 export function LoginPage() {
 
   const { user_session, setUserSession } = React.useContext(UserSessionContext);
-  const { logger, setLogger } = React.useContext(LoggerContext);
+  // const { logger, setLogger } = React.useContext(LoggerContext);
   const { create_user_profile_context, setCreateUserProfileContext } = React.useContext(CreateUserProfileContext);
 
   const [fetching_google_client_id, setFetchingGoogleClientId] = useState(false);
-  const [googleClientId, setGoogleClientId] = useState(null);
+  const [googleClientId, setGoogleClientId] = useState(false);
 
   const [ fetching_google_profile, setFetchingGoogleProfile ] = useState(false);
   const [ google_access_token, setGoogleAccessToken ] = useState(null);
-
 
   const [email, setEmail] = useState(null);
   const [first_name, setFirstName] = useState(null);
   const [last_name, setLastName] = useState(null);
 
-
+  console.log('googleClientId', googleClientId)
   useEffect(() => {
-    if (googleClientId === null) {
+    if (googleClientId === false) {
       setFetchingGoogleClientId(true);
     }
   }, [googleClientId]);
 
   const get_google_profile = (response) => {
+    
     console.log(response.access_token)
     setGoogleAccessToken(response.access_token);
     setFetchingGoogleProfile(true);
-
-  };
-  const errorMessage = (error) => {
-    console.log(error);
   };
 
   const login = useGoogleLogin({
     onSuccess: (response) => get_google_profile(response),
-    // onSuccess: (codeResponse) => setUser(codeResponse),
     onError: (error) => console.log('Login Failed:', error)
   });
 
@@ -88,17 +85,15 @@ export function LoginPage() {
     setEmail(null);
   };
 
-  function handleCallbackResponse(response) {
-    var userObject = jwt_decode(response.credential);
-    setEmail(userObject.email);
-    setFirstName(userObject.given_name);
-    setLastName(userObject.family_name);
-  };
-
-  // useSetGoogleClientId(fetching_google_client_id, setFetchingGoogleClientId, setGoogleClientId);
-  useSetUserProfile(email, setCreateUserProfileContext, setUserSession, first_name, last_name, resetLoginInfo, logger);
-  useBypassLoginIfInDebugMode(setEmail, setFirstName, setLastName);
-  // useInitializeGoogleLoginButton(googleClientId, handleCallbackResponse, isFirstLoginRenderRef);
+  useSetGoogleClientId(fetching_google_client_id, setFetchingGoogleClientId, setGoogleClientId);
+  useSetUserProfile(email,
+    setCreateUserProfileContext,
+    setUserSession,
+    first_name,
+    last_name,
+    resetLoginInfo,
+    // logger
+    );
 
   return (
     <div style={login_page_styles.verticalContainer} id="LoginFullPageContainer">

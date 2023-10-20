@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
-import Container from "@mui/material/Container";
+import Button from '@mui/material/Button';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -10,6 +10,7 @@ import MapMarkerWithTooltip from './MapMarkerWithTooltip';
 import { LoggerContext, UserSessionContext } from '../utils/Contexts';
 import { day_start_time, day_end_time, defaultCenter } from '../utils/constants';
 import { useFetchEvents, useFetchGoogleMapsApiKey, useFilterEvents, useSetUserLocation } from '../utils/Hooks';
+import { removeUserSession } from '../utils/SessionManager';
 
 
 import { map_styles } from '../styles';
@@ -17,25 +18,19 @@ import { map_styles } from '../styles';
 export default function Map({
   mapRef,
   google_maps_api_key,
-  map_events_filtered,
-  // ...props
+  map_events_filtered
 }) {
   // const { logger, setLogger } = React.useContext(LoggerContext);
-
-  // Start logging
-  // logger.info("Map component is initializing...");
+  const { user_session, setUserSession } = React.useContext(UserSessionContext);
 
   // Handle Map Events
   const [mapCenter, setMapCenter] = useState(defaultCenter);
-
   const [activePopup, setActivePopup] = useState(null);
 
   useSetUserLocation(setMapCenter);
   const onLoad = (map) => {
     mapRef.current = map;
   };
-
-  // console.log('map_events_filtered = ', map_events_filtered)
 
   const handleSetActivePopup = (uuid) => {
     if (activePopup === uuid) {
@@ -90,13 +85,21 @@ export default function Map({
                 event={event}
                 activePopup={activePopup}
                 onSetActivePopup={handleSetActivePopup}
-                // Removed clusterer prop
+              // Removed clusterer prop
               />
             ))
             // )
           }
           {/* </MarkerClusterer> */}
-
+          <Button
+            id="button-logout"
+            title="Logout"
+            onClick={() => {
+              removeUserSession();
+              setUserSession(null);
+            }}
+            sx={map_styles.logoutButtonStyle}
+          />
 
         </GoogleMap>
       </LoadScript>
