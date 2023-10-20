@@ -1,8 +1,7 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import moment from 'moment';
 
 import { InfoWindow, Marker } from '@react-google-maps/api';
-import { ButtonComponent } from '../base_components/ButtonComponent'; // Assuming you also have a web version of this
 import { LoggerContext } from '../utils/Contexts';
 import { convertUTCDateToLocalDate } from '../utils/HelperFunctions';
 
@@ -37,7 +36,7 @@ const MapMarkerWithTooltip = ({
   };
 
   const handleMarkerClick = () => {
-    logger.info(`Marker clicked for event: ${event.UUID}\nEvent Name: ${event.EventName}`);
+    // logger.info(`Marker clicked for event: ${event.UUID}\nEvent Name: ${event.EventName}`);
     onSetActivePopup(event.UUID);
   };
 

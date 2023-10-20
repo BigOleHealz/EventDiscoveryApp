@@ -256,9 +256,9 @@ export const map_styles = {
   },
   logoutButtonStyle: {
     position: 'absolute',
-    bottom: '20px',
-    left: '20px',
-    width: '20%',
+    bottom: { xs: "20px", sm: "30px", md: "40px"},
+    left: { xs: "10px", sm: "15px", md: "20px"},
+    width: { xs: "100px", sm: "150px", md: "200px"},
     height: '50px',
     borderRadius: '8px',
     display: 'flex',
