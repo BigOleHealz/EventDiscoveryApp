@@ -46,49 +46,6 @@ export const useFetchUsername = (fetching_username_is_taken, username, setFetchi
   }, [fetching_username_is_taken]);
 };
 
-export const useCreateUserProfile = (email, create_user_profile_context, setCreateUserProfileContext, setEmail, navigate, logger) => {
-  useEffect(() => {
-    if (email) {
-      fetch('/api/get_user_profile', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: email
-        }),
-      }).then(res => res.json())
-        .then(data => {
-          console.log(data);
-          if (!data || data.length === 0) {
-            toast.success('Welcome New User!');
-            console.log('No user data returned for email:', email);
-            setCreateUserProfileContext({
-              FirstName: first_name,
-              LastName: last_name,
-              Email: email
-            });
-            navigate('/create-account');
-            return;
-          }
-
-          const user = data;
-          user.TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-          storeUserSession(user);
-          setUserSession(user);
-          toast.success('Login Successful!');
-          console.log('Login Successful');
-          logger.info(`Login Successful for email: ${email}`);
-          resetLoginInfo();
-        }).catch((error) => {
-          console.error('Error:', error);
-          toast.error('An error occurred while fetching user profile!');
-        });
-    }
-    setEmail(false);
-  }, [email]);
-};
-
 export const useCreateEventNode = (is_creating_event_node, create_event_context, setIsCreatingEventNode, setCreateEventStage) => {
   useEffect(() => {
     if (is_creating_event_node) {
@@ -186,8 +143,8 @@ export const useFetchEventTypes = (first_run, setFirstRun, setEventTypes, event_
       })
         .then(res => res.json())
         .then(data => {
-          console.log('hook-event_types_selected:', event_types_selected)
-          console.log('event_type_mappings:', data);
+          console.debug('hook-event_types_selected:', event_types_selected)
+          console.debug('event_type_mappings:', data);
           let eventTypeList;
           if (event_types_selected) {
             eventTypeList = data.map((eventType) => {
@@ -215,7 +172,6 @@ export const useFetchEventTypes = (first_run, setFirstRun, setEventTypes, event_
     }
   }, [first_run, event_types_selected]);
 };
-
 
 export const useFetchGoogleMapsApiKey = (
   fetching_google_maps_api_key,
@@ -253,7 +209,7 @@ export const useFetchGoogleProfile = (
   fetching_google_profile,
   setFetchingGoogleProfile,
   google_access_token,
-  setCreateUserProfileContext
+  setUserAuthContext,
 ) => {
   useEffect(() => {
     if (fetching_google_profile) {
@@ -271,7 +227,7 @@ export const useFetchGoogleProfile = (
         .then(data => {
           if (data) {
             toast.success('google account retrieved!');
-            setCreateUserProfileContext({
+            setUserAuthContext({
               FirstName: data.given_name,
               LastName: data.family_name,
               Email: data.email
@@ -288,7 +244,6 @@ export const useFetchGoogleProfile = (
     setFetchingGoogleProfile(false);
   }, [fetching_google_profile]);
 };
-
 
 export const useSetGoogleClientId = (fetching_google_client_id, setFetchingGoogleClientId, setGoogleClientId) => {
   useEffect(() => {
@@ -314,16 +269,22 @@ export const useSetGoogleClientId = (fetching_google_client_id, setFetchingGoogl
   }, [fetching_google_client_id]);
 };
 
-export const useSetUserProfile = (
-  create_user_profile_context,
+export const useAuthenticateUser = (
+  user_auth_context,
+  setCreateUserProfileContext,
   setUserSession,
   resetLoginInfo,
   // logger
 ) => {
   const navigate = useNavigate();
 
+  console.log('user_auth_context:', user_auth_context)
   useEffect(() => {
-    const email = create_user_profile_context.Email;
+    if (!user_auth_context) {
+      return;
+    }
+
+    const email = user_auth_context.Email;
     if (email) {
       fetch('/api/get_user_profile', {
         method: 'POST',
@@ -338,23 +299,21 @@ export const useSetUserProfile = (
           if (!data || data.length === 0) {
             toast.success('Welcome New User!');
             console.log('No user data returned for email:', email);
+            setCreateUserProfileContext(user_auth_context);
             navigate('/create-account');
             return;
+          } else {
+            const user_session_data = data;
+            user_session_data.TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            storeUserSession(user_session_data, setUserSession);
+            toast.success('Login Successful!');
           }
-          const user = data;
-          user.TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-          storeUserSession(user, setUserSession);
-          toast.success('Login Successful!');
-          // logger.info(`Login Successful for email: ${email}`);
-          resetLoginInfo();
         }).catch((error) => {
           console.error('Error:', error);
           toast.error('An error occurred while fetching user profile!');
         });
     }
-  }, [
-    create_user_profile_context
-  ]);
+  }, [user_auth_context]);
 };
 
 export const useBypassLoginIfInDebugMode = (setEmail, setFirstName, setLastName) => {

@@ -77,21 +77,15 @@ export const common_styles = {
 };
 
 export const login_page_styles = {
-  authContainer: {
-    width: '60%',
-    flex: '1',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  verticalContainer: {
-    ...common_styles.appTheme,
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: '100vh',
-  },
+  
+  // verticalContainer: {
+  //   ...common_styles.appTheme,
+  //   display: 'flex',
+  //   flexDirection: 'column',
+  //   justifyContent: 'center',
+  //   alignItems: 'center',
+  //   height: '100vh',
+  // },
   horizontalContainer: {
     display: 'flex',
     flexDirection: 'column',
@@ -107,36 +101,6 @@ export const login_page_styles = {
     fontSize: '16px',
     marginBottom: '8px',
   },
-  input: {
-    border: '1px solid gray',
-    borderRadius: '4px',
-    paddingLeft: '8px',
-    paddingRight: '8px',
-    paddingTop: '4px',
-    paddingBottom: '4px',
-    marginBottom: '16px',
-  },
-
-  forgotPassword: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: '16px',
-  },
-  hyperlinkContainer: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
-  },
-  createAccount: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-    marginTop: '16px',
-  }
 };
 
 export const create_account_styles = {
@@ -146,17 +110,6 @@ export const create_account_styles = {
     justifyContent: 'center',
     alignItems: 'center',
     padding: '16px',
-  },
-  loginLinkContainer: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    margin: '16px'
-  },
-  loginLink: {
-    color: '#2196F3',
-    textDecoration: 'underline',
   },
 };
 
@@ -170,8 +123,10 @@ export const button_styles = {
   },
   menu_button_styles: {
     backgroundColor: brightBlueColor,
+    color: 'white',
     borderRadius: defaultBorderRadius,
-    height: '50px',
+    padding: { xs: "5px", sm: "7px", md: "9px", lg: "11px", xl: "13px"},
+    borderRadius: { xs: "5px", sm: "7px", md: "9px", lg: "20px", xl: "13px"},
     alignItems: 'center',
     justifyContent: 'center'
   },

@@ -75,7 +75,7 @@ export default function Map({
             ))
           }
           {/* </MarkerClusterer> */}
-          <Button
+          {/* <Button
             id="button-logout"
             onClick={() => {
               removeUserSession();
@@ -84,7 +84,7 @@ export default function Map({
             sx={map_styles.logoutButtonStyle}
           >
             Logout
-          </Button>
+          </Button> */}
         </GoogleMap>
     </>
   );

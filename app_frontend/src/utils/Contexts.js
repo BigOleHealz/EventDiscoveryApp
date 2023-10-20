@@ -8,6 +8,8 @@ export const GoogleMapsApiKeyContext = React.createContext();
 
 export const GoogleClientIdContext = React.createContext();
 
+export const UserAuthContext = React.createContext();
+
 export const UserSessionContext = React.createContext();
 
 export const LoggerContext = React.createContext();

@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import { format } from 'date-fns';
-import Box from "@mui/material/Box";
 
 import BoxComponent from '../base_components/BoxComponent';
 import { CalendarComponent } from '../base_components/CalendarComponent';
@@ -268,7 +267,7 @@ export const CreateUsernameModal = ({
         submitButtonText="Submit Username"
         onSubmitButtonClick={handleSubmitButtonClick}
       >
-        <div>
+        <BoxComponent style={{ display: 'flex', flexDirection: 'column' }}>
           <TextInputComponent
             required={true}
             id="input-username"
@@ -276,7 +275,7 @@ export const CreateUsernameModal = ({
             value={username}
             onChangeText={handleUsernameChange}
           />
-        </div>
+        </BoxComponent>
       </ModalComponent>
     </>
   );

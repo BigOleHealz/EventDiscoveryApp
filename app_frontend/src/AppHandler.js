@@ -11,6 +11,7 @@ import {
   CreateEventProvider,
   CreateUserProfileContext,
   GoogleMapsApiKeyContext,
+  UserAuthContext,
   // LoggerContext,
   UserSessionContext,
 } from './utils/Contexts';
@@ -20,6 +21,7 @@ import { getUserSession } from './utils/SessionManager';
 export function AppHandler() {
   const [user_session, setUserSession] = useState(null);
   const [logger, setLogger] = useState(null);
+  const [ user_auth_context, setUserAuthContext ] = useState({});
   const [create_user_profile_context, setCreateUserProfileContext] = useState({});
 
   const [fetching_google_maps_api_key, setFetchingGoogleMapsApiKey] = useState(true);
@@ -27,20 +29,19 @@ export function AppHandler() {
 
   const [fetching_google_client_id, setFetchingGoogleClientId] = useState(false);
   const [google_client_id, setGoogleClientId] = useState(false);
-  // const [redirectRoute, setRedirectRoute] = useState(null);
   const navigate = useNavigate();
 
 
   useEffect(() => {
     (async () => {
       const session = await getUserSession();
+      console.log(session)
       setUserSession(session);
     })();
   }, []);
 
   useEffect(() => {
     if (user_session) {
-      console.log(user_session)
       navigate('/');
     }
     else {
@@ -67,17 +68,19 @@ export function AppHandler() {
         <ToastContainer />
         <GoogleOAuthProvider clientId={google_client_id}>
           <GoogleMapsApiKeyContext.Provider value={google_maps_api_key}>
-            <UserSessionContext.Provider value={{ user_session, setUserSession }}>
-              <CreateUserProfileContext.Provider value={{ create_user_profile_context, setCreateUserProfileContext }}>
-                <CreateEventProvider>
-                  <Routes>
-                    <Route path="/" element={<HomePage />} />
-                    <Route path="/login" element={<LoginPage />} />
-                    <Route path="/create-account" element={<CreateAccountPage />} />
-                  </Routes>
-                </CreateEventProvider>
-              </CreateUserProfileContext.Provider>
-            </UserSessionContext.Provider>
+            <UserAuthContext.Provider value={{ user_auth_context, setUserAuthContext }}>
+              <UserSessionContext.Provider value={{ user_session, setUserSession }}>
+                <CreateUserProfileContext.Provider value={{ create_user_profile_context, setCreateUserProfileContext }}>
+                  <CreateEventProvider>
+                    <Routes>
+                      <Route path="/" element={<HomePage />} />
+                      <Route path="/login" element={<LoginPage />} />
+                      <Route path="/create-account" element={<CreateAccountPage />} />
+                    </Routes>
+                  </CreateEventProvider>
+                </CreateUserProfileContext.Provider>
+              </UserSessionContext.Provider>
+            </UserAuthContext.Provider>
           </GoogleMapsApiKeyContext.Provider>
         </GoogleOAuthProvider>
       </LoadScript>
