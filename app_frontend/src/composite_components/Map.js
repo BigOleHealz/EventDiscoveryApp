@@ -17,7 +17,6 @@ import { map_styles } from '../styles';
 
 export default function Map({
   mapRef,
-  google_maps_api_key,
   map_events_filtered
 }) {
   // const { logger, setLogger } = React.useContext(LoggerContext);
@@ -40,22 +39,10 @@ export default function Map({
     }
   };
 
-  if (!google_maps_api_key) {
-    return (
-      <div>
-        <p>Loading...</p>
-      </div>
-    );
-  }
 
   return (
     <>
       <ToastContainer />
-      <LoadScript
-        id="script-loader"
-        googleMapsApiKey={google_maps_api_key}
-        language="en"
-      >
         <GoogleMap
           mapContainerStyle={map_styles.mapContainerStyle}
           zoom={15}
@@ -73,7 +60,7 @@ export default function Map({
           }}
         >
 
-          {/* <MarkerClusterer
+             {/* <MarkerClusterer
             options={{ imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m' }}
             maxZoom={20}
           > */}
@@ -85,10 +72,9 @@ export default function Map({
                 event={event}
                 activePopup={activePopup}
                 onSetActivePopup={handleSetActivePopup}
-              // Removed clusterer prop
+                // clusterer={clusterer}
               />
             ))
-            // )
           }
           {/* </MarkerClusterer> */}
           <Button
@@ -102,7 +88,7 @@ export default function Map({
           />
 
         </GoogleMap>
-      </LoadScript>
+
 
     </>
   );

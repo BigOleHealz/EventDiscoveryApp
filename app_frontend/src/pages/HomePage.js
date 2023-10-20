@@ -14,8 +14,6 @@ export function HomePage() {
   // const { logger, setLogger } = React.useContext(LoggerContext);
   const { user_session, setUserSession } = React.useContext(UserSessionContext);
 
-  const [google_maps_api_key, setGoogleMapsApiKey] = useState(null);
-  const [fetching_google_maps_api_key, setFetchingGoogleMapsApiKey] = useState(true);
 
   const currentDateTime = new Date();
   const [find_event_start_time, setFindEventStartTime] = useState(day_start_time);
@@ -42,7 +40,6 @@ export function HomePage() {
 
   const { create_event_context, setCreateEventContext } = React.useContext(CreateEventContext);
 
-  useFetchGoogleMapsApiKey(fetching_google_maps_api_key, setGoogleMapsApiKey, setFetchingGoogleMapsApiKey, setFetchingEvents);
   useFetchEvents(fetching_events, start_timestamp, end_timestamp, setMapEventsFullDay, setFetchingEvents);
   useFilterEvents(find_event_selected_date, find_event_start_time, find_event_end_time, map_events_full_day, event_types_selected, setMapEventsFiltered);
 
@@ -100,7 +97,6 @@ export function HomePage() {
 
       // Map props
       mapRef={mapRef}
-      google_maps_api_key={google_maps_api_key}
       map_events_filtered={map_events_filtered}
 
       // CreateEvent props
