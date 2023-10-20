@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useGoogleLogin } from '@react-oauth/google';
 import { ToastContainer } from 'react-toastify';
 
@@ -9,7 +9,7 @@ import {
   // LoggerContext,
   UserSessionContext
 } from '../utils/Contexts';
-import { useFetchGoogleProfile, useSetGoogleClientId, useSetUserProfile } from '../utils/Hooks';
+import { useFetchGoogleProfile, useSetUserProfile } from '../utils/Hooks';
 import { login_page_styles } from '../styles';
 
 export function LoginPage() {
@@ -18,20 +18,12 @@ export function LoginPage() {
   // const { logger, setLogger } = React.useContext(LoggerContext);
   const { create_user_profile_context, setCreateUserProfileContext } = React.useContext(CreateUserProfileContext);
 
-  const [fetching_google_client_id, setFetchingGoogleClientId] = useState(false);
-  const [googleClientId, setGoogleClientId] = useState(false);
 
   const [ fetching_google_profile, setFetchingGoogleProfile ] = useState(false);
   const [ google_access_token, setGoogleAccessToken ] = useState(null);
 
-  useEffect(() => {
-    if (googleClientId === false) {
-      setFetchingGoogleClientId(true);
-    }
-  }, [googleClientId]);
 
   const get_google_profile = (response) => {
-    
     console.log(response.access_token)
     setGoogleAccessToken(response.access_token);
     setFetchingGoogleProfile(true);
@@ -46,7 +38,6 @@ export function LoginPage() {
     setCreateUserProfileContext({})
   };
 
-  useSetGoogleClientId(fetching_google_client_id, setFetchingGoogleClientId, setGoogleClientId);
   useFetchGoogleProfile(fetching_google_profile, setFetchingGoogleProfile, google_access_token, setCreateUserProfileContext);
   useSetUserProfile(
     create_user_profile_context,
