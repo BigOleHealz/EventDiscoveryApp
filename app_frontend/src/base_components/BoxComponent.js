@@ -1,12 +1,15 @@
 import * as React from 'react';
 import Box from "@mui/material/Box";
-
 import { common_styles } from '../styles';
 
-export default function BoxComponent({ children, style }) {
+const BoxComponent = React.forwardRef((props, ref) => {
+  const { children, style, ...otherProps } = props;
+  
   return (
-    <Box sx={{...common_styles.basicComponent, ...style}} >
+    <Box ref={ref} sx={{...common_styles.basicComponent, ...style}} {...otherProps}>
       {children}
     </Box>
-  )
-}
+  );
+});
+
+export default BoxComponent;

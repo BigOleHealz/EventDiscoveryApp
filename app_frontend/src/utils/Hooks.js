@@ -175,7 +175,7 @@ export const useFetchEvents = (fetching_events, start_timestamp, end_timestamp, 
   }, [fetching_events, start_timestamp, end_timestamp, setMapEventsFullDay, setFetchingEvents]);
 };
 
-export const useFetchEventTypes = (first_run, setFirstRun, setEventTypes) => {
+export const useFetchEventTypes = (first_run, setFirstRun, setEventTypes, event_types_selected, setEventTypesSelected) => {
   useEffect(() => {
     if (first_run) {
       fetch('/api/get_event_type_mappings', {
@@ -186,11 +186,24 @@ export const useFetchEventTypes = (first_run, setFirstRun, setEventTypes) => {
       })
         .then(res => res.json())
         .then(data => {
-          const eventTypeList = data.map((eventType) => {
-            return {
-              ...eventType
-            }
-          });
+          console.log('hook-event_types_selected:', event_types_selected)
+          console.log('event_type_mappings:', data);
+          let eventTypeList;
+          if (event_types_selected) {
+            eventTypeList = data.map((eventType) => {
+              return {
+                ...eventType,
+                isChecked: event_types_selected.includes(eventType.UUID)
+              };
+            });
+          } else {
+            eventTypeList = data.map((eventType) => {
+              return {
+                ...eventType,
+                isChecked: false
+              };
+            });
+          }
           setEventTypes(eventTypeList);
           setFirstRun(false);
         })
@@ -200,8 +213,9 @@ export const useFetchEventTypes = (first_run, setFirstRun, setEventTypes) => {
           setFirstRun(false);
         });
     }
-  }, [first_run]);
+  }, [first_run, event_types_selected]);
 };
+
 
 export const useFetchGoogleMapsApiKey = (fetching_google_maps_api_key, setGoogleMapsApiKey, setFetchingGoogleMapsApiKey, setFetchingEvents) => {
   useEffect(() => {

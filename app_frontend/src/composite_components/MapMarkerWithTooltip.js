@@ -85,22 +85,22 @@ const MapMarkerWithTooltip = ({
   return (
     <Marker
       position={position}
-      // onMouseOver={handleMouseOver}
-      // onMouseOut={handleMouseOut}
-      // onClick={handleMarkerClick}
-      // icon={icon}
+      onMouseOver={handleMouseOver}
+      onMouseOut={handleMouseOut}
+      onClick={handleMarkerClick}
+      icon={icon}
       // clusterer={clusterer}
     >
-      {/* {showTooltip && (
+      {showTooltip && (
         <InfoWindow position={position} onCloseClick={handleMarkerClick}>
           <div style={tooltip_styles.container}>{renderInfoContent()}</div>
         </InfoWindow>
-      )} */}
-      {/* {activePopup === event.UUID && (
+      )}
+      {activePopup === event.UUID && (
         <InfoWindow position={position} onCloseClick={handleMarkerClick}>
           <div style={tooltip_styles.container}>{renderInfoContent()}</div>
         </InfoWindow>
-      )} */}
+      )}
     </Marker>
   );
 

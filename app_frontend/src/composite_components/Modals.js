@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import { format } from 'date-fns';
+import Box from "@mui/material/Box";
 
 import { CalendarComponent } from '../base_components/CalendarComponent';
 import { ModalComponent } from '../base_components/ModalComponent';
@@ -46,17 +47,17 @@ export const CreateEventDatetimeModal = ({
       submitButtonText="Submit Datetime"
       onSubmitButtonClick={addDateTimesToCreateEventContext}
     >
-      <CalendarComponent
-        testid="left-calendar"
-        selected={selected_date}
-        onDateSelected={setSelectedDate}
-      />
-      <TimeRangeSliderComponent
-        startTime={start_time}
-        setStartTime={setStartTime}
-        endTime={end_time}
-        setEndTime={setEndTime}
-      />
+        <CalendarComponent
+          testid="left-calendar"
+          selected={selected_date}
+          onDateSelected={setSelectedDate}
+        />
+        <TimeRangeSliderComponent
+          startTime={start_time}
+          setStartTime={setStartTime}
+          endTime={end_time}
+          setEndTime={setEndTime}
+        />
     </ModalComponent>
   )
 }
@@ -69,12 +70,15 @@ export const CreateEventSelectEventTypeModal = ({
   const { create_event_context, setCreateEventContext } = React.useContext(CreateEventContext);
   const [event_type, setEventType] = useState(null);
 
+
   const addEventTypeToCreateEventContext = () => {
     if (!event_type) {
       toast.error('Please select an event type.');
       return;
     } else {
-      const new_data = {...create_event_context, ...event_type}
+      const new_data = {
+        ...create_event_context,
+        ...event_type}
       console.log("new_data", new_data)
       setCreateEventContext({
         ...create_event_context,
