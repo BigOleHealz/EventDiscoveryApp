@@ -1,15 +1,13 @@
 // HomePage.js
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Route, Routes, useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 
 import Layout from '../container_components/Layout';
-
-import { day_start_time, day_end_time, day_format, iconSvgDataUrl } from '../utils/constants';
+import { day_start_time, day_end_time, day_format } from '../utils/constants';
 import { LoggerContext, UserSessionContext, CreateEventContext } from '../utils/Contexts';
-import { convertUTCDateToLocalDate, getAddressFromCoordinates } from '../utils/HelperFunctions';
-import { useCreateEventNode, useFetchEvents, useFetchGoogleMapsApiKey, useFilterEvents } from '../utils/Hooks';
+import { convertUTCDateToLocalDate } from '../utils/HelperFunctions';
+import { useFetchEvents, useFetchGoogleMapsApiKey, useFilterEvents } from '../utils/Hooks';
 
 export function HomePage() {
   const mapRef = useRef();

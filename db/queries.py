@@ -359,6 +359,14 @@ CREATE_EVENT_IF_NOT_EXISTS=r"""
                             ON CREATE SET e += $params
                             WITH e, $params as params
                             MATCH (et:EventType {UUID: params.EventTypeUUID})
+                            MERGE (et)-[:RELATED_EVENT]->(e);
+                            """
+
+CREATE_USER_CREATED_EVENT=r"""
+                            MERGE (e:Event {Source: $params.Source, SourceEventID: $params.SourceEventID})
+                            ON CREATE SET e += $params
+                            WITH e, $params as params
+                            MATCH (et:EventType {UUID: params.EventTypeUUID})
                             MERGE (et)-[:RELATED_EVENT]->(e)
                             WITH e, params
                             OPTIONAL MATCH (a:Account {UUID: params.CreatedByUUID})
