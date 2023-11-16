@@ -1,5 +1,7 @@
 
 import React from 'react';
+
+import CloseIcon from '@mui/icons-material/Close';
 import Divider from '@mui/material/Divider';
 import Modal from '@mui/material/Modal';
 import Typography from '@mui/material/Typography';
@@ -27,7 +29,7 @@ const modalStyle = {
   top: '50%',
   height: { xs: '90%', sm: '85%', md: '80%', lg: '75%', xl: '75%' },
   width: { xs: '95%', sm: '80%', md: '40%', lg: '30%', xl: '25%' },
-  borderRadius: { xs: '10px', sm: '15px', md: '20px', lg: '25px', xl: '30px'},
+  borderRadius: { xs: '10px', sm: '15px', md: '20px', lg: '25px', xl: '30px' },
   left: '50%',
   transform: 'translate(-50%, -50%)',
   bgcolor: 'background.paper',
@@ -51,13 +53,23 @@ export const ModalComponent = ({
     <ThemeProvider theme={theme}>
       <Modal
         open={isVisible}
-        onClose={onRequestClose}
+        onClose={() => {
+          console.log('Modal closed');
+          onRequestClose();
+        }}
+
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
         id="modal-parent"
         sx={modalStyle}
       >
         <BoxComponent id="box-modal-parent" style={{ height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between", borderRadius: "10px" }}>
+          <Button
+            onClick={onRequestClose}
+            style={{ position: "absolute", top: 0, right: 0 }}
+          >
+            <CloseIcon />
+          </Button>
           <BoxComponent id="box-modal-title" style={{ display: 'flex', justifyContent: 'center', paddingTop: vertical_padding, paddingBottom: vertical_padding, borderRadius: "10px" }}>
             <Typography id="typography-modal-title" variant="h6" component="h2">
               {title}
@@ -70,7 +82,7 @@ export const ModalComponent = ({
           <Divider style={{ backgroundColor: 'grey', height: '2px' }} />
           <BoxComponent
             id="box-modal-submit-button"
-            style={{ display: 'flex', justifyContent: 'center', paddingTop: vertical_padding, paddingBottom: vertical_padding, borderRadius: "10px"  }}>
+            style={{ display: 'flex', justifyContent: 'center', paddingTop: vertical_padding, paddingBottom: vertical_padding, borderRadius: "10px" }}>
             <Button
               id="button-modal-submit"
               variant="contained"

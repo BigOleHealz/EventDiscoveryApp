@@ -8,8 +8,9 @@ const defaultMargin = 10;
 const defaultBorderRadius = 8;
 const brightBlueColor = '#2196F3';
 
-const toolbar_height = 6;
-const display_container_top = 100 - toolbar_height;
+
+export const toolbar_height = 6;
+export const display_container_top = 100 - toolbar_height;
 
 export const common_styles = {
   defaultBackgroundColor: defaultBackgroundColor,
@@ -126,7 +127,7 @@ export const button_styles = {
     color: 'white',
     borderRadius: defaultBorderRadius,
     padding: { xs: "5px", sm: "7px", md: "9px", lg: "11px", xl: "13px"},
-    borderRadius: { xs: "5px", sm: "7px", md: "9px", lg: "20px", xl: "13px"},
+    borderRadius: { xs: "5px", sm: "7px", md: "9px", lg: "11px", xl: "13px"},
     alignItems: 'center',
     justifyContent: 'center'
   },
@@ -310,7 +311,6 @@ export const side_panel_styles = {
     height: `${display_container_top}vh`,
     bottom: 0,
     width: windowWidth > 800 ? '30%' : '100%',
-    // minWidth: '300px',
     backgroundColor: common_styles.appTheme.backgroundColor,
     display: 'flex',
     flexDirection: 'column',
@@ -373,14 +373,11 @@ export const tooltip_styles = {
   container: {
     display: 'flex',
     flexDirection: 'column',
-    backgroundColor: '#222', // Dark background color
-    color: '#fff', // Light text color
-    padding: '10px', // Add padding for better appearance
-    borderRadius: '4px', // Add border radius for a smoother look
+    borderRadius: '4px',
     margin: 0,
   },
   table: {
-    margin: '10px',
+    marginBottom: "10px",
     borderCollapse: 'collapse',
     width: '100%',
   },
@@ -391,10 +388,9 @@ export const tooltip_styles = {
     ...common_styles.h1,
   },
   label: {
-    width: '30%',
+    whiteSpace: 'nowrap',
     fontWeight: 600,
     marginRight: '4px',
-    paddingLeft: '4px',
     paddingTop: '2px',
     paddingBottom: '2px',
     textAlign: 'right',
