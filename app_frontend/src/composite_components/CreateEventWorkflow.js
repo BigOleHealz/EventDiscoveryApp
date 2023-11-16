@@ -11,8 +11,6 @@ export const CreateEventWorkflow = ({
   mapRef,
   exitCreateEventMode,
   ...props
-
-
 }) => {
   const { user_session, setUserSession } = React.useContext(UserSessionContext);
   const { create_event_context, setCreateEventContext } = React.useContext(CreateEventContext);

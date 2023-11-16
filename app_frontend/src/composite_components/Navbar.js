@@ -14,7 +14,7 @@ export default function Navbar({
   navbarHeight,
   onFindEventsButtonClick,
   onEventInvitesButtonClick,
-  onInviteFriendsButtonClick,
+  onFriendRequestsButtonClick,
   onCreateEventButtonClick,
   ...props
 }) {
@@ -50,7 +50,7 @@ export default function Navbar({
           />
           <NavbarButton
             id="button-friend-requests"
-            onClick={onInviteFriendsButtonClick}
+            onClick={onFriendRequestsButtonClick}
             Icon={PeopleAltIcon}
             text="Friend Requests"
           />

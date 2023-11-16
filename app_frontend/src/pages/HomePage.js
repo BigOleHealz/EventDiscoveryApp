@@ -47,10 +47,10 @@ export function HomePage() {
   const [attend_event_stage, setAttendEventStage] = useState(0);
   
   // Handle left side panel
-  const [is_left_panel_visible, setIsLeftPanelVisible] = useState(false);
-  const [create_event_stage, setCreateEventStage] = useState(0);
+  const [is_left_panel_visible, setIsLeftPanelVisible] = useState(true);
   const [isEventInvitesPanelVisible, setIsEventInvitesPanelVisible] = useState(false);
-  const [isFriendRequestsPanelVisible, setIsFriendRequestsPanelVisible] = useState(false);
+  const [isFriendRequestsModalVisible, setIsFriendRequestsModalVisible] = useState(false);
+  const [create_event_stage, setCreateEventStage] = useState(0);
 
 
   const exitCreateEventMode = () => {
@@ -68,7 +68,7 @@ export function HomePage() {
     exitAttendEventMode();
     setIsLeftPanelVisible(false);
     setIsEventInvitesPanelVisible(false);
-    // setIsFriendRequestsPanelVisible(false);
+    setIsFriendRequestsModalVisible(false);
   };
 
   const initializeCreateEventMode = () => {
@@ -86,11 +86,15 @@ export function HomePage() {
     console.log('handleEventInvitesButtonClick: isEventInvitesPanelVisible = ', isEventInvitesPanelVisible);
   };
 
+  const handleFriendRequestsButtonClick = () => {
+    setIsFriendRequestsModalVisible(!isFriendRequestsModalVisible);
+    console.log('handleFriendRequestsButtonClick: isFriendRequestsModalVisible = ', isFriendRequestsModalVisible);
+  };
+
   const handleCreateEventButtonClick = () => {
     initializeCreateEventMode();
     console.log('handleCreateEventButtonClick: create_event_stage = ', create_event_stage);
   };
-
 
   return (
     <Layout
@@ -124,6 +128,10 @@ export function HomePage() {
       setAttendEventStage={setAttendEventStage}
       exitAttendEventMode={exitAttendEventMode}
 
+      // Friend Requests props
+      isFriendRequestsModalVisible={isFriendRequestsModalVisible}
+      setIsFriendRequestsModalVisible={setIsFriendRequestsModalVisible}
+      onFriendRequestsButtonClick={handleFriendRequestsButtonClick}
     >
     </Layout>
   );
