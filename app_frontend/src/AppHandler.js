@@ -8,6 +8,7 @@ import { LoginPage } from './pages/LoginPage';
 import { HomePage } from './pages/HomePage';
 import { CreateAccountPage } from './pages/CreateAccountPage';
 import {
+  // AttendEventContext,
   CreateEventProvider,
   CreateUserProfileContext,
   GoogleMapsApiKeyContext,
@@ -21,7 +22,9 @@ import { getUserSession } from './utils/SessionManager';
 export function AppHandler() {
   const [user_session, setUserSession] = useState(null);
   const [logger, setLogger] = useState(null);
-  const [ user_auth_context, setUserAuthContext ] = useState({});
+  const [user_auth_context, setUserAuthContext] = useState({});
+
+  // const [attend_event_context, setAttendEventContext] = useState({});
   const [create_user_profile_context, setCreateUserProfileContext] = useState({});
 
   const [fetching_google_maps_api_key, setFetchingGoogleMapsApiKey] = useState(true);
@@ -71,6 +74,7 @@ export function AppHandler() {
             <UserAuthContext.Provider value={{ user_auth_context, setUserAuthContext }}>
               <UserSessionContext.Provider value={{ user_session, setUserSession }}>
                 <CreateUserProfileContext.Provider value={{ create_user_profile_context, setCreateUserProfileContext }}>
+                  {/* <AttendEventContext.Provider value={{ attend_event_context, setAttendEventContext }}> */}
                   <CreateEventProvider>
                     <Routes>
                       <Route path="/" element={<HomePage />} />
@@ -78,6 +82,7 @@ export function AppHandler() {
                       <Route path="/create-account" element={<CreateAccountPage />} />
                     </Routes>
                   </CreateEventProvider>
+                  {/* </AttendEventContext.Provider> */}
                 </CreateUserProfileContext.Provider>
               </UserSessionContext.Provider>
             </UserAuthContext.Provider>

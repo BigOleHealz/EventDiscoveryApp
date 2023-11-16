@@ -16,6 +16,8 @@ import {
 import { useFetchGoogleProfile, useAuthenticateUser } from '../utils/Hooks';
 import { login_page_styles, button_styles, common_styles } from '../styles';
 
+const margins = { xs: "5px", sm: "8px", md: "10px" }
+
 export function LoginPage() {
 
   const { create_user_profile_context, setCreateUserProfileContext } = React.useContext(CreateUserProfileContext);
@@ -59,7 +61,7 @@ export function LoginPage() {
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
-        height: '100vh'
+        height: '100vh',
       }} >
       <BoxComponent style={login_page_styles.horizontalContainer}>
         <Typography
@@ -75,14 +77,17 @@ export function LoginPage() {
             fontWeight: 700,
             color: "inherit",
             textDecoration: "none",
-            margin: "5px",
+            margin: margins
           }}
         >
           Login
         </Typography>
         <Button
           onClick={() => login()}
-          sx={{ ...button_styles.menu_button_styles, margin: "5px" }}
+          sx={{
+            ...button_styles.menu_button_styles,
+            margin: margins
+          }}
         >
           Sign in with Google
         </Button>
