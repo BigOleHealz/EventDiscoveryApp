@@ -16,7 +16,9 @@ import { map_styles } from '../styles';
 
 export default function Map({
   mapRef,
-  map_events_filtered
+  map_events_filtered,
+  setAttendEventStage,
+  exitAttendEventMode,
 }) {
   // const { logger, setLogger } = React.useContext(LoggerContext);
   const { user_session, setUserSession } = React.useContext(UserSessionContext);
@@ -70,6 +72,8 @@ export default function Map({
                 event={event}
                 activePopup={activePopup}
                 onSetActivePopup={handleSetActivePopup}
+                setAttendEventStage={setAttendEventStage}
+                exitAttendEventMode={exitAttendEventMode}
                 // clusterer={clusterer}
               />
             ))
