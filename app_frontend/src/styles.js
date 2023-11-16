@@ -406,3 +406,11 @@ export const tooltip_styles = {
     margin: 0,
   },
 };
+
+export const table_styles = {
+  table_cell: {
+    backgroundColor: common_styles.appTheme.backgroundColor,
+    color: common_styles.appTheme.color,
+    borderBottom: 'none',
+  },
+};

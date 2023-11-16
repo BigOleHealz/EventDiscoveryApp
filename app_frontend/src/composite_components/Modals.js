@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import { format } from 'date-fns';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Divider from '@mui/material/Divider';
 
 import BoxComponent from '../base_components/BoxComponent';
 import { CalendarComponent } from '../base_components/CalendarComponent';
 import { ModalComponent } from '../base_components/ModalComponent';
 import { TextInputComponent } from '../base_components/TextInputComponent';
 import { TimeRangeSliderComponent } from '../base_components/TimeRangeSliderComponent';
+import { FriendRequestsTable } from './Tables';
 import { SelectInterestsScrollView } from './SelectInterestsScrollview';
 import { SwitchComponent } from './SwitchComponent';
 
@@ -14,6 +18,65 @@ import { day_start_time, day_end_time, day_format } from '../utils/constants';
 import { CreateEventContext, CreateUserProfileContext, UserSessionContext } from '../utils/Contexts';
 import { convertUTCDateToLocalDate } from '../utils/HelperFunctions';
 import { useFetchUsername } from '../utils/Hooks';
+
+export const FriendRequestsModal = ({
+  isVisible,
+  handleSubmitButtonClick,
+  onRequestClose,
+  ...props
+}) => {
+
+  const height_text_input_and_button = { xs: '40px', sm: '45px', md: '50px', lg: '55px', xl: '60px' };
+  const margin_text_input_and_button = { xs: '3px', sm: '4px', md: '5px', lg: '6px', xl: '7px' };
+  const friend_request_vertical_margin = { xs: '5px', sm: '10px', md: '15px', lg: '20px', xl: '25px'}
+
+  const [friend_request_username, setFriendRequestUsername] = useState('');
+
+  const handleFriendRequestUsernameChange = (text) => {
+    setFriendRequestUsername(text.target.value);
+  };
+
+  return (
+    <ModalComponent
+      isVisible={isVisible}
+      onRequestClose={onRequestClose}
+      title="Manage Friends"
+      submitButtonText="Submit"
+      onSubmitButtonClick={handleSubmitButtonClick}
+    >
+      <BoxComponent sx={{ width: '100%', height: '100%' }}>
+        <Box display="flex" flexDirection="row" alignItems="center" justifyContent="space-between">
+          <TextInputComponent
+            id="input-friend-request-username"
+            label="Enter Friend's Username"
+            value={friend_request_username}
+            onChangeText={handleFriendRequestUsernameChange}
+            style={{ flexGrow: 1, marginRight: margin_text_input_and_button, height: height_text_input_and_button, padding: 0 }}
+          />
+          <Button
+            id="button-friend-request-submit"
+            variant="contained"
+            color="primary"
+            onClick={handleSubmitButtonClick}
+            sx={{ marginLeft: margin_text_input_and_button, height: height_text_input_and_button }}
+
+          >
+            Send Request
+          </Button>
+        </Box>
+        <Divider
+          sx={{
+            marginTop: friend_request_vertical_margin,
+            marginBottom: friend_request_vertical_margin,
+            backgroundColor: 'grey'
+          }}/>
+        <Box>
+          <FriendRequestsTable />
+        </Box>
+      </BoxComponent>
+    </ModalComponent>
+  );
+}
 
 export const EventViewerModal = ({
   isVisible,
@@ -288,7 +351,6 @@ export const CreateUsernameModal = ({
 
   return (
     <>
-      <ToastContainer />
       <ModalComponent
         id="create-username-modal"
         isVisible={isVisible}

@@ -4,7 +4,7 @@ import SwipeableDrawer from '@mui/material/SwipeableDrawer';
 import BoxComponent from '../base_components/BoxComponent';
 import { CalendarComponent } from '../base_components/CalendarComponent';
 import { TimeRangeSliderComponent } from '../base_components/TimeRangeSliderComponent';
-import { SelectInterestsScrollView } from './SelectInterestsScrollview';
+import { EventTypesTable } from './Tables';
 import { day_start_time, day_end_time } from '../utils/constants';
 
 
@@ -52,7 +52,7 @@ export default function LeftSidePanel({
           setIsLeftPanelVisible(true);
         }}
       >
-        <BoxComponent style={{height: '100%'}}>
+        <BoxComponent style={{ height: '100%' }}>
           <CalendarComponent
             testid="left-calendar"
             selected={find_event_selected_date}
@@ -64,7 +64,7 @@ export default function LeftSidePanel({
             endTime={find_event_end_time}
             setEndTime={setFindEventEndTime}
           />
-          <SelectInterestsScrollView
+          <EventTypesTable
             event_types_selected={event_types_selected}
             setEventTypesSelected={setEventTypesSelected}
           />
