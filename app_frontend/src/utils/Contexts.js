@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 
+export const AttendEventContext = React.createContext();
+
 export const CreateEventContext = React.createContext();
 
 export const CreateUserProfileContext = React.createContext();

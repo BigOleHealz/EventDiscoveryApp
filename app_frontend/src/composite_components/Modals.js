@@ -15,6 +15,36 @@ import { CreateEventContext, CreateUserProfileContext, UserSessionContext } from
 import { convertUTCDateToLocalDate } from '../utils/HelperFunctions';
 import { useFetchUsername } from '../utils/Hooks';
 
+export const EventViewerModal = ({
+  isVisible,
+  handleSubmitButtonClick,
+  event,
+  onRequestClose,
+  ...props
+}) => {
+
+  return (
+    <ModalComponent
+      isVisible={isVisible}
+      onRequestClose={onRequestClose}
+      title="Event Viewer"
+      submitButtonText="Attend Event"
+      onSubmitButtonClick={handleSubmitButtonClick}
+    >
+      <BoxComponent style={{ width: '100%', height: '100%' }}>
+        <iframe 
+          src={event.EventURL}
+          title="Event Content"
+          style={{
+            border: 'none',
+            width: '100%',
+            height: '100%'
+          }}
+        />
+      </BoxComponent>
+    </ModalComponent>
+  );
+}
 
 export const CreateEventDatetimeModal = ({
   isVisible,

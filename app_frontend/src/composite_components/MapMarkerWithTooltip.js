@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import moment from 'moment';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
 
 import { InfoWindow, Marker } from '@react-google-maps/api';
-import { LoggerContext } from '../utils/Contexts';
+import { AttendEventContext, LoggerContext } from '../utils/Contexts';
 import { convertUTCDateToLocalDate } from '../utils/HelperFunctions';
+import { EventViewerModal } from './Modals';
 
 import { icon_size, iconSvgObject } from '../utils/constants'
 
@@ -13,9 +16,12 @@ const MapMarkerWithTooltip = ({
   event,
   activePopup,
   onSetActivePopup,
+  setAttendEventStage,
+  exitAttendEventMode,
   clusterer
 }) => {
   const [showTooltip, setShowTooltip] = useState(false);
+  const { attend_event_context, setAttendEventContext } = React.useContext(AttendEventContext);
   // const { logger, setLogger } = React.useContext(LoggerContext);
   const icon = iconSvgObject(event.PinColor);
 
@@ -40,10 +46,14 @@ const MapMarkerWithTooltip = ({
     onSetActivePopup(event.UUID);
   };
 
+  const handleAttendEventButtonClick = () => {
+    setAttendEventContext(event);
+    setAttendEventStage(1);
+  };
 
   const renderInfoContent = () => {
     return (
-      <div style={tooltip_styles.container}>
+      <Box style={tooltip_styles.container}>
         <div style={tooltip_styles.title}>{event.EventName}</div>
         <table style={tooltip_styles.table}>
           <tbody>
@@ -77,11 +87,21 @@ const MapMarkerWithTooltip = ({
             )}
           </tbody>
         </table>
-      </div>
+        <Button
+          variant="contained"
+          color="primary"
+          size="small"
+          onClick={handleAttendEventButtonClick}
+          style={tooltip_styles.buttonStyle}
+        >
+          View Event
+        </Button>
+      </Box>
     );
   };
 
   return (
+    <>
     <Marker
       position={position}
       onMouseOver={handleMouseOver}
@@ -101,6 +121,13 @@ const MapMarkerWithTooltip = ({
         </InfoWindow>
       )}
     </Marker>
+    <EventViewerModal
+      isVisible={attend_event_context.UUID === event.UUID}
+      handleSubmitButtonClick={handleAttendEventButtonClick}
+      event={event}
+      onRequestClose={exitAttendEventMode}
+    />
+    </>
   );
 
 };

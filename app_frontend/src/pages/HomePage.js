@@ -5,7 +5,7 @@ import { format } from 'date-fns';
 
 import Layout from '../container_components/Layout';
 import { day_start_time, day_end_time, day_format } from '../utils/constants';
-import { LoggerContext, UserSessionContext, CreateEventContext } from '../utils/Contexts';
+import { AttendEventContext, LoggerContext, UserSessionContext, CreateEventContext } from '../utils/Contexts';
 import { convertUTCDateToLocalDate } from '../utils/HelperFunctions';
 import { useFetchEvents, useFetchGoogleMapsApiKey, useFilterEvents } from '../utils/Hooks';
 
@@ -43,6 +43,9 @@ export function HomePage() {
   useFetchEvents(fetching_events, start_timestamp, end_timestamp, setMapEventsFullDay, setFetchingEvents);
   useFilterEvents(find_event_selected_date, find_event_start_time, find_event_end_time, map_events_full_day, event_types_selected, setMapEventsFiltered);
 
+  const [ attend_event_context, setAttendEventContext ] = useState({});
+  const [attend_event_stage, setAttendEventStage] = useState(0);
+  
   // Handle left side panel
   const [is_left_panel_visible, setIsLeftPanelVisible] = useState(false);
   const [create_event_stage, setCreateEventStage] = useState(0);
@@ -55,10 +58,16 @@ export function HomePage() {
     setCreateEventStage(0);
   };
 
+  const exitAttendEventMode = () => {
+    setAttendEventContext({});
+    setAttendEventStage(0);
+  };
+
   const resetAllStates = () => {
     exitCreateEventMode();
+    exitAttendEventMode();
     setIsLeftPanelVisible(false);
-    // setIsEventInvitesPanelVisible(false);
+    setIsEventInvitesPanelVisible(false);
     // setIsFriendRequestsPanelVisible(false);
   };
 
@@ -72,6 +81,11 @@ export function HomePage() {
     console.log('handleFindEventsButtonClick: is_left_panel_visible = ', is_left_panel_visible);
   };
 
+  const handleEventInvitesButtonClick = () => {
+    setIsEventInvitesPanelVisible(!isEventInvitesPanelVisible);
+    console.log('handleEventInvitesButtonClick: isEventInvitesPanelVisible = ', isEventInvitesPanelVisible);
+  };
+
   const handleCreateEventButtonClick = () => {
     initializeCreateEventMode();
     console.log('handleCreateEventButtonClick: create_event_stage = ', create_event_stage);
@@ -81,6 +95,7 @@ export function HomePage() {
   return (
     <Layout
       onFindEventsButtonClick={handleFindEventsButtonClick}
+      onEventInvitesButtonClick={handleEventInvitesButtonClick}
       onCreateEventButtonClick={handleCreateEventButtonClick}
 
       // LeftSidePanel props
@@ -103,6 +118,11 @@ export function HomePage() {
       create_event_stage={create_event_stage}
       setCreateEventStage={setCreateEventStage}
       exitCreateEventMode={exitCreateEventMode}
+
+      // Attend Event props
+      attend_event_stage={attend_event_stage}
+      setAttendEventStage={setAttendEventStage}
+      exitAttendEventMode={exitAttendEventMode}
 
     >
     </Layout>
