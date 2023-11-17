@@ -5,6 +5,105 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { storeUserSession } from './SessionManager';
 
+export const useRespondToFriendRequest = (friend_request_response, setFriendRequestResponse, setFetchingPendingFriendRequests) => {
+  useEffect(() => {
+    if (friend_request_response) {
+      console.log('friend_request_response:', friend_request_response)
+      fetch('/api/respond_to_friend_request', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ ...friend_request_response })
+      }).then(res => res.json())
+        .then(data => {
+          console.log(data);
+          if (data) {
+            if (data.result === null) {
+              toast.error('An error occurred. Backend response does not contain a result!');
+            } else if (data.result.STATUS === 'SUCCESS') {
+              toast.success('Response Sent Successfully!');
+            } else if (data.result.STATUS === 'ERROR') {
+              toast.error(data.result.MESSAGE);
+            } else {
+              toast.error('An unknown error occurred. Printing response to console.');
+              console.error(data);
+            }
+          }
+        }).catch((error) => {
+          console.error('Error:', error);
+          toast.error('An error occurred while responding to friend request!');
+        });
+    }
+    setFriendRequestResponse(null);
+    setFetchingPendingFriendRequests(true);
+  }, [friend_request_response]);
+};
+
+export const useFetchPendingFriendRequests = (recipient, fetching_pending_friend_requests, setFetchingPendingFriendRequests, setPendingFriendRequests) => {
+  useEffect(() => {
+    if (fetching_pending_friend_requests) {
+      fetch('/api/fetch_pending_friend_requests', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({...recipient}),
+      }).then(res => res.json())
+        .then(data => {
+          console.log(data);
+          if (data) {
+            setPendingFriendRequests(data);
+          } else {
+            console.error('An error occurred. Backend response does not contain a result!');
+            toast.error('An error occurred. Backend response does not contain a result!');
+          }
+        }).catch((error) => {
+          console.error('Error:', error);
+          toast.error('An error occurred while checking if username exists!');
+        });
+    }
+    setFetchingPendingFriendRequests(false);
+  }, [fetching_pending_friend_requests]);
+};
+
+
+export const useCreateFriendRequestRelationshipIfNotExist = (username_sender, username_recipient, sending_friend_request, setSendingFriendRequest, setFriendRequestUsername) => {
+  useEffect(() => {
+    if (sending_friend_request) {
+      fetch('/api/create_friend_request_relationship_if_not_exists', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          UsernameSender: username_sender,
+          UsernameRecipient: username_recipient
+        }),
+      }).then(res => res.json())
+        .then(data => {
+          console.log(data);
+          if (data) {
+            if (data.result === null) {
+              toast.error('An error occurred. Backend response does not contain a result!');
+            } else if (data.result.STATUS === 'SUCCESS') {
+              toast.success('Friend Request Sent!');
+              setFriendRequestUsername('');
+            } else if (data.result.STATUS === 'ERROR') {
+              toast.error(data.result.MESSAGE);
+            } else {
+              toast.error('An unknown error occurred. Printing response to console.');
+              console.error(data);
+            }
+          }
+        }).catch((error) => {
+          console.error('Error:', error);
+          toast.error('An error occurred while trying to send friend request!');
+        });
+    }
+    setSendingFriendRequest(false);
+  }, [sending_friend_request]);
+};
 
 export const useFetchUsername = (fetching_username_is_taken, username, setFetchingUsernameExists, setCreateUserProfileContext, create_user_profile_context, onUsernameAvailable) => {
   useEffect(() => {

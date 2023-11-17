@@ -17,12 +17,6 @@ export const InfoWindowComponent = ({ children, onCloseClick, position }) => {
     return () => window.removeEventListener('mousedown', handleOutsideClick);
   }, [onCloseClick]);
 
-  // Recalculate position of the InfoWindow to be slightly higher
-  // const adjustedPosition = {
-  //   lat: position.lat + 175 / (111.32 * 1000), // 50 meters higher
-  //   lng: position.lng,
-  // };
-
   return (
     <InfoWindow
       position={position}

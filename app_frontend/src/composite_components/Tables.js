@@ -1,17 +1,30 @@
 import React, { useState } from 'react';
 import { AcceptDeclineTable, CheckboxTableComponent } from '../base_components/TableComponents'; // Adjust the import path as necessary
-import { useFetchEventTypes } from '../utils/Hooks';
+import {
+  useFetchEventTypes,
+  useFetchPendingFriendRequests,
+  useRespondToFriendRequest
+} from '../utils/Hooks';
 
-export const FriendRequestsTable = () => {
+export const FriendRequestsTable = ({
+  user_session,
+}) => {
 
-  const rows = [
-    { id: 1, name: 'Item 1', onAccept: () => console.log("Item 1 accepted"), onDecline: () => console.log("Item 1 declined") },
-    { id: 2, name: 'Item 2', onAccept: () => console.log("Item 2 accepted"), onDecline: () => console.log("Item 2 declined") },
-    { id: 3, name: 'Item 3', onAccept: () => console.log("Item 3 accepted"), onDecline: () => console.log("Item 3 declined") },
-    { id: 4, name: 'Item 4', onAccept: () => console.log("Item 4 accepted"), onDecline: () => console.log("Item 4 declined") },
-    { id: 5, name: 'Item 5', onAccept: () => console.log("Item 5 accepted"), onDecline: () => console.log("Item 5 declined") },
-    { id: 6, name: 'Item 6', onAccept: () => console.log("Item 6 accepted"), onDecline: () => console.log("Item 6 declined") },
-  ];
+  const [pending_friend_requests, setPendingFriendRequests] = useState([]);
+  const [fetching_pending_friend_requests, setFetchingPendingFriendRequests] = useState(true);
+
+  const [friend_request_response, setFriendRequestResponse] = useState(null);
+  const rows = pending_friend_requests.map((friend_request) => {
+    return {
+      id: friend_request.UUID,
+      name: friend_request.SENDER_USERNAME,
+      onAccept: () => setFriendRequestResponse({ friend_request_uuid: friend_request.UUID, response: "ACCEPTED" }),
+      onDecline: () => setFriendRequestResponse({ friend_request_uuid: friend_request.UUID, response: "DECLINED" })
+    }
+  });
+
+  useFetchPendingFriendRequests(user_session, fetching_pending_friend_requests, setFetchingPendingFriendRequests, setPendingFriendRequests)
+  useRespondToFriendRequest(friend_request_response, setFriendRequestResponse, setFetchingPendingFriendRequests)
 
   return (
     <AcceptDeclineTable rows={rows} />
@@ -36,7 +49,6 @@ export const EventTypesTable = ({
       isChecked: event_types_selected.includes(event_type.UUID),
     }
   });
-  console.log('EventTypesTable: event_types_selected = ', event_types_selected);
   return (
     <CheckboxTableComponent rows={rows} selected={event_types_selected} setSelected={setEventTypesSelected} />
   );
