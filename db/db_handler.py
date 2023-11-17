@@ -235,8 +235,6 @@ class Neo4jDB:
         except Exception as e:
             pass
         
-
-    
     def create_event_node(self, properties: dict=None):
         self.logger.emit(f'Running {sys._getframe().f_code.co_name}')
         node = self.__create_node(node_labels='Event', properties=properties)
@@ -403,7 +401,6 @@ class Neo4jDB:
             
             self.__create_relationship(node_a=node_a, relationship_label='FRIENDS_WITH', node_b=node_b, properties=properties)
             self.__create_relationship(node_a=node_b, relationship_label='FRIENDS_WITH', node_b=node_a, properties=properties)
-            # return self.run_command(queries.CREATE_FRIENDSHIP.format(node_a=node_a, node_b=node_b, properties=properties))
             self.logger.emit(f'Created FRIENDS_WITH relationship between {node_a["Email"]}<->{node_b["Email"]}')
             tx.commit()
         except Exception as error:

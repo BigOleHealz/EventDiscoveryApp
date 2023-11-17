@@ -372,10 +372,8 @@ export const useAuthenticateUser = (
   user_auth_context,
   setCreateUserProfileContext,
   setUserSession,
-  resetLoginInfo,
   // logger
 ) => {
-  const navigate = useNavigate();
 
   console.log('user_auth_context:', user_auth_context)
   useEffect(() => {
@@ -399,7 +397,6 @@ export const useAuthenticateUser = (
             toast.success('Welcome New User!');
             console.log('No user data returned for email:', email);
             setCreateUserProfileContext(user_auth_context);
-            navigate('/create-account');
             return;
           } else {
             const user_session_data = data;

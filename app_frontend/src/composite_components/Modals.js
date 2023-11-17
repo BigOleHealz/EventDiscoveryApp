@@ -13,6 +13,7 @@ import { TimeRangeSliderComponent } from '../base_components/TimeRangeSliderComp
 import { FriendRequestsTable } from './Tables';
 import { SelectInterestsScrollView } from './SelectInterestsScrollview';
 import { SwitchComponent } from './SwitchComponent';
+import { EventTypesTable } from './Tables';
 
 import { day_start_time, day_end_time, day_format } from '../utils/constants';
 import { CreateEventContext, CreateUserProfileContext, UserSessionContext } from '../utils/Contexts';
@@ -22,16 +23,46 @@ import {
   useFetchUsername
 } from '../utils/Hooks';
 
-export const FriendRequestsModal = ({
+export const EventInvitesModal = ({
   isVisible,
-  handleSubmitButtonClick,
   onRequestClose,
   ...props
 }) => {
 
   const height_text_input_and_button = { xs: '40px', sm: '45px', md: '50px', lg: '55px', xl: '60px' };
   const margin_text_input_and_button = { xs: '3px', sm: '4px', md: '5px', lg: '6px', xl: '7px' };
-  const friend_request_vertical_margin = { xs: '5px', sm: '10px', md: '15px', lg: '20px', xl: '25px'}
+  const friend_request_vertical_margin = { xs: '5px', sm: '10px', md: '15px', lg: '20px', xl: '25px' }
+
+  const { user_session, setUserSession } = useContext(UserSessionContext);
+
+  const [friend_request_username, setFriendRequestUsername] = useState('');
+  const [sending_friend_request, setSendingFriendRequest] = useState(false);
+
+
+  return (
+    <ModalComponent
+      isVisible={isVisible}
+      onRequestClose={onRequestClose}
+      title="Event Invites"
+      submitButtonText="Close"
+      onSubmitButtonClick={onRequestClose}
+    >
+      <BoxComponent sx={{ width: '100%', height: '100%' }}>
+        event invites
+      </BoxComponent>
+    </ModalComponent>
+  );
+}
+
+export const FriendRequestsModal = ({
+  isVisible,
+  onRequestClose,
+  ...props
+}) => {
+
+  const height_text_input_and_button = { xs: '40px', sm: '45px', md: '50px', lg: '55px', xl: '60px' };
+  const margin_text_input_and_button = { xs: '3px', sm: '4px', md: '5px', lg: '6px', xl: '7px' };
+  const friend_request_vertical_margin = { xs: '5px', sm: '10px', md: '15px', lg: '20px', xl: '25px' }
 
   const { user_session, setUserSession } = useContext(UserSessionContext);
 
@@ -59,8 +90,8 @@ export const FriendRequestsModal = ({
       isVisible={isVisible}
       onRequestClose={onRequestClose}
       title="Manage Friends"
-      submitButtonText="Submit"
-      onSubmitButtonClick={handleSubmitButtonClick}
+      submitButtonText="Close"
+      onSubmitButtonClick={onRequestClose}
     >
       <BoxComponent sx={{ width: '100%', height: '100%' }}>
         <Box display="flex" flexDirection="row" alignItems="center" justifyContent="space-between">
@@ -73,7 +104,8 @@ export const FriendRequestsModal = ({
               flexGrow: 1,
               marginRight: margin_text_input_and_button,
               height: height_text_input_and_button,
-              padding: 0 }}
+              padding: 0
+            }}
           />
           <Button
             id="button-friend-request-submit"
@@ -93,9 +125,9 @@ export const FriendRequestsModal = ({
             marginTop: friend_request_vertical_margin,
             marginBottom: friend_request_vertical_margin,
             backgroundColor: 'grey'
-          }}/>
+          }} />
         <Box>
-          <FriendRequestsTable user_session={user_session}/>
+          <FriendRequestsTable user_session={user_session} />
         </Box>
       </BoxComponent>
     </ModalComponent>
@@ -119,7 +151,7 @@ export const EventViewerModal = ({
       onSubmitButtonClick={handleSubmitButtonClick}
     >
       <BoxComponent style={{ width: '100%', height: '100%' }}>
-        <iframe 
+        <iframe
           src={event.EventURL}
           title="Event Content"
           style={{
@@ -399,10 +431,7 @@ export const CreateUsernameModal = ({
 
 export const SelectInterestsModal = ({
   isVisible,
-  // setIsSelectInterestsModalVisible,
   onRequestClose,
-  // onInterestsSelected,
-  // accountUUID,
   onSubmitButtonClick,
   updateSelectedUUIDs
 }) => {
@@ -423,7 +452,10 @@ export const SelectInterestsModal = ({
       submitButtonText="Submit Interests"
       onSubmitButtonClick={handleSubmitButtonClick}
     >
-      <SelectInterestsScrollView setEventTypesSelected={setEventTypesSelected} />
+      <EventTypesTable
+        event_types_selected={event_types_selected}
+        setEventTypesSelected={setEventTypesSelected}
+      />
     </ModalComponent>
   );
 };

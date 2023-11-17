@@ -14,9 +14,9 @@ export default function Navbar({
   navbarHeight,
   is_left_panel_visible,
   setIsLeftPanelVisible,
-  isEventInvitesPanelVisible,
-  setIsEventInvitesPanelVisible,
-  isFriendRequestsModalVisible,
+  is_event_invites_modal_visible,
+  setIsEventInvitesModalVisible,
+  is_friend_requests_modal_visible,
   setIsFriendRequestsModalVisible,
   create_event_stage,
   initializeCreateEventMode,
@@ -37,23 +37,23 @@ export default function Navbar({
   };
 
   const handleEventInvitesButtonClick = () => {
-    if (isEventInvitesPanelVisible === false) {
+    if (is_event_invites_modal_visible === false) {
       resetAllStates();
-      setIsEventInvitesPanelVisible(true);
+      setIsEventInvitesModalVisible(true);
     } else {
-      setIsEventInvitesPanelVisible(false);
+      setIsEventInvitesModalVisible(false);
     }
-    console.log('handleEventInvitesButtonClick: isEventInvitesPanelVisible = ', isEventInvitesPanelVisible);
+    console.log('handleEventInvitesButtonClick: is_event_invites_modal_visible = ', is_event_invites_modal_visible);
   };
 
   const handleFriendRequestsButtonClick = () => {
-    if (isFriendRequestsModalVisible === false) {
+    if (is_friend_requests_modal_visible === false) {
       resetAllStates();
       setIsFriendRequestsModalVisible(true);
     } else {
       setIsFriendRequestsModalVisible(false);
     }
-    console.log('handleFriendRequestsButtonClick: isFriendRequestsModalVisible = ', isFriendRequestsModalVisible);
+    console.log('handleFriendRequestsButtonClick: is_friend_requests_modal_visible = ', is_friend_requests_modal_visible);
   };
 
   const handleCreateEventButtonClick = () => {

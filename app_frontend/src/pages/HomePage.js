@@ -13,6 +13,7 @@ export function HomePage() {
   const mapRef = useRef();
   // const { logger, setLogger } = React.useContext(LoggerContext);
   const { user_session, setUserSession } = React.useContext(UserSessionContext);
+  const { attend_event_context, setAttendEventContext } = React.useContext(AttendEventContext);
 
   const currentDateTime = new Date();
   const [find_event_start_time, setFindEventStartTime] = useState(day_start_time);
@@ -42,13 +43,12 @@ export function HomePage() {
   useFetchEvents(fetching_events, start_timestamp, end_timestamp, setMapEventsFullDay, setFetchingEvents);
   useFilterEvents(find_event_selected_date, find_event_start_time, find_event_end_time, map_events_full_day, event_types_selected, setMapEventsFiltered);
 
-  const [ attend_event_context, setAttendEventContext ] = useState({});
   const [attend_event_stage, setAttendEventStage] = useState(0);
   
   // Handle left side panel
   const [is_left_panel_visible, setIsLeftPanelVisible] = useState(false);
-  const [isEventInvitesPanelVisible, setIsEventInvitesPanelVisible] = useState(false);
-  const [isFriendRequestsModalVisible, setIsFriendRequestsModalVisible] = useState(true);
+  const [is_event_invites_modal_visible, setIsEventInvitesModalVisible] = useState(false);
+  const [is_friend_requests_modal_visible, setIsFriendRequestsModalVisible] = useState(false);
   const [create_event_stage, setCreateEventStage] = useState(0);
 
 
@@ -66,7 +66,7 @@ export function HomePage() {
     exitCreateEventMode();
     exitAttendEventMode();
     setIsLeftPanelVisible(false);
-    setIsEventInvitesPanelVisible(false);
+    setIsEventInvitesModalVisible(false);
     setIsFriendRequestsModalVisible(false);
   };
 
@@ -105,8 +105,12 @@ export function HomePage() {
       setAttendEventStage={setAttendEventStage}
       exitAttendEventMode={exitAttendEventMode}
 
+      // Event Invites props
+      is_event_invites_modal_visible={is_event_invites_modal_visible}
+      setIsEventInvitesModalVisible={setIsEventInvitesModalVisible}
+
       // Friend Requests props
-      isFriendRequestsModalVisible={isFriendRequestsModalVisible}
+      is_friend_requests_modal_visible={is_friend_requests_modal_visible}
       setIsFriendRequestsModalVisible={setIsFriendRequestsModalVisible}
 
       //Navbar props

@@ -25,7 +25,7 @@ export function AppHandler() {
   const [user_auth_context, setUserAuthContext] = useState({});
 
   const [attend_event_context, setAttendEventContext] = useState({});
-  const [create_user_profile_context, setCreateUserProfileContext] = useState({});
+  const [create_user_profile_context, setCreateUserProfileContext] = useState(null);
 
   const [fetching_google_maps_api_key, setFetchingGoogleMapsApiKey] = useState(true);
   const [google_maps_api_key, setGoogleMapsApiKey] = useState(null);
@@ -46,11 +46,12 @@ export function AppHandler() {
   useEffect(() => {
     if (user_session) {
       navigate('/');
-    }
-    else {
+    } else if (create_user_profile_context) {
+      navigate('/create-account');
+    } else {
       navigate('/login');
     }
-  }, [user_session, navigate]);
+  }, [user_session, create_user_profile_context]);
 
   useEffect(() => {
     if (google_client_id === false) {

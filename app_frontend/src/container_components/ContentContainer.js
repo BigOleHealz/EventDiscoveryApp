@@ -3,13 +3,15 @@ import Box from "@mui/material/Box";
 
 import { CreateEventWorkflow } from '../composite_components/CreateEventWorkflow';
 import { AttendEventWorkflow } from '../composite_components/AttendEventWorkflow';
-import { FriendRequestsModal } from '../composite_components/Modals';
+import { EventInvitesModal, FriendRequestsModal } from '../composite_components/Modals';
 import LeftSidePanel from '../composite_components/LeftSidePanel';
 import Map from '../composite_components/Map';
 
 export default function ContentContainer({
   attend_event_stage,
-  isFriendRequestsModalVisible,
+  is_event_invites_modal_visible,
+  setIsEventInvitesModalVisible,
+  is_friend_requests_modal_visible,
   setIsFriendRequestsModalVisible,
   ...props
 }) {
@@ -19,9 +21,13 @@ export default function ContentContainer({
       <LeftSidePanel {...props} />
       <Box style={{ position: 'relative' }}>
         <Map {...props} />
+        <EventInvitesModal
+          isVisible={is_event_invites_modal_visible}
+          onRequestClose={() => setIsEventInvitesModalVisible(false)}
+          {...props}
+        />
         <FriendRequestsModal
-          isVisible={isFriendRequestsModalVisible}
-          handleSubmitButtonClick={() => setIsFriendRequestsModalVisible(false)}
+          isVisible={is_friend_requests_modal_visible}
           onRequestClose={() => setIsFriendRequestsModalVisible(false)}
           {...props}
         />
