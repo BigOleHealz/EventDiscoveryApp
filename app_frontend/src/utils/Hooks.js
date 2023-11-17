@@ -77,8 +77,8 @@ export const useCreateFriendRequestRelationshipIfNotExist = (username_sender, us
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          UsernameSender: username_sender,
-          UsernameRecipient: username_recipient
+          username_sender: username_sender,
+          username_recipient: username_recipient
         }),
       }).then(res => res.json())
         .then(data => {

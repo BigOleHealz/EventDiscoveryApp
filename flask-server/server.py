@@ -218,19 +218,15 @@ def create_server():
             body = request.get_json()
             if not body:
                 return jsonify({"STATUS": "ERROR", "MESSAGE": "No input body provided"}), 400
-            username_sender = body.get('UsernameSender')
-            username_recipient = body.get('UsernameRecipient')
+            username_sender = body.get('username_sender')
+            username_recipient = body.get('username_recipient')
 
             if not username_sender:
                 return jsonify({"STATUS": "ERROR", "MESSAGE": "Missing username_sender"}), 400
             elif not username_recipient:
                 return jsonify({"STATUS": "ERROR", "MESSAGE": "Missing username_recipient"}), 400
 
-            formatted_query = queries.CREATE_FRIEND_REQUEST_RELATIONSHIP_IF_NOT_EXISTS.format(
-                                                                    username_sender=username_sender,
-                                                                    username_recipient=username_recipient
-                                                                )
-            result = neo4j.execute_query(formatted_query)
+            result = neo4j.execute_query_with_params(query=queries.CREATE_FRIEND_REQUEST_RELATIONSHIP_IF_NOT_EXISTS, params=body)
             if len(result) == 0:
                 return jsonify({"STATUS": "ERROR", "MESSAGE": "Friend request relationship could not be created"}), 400
             else:

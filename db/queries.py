@@ -368,24 +368,24 @@ CREATE_FRIENDSHIP = """
                     RETURN abr, bar;
                     """
 
-CREATE_FRIEND_REQUEST_RELATIONSHIP_IF_NOT_EXISTS = """
-    MATCH (sender:Person {{Username: "{username_sender}"}})
-    OPTIONAL MATCH (recipient:Person {{Username: "{username_recipient}"}})
-    OPTIONAL MATCH (sender)-[existingFriendRequest:FRIEND_REQUEST {{STATUS: "PENDING"}}]->(recipient)
-    OPTIONAL MATCH (sender)<-[existingFriendRequestReverse:FRIEND_REQUEST {{STATUS: "PENDING"}}]-(recipient)
+CREATE_FRIEND_REQUEST_RELATIONSHIP_IF_NOT_EXISTS = r"""
+    MATCH (sender:Person {Username: $params.username_sender})
+    OPTIONAL MATCH (recipient:Person {Username: $params.username_recipient})
+    OPTIONAL MATCH (sender)-[existingFriendRequest:FRIEND_REQUEST {STATUS: "PENDING"}]->(recipient)
+    OPTIONAL MATCH (sender)<-[existingFriendRequestReverse:FRIEND_REQUEST {STATUS: "PENDING"}]-(recipient)
     OPTIONAL MATCH (sender)-[existingFriends:FRIENDS_WITH]-(recipient)
     WITH sender, recipient, existingFriendRequest, existingFriendRequestReverse, existingFriends,
         CASE
             WHEN recipient IS NULL THEN
-                {{STATUS: "ERROR", MESSAGE: "No user with that username", UUID: null}}
+                {STATUS: "ERROR", MESSAGE: "No user with that username", UUID: null}
             WHEN existingFriendRequest IS NOT NULL THEN
-                {{STATUS: "ERROR", MESSAGE: "You have already sent a friend request to this person", UUID: existingFriendRequest.UUID}}
+                {STATUS: "ERROR", MESSAGE: "You have already sent a friend request to this person", UUID: existingFriendRequest.UUID}
             WHEN existingFriendRequestReverse IS NOT NULL THEN
-                {{STATUS: "ERROR", MESSAGE: "This person has already sent you a friend request", UUID: existingFriendRequestReverse.UUID}}
+                {STATUS: "ERROR", MESSAGE: "This person has already sent you a friend request", UUID: existingFriendRequestReverse.UUID}
             WHEN existingFriends IS NOT NULL THEN
-                {{STATUS: "ERROR", MESSAGE: "You are already friends with this person", UUID: null}}
+                {STATUS: "ERROR", MESSAGE: "You are already friends with this person", UUID: null}
             ELSE
-                {{STATUS: "SUCCESS", MESSAGE: "No existing relationship"}}
+                {STATUS: "SUCCESS", MESSAGE: "No existing relationship"}
         END as result
     WITH sender, recipient, result
     WHERE result.STATUS = "ERROR"
@@ -393,14 +393,14 @@ CREATE_FRIEND_REQUEST_RELATIONSHIP_IF_NOT_EXISTS = """
 
     UNION
 
-    MATCH (sender:Person {{Username: "{username_sender}"}}), (recipient:Person {{Username: "{username_recipient}"}})
-    OPTIONAL MATCH (sender)-[existingFriendRequest:FRIEND_REQUEST {{STATUS: "PENDING"}}]->(recipient)
-    OPTIONAL MATCH (sender)<-[existingFriendRequestReverse:FRIEND_REQUEST {{STATUS: "PENDING"}}]-(recipient)
+    MATCH (sender:Person {Username: $params.username_sender}), (recipient:Person {Username: $params.username_recipient})
+    OPTIONAL MATCH (sender)-[existingFriendRequest:FRIEND_REQUEST {STATUS: "PENDING"}]->(recipient)
+    OPTIONAL MATCH (sender)<-[existingFriendRequestReverse:FRIEND_REQUEST {STATUS: "PENDING"}]-(recipient)
     OPTIONAL MATCH (sender)-[existingFriends:FRIENDS_WITH]-(recipient)
     WITH sender, recipient, existingFriendRequest, existingFriendRequestReverse, existingFriends
     WHERE existingFriendRequest IS NULL AND existingFriendRequestReverse IS NULL AND existingFriends IS NULL
-    CREATE (sender)-[r:FRIEND_REQUEST {{FRIEND_REQUEST_TS: apoc.date.format(apoc.date.currentTimestamp(), "ms", "yyyy-MM-dd'T'HH:mm:ss"), STATUS: "PENDING", UUID: apoc.create.uuid()}}]->(recipient)
-    RETURN {{STATUS: "SUCCESS", MESSAGE: "Friend request sent", UUID: r.UUID}} as result;
+    CREATE (sender)-[r:FRIEND_REQUEST {FRIEND_REQUEST_TS: apoc.date.format(apoc.date.currentTimestamp(), "ms", "yyyy-MM-dd'T'HH:mm:ss"), STATUS: "PENDING", UUID: apoc.create.uuid()}]->(recipient)
+    RETURN {STATUS: "SUCCESS", MESSAGE: "Friend request sent", UUID: r.UUID} as result;
     """
 
 GET_PENDING_FRIEND_REQUESTS_BY_RECIPIENT_UUID = r"""
