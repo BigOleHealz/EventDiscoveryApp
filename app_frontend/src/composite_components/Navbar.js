@@ -12,12 +12,58 @@ import { common_styles } from "../styles";
 
 export default function Navbar({
   navbarHeight,
-  onFindEventsButtonClick,
-  onEventInvitesButtonClick,
-  onFriendRequestsButtonClick,
-  onCreateEventButtonClick,
+  is_left_panel_visible,
+  setIsLeftPanelVisible,
+  isEventInvitesPanelVisible,
+  setIsEventInvitesPanelVisible,
+  isFriendRequestsModalVisible,
+  setIsFriendRequestsModalVisible,
+  create_event_stage,
+  initializeCreateEventMode,
+  exitCreateEventMode,
+  resetAllStates,
+
   ...props
 }) {
+
+  const handleFindEventsButtonClick = () => {
+    if (is_left_panel_visible === false) {
+      resetAllStates();
+      setIsLeftPanelVisible(true);
+    } else {
+      setIsLeftPanelVisible(false);
+    }
+    console.log('handleFindEventsButtonClick: is_left_panel_visible = ', is_left_panel_visible);
+  };
+
+  const handleEventInvitesButtonClick = () => {
+    if (isEventInvitesPanelVisible === false) {
+      resetAllStates();
+      setIsEventInvitesPanelVisible(true);
+    } else {
+      setIsEventInvitesPanelVisible(false);
+    }
+    console.log('handleEventInvitesButtonClick: isEventInvitesPanelVisible = ', isEventInvitesPanelVisible);
+  };
+
+  const handleFriendRequestsButtonClick = () => {
+    if (isFriendRequestsModalVisible === false) {
+      resetAllStates();
+      setIsFriendRequestsModalVisible(true);
+    } else {
+      setIsFriendRequestsModalVisible(false);
+    }
+    console.log('handleFriendRequestsButtonClick: isFriendRequestsModalVisible = ', isFriendRequestsModalVisible);
+  };
+
+  const handleCreateEventButtonClick = () => {
+    if (create_event_stage === 0) {
+      resetAllStates();
+      initializeCreateEventMode();
+    } else {
+      exitCreateEventMode();
+    }
+  };
 
   return (
     <AppBar
@@ -38,25 +84,25 @@ export default function Navbar({
           }}>
           <NavbarButton
             id="button-find-events"
-            onClick={onFindEventsButtonClick}
+            onClick={handleFindEventsButtonClick}
             Icon={SearchIcon}
             text="Find Events"
           />
           <NavbarButton
             id="button-event-invites"
-            onClick={onEventInvitesButtonClick}
+            onClick={handleEventInvitesButtonClick}
             Icon={EventIcon}
             text="Event Invites"
           />
           <NavbarButton
             id="button-friend-requests"
-            onClick={onFriendRequestsButtonClick}
+            onClick={handleFriendRequestsButtonClick}
             Icon={PeopleAltIcon}
             text="Friend Requests"
           />
           <NavbarButton
             id="button-create-event"
-            onClick={onCreateEventButtonClick}
+            onClick={handleCreateEventButtonClick}
             Icon={AddIcon}
             text="Create Event"
           />

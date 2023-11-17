@@ -211,6 +211,73 @@ def create_server():
                 return jsonify({"success": False, "message": "Person node could not be created"}), 400
         except Exception as e:
             return jsonify({"message": "An error occurred: " + str(e)}), 500
+    
+    @app.route('/create_friend_request_relationship_if_not_exists', methods=["POST"])
+    def create_friend_request_relationship_if_not_exists():
+        try:
+            body = request.get_json()
+            if not body:
+                return jsonify({"STATUS": "ERROR", "MESSAGE": "No input body provided"}), 400
+            username_sender = body.get('UsernameSender')
+            username_recipient = body.get('UsernameRecipient')
+
+            if not username_sender:
+                return jsonify({"STATUS": "ERROR", "MESSAGE": "Missing username_sender"}), 400
+            elif not username_recipient:
+                return jsonify({"STATUS": "ERROR", "MESSAGE": "Missing username_recipient"}), 400
+
+            formatted_query = queries.CREATE_FRIEND_REQUEST_RELATIONSHIP_IF_NOT_EXISTS.format(
+                                                                    username_sender=username_sender,
+                                                                    username_recipient=username_recipient
+                                                                )
+            result = neo4j.execute_query(formatted_query)
+            if len(result) == 0:
+                return jsonify({"STATUS": "ERROR", "MESSAGE": "Friend request relationship could not be created"}), 400
+            else:
+                result = result[0]
+                return jsonify(result), 200
+        except Exception as e:
+            return jsonify({"STATUS": "ERROR", "MESSAGE": "An error occurred: " + str(e)}), 500
+    
+    @app.route('/respond_to_friend_request', methods=["POST"])
+    def respond_to_friend_request():
+        try:
+            body = request.get_json()
+            if not body:
+                return jsonify({"STATUS": "ERROR", "MESSAGE": "No input body provided"}), 400
+            friend_request_uuid = body.get('friend_request_uuid')
+            response = body.get('response')
+
+            if not friend_request_uuid:
+                return jsonify({"STATUS": "ERROR", "MESSAGE": "Missing friend_request_uuid"}), 400
+            elif not response:
+                return jsonify({"STATUS": "ERROR", "MESSAGE": "Missing response"}), 400
+            
+            result = neo4j.execute_query_with_params(query=queries.RESPOND_TO_FRIEND_REQUEST_BY_FRIEND_REQUEST_UUID, params=body)
+            if len(result) == 0:
+                return jsonify({"STATUS": "ERROR", "MESSAGE": "Friendship could not be created"}), 400
+            else:
+                result = result[0]
+                return jsonify(result), 200
+
+        except Exception as e:
+            return jsonify({"STATUS": "ERROR", "MESSAGE": "An error occurred: " + str(e)}), 500
+    
+    @app.route('/fetch_pending_friend_requests', methods=["POST"])
+    def fetch_pending_friend_requests():
+        try:
+            body = request.get_json()
+            if not body:
+                return jsonify({"STATUS": "ERROR", "MESSAGE": "No input body provided"}), 400
+            username = body.get('Username')
+
+            if not username:
+                return jsonify({"STATUS": "ERROR", "MESSAGE": "Missing username"}), 400
+
+            result = neo4j.execute_query_with_params(query=queries.GET_PENDING_FRIEND_REQUESTS_BY_RECIPIENT_UUID, params=body)
+            return jsonify(result), 200
+        except Exception as e:
+            return jsonify({"STATUS": "ERROR", "MESSAGE": "An error occurred: " + str(e)}), 500
 
     @app.route('/create_event_node', methods=["POST"])
     def create_event_node():
@@ -250,4 +317,5 @@ def create_server():
             return jsonify({"success": True, "UUID": uuid}), 200
         except Exception as e:
             return jsonify({"message": "An error occurred: " + str(e)}), 500
+    
     return app

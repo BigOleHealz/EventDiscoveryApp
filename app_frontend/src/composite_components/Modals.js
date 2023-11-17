@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { toast } from 'react-toastify';
 import { format } from 'date-fns';
 import Box from '@mui/material/Box';
@@ -17,7 +17,10 @@ import { SwitchComponent } from './SwitchComponent';
 import { day_start_time, day_end_time, day_format } from '../utils/constants';
 import { CreateEventContext, CreateUserProfileContext, UserSessionContext } from '../utils/Contexts';
 import { convertUTCDateToLocalDate } from '../utils/HelperFunctions';
-import { useFetchUsername } from '../utils/Hooks';
+import {
+  useCreateFriendRequestRelationshipIfNotExist,
+  useFetchUsername
+} from '../utils/Hooks';
 
 export const FriendRequestsModal = ({
   isVisible,
@@ -30,10 +33,25 @@ export const FriendRequestsModal = ({
   const margin_text_input_and_button = { xs: '3px', sm: '4px', md: '5px', lg: '6px', xl: '7px' };
   const friend_request_vertical_margin = { xs: '5px', sm: '10px', md: '15px', lg: '20px', xl: '25px'}
 
+  const { user_session, setUserSession } = useContext(UserSessionContext);
+
   const [friend_request_username, setFriendRequestUsername] = useState('');
+  const [sending_friend_request, setSendingFriendRequest] = useState(false);
+
+  useCreateFriendRequestRelationshipIfNotExist(user_session.Username, friend_request_username, sending_friend_request, setSendingFriendRequest, setFriendRequestUsername);
 
   const handleFriendRequestUsernameChange = (text) => {
     setFriendRequestUsername(text.target.value);
+  };
+
+  const handleSendFriendRequestButtonClick = () => {
+    if (friend_request_username === '') {
+      toast.error('Please enter a username.');
+    } else if (friend_request_username === user_session.Username) {
+      toast.error('You cannot send a friend request to yourself.');
+    } else {
+      setSendingFriendRequest(true);
+    }
   };
 
   return (
@@ -51,15 +69,21 @@ export const FriendRequestsModal = ({
             label="Enter Friend's Username"
             value={friend_request_username}
             onChangeText={handleFriendRequestUsernameChange}
-            style={{ flexGrow: 1, marginRight: margin_text_input_and_button, height: height_text_input_and_button, padding: 0 }}
+            style={{
+              flexGrow: 1,
+              marginRight: margin_text_input_and_button,
+              height: height_text_input_and_button,
+              padding: 0 }}
           />
           <Button
             id="button-friend-request-submit"
             variant="contained"
             color="primary"
-            onClick={handleSubmitButtonClick}
-            sx={{ marginLeft: margin_text_input_and_button, height: height_text_input_and_button }}
-
+            onClick={handleSendFriendRequestButtonClick}
+            sx={{
+              marginLeft: margin_text_input_and_button,
+              height: height_text_input_and_button
+            }}
           >
             Send Request
           </Button>
@@ -71,7 +95,7 @@ export const FriendRequestsModal = ({
             backgroundColor: 'grey'
           }}/>
         <Box>
-          <FriendRequestsTable />
+          <FriendRequestsTable user_session={user_session}/>
         </Box>
       </BoxComponent>
     </ModalComponent>
@@ -403,184 +427,3 @@ export const SelectInterestsModal = ({
     </ModalComponent>
   );
 };
-
-
-
-
-
-
-
-  // const {
-  //   transactionStatus: invite_friends_status,
-  //   executeQuery: run_invite_friends,
-  //   resetTransactionStatus: reset_invite_friends_transaction_status,
-  // } = useCustomCypherWrite(INVITE_FRIENDS_TO_EVENT);
-
-  // useEffect(() => {
-  //   if (invite_friends_status.STATUS === 'ERROR') {
-  //     toast.error(
-  //       `Error Sending Event Invites: ${invite_friends_status.RESPONSE}`
-  //     );
-  //     console.log(invite_friends_status.RESPONSE);
-  //     reset_invite_friends_transaction_status();
-  //     setIsInviteFriendsToEventModalVisible(false);
-  //     setEventUUID(null);
-  //   } else if (invite_friends_status.STATUS === 'SUCCESS') {
-  //     toast.success('Event Invites Sent!');
-  //     reset_invite_friends_transaction_status();
-  //     setIsInviteFriendsToEventModalVisible(false);
-  //     setEventUUID(null);
-  //   }
-  // }, [invite_friends_status]);
-
-  // const {
-  //   transactionStatus: create_event_status,
-  //   executeQuery: run_create_event,
-  //   resetTransactionStatus: reset_create_event_transaction_status,
-  // } = useCustomCypherWrite(CREATE_EVENT);
-
-  // useEffect(() => {
-  //   if (create_event_status.STATUS === 'ERROR') {
-  //     toast.error(`Error Creating Event: ${create_event_status.RESPONSE}`);
-  //     console.log(create_event_status.RESPONSE);
-  //     setIsCreateEventMode(false);
-  //   } else if (create_event_status.STATUS === 'SUCCESS') {
-  //     console.log(
-  //       'create_event_status.RESPONSE: ',
-  //       create_event_status.RESPONSE
-  //     );
-  //     const event = create_event_status.RESPONSE.RECORDS[0];
-  //     setEventUUID(event.UUID);
-  //     toast.success('You Created an Event!');
-  //     reset_create_event_transaction_status();
-  //     resetCreateEventDetails();
-  //     setIsInviteFriendsToEventModalVisible(true);
-  //     setIsCreateEventMode(false);
-  //   }
-  // }, [create_event_status]);
-
-
-
-// export const InviteFriendsToEventModal = ({
-//   isVisible,
-//   setIsInviteFriendsToEventModalVisible,
-//   setIsCreateEventDetailsModalVisible,
-//   onRequestClose,
-//   isCreateEventMode,
-//   event_uuid
-// }) => {
-// 	const { user_session, setUserSession } = React.useContext(UserSessionContext);
-//   const { createEventData, setCreateEventData } = React.useContext(CreateEventContext);
-
-//   const initialFriends = user_session.Friends.map((friend) => {
-//     return {
-//       ...friend,
-//       isChecked: false,
-//     };
-//   });
-
-//   const [friends, setFriends] = React.useState(initialFriends);
-//   const [anyChecked, setAnyChecked] = React.useState(false);
-
-//   const handleValueChange = (index, newValue) => {
-//     const updatedFriends = friends.map((friend, i) => {
-//       if (i === index) {
-//         return { ...friend, isChecked: newValue };
-//       }
-//       return friend;
-//     });
-//     setFriends(updatedFriends);
-//     setAnyChecked(updatedFriends.some((friend) => friend.isChecked));
-//   };
-
-//   const {
-// 		transactionStatus: invite_friends_to_event_status,
-// 		executeQuery: run_invite_friends_to_event,
-// 		resetTransactionStatus: reset_invite_friends_to_event_transaction_status
-// 	} = useCustomCypherWrite(INVITE_FRIENDS_TO_EVENT);
-
-//   const invite_friends_to_event = (invite_uuid_list) => {
-// 		console.log("Creating Event: ", invite_uuid_list);
-// 		run_invite_friends_to_event(invite_uuid_list);
-// 	};
-
-//   useEffect(() => {
-// 		if (invite_friends_to_event_status.STATUS === 'ERROR') {
-//       const error_message = `Error Sending Event Invites: ${invite_friends_to_event_status.RESPONSE}`;
-// 			toast.error(error_message);
-// 			console.log(error_message);
-// 			reset_invite_friends_to_event_transaction_status();
-// 		} else if (invite_friends_to_event_status.STATUS === 'SUCCESS') {
-// 			toast.success(`Event Invites Sent Successfully!`);
-// 			reset_invite_friends_to_event_transaction_status();
-// 		}
-// 	}, [invite_friends_to_event_status]);
-
-//   const handleSubmitButtonClick = () => {
-//     const selectedFriendUUIDs = friends
-//       .filter((friend) => friend.isChecked)
-//       .map((friend) => friend.friendUUID);
-//     console.log('Selected friends:', selectedFriendUUIDs);
-
-//     if (isCreateEventMode) {
-//       setCreateEventData({
-//         ...createEventData,
-//         InvitedFriends: selectedFriendUUIDs
-//       });
-//       setIsInviteFriendsToEventModalVisible(false);
-//       setIsCreateEventDetailsModalVisible(true);
-//     } else if (!event_uuid) {
-//       const error_message = `Error: No Event UUID`;
-//       toast.error(error_message);
-//       console.log(error_message);
-//       setIsInviteFriendsToEventModalVisible(false);
-//     } else {
-//       invite_friends_to_event({
-//         "event_uuid" : event_uuid,
-//         "inviter_uuid" : user_session.UUID,
-//         "friend_invite_list" : selectedFriendUUIDs,
-//       });
-//       setIsInviteFriendsToEventModalVisible(false);
-//     }
-//   }
-
-//   const FriendChecklistItem = ({ name, isChecked, onValueChange }) => {
-//     return (
-//       <View style={select_interests_scrollview_styles.itemContainer}>
-//         <CheckBox value={isChecked} onValueChange={onValueChange} />
-//         <Text style={select_interests_scrollview_styles.itemText}>{name}</Text>
-//       </View>
-//     );
-//   };
-
-//   return (
-//     <ModalComponent
-//       id="create-event-invite-friend-modal"
-//       isVisible={isVisible}
-//       onRequestClose={onRequestClose}
-//       title="Invite Friends"
-//       menuButton={
-//         <ButtonComponent
-//           id="create-event-invite-friends-button"
-//           title={
-//             anyChecked ? 'Send Invites & Create Event' : 'Skip & Create Event'
-//           }
-//           onPress={handleSubmitButtonClick}
-//           // style={styles.buttons.menu_button_styles}
-//           isMenuButton={true}
-//         />
-//       }
-//     >
-//       <ScrollView style={modal_styles.scrollView}>
-//         {friends.map((friend, index) => (
-//           <FriendChecklistItem
-//             key={friend.friendUUID}
-//             name={friend.friendUsername}
-//             isChecked={friend.isChecked}
-//             onValueChange={(newValue) => handleValueChange(index, newValue)}
-//           />
-//         ))}
-//       </ScrollView>
-//     </ModalComponent>
-//   );
-// };

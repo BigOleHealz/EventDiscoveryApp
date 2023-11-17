@@ -14,7 +14,6 @@ export function HomePage() {
   // const { logger, setLogger } = React.useContext(LoggerContext);
   const { user_session, setUserSession } = React.useContext(UserSessionContext);
 
-
   const currentDateTime = new Date();
   const [find_event_start_time, setFindEventStartTime] = useState(day_start_time);
   const [find_event_end_time, setFindEventEndTime] = useState(day_end_time);
@@ -47,9 +46,9 @@ export function HomePage() {
   const [attend_event_stage, setAttendEventStage] = useState(0);
   
   // Handle left side panel
-  const [is_left_panel_visible, setIsLeftPanelVisible] = useState(true);
+  const [is_left_panel_visible, setIsLeftPanelVisible] = useState(false);
   const [isEventInvitesPanelVisible, setIsEventInvitesPanelVisible] = useState(false);
-  const [isFriendRequestsModalVisible, setIsFriendRequestsModalVisible] = useState(false);
+  const [isFriendRequestsModalVisible, setIsFriendRequestsModalVisible] = useState(true);
   const [create_event_stage, setCreateEventStage] = useState(0);
 
 
@@ -76,32 +75,9 @@ export function HomePage() {
     setCreateEventStage(1);
   };
 
-  const handleFindEventsButtonClick = () => {
-    setIsLeftPanelVisible(!is_left_panel_visible);
-    console.log('handleFindEventsButtonClick: is_left_panel_visible = ', is_left_panel_visible);
-  };
-
-  const handleEventInvitesButtonClick = () => {
-    setIsEventInvitesPanelVisible(!isEventInvitesPanelVisible);
-    console.log('handleEventInvitesButtonClick: isEventInvitesPanelVisible = ', isEventInvitesPanelVisible);
-  };
-
-  const handleFriendRequestsButtonClick = () => {
-    setIsFriendRequestsModalVisible(!isFriendRequestsModalVisible);
-    console.log('handleFriendRequestsButtonClick: isFriendRequestsModalVisible = ', isFriendRequestsModalVisible);
-  };
-
-  const handleCreateEventButtonClick = () => {
-    initializeCreateEventMode();
-    console.log('handleCreateEventButtonClick: create_event_stage = ', create_event_stage);
-  };
 
   return (
     <Layout
-      onFindEventsButtonClick={handleFindEventsButtonClick}
-      onEventInvitesButtonClick={handleEventInvitesButtonClick}
-      onCreateEventButtonClick={handleCreateEventButtonClick}
-
       // LeftSidePanel props
       is_left_panel_visible={is_left_panel_visible}
       setIsLeftPanelVisible={setIsLeftPanelVisible}
@@ -122,6 +98,7 @@ export function HomePage() {
       create_event_stage={create_event_stage}
       setCreateEventStage={setCreateEventStage}
       exitCreateEventMode={exitCreateEventMode}
+      initializeCreateEventMode={initializeCreateEventMode}
 
       // Attend Event props
       attend_event_stage={attend_event_stage}
@@ -131,7 +108,9 @@ export function HomePage() {
       // Friend Requests props
       isFriendRequestsModalVisible={isFriendRequestsModalVisible}
       setIsFriendRequestsModalVisible={setIsFriendRequestsModalVisible}
-      onFriendRequestsButtonClick={handleFriendRequestsButtonClick}
+
+      //Navbar props
+      resetAllStates={resetAllStates}
     >
     </Layout>
   );

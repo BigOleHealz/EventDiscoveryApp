@@ -22,7 +22,6 @@ GET_NODE_BY_ID = "MATCH (n) WHERE ID(n) = {node_id} RETURN n"
 
 GET_ALL_NODES_BY_LABEL = "MATCH (n:{label}) RETURN n;"
 
-
 ##### GET ALL NODE IDS BY LABEL #####
 GET_ALL_NODE_IDS = "MATCH (n) RETURN n.UUID as UUID;"
 
@@ -51,11 +50,6 @@ GET_ACCOUNT_NODE_BY_UUID = """
                             RETURN
                                 n;
                             """
-# n.Email as Email,
-# n.Username as Username,
-# n.FirstName as FirstName,
-# n.LastName as LastName,
-# n.UUID as UUID;
 
 GET_ACCOUNT_NODE_BY_EMAIL = """
                             MATCH (n:Account)
@@ -109,20 +103,17 @@ GET_RELATIONSHIP_BY_UUID = """
 GET_RELATIONSHIP_UUID_BETWEEN_NODES = """
                                 MATCH (node_a {UUID: "{node_a_uuid}"})-[r:{label}]->(node_b {UUID: "{node_b_uuid}"})
                                 RETURN r.UUID;
-
-
                                 """
 
 DETERMINE_IF_FRIEND_REQUESTS_ALREADY_EXISTS_OR_USERS_ALREADY_FRIENDS = """
-                                                                        MATCH (a), (b)
-                                                                        WHERE ID(a) = {node_a_id} AND ID(b) = {node_b_id}
-                                                                        WITH a, b
-                                                                        OPTIONAL MATCH (a)-[fr:FRIEND_REQUEST]->(b)
-                                                                        with a, b, fr
+                                                                        MATCH (sender {{Username: '{username_sender}'}}), (recipient {{Username: '{username_recipient}'}})
+                                                                        WITH sender, recipient
+                                                                        OPTIONAL MATCH (sender)-[fr:FRIEND_REQUEST]->(recipient)
+                                                                        with sender, recipient, fr
                                                                         RETURN 
-                                                                            EXISTS((a)-[:FRIENDS_WITH]->(b)) as friends_with,
+                                                                            EXISTS((sender)-[:FRIENDS_WITH]->(recipient)) as friends_with,
                                                                             CASE
-                                                                                WHEN EXISTS((a)-[:FRIEND_REQUEST]->(b)) = true
+                                                                                WHEN EXISTS((sender)-[:FRIEND_REQUEST]->(recipient)) = true
                                                                                 THEN fr.STATUS
                                                                                 ELSE False
                                                                             END AS friend_request_status
@@ -138,7 +129,6 @@ GET_FRIEND_REQUEST_STATUS = """
                                 WHERE ID(a) = {node_a_id} AND ID(b) = {node_b_id}
                             RETURN r.status
                             """
-
 
 AUTHENTICATE_ACCOUNT_EMAIL_AND_PASSWORD = """
                                         MATCH (n:Account)
@@ -176,43 +166,6 @@ FETCH_EVENTS_FOR_MAP = """
         eventType.PinColor as PinColor,
         AttendeeCount;
     """
-# GET_EVENTS_RELATED_TO_USER = """
-#                             MATCH (n:Person)
-#                             WHERE n.Email = "{email}"
-#                             WITH n
-#                             MATCH (e:Event), (et:EventType)
-#                             WHERE 
-#                                 (
-#                                     (n)-[:INVITED|:CREATED_EVENT]->(e) 
-#                                     OR (
-#                                         e.PublicEventFlag = true
-#                                         AND
-#                                         (n)-[:INTERESTED_IN]->(et)-[:RELATED_EVENT]->(e)
-#                                     )
-#                                 )
-#                                 AND (
-#                                     "{start_ts}" <= e.StartTimestamp < "{end_ts}"
-#                                     OR
-#                                     "{start_ts}" < e.EndTimestamp <= "{end_ts}"
-#                                     OR
-#                                     (e.StartTimestamp <= "{start_ts}" AND "{end_ts}" <= e.EndTimestamp)
-#                                 )
-#                                 AND point.distance(point(
-#                                     {{ longitude: e.Lon, latitude: e.Lat }}), 
-#                                     point({{ longitude: {longitude}, latitude: {latitude} }})) <= {radius} * 1000
-#                             WITH n, COLLECT(e) as events
-#                             UNWIND events as event
-#                             OPTIONAL MATCH (u:Person)-[r:ATTENDING]->(event)
-#                             WITH n, event, COALESCE(count(r), 0) as AttendeeCount
-#                             MATCH (et:EventType)
-#                                 WHERE ID(et) = event.EventTypeID
-#                             WITH event, AttendeeCount, et,
-#                                 CASE
-#                                     WHEN (n)-[:ATTENDING]->(event) THEN True
-#                                     ELSE False
-#                                 END as ATTENDING_BOOLEAN
-#                             RETURN event as Event, AttendeeCount, et.EventType as EventType, ATTENDING_BOOLEAN;
-#                             """
 
 GET_USER_PROFILE = """
                 MATCH (account:Account)
@@ -245,7 +198,6 @@ GET_PERSON_FRIENDS_UUID_NAME_MAPPINGS_BY_EMAIL = """
                                                 n.LastName AS LastName;
                                                 """
 
-
 GET_ALL_EVENT_INVITED = """
                         MATCH (n:Person)
                             WHERE n.Email = "{email}"
@@ -256,12 +208,10 @@ GET_ALL_EVENT_INVITED = """
                         RETURN e;
                         """
 
-
 GET_EVENTS_PERSON_IS_ATTENDING = """
                                 MATCH (p:Person {{Email: "{email}"}})-[:ATTENDING]->(e:Event)
                                 RETURN p, e;
                                 """
-
 
 GET_PERSON_INTERESTS = """
                     MATCH (u:Person {{Email: "{email}"}})-[:INTERESTED_IN]->(et:EventType)
@@ -329,8 +279,6 @@ GET_NOTIFICATIONS = """
 #####################
 ###### CREATES ######
 #####################
-
-
 CREATE_PERSON_NODE = """
     CREATE (n:Account:Person {{
         FirstName: "{first_name}", 
@@ -344,10 +292,8 @@ CREATE_PERSON_NODE = """
         MERGE (e:EventType {{UUID: interestUUID}})
         MERGE (n)-[:INTERESTED_IN {{UUID: apoc.create.uuid()}}]->(e)
     )
-    
     RETURN n.UUID as UUID;
     """
-
 
 CHECK_IF_EVENT_EXISTS = r"""
                     MATCH (e:Event {Source: $params.Source, SourceEventID: $params.SourceEventID})
@@ -411,13 +357,6 @@ CREATE_ACCOUNT_INTERESTED_IN_RELATIONSHIPS_BY_MANUALLY_ASSIGNED_ID = """
                                                                     CREATE (a)-[:INTERESTED_IN]->(et);
                                                                     """
 
-CREATE_FRIEND_REQUEST_BY_ID = """
-                            MATCH (a), (b)
-                            WHERE ID(a) = {node_a_id} AND ID(b) = {node_b_id}
-                            CREATE (a)-[r:FRIEND_REQUEST {properties}]->(b)
-                            RETURN r;
-                            """
-
 CREATE_FRIENDSHIP = """
                     MATCH (a:Person), (b:Person)
                     WHERE ID(a) = {node_a_id} AND ID(b) = {node_b_id}
@@ -428,3 +367,74 @@ CREATE_FRIENDSHIP = """
                     SET bar.FRIENDS_SINCE = dt
                     RETURN abr, bar;
                     """
+
+CREATE_FRIEND_REQUEST_RELATIONSHIP_IF_NOT_EXISTS = """
+    MATCH (sender:Person {{Username: "{username_sender}"}})
+    OPTIONAL MATCH (recipient:Person {{Username: "{username_recipient}"}})
+    OPTIONAL MATCH (sender)-[existingFriendRequest:FRIEND_REQUEST {{STATUS: "PENDING"}}]->(recipient)
+    OPTIONAL MATCH (sender)<-[existingFriendRequestReverse:FRIEND_REQUEST {{STATUS: "PENDING"}}]-(recipient)
+    OPTIONAL MATCH (sender)-[existingFriends:FRIENDS_WITH]-(recipient)
+    WITH sender, recipient, existingFriendRequest, existingFriendRequestReverse, existingFriends,
+        CASE
+            WHEN recipient IS NULL THEN
+                {{STATUS: "ERROR", MESSAGE: "No user with that username", UUID: null}}
+            WHEN existingFriendRequest IS NOT NULL THEN
+                {{STATUS: "ERROR", MESSAGE: "You have already sent a friend request to this person", UUID: existingFriendRequest.UUID}}
+            WHEN existingFriendRequestReverse IS NOT NULL THEN
+                {{STATUS: "ERROR", MESSAGE: "This person has already sent you a friend request", UUID: existingFriendRequestReverse.UUID}}
+            WHEN existingFriends IS NOT NULL THEN
+                {{STATUS: "ERROR", MESSAGE: "You are already friends with this person", UUID: null}}
+            ELSE
+                {{STATUS: "SUCCESS", MESSAGE: "No existing relationship"}}
+        END as result
+    WITH sender, recipient, result
+    WHERE result.STATUS = "ERROR"
+    RETURN result
+
+    UNION
+
+    MATCH (sender:Person {{Username: "{username_sender}"}}), (recipient:Person {{Username: "{username_recipient}"}})
+    OPTIONAL MATCH (sender)-[existingFriendRequest:FRIEND_REQUEST {{STATUS: "PENDING"}}]->(recipient)
+    OPTIONAL MATCH (sender)<-[existingFriendRequestReverse:FRIEND_REQUEST {{STATUS: "PENDING"}}]-(recipient)
+    OPTIONAL MATCH (sender)-[existingFriends:FRIENDS_WITH]-(recipient)
+    WITH sender, recipient, existingFriendRequest, existingFriendRequestReverse, existingFriends
+    WHERE existingFriendRequest IS NULL AND existingFriendRequestReverse IS NULL AND existingFriends IS NULL
+    CREATE (sender)-[r:FRIEND_REQUEST {{FRIEND_REQUEST_TS: apoc.date.format(apoc.date.currentTimestamp(), "ms", "yyyy-MM-dd'T'HH:mm:ss"), STATUS: "PENDING", UUID: apoc.create.uuid()}}]->(recipient)
+    RETURN {{STATUS: "SUCCESS", MESSAGE: "Friend request sent", UUID: r.UUID}} as result;
+    """
+
+GET_PENDING_FRIEND_REQUESTS_BY_RECIPIENT_UUID = r"""
+    MATCH (friend_request_recipient:Person {UUID: $params.UUID})<-[friend_request:FRIEND_REQUEST {STATUS: "PENDING"}]-(friend_request_sender:Person)
+    RETURN 
+        friend_request.UUID AS UUID,
+        friend_request_sender.Username AS SENDER_USERNAME,
+        friend_request_sender.UUID AS SENDER_UUID,
+        friend_request_sender.FirstName AS SENDER_FIRST_NAME,
+        friend_request_sender.LastName AS SENDER_LAST_NAME,
+        friend_request_sender.Email AS SENDER_EMAIL,
+        friend_request.FRIEND_REQUEST_TS AS FRIEND_REQUEST_TS
+    ORDER BY friend_request.FRIEND_REQUEST_TS DESC;
+    """
+
+RESPOND_TO_FRIEND_REQUEST_BY_FRIEND_REQUEST_UUID = r"""
+    WITH
+        $params.friend_request_uuid AS friend_request_uuid,
+        apoc.date.format(apoc.date.currentTimestamp(), "ms", "yyyy-MM-dd'T'HH:mm:ss") AS response_timestamp,
+        $params.response AS friend_request_response
+    MATCH (friend_request_recipient:Person)<-[friend_request:FRIEND_REQUEST {UUID: friend_request_uuid}]-(friend_request_sender:Person)
+    SET friend_request.STATUS = friend_request_response,
+        friend_request.RESPONSE_TIMESTAMP = response_timestamp
+    WITH
+        friend_request_recipient,
+        friend_request_sender,
+        friend_request_uuid,
+        friend_request_response,
+        response_timestamp,
+        friend_request_response = "ACCEPTED" AS shouldCreateFriendsWithRelationship,
+        apoc.create.uuid() AS friendship_uuid
+    FOREACH (_ IN CASE WHEN shouldCreateFriendsWithRelationship THEN [1] ELSE [] END |
+         MERGE (friend_request_sender)-[:FRIENDS_WITH {UUID: friendship_uuid, FRIENDS_SINCE: response_timestamp}]->(friend_request_recipient)
+         MERGE (friend_request_recipient)-[:FRIENDS_WITH {UUID: friendship_uuid, FRIENDS_SINCE: response_timestamp}]->(friend_request_sender)
+     )
+     RETURN {STATUS: "SUCCESS", MESSAGE: "Response Sent"} as result;
+    """
