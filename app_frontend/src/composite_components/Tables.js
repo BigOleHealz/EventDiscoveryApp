@@ -53,3 +53,28 @@ export const EventTypesTable = ({
     <CheckboxTableComponent rows={rows} selected={event_types_selected} setSelected={setEventTypesSelected} />
   );
 };
+
+export const InviteFriendsToEventTable = ({
+  friends_list,
+  friends_invited,
+  setFriendsInvited
+}) => {
+
+  console.log('InviteFriendsToEventTable: friends_list = ', friends_list)
+
+  const rows = friends_list.map((friend) => {
+    return {
+      id: friend.UUID,
+      label: friend.Username,
+      isChecked: false
+    }
+  });
+  console.log('InviteFriendsToEventTable: rows = ', rows)
+  return (
+    <CheckboxTableComponent
+      rows={rows}
+      selected={friends_invited}
+      setSelected={setFriendsInvited}
+    />
+  );
+};

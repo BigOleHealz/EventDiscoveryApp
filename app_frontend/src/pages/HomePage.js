@@ -5,7 +5,7 @@ import { format } from 'date-fns';
 
 import Layout from '../container_components/Layout';
 import { day_start_time, day_end_time, day_format } from '../utils/constants';
-import { AttendEventContext, LoggerContext, UserSessionContext, CreateEventContext } from '../utils/Contexts';
+import { AttendEventContext, CreateEventContext, UserSessionContext } from '../utils/Contexts';
 import { convertUTCDateToLocalDate } from '../utils/HelperFunctions';
 import { useFetchEvents, useFetchGoogleMapsApiKey, useFilterEvents } from '../utils/Hooks';
 
@@ -13,7 +13,6 @@ export function HomePage() {
   const mapRef = useRef();
   // const { logger, setLogger } = React.useContext(LoggerContext);
   const { user_session, setUserSession } = React.useContext(UserSessionContext);
-  const { attend_event_context, setAttendEventContext } = React.useContext(AttendEventContext);
 
   const currentDateTime = new Date();
   const [find_event_start_time, setFindEventStartTime] = useState(day_start_time);
@@ -38,72 +37,59 @@ export function HomePage() {
     setFetchingEvents(true);
   }, [find_event_selected_date]);
 
+  const [create_event_stage, setCreateEventStage] = useState(0);
   const { create_event_context, setCreateEventContext } = React.useContext(CreateEventContext);
 
   useFetchEvents(fetching_events, start_timestamp, end_timestamp, setMapEventsFullDay, setFetchingEvents);
   useFilterEvents(find_event_selected_date, find_event_start_time, find_event_end_time, map_events_full_day, event_types_selected, setMapEventsFiltered);
 
-  const [attend_event_stage, setAttendEventStage] = useState(0);
-  
   // Handle left side panel
   const [is_left_panel_visible, setIsLeftPanelVisible] = useState(false);
   const [is_event_invites_modal_visible, setIsEventInvitesModalVisible] = useState(false);
   const [is_friend_requests_modal_visible, setIsFriendRequestsModalVisible] = useState(false);
-  const [create_event_stage, setCreateEventStage] = useState(0);
 
+  const [attend_event_stage, setAttendEventStage] = useState(0);
+  const [attend_event_currently_active_data, setAttendEventCurrentlyActiveData] = useState(null);
+  const { attend_event_context, setAttendEventContext } = React.useContext(AttendEventContext);
 
-  const exitCreateEventMode = () => {
-    setCreateEventContext({});
-    setCreateEventStage(0);
-  };
-
-  const exitAttendEventMode = () => {
-    setAttendEventContext({});
-    setAttendEventStage(0);
-  };
-
-  const resetAllStates = () => {
-    exitCreateEventMode();
-    exitAttendEventMode();
-    setIsLeftPanelVisible(false);
-    setIsEventInvitesModalVisible(false);
-    setIsFriendRequestsModalVisible(false);
-  };
 
   const initializeCreateEventMode = () => {
     resetAllStates();
     setCreateEventStage(1);
   };
 
+  const exitCreateEventMode = () => {
+    setCreateEventContext({});
+    setCreateEventStage(0);
+  };
+
+  const initializeAttendEventMode = () => {
+    resetAllStates();
+    setAttendEventStage(1);
+  };
+
+  const exitAttendEventMode = () => {
+    setAttendEventContext({});
+    setAttendEventCurrentlyActiveData(null);
+    setAttendEventStage(0);
+  };
+
+  const resetAllStates = () => {
+    setIsLeftPanelVisible(false);
+    setIsEventInvitesModalVisible(false);
+    setIsFriendRequestsModalVisible(false);
+    exitCreateEventMode();
+    exitAttendEventMode();
+  };
 
   return (
     <Layout
-      // LeftSidePanel props
+      //Navbar props
+      resetAllStates={resetAllStates}
+
+      // Find Events props
       is_left_panel_visible={is_left_panel_visible}
       setIsLeftPanelVisible={setIsLeftPanelVisible}
-      find_event_selected_date={find_event_selected_date}
-      setFindEventSelectedDate={setFindEventSelectedDate}
-      find_event_start_time={find_event_start_time}
-      setFindEventStartTime={setFindEventStartTime}
-      find_event_end_time={find_event_end_time}
-      setFindEventEndTime={setFindEventEndTime}
-      event_types_selected={event_types_selected}
-      setEventTypesSelected={setEventTypesSelected}
-
-      // Map props
-      mapRef={mapRef}
-      map_events_filtered={map_events_filtered}
-
-      // CreateEvent props
-      create_event_stage={create_event_stage}
-      setCreateEventStage={setCreateEventStage}
-      exitCreateEventMode={exitCreateEventMode}
-      initializeCreateEventMode={initializeCreateEventMode}
-
-      // Attend Event props
-      attend_event_stage={attend_event_stage}
-      setAttendEventStage={setAttendEventStage}
-      exitAttendEventMode={exitAttendEventMode}
 
       // Event Invites props
       is_event_invites_modal_visible={is_event_invites_modal_visible}
@@ -113,9 +99,33 @@ export function HomePage() {
       is_friend_requests_modal_visible={is_friend_requests_modal_visible}
       setIsFriendRequestsModalVisible={setIsFriendRequestsModalVisible}
 
-      //Navbar props
-      resetAllStates={resetAllStates}
-    >
-    </Layout>
+      // CreateEvent props
+      create_event_stage={create_event_stage}
+      setCreateEventStage={setCreateEventStage}
+      initializeCreateEventMode={initializeCreateEventMode}
+      exitCreateEventMode={exitCreateEventMode}
+
+      // Map props
+      mapRef={mapRef}
+      map_events_filtered={map_events_filtered}
+
+      // LeftSidePanel props
+      find_event_selected_date={find_event_selected_date}
+      setFindEventSelectedDate={setFindEventSelectedDate}
+      find_event_start_time={find_event_start_time}
+      setFindEventStartTime={setFindEventStartTime}
+      find_event_end_time={find_event_end_time}
+      setFindEventEndTime={setFindEventEndTime}
+      event_types_selected={event_types_selected}
+      setEventTypesSelected={setEventTypesSelected}
+
+      // AttendEvent props
+      attend_event_stage={attend_event_stage}
+      setAttendEventStage={setAttendEventStage}
+      attend_event_currently_active_data={attend_event_currently_active_data}
+      setAttendEventCurrentlyActiveData={setAttendEventCurrentlyActiveData}
+      initializeAttendEventMode={initializeAttendEventMode}
+      exitAttendEventMode={exitAttendEventMode}
+    />
   );
 };

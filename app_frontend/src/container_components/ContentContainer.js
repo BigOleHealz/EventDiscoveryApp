@@ -32,9 +32,7 @@ export default function ContentContainer({
           {...props}
         />
         <CreateEventWorkflow {...props} />
-        {/* {attend_event_stage &&
-          <AttendEventWorkflow {...props} />
-        } */}
+        <AttendEventWorkflow {...props} />
 
       </Box>
     </Box>

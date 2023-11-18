@@ -17,8 +17,7 @@ import { map_styles } from '../styles';
 export default function Map({
   mapRef,
   map_events_filtered,
-  setAttendEventStage,
-  exitAttendEventMode,
+  ...props
 }) {
   // const { logger, setLogger } = React.useContext(LoggerContext);
   const { user_session, setUserSession } = React.useContext(UserSessionContext);
@@ -26,6 +25,8 @@ export default function Map({
   // Handle Map Events
   const [mapCenter, setMapCenter] = useState(defaultCenter);
   const [activePopup, setActivePopup] = useState(null);
+
+  console.log('Map: map_events_filtered = ', map_events_filtered)
 
   useSetUserLocation(setMapCenter);
   const onLoad = (map) => {
@@ -72,23 +73,12 @@ export default function Map({
                 event={event}
                 activePopup={activePopup}
                 onSetActivePopup={handleSetActivePopup}
-                setAttendEventStage={setAttendEventStage}
-                exitAttendEventMode={exitAttendEventMode}
+                {...props}
                 // clusterer={clusterer}
               />
             ))
           }
           {/* </MarkerClusterer> */}
-          {/* <Button
-            id="button-logout"
-            onClick={() => {
-              removeUserSession();
-              setUserSession(null);
-            }}
-            sx={map_styles.logoutButtonStyle}
-          >
-            Logout
-          </Button> */}
         </GoogleMap>
     </>
   );

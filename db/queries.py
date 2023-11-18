@@ -171,7 +171,13 @@ GET_USER_PROFILE = """
                 MATCH (account:Account)
                 WHERE account.Email = '{email}'
                 OPTIONAL MATCH (account)-[:FRIENDS_WITH]->(friend:Account)
-                WITH account, collect(DISTINCT {{friendUUID: friend.UUID, friendFirstName: friend.FirstName, friendLastName: friend.LastName, friendUsername: friend.Username}}) as Friends
+                WITH account, 
+                    collect(DISTINCT {{UUID: friend.UUID, FirstName: friend.FirstName, LastName: friend.LastName, Username: friend.Username}}) AS allFriends
+                WITH account, allFriends,
+                    CASE 
+                        WHEN size(allFriends) = 0 THEN []
+                        ELSE allFriends
+                    END as Friends
                 OPTIONAL MATCH (account)-[:INTERESTED_IN]->(eventType:EventType)
                 WITH account, Friends, collect(DISTINCT eventType.UUID) as Interests
                 RETURN
