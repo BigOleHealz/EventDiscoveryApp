@@ -4,7 +4,7 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 
 import { InfoWindow, Marker } from '@react-google-maps/api';
-import { AttendEventContext, LoggerContext } from '../utils/Contexts';
+import { AttendEventWorkflow } from './AttendEventWorkflow';
 import { convertUTCDateToLocalDate } from '../utils/HelperFunctions';
 import { EventViewerModal } from './Modals';
 
@@ -16,16 +16,16 @@ const MapMarkerWithTooltip = ({
   event,
   activePopup,
   onSetActivePopup,
-  setAttendEventStage,
-  exitAttendEventMode,
+  setAttendEventCurrentlyActiveData,
   clusterer
 }) => {
   const [showTooltip, setShowTooltip] = useState(false);
-  const { attend_event_context, setAttendEventContext } = React.useContext(AttendEventContext);
   // const { logger, setLogger } = React.useContext(LoggerContext);
   const icon = iconSvgObject(event.PinColor);
 
   const position = { lat: event.Lat, lng: event.Lon };
+
+  const [attend_event_stage, setAttendEventStage] = useState(0);
 
   useEffect(() => {
     if (activePopup === event.UUID) {
@@ -43,13 +43,18 @@ const MapMarkerWithTooltip = ({
 
   const handleMarkerClick = () => {
     // logger.info(`Marker clicked for event: ${event.UUID}\nEvent Name: ${event.EventName}`);
+    console.log(`Marker clicked for event: ${event.UUID}\nEvent Name: ${event.EventName}`);
     onSetActivePopup(event.UUID);
   };
 
-  const handleAttendEventButtonClick = () => {
-    setAttendEventContext(event);
+  const viewEventButtonClick = () => {
+    setAttendEventCurrentlyActiveData({
+      ...event,
+      attending_stage: 1
+    })
     setAttendEventStage(1);
-  };
+  }
+
 
   const renderInfoContent = () => {
     return (
@@ -91,7 +96,7 @@ const MapMarkerWithTooltip = ({
           variant="contained"
           color="primary"
           size="small"
-          onClick={handleAttendEventButtonClick}
+          onClick={viewEventButtonClick}
           style={tooltip_styles.buttonStyle}
         >
           View Event
@@ -102,34 +107,28 @@ const MapMarkerWithTooltip = ({
 
   return (
     <>
-    <Marker
-      position={position}
-      onMouseOver={handleMouseOver}
-      onMouseOut={handleMouseOut}
-      onClick={handleMarkerClick}
-      icon={icon}
+      <Marker
+        position={position}
+        onMouseOver={handleMouseOver}
+        onMouseOut={handleMouseOut}
+        onClick={handleMarkerClick}
+        icon={icon}
       // clusterer={clusterer}
-    >
-      {showTooltip && (
-        <InfoWindow position={position} onCloseClick={handleMarkerClick}>
-          <div style={tooltip_styles.container}>{renderInfoContent()}</div>
-        </InfoWindow>
-      )}
-      {activePopup === event.UUID && (
-        <InfoWindow position={position} onCloseClick={handleMarkerClick}>
-          <div style={tooltip_styles.container}>{renderInfoContent()}</div>
-        </InfoWindow>
-      )}
-    </Marker>
-    <EventViewerModal
-      isVisible={attend_event_context.UUID === event.UUID}
-      handleSubmitButtonClick={handleAttendEventButtonClick}
-      event={event}
-      onRequestClose={exitAttendEventMode}
-    />
+      >
+        {showTooltip && (
+          <InfoWindow position={position} onCloseClick={handleMarkerClick}>
+            <Box style={tooltip_styles.container}>{renderInfoContent()}</Box>
+          </InfoWindow>
+        )}
+        {activePopup === event.UUID && (
+          <InfoWindow position={position} onCloseClick={handleMarkerClick}>
+            <Box style={tooltip_styles.container}>{renderInfoContent()}</Box>
+          </InfoWindow>
+        )}
+      </Marker>
+
     </>
   );
-
 };
 
 export default MapMarkerWithTooltip;

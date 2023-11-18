@@ -13,7 +13,7 @@ import { TimeRangeSliderComponent } from '../base_components/TimeRangeSliderComp
 import { FriendRequestsTable } from './Tables';
 import { SelectInterestsScrollView } from './SelectInterestsScrollview';
 import { SwitchComponent } from './SwitchComponent';
-import { EventTypesTable } from './Tables';
+import { EventTypesTable, InviteFriendsToEventTable } from './Tables';
 
 import { day_start_time, day_end_time, day_format } from '../utils/constants';
 import { CreateEventContext, CreateUserProfileContext, UserSessionContext } from '../utils/Contexts';
@@ -22,6 +22,68 @@ import {
   useCreateFriendRequestRelationshipIfNotExist,
   useFetchUsername
 } from '../utils/Hooks';
+
+export const EventViewerModal = ({
+  isVisible,
+  handleSubmitButtonClick,
+  event,
+  onRequestClose,
+  ...props
+}) => {
+
+  return (
+    <ModalComponent
+      isVisible={isVisible}
+      onRequestClose={onRequestClose}
+      title="Event Viewer"
+      submitButtonText="Attend Event"
+      onSubmitButtonClick={handleSubmitButtonClick}
+    >
+      <BoxComponent style={{ width: '100%', height: '100%' }}>
+        { event ? <iframe
+          src={event.EventURL}
+          title="Event Content"
+          style={{
+            border: 'none',
+            width: '100%',
+            height: '100%'
+          }}
+        /> : <div>Event URL not found.</div>}
+      </BoxComponent>
+    </ModalComponent>
+  );
+};
+
+
+export const InviteFriendsToEventModal = ({
+  isVisible,
+  handleSubmitButtonClick,
+  onRequestClose,
+  ...props
+}) => {
+
+  const { user_session, setUserSession } = useContext(UserSessionContext);
+  const [ friends_invited, setFriendsInvited ] = useState([]);
+
+  return (
+    <ModalComponent
+    isVisible={isVisible}
+    onRequestClose={onRequestClose}
+    title="Invite Friends to Event"
+    submitButtonText="Send Invites"
+    onSubmitButtonClick={handleSubmitButtonClick}
+    >
+      <BoxComponent sx={{ width: '100%', height: '100%' }}>
+        <InviteFriendsToEventTable
+          friends_list={user_session.Friends}
+          friends_invited={friends_invited}
+          setFriendsInvited={setFriendsInvited}
+          />
+      </BoxComponent>
+    </ModalComponent>
+  );
+}
+
 
 export const EventInvitesModal = ({
   isVisible,
@@ -129,37 +191,6 @@ export const FriendRequestsModal = ({
         <Box>
           <FriendRequestsTable user_session={user_session} />
         </Box>
-      </BoxComponent>
-    </ModalComponent>
-  );
-}
-
-export const EventViewerModal = ({
-  isVisible,
-  handleSubmitButtonClick,
-  event,
-  onRequestClose,
-  ...props
-}) => {
-
-  return (
-    <ModalComponent
-      isVisible={isVisible}
-      onRequestClose={onRequestClose}
-      title="Event Viewer"
-      submitButtonText="Attend Event"
-      onSubmitButtonClick={handleSubmitButtonClick}
-    >
-      <BoxComponent style={{ width: '100%', height: '100%' }}>
-        <iframe
-          src={event.EventURL}
-          title="Event Content"
-          style={{
-            border: 'none',
-            width: '100%',
-            height: '100%'
-          }}
-        />
       </BoxComponent>
     </ModalComponent>
   );

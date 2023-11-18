@@ -32,3 +32,20 @@ export const CreateEventProvider = ({ children }) => {
     </CreateEventContext.Provider>
   );
 };
+
+export const AttendEventProvider = ({ children }) => {
+  const [attend_event_context, setAttendEventContextState] = useState({});
+
+  const setAttendEventContext = (newValues) => {
+    setAttendEventContextState(prevState => ({
+      ...prevState,
+      ...newValues
+    }));
+  };
+
+  return (
+    <AttendEventContext.Provider value={{ attend_event_context, setAttendEventContext }}>
+      {children}
+    </AttendEventContext.Provider>
+  );
+};
