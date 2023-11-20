@@ -9,6 +9,8 @@ export const CheckboxTableComponent = ({
   setSelected
 }) => {
 
+  const isSelected = (id) => selected.includes(id);
+  
   const handleSelectAllClick = (event) => {
     setSelected(event.target.checked ? rows.map((row) => row.id) : []);
   };

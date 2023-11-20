@@ -145,7 +145,7 @@ export const useFetchUsername = (fetching_username_is_taken, username, setFetchi
   }, [fetching_username_is_taken]);
 };
 
-export const useCreateEventNode = (is_creating_event_node, create_event_context, setIsCreatingEventNode, setCreateEventStage) => {
+export const useCreateEventNode = (is_creating_event_node, create_event_context, setIsCreatingEventNode, setCreateEventStage, setIsFetchingEvents) => {
   useEffect(() => {
     if (is_creating_event_node) {
       console.log('create_event_context:', create_event_context)
@@ -157,12 +157,12 @@ export const useCreateEventNode = (is_creating_event_node, create_event_context,
         body: JSON.stringify({ ...create_event_context })
       }).then(res => res.json())
         .then(data => {
-          console.log(data);
-          if (data.success) {
+          console.log('data:', data);
+          if (data && data.STATUS === 'SUCCESS') {
             toast.success('Event Created Successfully!');
             setCreateEventStage(0);
           } else {
-            toast.error('Failed to create Event: ' + (data.message || 'Unknown error'));
+            toast.error('Failed to create Event: ' + (data.MESSAGE || 'Unknown error'));
           }
         }).catch((error) => {
           console.error('Error:', error);
@@ -170,6 +170,7 @@ export const useCreateEventNode = (is_creating_event_node, create_event_context,
         });
     }
     setIsCreatingEventNode(false);
+    setIsFetchingEvents(true);
   }, [is_creating_event_node]);
 };
 
@@ -208,9 +209,9 @@ export const useCreatePersonNode = (is_creating_person_node, create_user_profile
   }, [is_creating_person_node]);
 };
 
-export const useFetchEvents = (fetching_events, start_timestamp, end_timestamp, setMapEventsFullDay, setFetchingEvents) => {
+export const useFetchEvents = (is_fetching_events, start_timestamp, end_timestamp, setMapEventsFullDay, setIsFetchingEvents) => {
   useEffect(() => {
-    if (fetching_events) {
+    if (is_fetching_events) {
       fetch('/api/events', {
         method: 'POST',
         headers: {
@@ -226,9 +227,9 @@ export const useFetchEvents = (fetching_events, start_timestamp, end_timestamp, 
         }).catch((error) => {
           console.error('Error:', error);
         });
-      setFetchingEvents(false);
+      setIsFetchingEvents(false);
     }
-  }, [fetching_events, start_timestamp, end_timestamp, setMapEventsFullDay, setFetchingEvents]);
+  }, [is_fetching_events, start_timestamp, end_timestamp, setMapEventsFullDay, setIsFetchingEvents]);
 };
 
 export const useFetchEventTypes = (first_run, setFirstRun, setEventTypes, event_types_selected, setEventTypesSelected) => {

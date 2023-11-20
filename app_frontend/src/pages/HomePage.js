@@ -29,18 +29,18 @@ export function HomePage() {
     }
   }, [user_session]);
 
-  const [fetching_events, setFetchingEvents] = useState(true);
+  const [is_fetching_events, setIsFetchingEvents] = useState(true);
   const [map_events_full_day, setMapEventsFullDay] = useState([]);
   const [map_events_filtered, setMapEventsFiltered] = useState([]);
 
   useEffect(() => {
-    setFetchingEvents(true);
+    setIsFetchingEvents(true);
   }, [find_event_selected_date]);
 
   const [create_event_stage, setCreateEventStage] = useState(0);
   const { create_event_context, setCreateEventContext } = React.useContext(CreateEventContext);
 
-  useFetchEvents(fetching_events, start_timestamp, end_timestamp, setMapEventsFullDay, setFetchingEvents);
+  useFetchEvents(is_fetching_events, start_timestamp, end_timestamp, setMapEventsFullDay, setIsFetchingEvents);
   useFilterEvents(find_event_selected_date, find_event_start_time, find_event_end_time, map_events_full_day, event_types_selected, setMapEventsFiltered);
 
   // Handle left side panel
@@ -104,6 +104,8 @@ export function HomePage() {
       setCreateEventStage={setCreateEventStage}
       initializeCreateEventMode={initializeCreateEventMode}
       exitCreateEventMode={exitCreateEventMode}
+      is_fetching_events={is_fetching_events}
+      setIsFetchingEvents={setIsFetchingEvents}
 
       // Map props
       mapRef={mapRef}
