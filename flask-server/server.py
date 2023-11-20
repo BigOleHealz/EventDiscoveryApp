@@ -280,23 +280,26 @@ def create_server():
         try:
             body = request.get_json()
             if not body:
-                return jsonify({"message": "No input body provided"}), 400
+                return jsonify({"STATUS": "ERROR", "MESSAGE": "No input body provided"}), 400
             event_type_uuid = body.get('EventTypeUUID')
             event_lat = body.get('Lat')
             event_lon = body.get('Lon')
             event_start_timestamp = body.get('StartTimestamp')
             event_end_timestamp = body.get('EndTimestamp')
+            created_by_uuid = body.get('CreatedByUUID')
 
             if not event_type_uuid:
-                return jsonify({"message": "Missing event_type_uuid"}), 400
+                return jsonify({"STATUS": "ERROR", "MESSAGE": "Missing event_type_uuid"}), 400
             elif not event_lat:
-                return jsonify({"message": "Missing event coordinates (Latitude)"}), 400
+                return jsonify({"STATUS": "ERROR", "MESSAGE": "Missing event_lat"}), 400
             elif not event_lon:
-                return jsonify({"message": "Missing event coordinates (Longitude)"}), 400
+                return jsonify({"STATUS": "ERROR", "MESSAGE": "Missing event_lon"}), 400
             elif not event_start_timestamp:
-                return jsonify({"message": "Missing event_start_timestamp"}), 400
+                return jsonify({"STATUS": "ERROR", "MESSAGE": "Missing event_start_timestamp"}), 400
             elif not event_end_timestamp:
-                return jsonify({"message": "Missing event_end_timestamp"}), 400
+                return jsonify({"STATUS": "ERROR", "MESSAGE": "Missing event_end_timestamp"}), 400
+            elif not created_by_uuid:
+                return jsonify({"STATUS": "ERROR", "MESSAGE": "Missing created_by_uuid"}), 400
 
             event_data = body
             uuid = str(uuid4())
@@ -307,11 +310,11 @@ def create_server():
 
             try:
                 result = neo4j.execute_query_with_params(query=queries.CREATE_USER_CREATED_EVENT, params=event_data)
+                return jsonify({"STATUS": "SUCCESS", "MESSAGE": "Event node created successfully"}), 200
             except Exception as e:
-                return jsonify({"message": "An error occurred while executing the query: " + str(e)}), 500
+                return jsonify({"STATUS": "ERROR", "MESSAGE": "An error occurred: " + str(e)}), 500
 
-            return jsonify({"success": True, "UUID": uuid}), 200
         except Exception as e:
-            return jsonify({"message": "An error occurred: " + str(e)}), 500
+            return jsonify({"STATUS": "ERROR", "MESSAGE": "An error occurred: " + str(e)}), 500
     
     return app

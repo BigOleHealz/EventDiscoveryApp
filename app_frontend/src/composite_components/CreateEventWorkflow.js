@@ -10,6 +10,8 @@ export const CreateEventWorkflow = ({
   setCreateEventStage,
   mapRef,
   exitCreateEventMode,
+  is_fetching_events,
+  setIsFetchingEvents,
   ...props
 }) => {
   const { user_session, setUserSession } = React.useContext(UserSessionContext);
@@ -25,7 +27,7 @@ export const CreateEventWorkflow = ({
     setIsCreatingEventNode(true);
   }
 
-  useCreateEventNode(is_creating_event_node, create_event_context, setIsCreatingEventNode, setCreateEventStage);
+  useCreateEventNode(is_creating_event_node, create_event_context, setIsCreatingEventNode, setCreateEventStage, setIsFetchingEvents);
 
   return (
     <>
