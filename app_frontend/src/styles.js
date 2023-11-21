@@ -197,11 +197,25 @@ export const create_event_location_selector_styles = {
   }
 };
 
+export const content_container_styles = {
+  container: {
+    position: 'absolute',
+    flexGrow: 1,
+    minHeight: '0',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    maxWidth: '100%'
+  }
+}
 export const map_styles = {
   mapContainerStyle: {
     display: 'flex',
-    width: '100vw',
-    height: `${display_container_top}vh`,
+    width: '100%',
+    height: '100%',
+    flexGrow: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
     flexDirection: 'column',
   },
 };
@@ -218,7 +232,7 @@ export const modal_component_styles = {
   modalContainer: {
     position: 'absolute',
     top: '50%',
-    height: { xs: '90%', sm: '85%', md: '80%', lg: '75%', xl: '75%' },
+    height: { xs: '80%', sm: '80%', md: '80%', lg: '75%', xl: '75%' },
     width: { xs: '95%', sm: '80%', md: '65%', lg: '57%', xl: '50%' },
     borderRadius: { xs: '10px', sm: '15px', md: '20px', lg: '25px', xl: '30px' },
     left: '50%',

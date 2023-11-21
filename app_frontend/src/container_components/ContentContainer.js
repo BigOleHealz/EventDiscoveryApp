@@ -17,9 +17,18 @@ export default function ContentContainer({
 }) {
 
   return (
-    <Box id="content-container">
+    <Box id="content-container"
+      sx={{
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
+        flexGrow: 1,
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center'
+      }}>
       <LeftSidePanel {...props} />
-      <Box style={{ position: 'relative' }}>
+      <Box >
         <Map {...props} />
         <EventInvitesModal
           isVisible={is_event_invites_modal_visible}
