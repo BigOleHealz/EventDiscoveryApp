@@ -43,11 +43,6 @@ export const AttendEventWorkflow = ({
 
   useAttendEventAndSendInvites(is_creating_attending_event_relationship, attend_event_currently_active_data, setIsCreatingAttendingEventRelationship, exitAttendEventMode);
 
-  useEffect(() => {
-    console.log("friends_invited changed", friends_invited)
-  }, [friends_invited]);
-  
-
   return (
     <>
       <EventViewerModal

@@ -492,3 +492,23 @@ FETCH_EVENT_INVITES = r"""
         AttendeeCount
     ORDER BY InviteTimestamp DESC;
     """
+
+RESPOND_TO_EVENT_INVITE_BY_EVENT_INVITE_UUID = r"""
+    WITH
+        $params.event_invite_uuid AS event_invite_uuid,
+        apoc.date.format(apoc.date.currentTimestamp(), "ms", "yyyy-MM-dd'T'HH:mm:ss") AS response_timestamp,
+        $params.response AS event_invite_response
+    MATCH (invitee:Person)-[event_invite:INVITED_TO_EVENT {UUID: event_invite_uuid}]-(event:Event)
+    SET event_invite.STATUS = event_invite_response,
+        event_invite.RESPONSE_TIMESTAMP = response_timestamp
+    WITH
+        invitee,
+        event,
+        event_invite_response,
+        response_timestamp,
+        event_invite_response = "ACCEPTED" AS eventInviteAccepted
+    FOREACH (_ IN CASE WHEN eventInviteAccepted THEN [1] ELSE [] END |
+         MERGE (invitee)-[:ATTENDING {UUID: apoc.create.uuid(), RESPONSE_TIMESTAMP: response_timestamp}]->(event)
+     )
+     RETURN {STATUS: "SUCCESS", MESSAGE: "Response Sent"} as result;
+    """

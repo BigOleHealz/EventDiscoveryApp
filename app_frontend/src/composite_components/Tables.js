@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
 import moment from 'moment';
-import { Box, Button, ButtonGroup, Divider, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
+import { Box, Divider, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 
 import { AcceptDeclineTable, CheckboxTableComponent } from '../base_components/TableComponents'; // Adjust the import path as necessary
 import { convertUTCDateToLocalDate } from '../utils/HelperFunctions';
@@ -49,57 +49,56 @@ export const EventInvitesTable = ({
 
   const [event_invite_response, setEventInviteResponse] = useState(null);
 
-  useEffect(() => {
-    console.log("pending_event_invites = ", pending_event_invites)
-  }, [pending_event_invites])
 
-  const rows = pending_event_invites.map((event_invite) => {
+  const rows = pending_event_invites.map((event_invite, index) => {
     return {
       id: event_invite.InviteUUID,
       content: (
-        <Box style={event_invite_styles.container}>
-          <Box style={event_invite_styles.title}>{event_invite.EventName}</Box>
-          <TableContainer component={Paper}>
-            <Table>
-            
-              <TableBody>
-                <TableRow style={event_invite_styles.row}>
-                  <TableCell style={event_invite_styles.label}>Invited By:</TableCell>
-                  <TableCell style={event_invite_styles.value}>{event_invite.InviterUsername}</TableCell>
-                </TableRow>
-                <TableRow style={event_invite_styles.row}>
-                  <TableCell style={event_invite_styles.label}>Address:</TableCell>
-                  <TableCell style={event_invite_styles.value}>{event_invite.Address}</TableCell>
-                </TableRow>
-                <TableRow style={event_invite_styles.row}>
-                  <TableCell style={event_invite_styles.label}>Time:</TableCell>
-                  <TableCell style={event_invite_styles.value}>{moment(convertUTCDateToLocalDate(event_invite.StartTimestamp)).format('hh:mm a')} - {moment(convertUTCDateToLocalDate(event_invite.EndTimestamp)).format('hh:mm a')}</TableCell>
-                </TableRow>
-                <TableRow style={event_invite_styles.row}>
-                  <TableCell style={event_invite_styles.label}>Event Type:</TableCell>
-                  <TableCell style={event_invite_styles.value}>{event_invite.EventType}</TableCell>
-                </TableRow>
-                <TableRow style={event_invite_styles.row}>
-                  <TableCell style={event_invite_styles.label}>Attendees:</TableCell>
-                  <TableCell style={event_invite_styles.value}>{event_invite.AttendeeCount}</TableCell>
-                </TableRow>
-                <TableRow style={event_invite_styles.row}>
-                  <TableCell style={event_invite_styles.label}>Price:</TableCell>
-                  <TableCell style={event_invite_styles.value}>{event_invite.Price}</TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
+        <>
+          <Box style={event_invite_styles.container}>
+            <Box style={event_invite_styles.title}>{event_invite.EventName}</Box>
+            <TableContainer component={Paper}>
+              <Table>
+                <TableBody sx={event_invite_styles.table}>
+                  <TableRow style={event_invite_styles.row}>
+                    <TableCell style={event_invite_styles.label}>Invited By:</TableCell>
+                    <TableCell style={event_invite_styles.value}>{event_invite.InviterUsername}</TableCell>
+                  </TableRow>
+                  <TableRow style={event_invite_styles.row}>
+                    <TableCell style={event_invite_styles.label}>Address:</TableCell>
+                    <TableCell style={event_invite_styles.value}>{event_invite.Address}</TableCell>
+                  </TableRow>
+                  <TableRow style={event_invite_styles.row}>
+                    <TableCell style={event_invite_styles.label}>Time:</TableCell>
+                    <TableCell style={event_invite_styles.value}>{moment(convertUTCDateToLocalDate(event_invite.StartTimestamp)).format('hh:mm a')} - {moment(convertUTCDateToLocalDate(event_invite.EndTimestamp)).format('hh:mm a')}</TableCell>
+                  </TableRow>
+                  <TableRow style={event_invite_styles.row}>
+                    <TableCell style={event_invite_styles.label}>Event Type:</TableCell>
+                    <TableCell style={event_invite_styles.value}>{event_invite.EventType}</TableCell>
+                  </TableRow>
+                  <TableRow style={event_invite_styles.row}>
+                    <TableCell style={event_invite_styles.label}>Attendees:</TableCell>
+                    <TableCell style={event_invite_styles.value}>{event_invite.AttendeeCount}</TableCell>
+                  </TableRow>
+                  <TableRow style={event_invite_styles.row}>
+                    <TableCell style={event_invite_styles.label}>Price:</TableCell>
+                    <TableCell style={event_invite_styles.value}>{event_invite.Price}</TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
 
-          </TableContainer>
-        </Box>
+            </TableContainer>
+          </Box>
+          {index !== pending_event_invites.length - 1 && <Divider />}
+        </>
       ),
-      onAccept: () => setEventInviteResponse({ event_invite_uuid: event_invite.UUID, response: "ACCEPTED" }),
-      onDecline: () => setEventInviteResponse({ event_invite_uuid: event_invite.UUID, response: "DECLINED" })
+      onAccept: () => setEventInviteResponse({ event_invite_uuid: event_invite.InviteUUID, response: "ACCEPTED" }),
+      onDecline: () => setEventInviteResponse({ event_invite_uuid: event_invite.InviteUUID, response: "DECLINED" })
     }
   });
 
   useFetchPendingEventInvites(user_session, fetching_pending_event_invites, setFetchingPendingEventInvites, setPendingEventInvites)
-  // useRespondToEventInvite(event_invite_response, setEventInviteResponse, setFetchingPendingEventInvites)
+  useRespondToEventInvite(event_invite_response, setEventInviteResponse, setFetchingPendingEventInvites)
 
   return (
     <AcceptDeclineTable rows={rows} />

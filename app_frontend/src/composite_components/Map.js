@@ -26,7 +26,6 @@ export default function Map({
   const [mapCenter, setMapCenter] = useState(defaultCenter);
   const [activePopup, setActivePopup] = useState(null);
 
-  console.log('Map: map_events_filtered = ', map_events_filtered)
 
   useSetUserLocation(setMapCenter);
   const onLoad = (map) => {

@@ -5,40 +5,40 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { storeUserSession } from './SessionManager';
 
-// export const useRespondToFriendRequest = (friend_request_response, setFriendRequestResponse, setFetchingPendingFriendRequests) => {
-//   useEffect(() => {
-//     if (friend_request_response) {
-//       console.log('friend_request_response:', friend_request_response)
-//       fetch('/api/respond_to_friend_request', {
-//         method: 'POST',
-//         headers: {
-//           'Content-Type': 'application/json',
-//         },
-//         body: JSON.stringify({ ...friend_request_response })
-//       }).then(res => res.json())
-//         .then(data => {
-//           console.log(data);
-//           if (data) {
-//             if (data.result === null) {
-//               toast.error('An error occurred. Backend response does not contain a result!');
-//             } else if (data.result.STATUS === 'SUCCESS') {
-//               toast.success('Response Sent Successfully!');
-//             } else if (data.result.STATUS === 'ERROR') {
-//               toast.error(data.result.MESSAGE);
-//             } else {
-//               toast.error('An unknown error occurred. Printing response to console.');
-//               console.error(data);
-//             }
-//           }
-//         }).catch((error) => {
-//           console.error('Error:', error);
-//           toast.error('An error occurred while responding to friend request!');
-//         });
-//     }
-//     setFriendRequestResponse(null);
-//     setFetchingPendingFriendRequests(true);
-//   }, [friend_request_response]);
-// };
+export const useRespondToEventInvite = (event_invite_response, setEventInviteResponse, setFetchingPendingEventInvites) => {
+  useEffect(() => {
+    if (event_invite_response) {
+      console.log('event_invite_response:', event_invite_response)
+      fetch('/api/respond_to_event_invite', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ ...event_invite_response })
+      }).then(res => res.json())
+        .then(data => {
+          console.log(data);
+          if (data) {
+            if (data.result === null) {
+              toast.error('An error occurred. Backend response does not contain a result!');
+            } else if (data.result.STATUS === 'SUCCESS') {
+              toast.success('Response Sent Successfully!');
+            } else if (data.result.STATUS === 'ERROR') {
+              toast.error(data.result.MESSAGE);
+            } else {
+              toast.error('An unknown error occurred. Printing response to console.');
+              console.error(data);
+            }
+          }
+        }).catch((error) => {
+          console.error('Error:', error);
+          toast.error('An error occurred while responding to friend request!');
+        });
+    }
+    setEventInviteResponse(null);
+    setFetchingPendingEventInvites(true);
+  }, [event_invite_response]);
+};
 
 export const useFetchPendingEventInvites = (recipient, fetching_pending_event_invites, setFetchingPendingEventInvites, setPendingEventInvites) => {
   useEffect(() => {
