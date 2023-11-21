@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Button, ButtonGroup, Checkbox, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
+import { Box, Button, Checkbox, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 
 import { common_styles, table_styles } from '../styles';
 
@@ -83,32 +83,35 @@ export const AcceptDeclineTable = ({ rows }) => {
           <TableBody>
             {rows.map((row, rowIndex) => (
               <TableRow key={rowIndex} sx={table_styles.row}>
-                <TableCell sx={table_styles.event_details_cell}>
+                <TableCell sx={table_styles.item_cell}>
                   <Box>
                     {row.content}
                   </Box>
                 </TableCell>
                 <TableCell 
                   align={'right'} sx={table_styles.accept_decline_cell}>
-                  <ButtonGroup variant="contained" color="primary" aria-label="contained primary button group">
+                  <Box sx={{ display: { xs: 'block', sm: 'block', md: 'block', lg: 'flex', xl: 'flex' } }}>
                     <Button
+                      variant="contained"
+                      color="primary"
                       onClick={() => row.onAccept(row)}
-                      sx={{ marginRight: button_margins }}
+                      sx={{ marginBottom: button_margins, width: '100px' }}
                     >
                       Accept
                     </Button>
                     <Button
-                      variant="outlined"
+                      variant="contained"
                       sx={{
                         backgroundColor: '#FF0000',
                         color: '#FFFFFF',
-                        marginLeft: button_margins
+                        marginTop: button_margins,
+                        width: '100px'
                       }}
                       onClick={() => row.onDecline(row)}
                     >
                       Decline
                     </Button>
-                  </ButtonGroup>
+                  </Box>
                 </TableCell>
               </TableRow>
             ))}

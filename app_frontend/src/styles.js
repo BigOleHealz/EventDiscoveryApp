@@ -78,10 +78,8 @@ export const common_styles = {
   table_cell: {
     backgroundColor: defaultBackgroundColor,
     color: defaultFontColor,
-    padding: 0,
     borderBottom: 'none',
-    paddingTop: '4px',
-    paddingBottom: '4px',
+    padding: 1,
   }
 };
 
@@ -490,6 +488,7 @@ export const table_styles = {
     position: 'absolute',
     top: 0,
     bottom: 0,
+    backgroundColor: common_styles.appTheme.backgroundColor,
   },
   row: {
     backgroundColor: common_styles.appTheme.backgroundColor,
@@ -505,9 +504,10 @@ export const table_styles = {
     width: '100',
     ...common_styles.table_cell
   },
-  event_details_cell: {
+  item_cell: {
     align: 'left',
     width: 'auto',
+    marginLeft: '10px',
     ...common_styles.table_cell
   },
   accept_decline_cell: {
