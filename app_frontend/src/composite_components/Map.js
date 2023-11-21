@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Button from '@mui/material/Button';
+import Box from '@mui/material/Box';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { GoogleMap, MarkerClusterer } from '@react-google-maps/api';
@@ -39,46 +39,55 @@ export default function Map({
       setActivePopup(uuid);
     }
   };
-
-
   return (
-    <>
+    <Box id="box-main-map"
+      sx={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        flexGrow: 1,
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center'
+      }}>
       <ToastContainer />
-        <GoogleMap
-          mapContainerStyle={map_styles.mapContainerStyle}
-          zoom={15}
-          center={mapCenter}
-          draggable={true}
-          onLoad={onLoad}
-          options={{
-            styles: [
-              {
-                featureType: 'poi',
-                elementType: 'labels',
-                stylers: [{ visibility: 'off' }],
-              },
-            ],
-          }}
-        >
-             {/* <MarkerClusterer
+      <GoogleMap
+        mapContainerStyle={map_styles.mapContainerStyle}
+        zoom={15}
+        center={mapCenter}
+        draggable={true}
+        onLoad={onLoad}
+        options={{
+          styles: [
+            {
+              featureType: 'poi',
+              elementType: 'labels',
+              stylers: [{ visibility: 'off' }],
+            },
+          ],
+        }}
+      >
+        {/* <MarkerClusterer
             options={{ imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m' }}
             maxZoom={20}
           > */}
-          {
-            // (clusterer) => (
-            Array.isArray(map_events_filtered) && map_events_filtered.map((event) => (
-              <MapMarkerWithTooltip
-                key={event.UUID}
-                event={event}
-                activePopup={activePopup}
-                onSetActivePopup={handleSetActivePopup}
-                {...props}
-                // clusterer={clusterer}
-              />
-            ))
-          }
-          {/* </MarkerClusterer> */}
-        </GoogleMap>
-    </>
+        {
+          // (clusterer) => (
+          Array.isArray(map_events_filtered) && map_events_filtered.map((event) => (
+            <MapMarkerWithTooltip
+              key={event.UUID}
+              event={event}
+              activePopup={activePopup}
+              onSetActivePopup={handleSetActivePopup}
+              {...props}
+            // clusterer={clusterer}
+            />
+          ))
+        }
+        {/* </MarkerClusterer> */}
+      </GoogleMap>
+    </Box>
   );
 };
