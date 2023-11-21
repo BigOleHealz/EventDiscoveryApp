@@ -75,6 +75,14 @@ export const common_styles = {
     color: brightBlueColor,
     textDecoration: 'underline',
   },
+  table_cell: {
+    backgroundColor: defaultBackgroundColor,
+    color: defaultFontColor,
+    padding: 0,
+    borderBottom: 'none',
+    paddingTop: '4px',
+    paddingBottom: '4px',
+  }
 };
 
 export const login_page_styles = {
@@ -247,7 +255,8 @@ export const modal_component_styles = {
     justifyContent: 'center',
     alignItems: 'center',
     padding: content_padding,
-    maxWidth: '100%'
+    maxWidth: '100%',
+    position: 'relative'
   },
   title: {
     ...common_styles.h1,
@@ -272,10 +281,12 @@ export const friend_request_styles = {
     width: '100%',
     height: '100%',
     flexDirection: 'column',
+    display: 'flex',
     justifyContent: 'space-between',
   },
   sendRequestContainer: {
     display: 'flex',
+    flexGrow: 0,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -284,7 +295,8 @@ export const friend_request_styles = {
   }
 
 
-}
+};
+
 export const select_interests_scrollview_styles = {
   parentContainer: {
     display: 'flex',
@@ -460,9 +472,33 @@ export const event_invite_styles = {
 };
 
 export const table_styles = {
-  table_cell: {
+  table_container: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+  },
+  row: {
     backgroundColor: common_styles.appTheme.backgroundColor,
-    color: common_styles.appTheme.color,
     borderBottom: 'none',
   },
+  checkbox_cell: {
+    align: 'left',
+    width: 'auto',
+    ...common_styles.table_cell
+  },
+  label_cell: {
+    align: 'left',
+    width: '100',
+    ...common_styles.table_cell
+  },
+  event_details_cell: {
+    align: 'left',
+    width: 'auto',
+    ...common_styles.table_cell
+  },
+  accept_decline_cell: {
+    align: 'right',
+    alignItems: 'right',
+    ...common_styles.table_cell
+  }
 };

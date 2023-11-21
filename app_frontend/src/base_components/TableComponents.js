@@ -36,58 +36,30 @@ export const CheckboxTableComponent = ({
       <TableContainer component={Paper}>
         <Table aria-label="checkbox table">
           <TableHead>
-            <TableRow sx={{ backgroundColor: common_styles.defaultBackgroundColor }}>
-              <TableCell
-                align={'left'}
-                sx={{
-                  width: 'auto',
-                  padding: 0,
-                  ...table_styles.table_cell
-                }}
-              >
+            <TableRow sx={table_styles.row}>
+              <TableCell sx={table_styles.checkbox_cell}>
                 <Checkbox
                   indeterminate={selected.length > 0 && selected.length < rows.length}
                   checked={rows.length > 0 && selected.length === rows.length}
                   onChange={handleSelectAllClick}
                 />
               </TableCell>
-              <TableCell
-                align={'left'}
-                sx={{
-                  width: '100%',
-                  padding: 0,
-                  ...table_styles.table_cell
-                }}>
+              <TableCell sx={table_styles.label_cell}>
                 Select All
               </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {rows.map((row, rowIndex) => (
-              <TableRow key={rowIndex} sx={{ backgroundColor: common_styles.defaultBackgroundColor }}>
-                <TableCell
-                  align={'left'}
-                  sx={{
-                    width: 'auto',
-                    padding: 0,
-                    ...table_styles.table_cell
-                  }}
-                >
+              <TableRow key={rowIndex} sx={table_styles.row}>
+                <TableCell sx={table_styles.checkbox_cell}>
                   <Checkbox
                     checked={isSelected(row.id)}
                     onChange={() => handleClick(row.id)}
                     style={{ color: row.checkboxColor || null }}
                   />
                 </TableCell>
-                <TableCell
-                  align={'left'}
-                  sx={{
-                    width: '100%',
-                    padding: 0,
-                    paddingLeft: 3,
-                    ...table_styles.table_cell
-                  }}
-                >
+                <TableCell sx={{paddingLeft: '3px', ...table_styles.label_cell}}>
                   {row.label}
                 </TableCell>
               </TableRow>
@@ -106,34 +78,18 @@ export const AcceptDeclineTable = ({ rows }) => {
 
   return (
     rows.length > 0 ?
-      <TableContainer component={Paper}>
+      <TableContainer component={Paper} sx={table_styles.table_container} >
         <Table aria-label="accept-decline table">
           <TableBody>
             {rows.map((row, rowIndex) => (
-              <TableRow
-                key={rowIndex}
-                style={{
-                  backgroundColor: common_styles.defaultBackgroundColor,
-                  borderBottom: 'none'
-                }}
-              >
-                <TableCell
-                  align={'left'}
-                  sx={{
-                    ...table_styles.table_cell
-                  }}
-                >
-                  {/* {row.name} */}
+              <TableRow key={rowIndex} sx={table_styles.row}>
+                <TableCell sx={table_styles.event_details_cell}>
                   <Box>
                     {row.content}
                   </Box>
                 </TableCell>
-                <TableCell
-                  align={'right'}
-                  sx={{
-                    ...table_styles.table_cell
-                  }}
-                >
+                <TableCell 
+                  align={'right'} sx={table_styles.accept_decline_cell}>
                   <ButtonGroup variant="contained" color="primary" aria-label="contained primary button group">
                     <Button
                       onClick={() => row.onAccept(row)}
