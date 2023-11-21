@@ -10,7 +10,7 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 
 import BoxComponent from '../base_components/BoxComponent';
 
-
+import { toolbar_height, modal_component_styles } from '../styles';
 
 const theme = createTheme({
   components: {
@@ -24,20 +24,6 @@ const theme = createTheme({
   }
 });
 
-const modalStyle = {
-  position: 'absolute',
-  top: '50%',
-  height: { xs: '90%', sm: '85%', md: '80%', lg: '75%', xl: '75%' },
-  width: { xs: '95%', sm: '87%', md: '60%', lg: '55%', xl: '50%' },
-  borderRadius: { xs: '10px', sm: '15px', md: '20px', lg: '25px', xl: '30px' },
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  bgcolor: 'background.paper',
-  boxShadow: 24,
-  padding: 0,
-};
-
-const vertical_padding = { xs: "10px", sm: "15px", md: "20px", lg: "25px", xl: "30px" }
 
 
 export const ModalComponent = ({
@@ -49,44 +35,34 @@ export const ModalComponent = ({
   children
 }) => {
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider theme={theme} >
       <Modal
         open={isVisible}
-        onClose={() => {
-          console.log('Modal closed');
-          onRequestClose();
-        }}
-
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-        id="modal-parent"
-        sx={modalStyle}
+        onClose={onRequestClose}
+        sx={modal_component_styles.modalContainer}
       >
-        <BoxComponent id="box-modal-parent" style={{ height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between", borderRadius: "10px" }}>
-          <Button
-            onClick={onRequestClose}
-            style={{ position: "absolute", top: 0, right: 0 }}
-          >
+        <BoxComponent
+          id="box-modal-parent"
+          sx={modal_component_styles.parentContainer}>
+          <Button onClick={onRequestClose} sx={modal_component_styles.closeButton}>
             <CloseIcon />
           </Button>
-          <BoxComponent id="box-modal-title" style={{ display: 'flex', justifyContent: 'center', paddingTop: vertical_padding, paddingBottom: vertical_padding, borderRadius: "10px" }}>
-            <Typography id="typography-modal-title" variant="h6" component="h2">
+          <BoxComponent id="box-modal-title" sx={modal_component_styles.wrapperContainers}>
+            <Typography id="typography-modal-title" variant="h6" component="h2" sx={modal_component_styles.title}>
               {title}
             </Typography>
           </BoxComponent>
-          <Divider style={{ backgroundColor: 'grey', height: '2px' }} />
-          <BoxComponent id="box-modal-content" style={{ flexGrow: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', paddingTop: vertical_padding, paddingBottom: vertical_padding, maxWidth: '100%' }}>
+          <Divider sx={modal_component_styles.divider} />
+          <BoxComponent id="box-modal-content" sx={modal_component_styles.contentContainer}>
             {children}
           </BoxComponent>
-          <Divider style={{ backgroundColor: 'grey', height: '2px' }} />
-          <BoxComponent
-            id="box-modal-submit-button"
-            style={{ display: 'flex', justifyContent: 'center', paddingTop: vertical_padding, paddingBottom: vertical_padding, borderRadius: "10px" }}>
+          <Divider sx={modal_component_styles.divider} />
+          <BoxComponent id="box-modal-submit-button" sx={modal_component_styles.wrapperContainers}>
             <Button
               id="button-modal-submit"
               variant="contained"
               onClick={onSubmitButtonClick}
-              sx={{ width: { xs: "80%", sm: "70%", md: "60%", lg: "50%", xl: "40%" }, height: { xs: "40px", sm: "50px", md: "60px", lg: "70px", xl: "80px" } }}
+              sx={modal_component_styles.submitButton}
             >
               {submitButtonText}
             </Button>

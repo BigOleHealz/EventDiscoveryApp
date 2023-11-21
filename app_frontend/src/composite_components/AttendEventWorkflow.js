@@ -41,7 +41,7 @@ export const AttendEventWorkflow = ({
     setIsCreatingAttendingEventRelationship(true);
   }
 
-  useAttendEventAndSendInvites(is_creating_attending_event_relationship, attend_event_currently_active_data, setIsCreatingAttendingEventRelationship, exitAttendEventMode);
+  useAttendEventAndSendInvites(is_creating_attending_event_relationship, attend_event_currently_active_data, setIsCreatingAttendingEventRelationship, setFriendsInvited, exitAttendEventMode);
 
   return (
     <>
