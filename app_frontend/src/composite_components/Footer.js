@@ -9,7 +9,9 @@ import Button from "@mui/material/Button";
 import { AttendEventContext, CreateEventContext, UserSessionContext } from '../utils/Contexts';
 import { removeUserSession } from '../utils/SessionManager';
 
-export default function Footer({ ...props }) {
+export default function Footer({
+  ...props
+}) {
 
   const { user_session, setUserSession } = React.useContext(UserSessionContext);
 
@@ -28,8 +30,8 @@ export default function Footer({ ...props }) {
             <Button
               id="button-logout"
               onClick={() => {
-                removeUserSession()
                 setUserSession(null)
+                removeUserSession()
               }}
               sx={{ my: 2, color: "white", display: "block" }}
             >

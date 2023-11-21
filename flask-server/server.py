@@ -363,5 +363,28 @@ def create_server():
 
         except Exception as e:
             return jsonify({"STATUS": "ERROR", "MESSAGE": "An error occurred: " + str(e)}), 500
+        
+    @app.route('/respond_to_event_invite', methods=["POST"])
+    def respond_to_event_invite():
+        try:
+            body = request.get_json()
+            if not body:
+                return jsonify({"STATUS": "ERROR", "MESSAGE": "No input body provided"}), 400
+            event_invite_uuid = body.get('event_invite_uuid')
+            response = body.get('response')
 
+            if not event_invite_uuid:
+                return jsonify({"STATUS": "ERROR", "MESSAGE": "Missing event_invite_uuid"}), 400
+            elif not response:
+                return jsonify({"STATUS": "ERROR", "MESSAGE": "Missing response"}), 400
+            
+            result = neo4j.execute_query_with_params(query=queries.RESPOND_TO_EVENT_INVITE_BY_EVENT_INVITE_UUID, params=body)
+            if len(result) == 0:
+                return jsonify({"STATUS": "ERROR", "MESSAGE": "Response could not be sent"}), 400
+            else:
+                result = result[0]
+                return jsonify(result), 200
+
+        except Exception as e:
+            return jsonify({"STATUS": "ERROR", "MESSAGE": "An error occurred: " + str(e)}), 500
     return app

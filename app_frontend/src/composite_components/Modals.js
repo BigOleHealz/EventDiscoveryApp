@@ -66,6 +66,9 @@ export const InviteFriendsToEventModal = ({
 
   const { user_session, setUserSession } = useContext(UserSessionContext);
 
+  if (!user_session) {
+    return null; // or some placeholder content
+  }
   return (
     <ModalComponent
       isVisible={isVisible}
@@ -118,12 +121,16 @@ export const FriendRequestsModal = ({
   onRequestClose,
   ...props
 }) => {
+  
+  const { user_session, setUserSession } = useContext(UserSessionContext);
+  if (!user_session) {
+    return null; // or some placeholder content
+  }
 
   const height_text_input_and_button = { xs: '40px', sm: '45px', md: '50px', lg: '55px', xl: '60px' };
   const margin_text_input_and_button = { xs: '3px', sm: '4px', md: '5px', lg: '6px', xl: '7px' };
   const friend_request_vertical_margin = { xs: '5px', sm: '10px', md: '15px', lg: '20px', xl: '25px' }
 
-  const { user_session, setUserSession } = useContext(UserSessionContext);
 
   const [friend_request_username, setFriendRequestUsername] = useState('');
   const [sending_friend_request, setSendingFriendRequest] = useState(false);

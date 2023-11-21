@@ -411,8 +411,12 @@ export const event_invite_styles = {
     borderRadius: '4px',
     margin: 0,
   },
+  table: {
+    border: 'none',
+  },
   row: {
     backgroundColor: common_styles.appTheme.backgroundColor,
+    border: 'none',
   },
   table: {
     marginBottom: "10px",
@@ -434,11 +438,13 @@ export const event_invite_styles = {
     paddingTop: '2px',
     paddingBottom: '2px',
     textAlign: 'right',
+    border: 'none',
   },
   value: {
     padding: '2px',
     width: '100%',
     color: common_styles.appTheme.color,
+    border: 'none',
   },
 };
 
