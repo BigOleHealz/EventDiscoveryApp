@@ -42,7 +42,7 @@ export const EventViewerModal = ({
       onSubmitButtonClick={handleSubmitButtonClick}
     >
       <BoxComponent style={{ width: '100%', height: '100%' }}>
-        { event ? <iframe
+        {event ? <iframe
           src={event.EventURL}
           title="Event Content"
           style={{
@@ -69,7 +69,7 @@ export const InviteFriendsToEventModal = ({
   const { user_session, setUserSession } = useContext(UserSessionContext);
 
   if (!user_session) {
-    return null; // or some placeholder content
+    return null;
   }
   return (
     <ModalComponent
@@ -84,7 +84,7 @@ export const InviteFriendsToEventModal = ({
           friends_list={user_session.Friends}
           friends_invited={friends_invited}
           setFriendsInvited={setFriendsInvited}
-          />
+        />
       </BoxComponent>
     </ModalComponent>
   );
@@ -99,10 +99,6 @@ export const EventInvitesModal = ({
 
   const { user_session, setUserSession } = useContext(UserSessionContext);
 
-  const [friend_request_username, setFriendRequestUsername] = useState('');
-  const [sending_friend_request, setSendingFriendRequest] = useState(false);
-
-
   return (
     <ModalComponent
       isVisible={isVisible}
@@ -111,9 +107,9 @@ export const EventInvitesModal = ({
       submitButtonText="Close"
       onSubmitButtonClick={onRequestClose}
     >
-      <BoxComponent sx={{ width: '100%', height: '100%' }}>
+      <Box sx={{ width: '100%', height: '100%' }}>
         <EventInvitesTable user_session={user_session} />
-      </BoxComponent>
+      </Box>
     </ModalComponent>
   );
 }
@@ -123,7 +119,7 @@ export const FriendRequestsModal = ({
   onRequestClose,
   ...props
 }) => {
-  
+
   const { user_session, setUserSession } = useContext(UserSessionContext);
   if (!user_session) {
     return null;
@@ -182,7 +178,7 @@ export const FriendRequestsModal = ({
             sx={{
               marginLeft: margin_text_input_and_button,
               height: height_text_input_and_button,
-              width: { xs: '120px', sm: '125px', md: '130px', lg: '140px', xl: '160px'}
+              width: { xs: '120px', sm: '125px', md: '130px', lg: '140px', xl: '160px' }
             }}
           >
             Send Request
@@ -194,7 +190,7 @@ export const FriendRequestsModal = ({
             marginBottom: friend_request_vertical_margin,
             backgroundColor: 'grey'
           }} />
-        <Box>
+        <Box id='box-accept-decline-friend-request' sx={{flexGrow: 1, position: 'relative', height: '100%' }}>
           <FriendRequestsTable user_session={user_session} />
         </Box>
       </Box>

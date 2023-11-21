@@ -101,7 +101,9 @@ export const EventInvitesTable = ({
   useRespondToEventInvite(event_invite_response, setEventInviteResponse, setFetchingPendingEventInvites)
 
   return (
-    <AcceptDeclineTable rows={rows} />
+    <Box sx={{position: 'relative', height: '100%'}}>
+      <AcceptDeclineTable rows={rows} />
+    </Box>
   );
 };
 

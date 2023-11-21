@@ -1,14 +1,25 @@
 // TextInputComponent.js
 import React from 'react';
 import TextField from '@mui/material/TextField';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
 
-import BoxComponent from './BoxComponent';
 import { text_input_styles } from '../styles';
 
-export const TextInputComponent = ({ label, id, required = false, style, value, onChangeText, ...props }) => {
+const theme = createTheme({
+  components: {
+    MuiInputBase: {
+      styleOverrides: {
+        input: {
+          padding: 0,
+        },
+      },
+    }
+  }
+});
+export const TextInputComponent = ({ label, id, required = false, style, sx, value, onChangeText, ...props }) => {
 
   return (
-    <BoxComponent>
+    <ThemeProvider theme={theme} >
       <TextField
         required={required}
         id={id}
@@ -25,10 +36,11 @@ export const TextInputComponent = ({ label, id, required = false, style, value, 
         sx={{
           padding: 0,
           borderRadius: 5,
-          ...style
+          ...style,
+          ...sx
         }}
       />
-    </BoxComponent>
+      </ThemeProvider>
   );
 };
 
