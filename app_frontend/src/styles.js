@@ -382,9 +382,6 @@ export const tooltip_styles = {
     width: '100%',
   },
   title: {
-    // fontWeight: 'bold',
-    // textAlign: 'center',
-    // justifyContent: 'center',
     ...common_styles.h1,
   },
   label: {
@@ -404,6 +401,44 @@ export const tooltip_styles = {
   infoWindowStyle: {
     padding: 0,
     margin: 0,
+  },
+};
+
+export const event_invite_styles = {
+  container: {
+    display: 'flex',
+    flexDirection: 'column',
+    borderRadius: '4px',
+    margin: 0,
+  },
+  row: {
+    backgroundColor: common_styles.appTheme.backgroundColor,
+  },
+  table: {
+    marginBottom: "10px",
+    borderCollapse: 'collapse',
+    width: '100%',
+  },
+  title: {
+    ...common_styles.h1,
+    width: '100%',
+    textAlign: 'left',
+    color: common_styles.appTheme.color,
+  },
+  label: {
+    whiteSpace: 'nowrap',
+    width: 'auto',
+    fontWeight: 600,
+    color: common_styles.appTheme.color,
+    marginRight: '4px',
+    paddingTop: '2px',
+    paddingBottom: '2px',
+    textAlign: 'right',
+  },
+  value: {
+    padding: '2px',
+    width: '100%',
+    color: common_styles.appTheme.color,
   },
 };
 

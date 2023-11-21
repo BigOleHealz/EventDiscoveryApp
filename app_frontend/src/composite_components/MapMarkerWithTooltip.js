@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import moment from 'moment';
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
+import { Box, Button, ButtonGroup, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 
 import { InfoWindow, Marker } from '@react-google-maps/api';
 import { AttendEventWorkflow } from './AttendEventWorkflow';
@@ -59,39 +58,36 @@ const MapMarkerWithTooltip = ({
   const renderInfoContent = () => {
     return (
       <Box style={tooltip_styles.container}>
-        <div style={tooltip_styles.title}>{event.EventName}</div>
-        <table style={tooltip_styles.table}>
-          <tbody>
-            <tr>
-              <td style={tooltip_styles.label}>Address:</td>
-              <td style={tooltip_styles.value}>{event.Address}</td>
-            </tr>
-            <tr>
-              <td style={tooltip_styles.label}>Time:</td>
-              <td style={tooltip_styles.value}>{moment(convertUTCDateToLocalDate(event.StartTimestamp)).format('hh:mm a')} - {moment(convertUTCDateToLocalDate(event.EndTimestamp)).format('hh:mm a')}</td>
-            </tr>
-            <tr>
-              <td style={tooltip_styles.label}>Event Type:</td>
-              <td style={tooltip_styles.value}>{event.EventType}</td>
-            </tr>
-            {event.Price && (
-              <tr>
-                <td style={tooltip_styles.label}>Price:</td>
-                <td style={tooltip_styles.value}>{event.Price}</td>
-              </tr>
-            )}
-            {event.EventURL && (
-              <tr>
-                <td style={tooltip_styles.label}>Event URL:</td>
-                <td style={tooltip_styles.value}>
-                  <a href={event.EventURL} target="_blank" rel="noopener noreferrer" style={common_styles.hyperlinkText}>
-                    {event.EventURL}
-                  </a>
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+        <Box style={tooltip_styles.title}>{event.EventName}</Box>
+        <TableContainer component={Paper}>
+          <Table>
+            <TableBody>
+              <TableRow>
+                <TableCell style={tooltip_styles.label}>Address:</TableCell>
+                <TableCell style={tooltip_styles.value}>{event.Address}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell style={tooltip_styles.label}>Time:</TableCell>
+                <TableCell style={tooltip_styles.value}>{moment(convertUTCDateToLocalDate(event.StartTimestamp)).format('hh:mm a')} - {moment(convertUTCDateToLocalDate(event.EndTimestamp)).format('hh:mm a')}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell style={tooltip_styles.label}>Event Type:</TableCell>
+                <TableCell style={tooltip_styles.value}>{event.EventType}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell style={tooltip_styles.label}>Attendees:</TableCell>
+                <TableCell style={tooltip_styles.value}>{event.AttendeeCount}</TableCell>
+              </TableRow>
+              {event.Price && (
+                <TableRow>
+                  <TableCell style={tooltip_styles.label}>Price:</TableCell>
+                  <TableCell style={tooltip_styles.value}>{event.Price}</TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+
+        </TableContainer>
         <Button
           variant="contained"
           color="primary"

@@ -5,6 +5,103 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { storeUserSession } from './SessionManager';
 
+// export const useRespondToFriendRequest = (friend_request_response, setFriendRequestResponse, setFetchingPendingFriendRequests) => {
+//   useEffect(() => {
+//     if (friend_request_response) {
+//       console.log('friend_request_response:', friend_request_response)
+//       fetch('/api/respond_to_friend_request', {
+//         method: 'POST',
+//         headers: {
+//           'Content-Type': 'application/json',
+//         },
+//         body: JSON.stringify({ ...friend_request_response })
+//       }).then(res => res.json())
+//         .then(data => {
+//           console.log(data);
+//           if (data) {
+//             if (data.result === null) {
+//               toast.error('An error occurred. Backend response does not contain a result!');
+//             } else if (data.result.STATUS === 'SUCCESS') {
+//               toast.success('Response Sent Successfully!');
+//             } else if (data.result.STATUS === 'ERROR') {
+//               toast.error(data.result.MESSAGE);
+//             } else {
+//               toast.error('An unknown error occurred. Printing response to console.');
+//               console.error(data);
+//             }
+//           }
+//         }).catch((error) => {
+//           console.error('Error:', error);
+//           toast.error('An error occurred while responding to friend request!');
+//         });
+//     }
+//     setFriendRequestResponse(null);
+//     setFetchingPendingFriendRequests(true);
+//   }, [friend_request_response]);
+// };
+
+export const useFetchPendingEventInvites = (recipient, fetching_pending_event_invites, setFetchingPendingEventInvites, setPendingEventInvites) => {
+  useEffect(() => {
+    if (fetching_pending_event_invites) {
+      fetch('/api/fetch_event_invites', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({InviteeUUID: recipient.UUID}),
+      }).then(res => res.json())
+        .then(data => {
+          console.log("useFetchPendingEventInvites data:", data);
+          if (data) {
+            setPendingEventInvites(data);
+          } else {
+            console.error('An error occurred. Backend response does not contain a result!');
+            toast.error('An error occurred. Backend response does not contain a result!');
+          }
+        }).catch((error) => {
+          console.error('Error:', error);
+          toast.error('An error occurred while checking if username exists!');
+        });
+    }
+    setFetchingPendingEventInvites(false);
+  }, [fetching_pending_event_invites]);
+};
+
+export const useAttendEventAndSendInvites = (is_creating_attending_event_relationship, attend_event_currently_active_data, setIsCreatingAttendingEventRelationship, exitAttendEventMode) => {
+  useEffect(() => {
+    if (is_creating_attending_event_relationship) {
+      console.log('attend_event_currently_active_data:', attend_event_currently_active_data)
+      fetch('/api/attend_event_and_send_invites', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ ...attend_event_currently_active_data })
+      }).then(res => res.json())
+
+        .then(data => {
+          console.log(data);
+          if (data) {
+            if (data.STATUS === "ERROR") {
+              toast.error("Error: " + data.MESSAGE);
+            } else if (data.STATUS === 'SUCCESS') {
+              toast.success('Event attendance and invites sent successfully!');
+            } else {
+              toast.error('An unknown error occurred. Printing response to console.');
+              console.error(data);
+            }
+          }
+        }).catch((error) => {
+          console.error('Error:', error);
+          toast.error('An error occurred while attending event!');
+        });
+    }
+    setIsCreatingAttendingEventRelationship(false);
+    exitAttendEventMode();
+  }, [is_creating_attending_event_relationship]);
+};
+
+  
 export const useRespondToFriendRequest = (friend_request_response, setFriendRequestResponse, setFetchingPendingFriendRequests) => {
   useEffect(() => {
     if (friend_request_response) {
