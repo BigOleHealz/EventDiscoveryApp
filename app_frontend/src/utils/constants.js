@@ -62,8 +62,8 @@ export const date_time_format = "yyyy-MM-dd'T'HH:mm:ss";
 // };
 
 export const defaultCenter = {
-    lat: 39.9526,
-    lng: -75.1652,
+    lat: 25.7687552,
+    lng: -80.196559
 };
 
 export const icon_size = {

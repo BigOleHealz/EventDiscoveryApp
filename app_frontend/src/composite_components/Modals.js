@@ -13,10 +13,10 @@ import { TimeRangeSliderComponent } from '../base_components/TimeRangeSliderComp
 import { FriendRequestsTable } from './Tables';
 import { SelectInterestsScrollView } from './SelectInterestsScrollview';
 import { SwitchComponent } from './SwitchComponent';
-import { EventTypesTable, InviteFriendsToEventTable } from './Tables';
+import { EventInvitesTable, EventTypesTable, InviteFriendsToEventTable } from './Tables';
 
 import { day_start_time, day_end_time, day_format } from '../utils/constants';
-import { CreateEventContext, CreateUserProfileContext, UserSessionContext } from '../utils/Contexts';
+import { AttendEventContext, CreateEventContext, CreateUserProfileContext, UserSessionContext } from '../utils/Contexts';
 import { convertUTCDateToLocalDate } from '../utils/HelperFunctions';
 import {
   useCreateFriendRequestRelationshipIfNotExist,
@@ -57,21 +57,22 @@ export const EventViewerModal = ({
 
 export const InviteFriendsToEventModal = ({
   isVisible,
+  friends_invited,
+  setFriendsInvited,
   handleSubmitButtonClick,
   onRequestClose,
   ...props
 }) => {
 
   const { user_session, setUserSession } = useContext(UserSessionContext);
-  const [ friends_invited, setFriendsInvited ] = useState([]);
 
   return (
     <ModalComponent
-    isVisible={isVisible}
-    onRequestClose={onRequestClose}
-    title="Invite Friends to Event"
-    submitButtonText="Send Invites"
-    onSubmitButtonClick={handleSubmitButtonClick}
+      isVisible={isVisible}
+      onRequestClose={onRequestClose}
+      title="Invite Friends to Event"
+      submitButtonText="Send Invites"
+      onSubmitButtonClick={handleSubmitButtonClick}
     >
       <BoxComponent sx={{ width: '100%', height: '100%' }}>
         <InviteFriendsToEventTable
@@ -91,10 +92,6 @@ export const EventInvitesModal = ({
   ...props
 }) => {
 
-  const height_text_input_and_button = { xs: '40px', sm: '45px', md: '50px', lg: '55px', xl: '60px' };
-  const margin_text_input_and_button = { xs: '3px', sm: '4px', md: '5px', lg: '6px', xl: '7px' };
-  const friend_request_vertical_margin = { xs: '5px', sm: '10px', md: '15px', lg: '20px', xl: '25px' }
-
   const { user_session, setUserSession } = useContext(UserSessionContext);
 
   const [friend_request_username, setFriendRequestUsername] = useState('');
@@ -110,7 +107,7 @@ export const EventInvitesModal = ({
       onSubmitButtonClick={onRequestClose}
     >
       <BoxComponent sx={{ width: '100%', height: '100%' }}>
-        event invites
+        <EventInvitesTable user_session={user_session} />
       </BoxComponent>
     </ModalComponent>
   );

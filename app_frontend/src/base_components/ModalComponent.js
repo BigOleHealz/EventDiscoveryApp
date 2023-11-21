@@ -28,7 +28,7 @@ const modalStyle = {
   position: 'absolute',
   top: '50%',
   height: { xs: '90%', sm: '85%', md: '80%', lg: '75%', xl: '75%' },
-  width: { xs: '95%', sm: '80%', md: '40%', lg: '30%', xl: '25%' },
+  width: { xs: '95%', sm: '87%', md: '60%', lg: '55%', xl: '50%' },
   borderRadius: { xs: '10px', sm: '15px', md: '20px', lg: '25px', xl: '30px' },
   left: '50%',
   transform: 'translate(-50%, -50%)',
@@ -38,7 +38,6 @@ const modalStyle = {
 };
 
 const vertical_padding = { xs: "10px", sm: "15px", md: "20px", lg: "25px", xl: "30px" }
-const width = { xs: '95%', sm: '80%', md: '40%', lg: '30%', xl: '25%' }
 
 
 export const ModalComponent = ({

@@ -317,4 +317,51 @@ def create_server():
         except Exception as e:
             return jsonify({"STATUS": "ERROR", "MESSAGE": "An error occurred: " + str(e)}), 500
     
+
+    @app.route('/attend_event_and_send_invites', methods=["POST"])
+    def attend_event_and_send_invites():
+        try:
+            body = request.get_json()
+            if not body:
+                return jsonify({"STATUS": "ERROR", "MESSAGE": "No input body provided"}), 400
+            event_uuid = body.get('EventUUID')
+            attendee_uuid = body.get('AttendeeUUID')
+            invite_uuids = body.get('InviteeUUIDs')
+
+            if not event_uuid:
+                return jsonify({"STATUS": "ERROR", "MESSAGE": "Missing event_uuid"}), 400
+            elif not attendee_uuid:
+                return jsonify({"STATUS": "ERROR", "MESSAGE": "Missing attendee_uuid"}), 400
+            elif not invite_uuids:
+                return jsonify({"STATUS": "ERROR", "MESSAGE": "Missing invite_uuids"}), 400
+
+            try:
+                result = neo4j.execute_query_with_params(query=queries.ATTEND_EVENT_AND_SEND_INVITES, params=body)
+                return jsonify({"STATUS": "SUCCESS", "MESSAGE": "Event attendance and invites sent successfully"}), 200
+            except Exception as e:
+                return jsonify({"STATUS": "ERROR", "MESSAGE": "An error occurred: " + str(e)}), 500
+
+        except Exception as e:
+            return jsonify({"STATUS": "ERROR", "MESSAGE": "An error occurred: " + str(e)}), 500
+    
+    @app.route('/fetch_event_invites', methods=["POST"])
+    def fetch_event_invites():
+        try:
+            body = request.get_json()
+            if not body:
+                return jsonify({"STATUS": "ERROR", "MESSAGE": "No input body provided"}), 400
+            invitee_uuid = body.get('InviteeUUID')
+
+            if not invitee_uuid:
+                return jsonify({"STATUS": "ERROR", "MESSAGE": "Missing InviteUUID"}), 400
+
+            try:
+                result = neo4j.execute_query_with_params(query=queries.FETCH_EVENT_INVITES, params=body)
+                return jsonify(result), 200
+            except Exception as e:
+                return jsonify({"STATUS": "ERROR", "MESSAGE": "An error occurred: " + str(e)}), 500
+
+        except Exception as e:
+            return jsonify({"STATUS": "ERROR", "MESSAGE": "An error occurred: " + str(e)}), 500
+
     return app

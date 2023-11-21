@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, ButtonGroup, Checkbox, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
+import { Box, Button, ButtonGroup, Checkbox, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 
 import { common_styles, table_styles } from '../styles';
 
@@ -122,7 +122,10 @@ export const CheckboxTableComponent = ({
                     ...table_styles.table_cell
                   }}
                 >
-                  {row.name}
+                  {/* {row.name} */}
+                  <Box>
+                    {row.content}
+                  </Box>
                 </TableCell>
                 <TableCell
                   align={'right'}

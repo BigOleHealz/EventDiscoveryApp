@@ -444,3 +444,51 @@ RESPOND_TO_FRIEND_REQUEST_BY_FRIEND_REQUEST_UUID = r"""
      )
      RETURN {STATUS: "SUCCESS", MESSAGE: "Response Sent"} as result;
     """
+
+ATTEND_EVENT_AND_SEND_INVITES = r"""
+    WITH $params as params, apoc.date.format(apoc.date.currentTimestamp(), "ms", "yyyy-MM-dd'T'HH:mm:ss") as response_timestamp
+    MATCH (attendee:Person {UUID: params.AttendeeUUID}), (event:Event {UUID: params.EventUUID})
+    CREATE (attendee)-[:ATTENDING {UUID: apoc.create.uuid(), RESPONSE_TIMESTAMP: response_timestamp}]->(event)
+    WITH attendee, event, params, response_timestamp
+    FOREACH (friend_uuid IN params.InviteeUUIDs | 
+        MERGE (friend:Person {UUID: friend_uuid})
+        MERGE (friend)-[:INVITED_TO_EVENT {UUID: apoc.create.uuid(), INVITED_TIMESTAMP: response_timestamp, INVITED_BY_UUID: attendee.UUID, STATUS: "PENDING"}]->(event)
+    )
+    RETURN {STATUS: "SUCCESS", MESSAGE: "Invites Sent"} as result;
+    """
+
+FETCH_EVENT_INVITES = r"""
+    MATCH (invitee:Person {UUID: $params.InviteeUUID})-[invite:INVITED_TO_EVENT {STATUS: "PENDING"}]->(event:Event)
+    WITH invitee, invite, event
+    OPTIONAL MATCH (event)-[r:ATTENDING]-()
+    WITH event, invite, count(r) as AttendeeCount
+    MATCH (inviter:Person {UUID: invite.INVITED_BY_UUID})
+    WITH event, invite, AttendeeCount, inviter
+    MATCH (eventType:EventType)-[:RELATED_EVENT]->(event)
+    RETURN
+        invite.UUID AS InviteUUID,
+        invite.INVITED_TIMESTAMP AS InviteTimestamp,
+        invite.INVITED_BY_UUID AS InvitedByUUID,
+        invite.STATUS AS Status,
+        event.CreatedByUUID as CreatedByUUID,
+        event.Address as Address,
+        event.Host as Host,
+        event.Lon as Lon,
+        event.Lat as Lat,
+        event.StartTimestamp as StartTimestamp,
+        event.EndTimestamp as EndTimestamp,
+        event.EventName as EventName,
+        event.UUID as EventUUID,
+        event.EventURL as EventURL,
+        event.Price as Price,
+        event.FreeEventFlag as FreeEventFlag,
+        event.EventTypeUUID as EventTypeUUID,
+        eventType.EventType as EventType,
+        eventType.IconURI as EventTypeIconURI,
+        inviter.FirstName as InviterFirstName,
+        inviter.LastName as InviterLastName,
+        inviter.UUID as InviterUUID,
+        inviter.Username as InviterUsername,
+        AttendeeCount
+    ORDER BY InviteTimestamp DESC;
+    """
