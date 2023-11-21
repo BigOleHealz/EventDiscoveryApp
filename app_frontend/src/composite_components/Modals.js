@@ -23,6 +23,8 @@ import {
   useFetchUsername
 } from '../utils/Hooks';
 
+import { friend_request_styles } from '../styles';
+
 export const EventViewerModal = ({
   isVisible,
   handleSubmitButtonClick,
@@ -124,13 +126,12 @@ export const FriendRequestsModal = ({
   
   const { user_session, setUserSession } = useContext(UserSessionContext);
   if (!user_session) {
-    return null; // or some placeholder content
+    return null;
   }
 
   const height_text_input_and_button = { xs: '40px', sm: '45px', md: '50px', lg: '55px', xl: '60px' };
   const margin_text_input_and_button = { xs: '3px', sm: '4px', md: '5px', lg: '6px', xl: '7px' };
   const friend_request_vertical_margin = { xs: '5px', sm: '10px', md: '15px', lg: '20px', xl: '25px' }
-
 
   const [friend_request_username, setFriendRequestUsername] = useState('');
   const [sending_friend_request, setSendingFriendRequest] = useState(false);
@@ -159,8 +160,8 @@ export const FriendRequestsModal = ({
       submitButtonText="Close"
       onSubmitButtonClick={onRequestClose}
     >
-      <BoxComponent sx={{ width: '100%', height: '100%' }}>
-        <Box display="flex" flexDirection="row" alignItems="center" justifyContent="space-between">
+      <Box sx={friend_request_styles.contentContainer}>
+        <Box label='box-send-friend-request' sx={friend_request_styles.sendRequestContainer}>
           <TextInputComponent
             id="input-friend-request-username"
             label="Enter Friend's Username"
@@ -180,7 +181,8 @@ export const FriendRequestsModal = ({
             onClick={handleSendFriendRequestButtonClick}
             sx={{
               marginLeft: margin_text_input_and_button,
-              height: height_text_input_and_button
+              height: height_text_input_and_button,
+              width: { xs: '120px', sm: '125px', md: '130px', lg: '140px', xl: '160px'}
             }}
           >
             Send Request
@@ -195,7 +197,7 @@ export const FriendRequestsModal = ({
         <Box>
           <FriendRequestsTable user_session={user_session} />
         </Box>
-      </BoxComponent>
+      </Box>
     </ModalComponent>
   );
 }

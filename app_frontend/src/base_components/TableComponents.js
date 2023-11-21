@@ -10,7 +10,7 @@ export const CheckboxTableComponent = ({
 }) => {
 
   const isSelected = (id) => selected.includes(id);
-  
+
   const handleSelectAllClick = (event) => {
     setSelected(event.target.checked ? rows.map((row) => row.id) : []);
   };
@@ -31,12 +31,40 @@ export const CheckboxTableComponent = ({
   };
 
 
-    return (
-      rows.length > 0 ?
-        <TableContainer component={Paper}>
-          <Table aria-label="checkbox table">
-            <TableHead>
-              <TableRow sx={{ backgroundColor: common_styles.defaultBackgroundColor }}>
+  return (
+    rows.length > 0 ?
+      <TableContainer component={Paper}>
+        <Table aria-label="checkbox table">
+          <TableHead>
+            <TableRow sx={{ backgroundColor: common_styles.defaultBackgroundColor }}>
+              <TableCell
+                align={'left'}
+                sx={{
+                  width: 'auto',
+                  padding: 0,
+                  ...table_styles.table_cell
+                }}
+              >
+                <Checkbox
+                  indeterminate={selected.length > 0 && selected.length < rows.length}
+                  checked={rows.length > 0 && selected.length === rows.length}
+                  onChange={handleSelectAllClick}
+                />
+              </TableCell>
+              <TableCell
+                align={'left'}
+                sx={{
+                  width: '100%',
+                  padding: 0,
+                  ...table_styles.table_cell
+                }}>
+                Select All
+              </TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {rows.map((row, rowIndex) => (
+              <TableRow key={rowIndex} sx={{ backgroundColor: common_styles.defaultBackgroundColor }}>
                 <TableCell
                   align={'left'}
                   sx={{
@@ -46,9 +74,9 @@ export const CheckboxTableComponent = ({
                   }}
                 >
                   <Checkbox
-                    indeterminate={selected.length > 0 && selected.length < rows.length}
-                    checked={rows.length > 0 && selected.length === rows.length}
-                    onChange={handleSelectAllClick}
+                    checked={isSelected(row.id)}
+                    onChange={() => handleClick(row.id)}
+                    style={{ color: row.checkboxColor || null }}
                   />
                 </TableCell>
                 <TableCell
@@ -56,55 +84,28 @@ export const CheckboxTableComponent = ({
                   sx={{
                     width: '100%',
                     padding: 0,
+                    paddingLeft: 3,
                     ...table_styles.table_cell
-                  }}>
-                  Select All
+                  }}
+                >
+                  {row.label}
                 </TableCell>
               </TableRow>
-            </TableHead>
-            <TableBody>
-              {rows.map((row, rowIndex) => (
-                <TableRow key={rowIndex} sx={{ backgroundColor: common_styles.defaultBackgroundColor }}>
-                  <TableCell
-                    align={'left'}
-                    sx={{
-                      width: 'auto',
-                      padding: 0,
-                      ...table_styles.table_cell
-                    }}
-                  >
-                    <Checkbox
-                      checked={isSelected(row.id)}
-                      onChange={() => handleClick(row.id)}
-                      style={{ color: row.checkboxColor || null }}
-                    />
-                  </TableCell>
-                  <TableCell
-                    align={'left'}
-                    sx={{
-                      width: '100%',
-                      padding: 0,
-                      paddingLeft: 3,
-                      ...table_styles.table_cell
-                    }}
-                  >
-                    {row.label}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        : <></>
-    );
-  };
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+      : <Box>No content to display</Box>
+  );
+};
 
 
-  export const AcceptDeclineTable = ({ rows }) => {
+export const AcceptDeclineTable = ({ rows }) => {
 
-    const button_margins = { xs: "1px", sm: "2px", md: "3px", lg: "4px", xl: "5px" };
+  const button_margins = { xs: "1px", sm: "2px", md: "3px", lg: "4px", xl: "5px" };
 
-    return (
+  return (
+    rows.length > 0 ?
       <TableContainer component={Paper}>
         <Table aria-label="accept-decline table">
           <TableBody>
@@ -158,5 +159,6 @@ export const CheckboxTableComponent = ({
           </TableBody>
         </Table>
       </TableContainer>
-    );
-  };
+      : <Box>No content to display</Box>
+  );
+};

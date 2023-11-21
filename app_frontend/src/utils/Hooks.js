@@ -67,7 +67,7 @@ export const useFetchPendingEventInvites = (recipient, fetching_pending_event_in
   }, [fetching_pending_event_invites]);
 };
 
-export const useAttendEventAndSendInvites = (is_creating_attending_event_relationship, attend_event_currently_active_data, setIsCreatingAttendingEventRelationship, exitAttendEventMode) => {
+export const useAttendEventAndSendInvites = (is_creating_attending_event_relationship, attend_event_currently_active_data, setIsCreatingAttendingEventRelationship, setFriendsInvited, exitAttendEventMode) => {
   useEffect(() => {
     if (is_creating_attending_event_relationship) {
       console.log('attend_event_currently_active_data:', attend_event_currently_active_data)
@@ -97,6 +97,7 @@ export const useAttendEventAndSendInvites = (is_creating_attending_event_relatio
         });
     }
     setIsCreatingAttendingEventRelationship(false);
+    setFriendsInvited([]);
     exitAttendEventMode();
   }, [is_creating_attending_event_relationship]);
 };

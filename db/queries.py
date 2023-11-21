@@ -192,7 +192,7 @@ GET_USER_PROFILE = """
 
 IS_USERNAME_TAKEN = """
                     MATCH (account:Account)
-                    WHERE account.Username = '{username}'
+                    WHERE toLower(account.Username) = toLower('{username}')
                     RETURN COUNT(account) > 0 AS usernameExists;
                     """
 
@@ -376,7 +376,8 @@ CREATE_FRIENDSHIP = """
 
 CREATE_FRIEND_REQUEST_RELATIONSHIP_IF_NOT_EXISTS = r"""
     MATCH (sender:Person {Username: $params.username_sender})
-    OPTIONAL MATCH (recipient:Person {Username: $params.username_recipient})
+    OPTIONAL MATCH (recipient:Person)
+    WHERE toLower(recipient.Username) = toLower($params.username_recipient)
     OPTIONAL MATCH (sender)-[existingFriendRequest:FRIEND_REQUEST {STATUS: "PENDING"}]->(recipient)
     OPTIONAL MATCH (sender)<-[existingFriendRequestReverse:FRIEND_REQUEST {STATUS: "PENDING"}]-(recipient)
     OPTIONAL MATCH (sender)-[existingFriends:FRIENDS_WITH]-(recipient)
@@ -399,7 +400,8 @@ CREATE_FRIEND_REQUEST_RELATIONSHIP_IF_NOT_EXISTS = r"""
 
     UNION
 
-    MATCH (sender:Person {Username: $params.username_sender}), (recipient:Person {Username: $params.username_recipient})
+    MATCH (sender:Person {Username: $params.username_sender}), (recipient:Person)
+    WHERE toLower(recipient.Username) = toLower($params.username_recipient)
     OPTIONAL MATCH (sender)-[existingFriendRequest:FRIEND_REQUEST {STATUS: "PENDING"}]->(recipient)
     OPTIONAL MATCH (sender)<-[existingFriendRequestReverse:FRIEND_REQUEST {STATUS: "PENDING"}]-(recipient)
     OPTIONAL MATCH (sender)-[existingFriends:FRIENDS_WITH]-(recipient)
