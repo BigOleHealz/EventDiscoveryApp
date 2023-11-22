@@ -27,8 +27,7 @@ export default function ContentContainer({
         justifyContent: 'center',
         alignItems: 'center'
       }}>
-      <LeftSidePanel {...props} />
-      <Box >
+        <LeftSidePanel {...props} />
         <Map {...props} />
         <EventInvitesModal
           isVisible={is_event_invites_modal_visible}
@@ -43,7 +42,6 @@ export default function ContentContainer({
         <CreateEventWorkflow {...props} />
         <AttendEventWorkflow {...props} />
 
-      </Box>
     </Box>
   )
 }

@@ -99,9 +99,7 @@ export const EventInvitesModal = ({
       submitButtonText="Close"
       onSubmitButtonClick={onRequestClose}
     >
-      <Box sx={{ width: '100%', height: '100%' }}>
         <EventInvitesTable user_session={user_session} />
-      </Box>
     </ModalComponent>
   );
 }
