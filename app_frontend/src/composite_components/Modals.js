@@ -66,11 +66,6 @@ export const InviteFriendsToEventModal = ({
   ...props
 }) => {
 
-  const { user_session, setUserSession } = useContext(UserSessionContext);
-
-  if (!user_session) {
-    return null;
-  }
   return (
     <ModalComponent
       isVisible={isVisible}
@@ -79,13 +74,10 @@ export const InviteFriendsToEventModal = ({
       submitButtonText="Send Invites"
       onSubmitButtonClick={handleSubmitButtonClick}
     >
-      <BoxComponent sx={{ width: '100%', height: '100%' }}>
         <InviteFriendsToEventTable
-          friends_list={user_session.Friends}
           friends_invited={friends_invited}
           setFriendsInvited={setFriendsInvited}
         />
-      </BoxComponent>
     </ModalComponent>
   );
 }

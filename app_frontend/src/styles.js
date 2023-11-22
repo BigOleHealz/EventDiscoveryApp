@@ -501,7 +501,7 @@ export const table_styles = {
   },
   label_cell: {
     align: 'left',
-    width: '100',
+    width: '100%',
     ...common_styles.table_cell
   },
   item_cell: {

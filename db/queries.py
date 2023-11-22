@@ -514,3 +514,12 @@ RESPOND_TO_EVENT_INVITE_BY_EVENT_INVITE_UUID = r"""
      )
      RETURN {STATUS: "SUCCESS", MESSAGE: "Response Sent"} as result;
     """
+
+FETCH_FRIENDS_BY_UUID = r"""
+    MATCH (friend:Person)-[:FRIENDS_WITH]->(user:Person {UUID: $params.UUID})
+    RETURN DISTINCT
+        friend.UUID AS UUID,
+        friend.Username as Username,
+        friend.FirstName as FirstName,
+        friend.LastName as LastName;
+    """

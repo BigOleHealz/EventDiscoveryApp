@@ -5,6 +5,41 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { storeUserSession } from './SessionManager';
 
+export const useFetchFriends = (user_uuid, is_fetching_friends, setIsFetchingFriends, setFriends) => {
+  useEffect(() => {
+    if (is_fetching_friends) {
+      console.log('useFetchFriends user_uuid: ' + user_uuid);
+      console.log('useFetchFriends is_fetching_friends: ' + is_fetching_friends);
+      console.log('useFetchFriends setIsFetchingFriends: ' + setIsFetchingFriends);
+      console.log('useFetchFriends setFriends: ' + setFriends);
+      fetch('/api/fetch_friends', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          UUID: user_uuid
+        }),
+      }).then(res => res.json())
+        .then(data => {
+          console.log('useFetchFriends data: ' + data);
+          if (data.STATUS === 'ERROR') {
+            toast.error('Error: ' + data.MESSAGE);
+          } else if (data) {
+            setFriends(data);
+          } else {
+            toast.error('not data === true. Printing response to console.');
+            console.error(data);
+          }
+        }).catch((error) => {
+          console.error('Error:', error);
+          toast.error('An error occurred while fetching friends!');
+        });
+    }
+    setIsFetchingFriends(false);
+  }, [is_fetching_friends]);
+};
+
 export const useRespondToEventInvite = (event_invite_response, setEventInviteResponse, setFetchingPendingEventInvites) => {
   useEffect(() => {
     if (event_invite_response) {

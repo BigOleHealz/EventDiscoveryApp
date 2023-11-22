@@ -387,4 +387,65 @@ def create_server():
 
         except Exception as e:
             return jsonify({"STATUS": "ERROR", "MESSAGE": "An error occurred: " + str(e)}), 500
+        
+    @app.route('/fetch_events_attended_by_user', methods=["POST"])
+    def fetch_events_attended_by_user():
+        try:
+            body = request.get_json()
+            if not body:
+                return jsonify({"STATUS": "ERROR", "MESSAGE": "No input body provided"}), 400
+            
+            attendee_uuid = body.get('AttendeeUUID')
+            if not attendee_uuid:
+                return jsonify({"STATUS": "ERROR", "MESSAGE": "Missing AttendeeUUID"}), 400
+            
+            try:
+                result = neo4j.execute_query_with_params(query=queries.FETCH_EVENTS_ATTENDED_BY_USER, params=body)
+                return jsonify(result), 200
+            except Exception as e:
+                return jsonify({"STATUS": "ERROR", "MESSAGE": "An error occurred: " + str(e)}), 500
+
+        except Exception as e:
+            return jsonify({"STATUS": "ERROR", "MESSAGE": "An error occurred: " + str(e)}), 500
+    
+    @app.route('/fetch_events_created_by_user', methods=["POST"])
+    def fetch_events_created_by_user():
+        try:
+            body = request.get_json()
+            if not body:
+                return jsonify({"STATUS": "ERROR", "MESSAGE": "No input body provided"}), 400
+            
+            created_by_uuid = body.get('CreatedByUUID')
+            if not created_by_uuid:
+                return jsonify({"STATUS": "ERROR", "MESSAGE": "Missing CreatedByUUID"}), 400
+            
+            try:
+                result = neo4j.execute_query_with_params(query=queries.FETCH_EVENTS_CREATED_BY_USER, params=body)
+                return jsonify(result), 200
+            except Exception as e:
+                return jsonify({"STATUS": "ERROR", "MESSAGE": "An error occurred: " + str(e)}), 500
+
+        except Exception as e:
+            return jsonify({"STATUS": "ERROR", "MESSAGE": "An error occurred: " + str(e)}), 500
+    
+    @app.route('/fetch_friends', methods=["POST"])
+    def fetch_friends():
+        try:
+            body = request.get_json()
+            if not body:
+                return jsonify({"STATUS": "ERROR", "MESSAGE": "No input body provided"}), 400
+            
+            uuid = body.get('UUID')
+            if not uuid:
+                return jsonify({"STATUS": "ERROR", "MESSAGE": "Missing UUID"}), 400
+            
+            try:
+                result = neo4j.execute_query_with_params(query=queries.FETCH_FRIENDS_BY_UUID, params=body)
+                return result
+            except Exception as e:
+                return jsonify({"STATUS": "ERROR", "MESSAGE": "An error occurred: " + str(e)}), 500
+
+        except Exception as e:
+            return jsonify({"STATUS": "ERROR", "MESSAGE": "An error occurred: " + str(e)}), 500
+
     return app
