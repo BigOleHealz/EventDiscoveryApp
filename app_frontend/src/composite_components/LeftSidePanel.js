@@ -39,37 +39,41 @@ export default function LeftSidePanel({
   };
 
   return (
-    <React.Fragment>
-      <SwipeableDrawer
-        anchor={anchor}
-        open={state[anchor]}
-        onClose={() => {
-          setState({ ...state, [anchor]: false });
-          setIsLeftPanelVisible(false);
-        }}
-        onOpen={() => {
-          setState({ ...state, [anchor]: true });
-          setIsLeftPanelVisible(true);
-        }}
-      >
-        <BoxComponent style={{ height: '100%' }}>
-          <CalendarComponent
-            testid="left-calendar"
-            selected={find_event_selected_date}
-            onDateSelected={handleDateSelected}
-          />
-          <TimeRangeSliderComponent
-            startTime={find_event_start_time}
-            setStartTime={setFindEventStartTime}
-            endTime={find_event_end_time}
-            setEndTime={setFindEventEndTime}
-          />
-          <EventTypesTable
-            event_types_selected={event_types_selected}
-            setEventTypesSelected={setEventTypesSelected}
-          />
-        </BoxComponent>
-      </SwipeableDrawer>
-    </React.Fragment>
+    <SwipeableDrawer
+      anchor={anchor}
+      open={state[anchor]}
+      onClose={() => {
+        setState({ ...state, [anchor]: false });
+        setIsLeftPanelVisible(false);
+      }}
+      onOpen={() => {
+        setState({ ...state, [anchor]: true });
+        setIsLeftPanelVisible(true);
+      }}
+    >
+      <BoxComponent sx={{
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
+        position: 'relative',
+        height: '100%',
+      }}>
+        <CalendarComponent
+          testid="left-calendar"
+          selected={find_event_selected_date}
+          onDateSelected={handleDateSelected}
+        />
+        <TimeRangeSliderComponent
+          startTime={find_event_start_time}
+          setStartTime={setFindEventStartTime}
+          endTime={find_event_end_time}
+          setEndTime={setFindEventEndTime}
+        />
+        <EventTypesTable
+          event_types_selected={event_types_selected}
+          setEventTypesSelected={setEventTypesSelected}
+        />
+      </BoxComponent>
+    </SwipeableDrawer>
   );
 };

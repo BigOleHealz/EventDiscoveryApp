@@ -58,6 +58,7 @@ export const useRespondToEventInvite = (event_invite_response, setEventInviteRes
               toast.error('An error occurred. Backend response does not contain a result!');
             } else if (data.result.STATUS === 'SUCCESS') {
               toast.success('Response Sent Successfully!');
+              setFetchingPendingEventInvites(true);
             } else if (data.result.STATUS === 'ERROR') {
               toast.error(data.result.MESSAGE);
             } else {
@@ -71,7 +72,6 @@ export const useRespondToEventInvite = (event_invite_response, setEventInviteRes
         });
     }
     setEventInviteResponse(null);
-    setFetchingPendingEventInvites(true);
   }, [event_invite_response]);
 };
 
@@ -156,6 +156,7 @@ export const useRespondToFriendRequest = (friend_request_response, setFriendRequ
               toast.error('An error occurred. Backend response does not contain a result!');
             } else if (data.result.STATUS === 'SUCCESS') {
               toast.success('Response Sent Successfully!');
+              setFetchingPendingFriendRequests(true);
             } else if (data.result.STATUS === 'ERROR') {
               toast.error(data.result.MESSAGE);
             } else {
@@ -169,7 +170,6 @@ export const useRespondToFriendRequest = (friend_request_response, setFriendRequ
         });
     }
     setFriendRequestResponse(null);
-    setFetchingPendingFriendRequests(true);
   }, [friend_request_response]);
 };
 

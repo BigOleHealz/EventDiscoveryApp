@@ -485,7 +485,7 @@ export const event_invite_styles = {
 
 export const table_styles = {
   table_container: {
-    position: 'absolute',
+    // position: 'absolute',
     top: 0,
     bottom: 0,
     backgroundColor: common_styles.appTheme.backgroundColor,
