@@ -33,12 +33,13 @@ export const CheckboxTableComponent = ({
 
   return (
     rows.length > 0 ?
-      <TableContainer component={Paper}>
+      <TableContainer component={Paper} sx={table_styles.table_container}>
         <Table aria-label="checkbox table">
           <TableHead>
             <TableRow sx={table_styles.row}>
               <TableCell sx={table_styles.checkbox_cell}>
                 <Checkbox
+                  label='checkbox-select-all'
                   indeterminate={selected.length > 0 && selected.length < rows.length}
                   checked={rows.length > 0 && selected.length === rows.length}
                   onChange={handleSelectAllClick}

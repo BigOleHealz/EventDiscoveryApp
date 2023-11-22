@@ -3,10 +3,13 @@ import React, { useEffect, useState } from 'react';
 import moment from 'moment';
 import { Box, Divider, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 
-import { AcceptDeclineTable, CheckboxTableComponent } from '../base_components/TableComponents'; // Adjust the import path as necessary
+import { AcceptDeclineTable, CheckboxTableComponent } from '../base_components/TableComponents';
+
+import { UserSessionContext } from '../utils/Contexts';
 import { convertUTCDateToLocalDate } from '../utils/HelperFunctions';
 import {
   useFetchEventTypes,
+  useFetchFriends,
   useFetchPendingEventInvites,
   useFetchPendingFriendRequests,
   useRespondToEventInvite,
@@ -101,7 +104,7 @@ export const EventInvitesTable = ({
   useRespondToEventInvite(event_invite_response, setEventInviteResponse, setFetchingPendingEventInvites)
 
   return (
-    <Box sx={{position: 'relative', height: '100%'}}>
+    <Box sx={{ position: 'relative', height: '100%' }}>
       <AcceptDeclineTable rows={rows} />
     </Box>
   );
@@ -131,12 +134,16 @@ export const EventTypesTable = ({
 };
 
 export const InviteFriendsToEventTable = ({
-  friends_list,
   friends_invited,
-  setFriendsInvited
+  setFriendsInvited,
 }) => {
 
-  console.log('InviteFriendsToEventTable: friends_list = ', friends_list)
+  const { user_session, setUserSession } = React.useContext(UserSessionContext);
+  const [is_fetching_friends, setIsFetchingFriends] = useState(true);
+
+  const [friends_list, setFriendsList] = useState([]);
+
+  useFetchFriends(user_session.UUID, is_fetching_friends, setIsFetchingFriends, setFriendsList);
 
   const rows = friends_list.map((friend) => {
     return {
@@ -146,7 +153,6 @@ export const InviteFriendsToEventTable = ({
     }
   });
 
-  console.log('InviteFriendsToEventTable: rows = ', rows)
   return (
     <CheckboxTableComponent
       rows={rows}
