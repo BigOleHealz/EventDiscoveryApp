@@ -8,6 +8,9 @@ import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import SearchIcon from '@mui/icons-material/Search';
 
 import NavbarButton from '../base_components/NavbarButton';
+
+import { UserSessionContext } from "../utils/Contexts";
+
 import { common_styles } from "../styles";
 
 export default function Navbar({
@@ -25,6 +28,9 @@ export default function Navbar({
 
   ...props
 }) {
+
+
+  const { user_session, setUserSession } = React.useContext(UserSessionContext);
 
   const handleFindEventsButtonClick = () => {
     if (is_left_panel_visible === false) {
@@ -80,32 +86,55 @@ export default function Navbar({
             flexGrow: 1,
             display: { xs: "flex", sm: "flex", md: "flex" },
             width: "100%",
-            height: navbarHeight
+            height: navbarHeight,
+            justifyContent: "space-between"
           }}>
-          <NavbarButton
-            id="button-find-events"
-            onClick={handleFindEventsButtonClick}
-            Icon={SearchIcon}
-            text="Find Events"
-          />
-          <NavbarButton
-            id="button-event-invites"
-            onClick={handleEventInvitesButtonClick}
-            Icon={EventIcon}
-            text="Event Invites"
-          />
-          <NavbarButton
-            id="button-friend-requests"
-            onClick={handleFriendRequestsButtonClick}
-            Icon={PeopleAltIcon}
-            text="Friend Requests"
-          />
-          <NavbarButton
-            id="button-create-event"
-            onClick={handleCreateEventButtonClick}
-            Icon={AddIcon}
-            text="Create Event"
-          />
+          {user_session === null ? (
+            <>
+              <NavbarButton
+                id="button-find-events"
+                onClick={handleFindEventsButtonClick}
+                smallContent="Find Events"
+                largeContent="Find Events"
+              />
+
+              <NavbarButton
+                id="button-Login"
+                // onClick={handleEventInvitesButtonClick}
+                onClick={() => { console.log("Login button clicked") }}
+                smallContent="Login"
+                largeContent="Login"
+              />
+            </>) :
+            (
+              <>
+                <NavbarButton
+                  id="button-find-events"
+                  onClick={handleFindEventsButtonClick}
+                  smallContent={<SearchIcon />}
+                  largeContent="Find Events"
+                />
+                <NavbarButton
+                  id="button-event-invites"
+                  onClick={handleEventInvitesButtonClick}
+                  smallContent={<EventIcon />}
+                  largeContent="Event Invites"
+                />
+                <NavbarButton
+                  id="button-friend-requests"
+                  onClick={handleFriendRequestsButtonClick}
+                  smallContent={<PeopleAltIcon />}
+                  largeContent="Friend Requests"
+                />
+                <NavbarButton
+                  id="button-create-event"
+                  onClick={handleCreateEventButtonClick}
+                  smallContent={<AddIcon />}
+                  largeContent="Create Event"
+                />
+              </>
+            )
+          }
         </Box>
       </Toolbar>
     </AppBar>

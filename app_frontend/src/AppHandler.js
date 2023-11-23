@@ -42,15 +42,18 @@ export function AppHandler() {
     })();
   }, []);
 
+  // useEffect(() => {
+  //   if (user_session) {
+  //     navigate('/');
+  //   } else if (create_user_profile_context) {
+  //     navigate('/create-account');
+  //   } else {
+  //     navigate('/login');
+  //   }
+  // }, [user_session, create_user_profile_context]);
   useEffect(() => {
-    if (user_session) {
-      navigate('/');
-    } else if (create_user_profile_context) {
-      navigate('/create-account');
-    } else {
-      navigate('/login');
-    }
-  }, [user_session, create_user_profile_context]);
+    navigate('/');
+  }, [user_session]);
 
   useEffect(() => {
     if (google_client_id === false) {
