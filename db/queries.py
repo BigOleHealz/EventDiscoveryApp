@@ -167,26 +167,17 @@ FETCH_EVENTS_FOR_MAP = """
         AttendeeCount;
     """
 
-GET_USER_PROFILE = """
+GET_USER_PROFILE = r"""
                 MATCH (account:Account)
-                WHERE account.Email = '{email}'
-                OPTIONAL MATCH (account)-[:FRIENDS_WITH]->(friend:Account)
-                WITH account, 
-                    collect(DISTINCT {{UUID: friend.UUID, FirstName: friend.FirstName, LastName: friend.LastName, Username: friend.Username}}) AS allFriends
-                WITH account, allFriends,
-                    CASE 
-                        WHEN size(allFriends) = 0 THEN []
-                        ELSE allFriends
-                    END as Friends
+                WHERE toLower(account.Email) = toLower($params.email)
                 OPTIONAL MATCH (account)-[:INTERESTED_IN]->(eventType:EventType)
-                WITH account, Friends, collect(DISTINCT eventType.UUID) as Interests
+                WITH account, collect(DISTINCT eventType.UUID) as Interests
                 RETURN
                     account.Email as Email,
                     account.Username as Username,
                     account.FirstName as FirstName,
                     account.LastName as LastName,
                     account.UUID as UUID,
-                    Friends,
                     Interests;
                 """
 
@@ -435,16 +426,22 @@ RESPOND_TO_FRIEND_REQUEST_BY_FRIEND_REQUEST_UUID = r"""
     WITH
         friend_request_recipient,
         friend_request_sender,
-        friend_request_uuid,
         friend_request_response,
         response_timestamp,
         friend_request_response = "ACCEPTED" AS shouldCreateFriendsWithRelationship,
         apoc.create.uuid() AS friendship_uuid
     FOREACH (_ IN CASE WHEN shouldCreateFriendsWithRelationship THEN [1] ELSE [] END |
-         MERGE (friend_request_sender)-[:FRIENDS_WITH {UUID: friendship_uuid, FRIENDS_SINCE: response_timestamp}]->(friend_request_recipient)
-         MERGE (friend_request_recipient)-[:FRIENDS_WITH {UUID: friendship_uuid, FRIENDS_SINCE: response_timestamp}]->(friend_request_sender)
-     )
-     RETURN {STATUS: "SUCCESS", MESSAGE: "Response Sent"} as result;
+        MERGE (friend_request_sender)-[toRecipient:FRIENDS_WITH]->(friend_request_recipient)
+        ON CREATE SET
+            toRecipient.UUID = friendship_uuid,
+            toRecipient.FRIENDS_SINCE = response_timestamp
+        MERGE (friend_request_recipient)-[toSender:FRIENDS_WITH]->(friend_request_sender)
+        ON CREATE SET
+            toSender.UUID = friendship_uuid,
+            toSender.FRIENDS_SINCE = response_timestamp
+    )
+    RETURN {STATUS: "SUCCESS", MESSAGE: "Response Sent"} as result;
+
     """
 
 ATTEND_EVENT_AND_SEND_INVITES = r"""
@@ -453,14 +450,18 @@ ATTEND_EVENT_AND_SEND_INVITES = r"""
     CREATE (attendee)-[:ATTENDING {UUID: apoc.create.uuid(), RESPONSE_TIMESTAMP: response_timestamp}]->(event)
     WITH attendee, event, params, response_timestamp
     FOREACH (friend_uuid IN params.InviteeUUIDs | 
-        MERGE (friend:Person {UUID: friend_uuid})
-        MERGE (friend)-[:INVITED_TO_EVENT {UUID: apoc.create.uuid(), INVITED_TIMESTAMP: response_timestamp, INVITED_BY_UUID: attendee.UUID, STATUS: "PENDING"}]->(event)
+        MERGE (friend:Person {UUID: friend_uuid})-[event_invite:INVITED_TO_EVENT {INVITED_BY_UUID: attendee.UUID}]->(event)
+        ON CREATE SET
+            event_invite.UUID = apoc.create.uuid(),
+            event_invite.INVITED_TIMESTAMP = response_timestamp,
+            event_invite.STATUS = "PENDING"
     )
     RETURN {STATUS: "SUCCESS", MESSAGE: "Invites Sent"} as result;
     """
 
 FETCH_EVENT_INVITES = r"""
     MATCH (invitee:Person {UUID: $params.InviteeUUID})-[invite:INVITED_TO_EVENT {STATUS: "PENDING"}]->(event:Event)
+    WHERE event.EndTimestamp > apoc.date.format(apoc.date.currentTimestamp(), "ms", "yyyy-MM-dd'T'HH:mm:ss")
     WITH invitee, invite, event
     OPTIONAL MATCH (event)-[r:ATTENDING]-()
     WITH event, invite, count(r) as AttendeeCount
@@ -510,8 +511,12 @@ RESPOND_TO_EVENT_INVITE_BY_EVENT_INVITE_UUID = r"""
         response_timestamp,
         event_invite_response = "ACCEPTED" AS eventInviteAccepted
     FOREACH (_ IN CASE WHEN eventInviteAccepted THEN [1] ELSE [] END |
-         MERGE (invitee)-[:ATTENDING {UUID: apoc.create.uuid(), RESPONSE_TIMESTAMP: response_timestamp}]->(event)
-     )
+        MERGE (invitee)-[attending:ATTENDING]->(event)
+        ON CREATE SET
+            attending.UUID = apoc.create.uuid(),
+            attending.RESPONSE_TIMESTAMP = response_timestamp
+    )
+
      RETURN {STATUS: "SUCCESS", MESSAGE: "Response Sent"} as result;
     """
 
@@ -523,3 +528,69 @@ FETCH_FRIENDS_BY_UUID = r"""
         friend.FirstName as FirstName,
         friend.LastName as LastName;
     """
+
+FETCH_EVENTS_ATTENDED_BY_USER = r"""
+    MATCH (user:Person {UUID: $params.UUID})-[r:ATTENDING]->(event:Event)
+    WHERE event.EndTimestamp < apoc.date.format(apoc.date.currentTimestamp(), "ms", "yyyy-MM-dd'T'HH:mm:ss")
+    WITH event, r
+    MATCH (eventType:EventType)-[:RELATED_EVENT]->(event)
+    RETURN DISTINCT
+        event.UUID AS UUID,
+        event.Address as Address,
+        event.Host as Host,
+        event.Lon as Lon,
+        event.Lat as Lat,
+        event.StartTimestamp as StartTimestamp,
+        event.EndTimestamp as EndTimestamp,
+        event.EventName as EventName,
+        event.UUID as EventUUID,
+        event.EventURL as EventURL,
+        event.Price as Price,
+        event.FreeEventFlag as FreeEventFlag,
+        event.EventTypeUUID as EventTypeUUID,
+        eventType.EventType as EventType;
+    """
+
+FETCH_EVENTS_CREATED_BY_USER = r"""
+    MATCH (user:Person {UUID: $params.UUID})-[r:CREATED_EVENT]->(event:Event)
+    WITH event, r
+    MATCH (eventType:EventType)-[:RELATED_EVENT]->(event)
+    RETURN DISTINCT
+        event.UUID AS UUID,
+        event.Address as Address,
+        event.Host as Host,
+        event.Lon as Lon,
+        event.Lat as Lat,
+        event.StartTimestamp as StartTimestamp,
+        event.EndTimestamp as EndTimestamp,
+        event.EventName as EventName,
+        event.UUID as EventUUID,
+        event.EventURL as EventURL,
+        event.Price as Price,
+        event.FreeEventFlag as FreeEventFlag,
+        event.EventTypeUUID as EventTypeUUID,
+        eventType.EventType as EventType;
+    """
+
+FETCH_UPCOMING_EVENTS_FOR_USER = r"""
+    MATCH (user:Person {UUID: $params.UUID})-[r:ATTENDING]->(event:Event)
+    WHERE event.EndTimestamp > apoc.date.format(apoc.date.currentTimestamp(), "ms", "yyyy-MM-dd'T'HH:mm:ss")
+    WITH event, r
+    MATCH (eventType:EventType)-[:RELATED_EVENT]->(event)
+    RETURN DISTINCT
+        event.UUID AS UUID,
+        event.Address as Address,
+        event.Host as Host,
+        event.Lon as Lon,
+        event.Lat as Lat,
+        event.StartTimestamp as StartTimestamp,
+        event.EndTimestamp as EndTimestamp,
+        event.EventName as EventName,
+        event.UUID as EventUUID,
+        event.EventURL as EventURL,
+        event.Price as Price,
+        event.FreeEventFlag as FreeEventFlag,
+        event.EventTypeUUID as EventTypeUUID,
+        eventType.EventType as EventType;
+    """
+

@@ -93,9 +93,7 @@ def create_server():
 
             if not email:
                 return jsonify({"message": "Missing email"}), 400
-            formatted_query = queries.GET_USER_PROFILE.format(email=email)
-
-            result = neo4j.execute_query(formatted_query)
+            result = neo4j.execute_query_with_params(query=queries.GET_USER_PROFILE, params=body)
             
             if len(result) == 0:
                 return jsonify([]), 200
@@ -421,6 +419,26 @@ def create_server():
             
             try:
                 result = neo4j.execute_query_with_params(query=queries.FETCH_EVENTS_CREATED_BY_USER, params=body)
+                return jsonify(result), 200
+            except Exception as e:
+                return jsonify({"STATUS": "ERROR", "MESSAGE": "An error occurred: " + str(e)}), 500
+
+        except Exception as e:
+            return jsonify({"STATUS": "ERROR", "MESSAGE": "An error occurred: " + str(e)}), 500
+    
+    @app.route('/fetch_upcoming_events_for_user', methods=["POST"])
+    def fetch_upcoming_events_for_user():
+        try:
+            body = request.get_json()
+            if not body:
+                return jsonify({"STATUS": "ERROR", "MESSAGE": "No input body provided"}), 400
+            
+            attendee_uuid = body.get('AttendeeUUID')
+            if not attendee_uuid:
+                return jsonify({"STATUS": "ERROR", "MESSAGE": "Missing AttendeeUUID"}), 400
+            
+            try:
+                result = neo4j.execute_query_with_params(query=queries.FETCH_UPCOMING_EVENTS_FOR_USER, params=body)
                 return jsonify(result), 200
             except Exception as e:
                 return jsonify({"STATUS": "ERROR", "MESSAGE": "An error occurred: " + str(e)}), 500
