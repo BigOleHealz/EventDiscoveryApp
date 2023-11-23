@@ -13,6 +13,7 @@ export function HomePage() {
   const mapRef = useRef();
   // const { logger, setLogger } = React.useContext(LoggerContext);
   const { user_session, setUserSession } = React.useContext(UserSessionContext);
+  const [is_create_user_profile_manager_active, setIsCreateUserProfileManagerActive] = useState(false);
 
   const currentDateTime = new Date();
   const [find_event_start_time, setFindEventStartTime] = useState(day_start_time);
@@ -86,6 +87,8 @@ export function HomePage() {
     <Layout
       //Navbar props
       resetAllStates={resetAllStates}
+      is_create_user_profile_manager_active={is_create_user_profile_manager_active}
+      setIsCreateUserProfileManagerActive={setIsCreateUserProfileManagerActive}
 
       // Find Events props
       is_left_panel_visible={is_left_panel_visible}
