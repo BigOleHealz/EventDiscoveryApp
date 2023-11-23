@@ -83,7 +83,7 @@ export const useFetchPendingEventInvites = (recipient, fetching_pending_event_in
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({InviteeUUID: recipient.UUID}),
+        body: JSON.stringify({ InviteeUUID: recipient.UUID }),
       }).then(res => res.json())
         .then(data => {
           console.log("useFetchPendingEventInvites data:", data);
@@ -137,7 +137,6 @@ export const useAttendEventAndSendInvites = (is_creating_attending_event_relatio
   }, [is_creating_attending_event_relationship]);
 };
 
-  
 export const useRespondToFriendRequest = (friend_request_response, setFriendRequestResponse, setFetchingPendingFriendRequests) => {
   useEffect(() => {
     if (friend_request_response) {
@@ -181,7 +180,7 @@ export const useFetchPendingFriendRequests = (recipient, fetching_pending_friend
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({...recipient}),
+        body: JSON.stringify({ ...recipient }),
       }).then(res => res.json())
         .then(data => {
           console.log(data);
@@ -238,7 +237,14 @@ export const useCreateFriendRequestRelationshipIfNotExist = (username_sender, us
   }, [sending_friend_request]);
 };
 
-export const useFetchUsername = (fetching_username_is_taken, username, setFetchingUsernameExists, setCreateUserProfileContext, create_user_profile_context, onUsernameAvailable) => {
+export const useFetchUsername = (
+  fetching_username_is_taken,
+  username,
+  setFetchingUsernameExists,
+  create_user_profile_context,
+  setCreateUserProfileContext,
+  onUsernameAvailable
+) => {
   useEffect(() => {
     if (fetching_username_is_taken) {
       fetch('/api/is_username_taken', {
@@ -307,7 +313,7 @@ export const useCreateEventNode = (is_creating_event_node, create_event_context,
   }, [is_creating_event_node]);
 };
 
-export const useCreatePersonNode = (is_creating_person_node, create_user_profile_context, setIsCreatingPersonNode, navigate) => {
+export const useCreatePersonNode = (is_creating_person_node, create_user_profile_context, setIsCreatingPersonNode, setUserSession, setCreateUserProfileManagerIsActive) => {
   useEffect(() => {
     if (is_creating_person_node) {
       console.log('create_user_profile_context:', create_user_profile_context)
@@ -329,7 +335,15 @@ export const useCreatePersonNode = (is_creating_person_node, create_user_profile
           console.log(data);
           if (data.success) {
             toast.success('Account Created Successfully!');
-            navigate('/login');
+            setUserSession({
+              Username: create_user_profile_context.Username,
+              Email: create_user_profile_context.Email,
+              FirstName: create_user_profile_context.FirstName,
+              LastName: create_user_profile_context.LastName,
+              InterestUUIDs: create_user_profile_context.InterestUUIDs,
+              UUID: create_user_profile_context.UUID
+            });
+            setCreateUserProfileManagerIsActive(false);
           } else {
             toast.error('Failed to create account: ' + (data.message || 'Unknown error'));
           }
@@ -503,19 +517,18 @@ export const useSetGoogleClientId = (fetching_google_client_id, setFetchingGoogl
 };
 
 export const useAuthenticateUser = (
-  user_auth_context,
-  setCreateUserProfileContext,
+  authentication_context,
+  setIsCreateUserProfileManagerActive,
   setUserSession,
   // logger
 ) => {
 
-  console.log('user_auth_context:', user_auth_context)
+  console.log('authentication_context:', authentication_context)
   useEffect(() => {
-    if (!user_auth_context) {
+    if (!authentication_context) {
       return;
     }
-
-    const email = user_auth_context.Email;
+    const email = authentication_context.Email;
     if (email) {
       fetch('/api/get_user_profile', {
         method: 'POST',
@@ -530,7 +543,7 @@ export const useAuthenticateUser = (
           if (!data || data.length === 0) {
             toast.success('Welcome New User!');
             console.log('No user data returned for email:', email);
-            setCreateUserProfileContext(user_auth_context);
+            setIsCreateUserProfileManagerActive(true);
             return;
           } else {
             const user_session_data = data;
@@ -543,7 +556,7 @@ export const useAuthenticateUser = (
           toast.error('An error occurred while fetching user profile!');
         });
     }
-  }, [user_auth_context]);
+  }, [authentication_context]);
 };
 
 export const useBypassLoginIfInDebugMode = (setEmail, setFirstName, setLastName) => {

@@ -16,7 +16,7 @@ import { SwitchComponent } from './SwitchComponent';
 import { EventInvitesTable, EventTypesTable, InviteFriendsToEventTable } from './Tables';
 
 import { day_start_time, day_end_time, day_format } from '../utils/constants';
-import { AttendEventContext, CreateEventContext, CreateUserProfileContext, UserSessionContext } from '../utils/Contexts';
+import { AttendEventContext, AuthenticationContext, CreateEventContext, CreateUserProfileContext, UserSessionContext } from '../utils/Contexts';
 import { convertUTCDateToLocalDate } from '../utils/HelperFunctions';
 import {
   useCreateFriendRequestRelationshipIfNotExist,
@@ -74,10 +74,10 @@ export const InviteFriendsToEventModal = ({
       submitButtonText="Send Invites"
       onSubmitButtonClick={handleSubmitButtonClick}
     >
-        <InviteFriendsToEventTable
-          friends_invited={friends_invited}
-          setFriendsInvited={setFriendsInvited}
-        />
+      <InviteFriendsToEventTable
+        friends_invited={friends_invited}
+        setFriendsInvited={setFriendsInvited}
+      />
     </ModalComponent>
   );
 }
@@ -99,7 +99,7 @@ export const EventInvitesModal = ({
       submitButtonText="Close"
       onSubmitButtonClick={onRequestClose}
     >
-        <EventInvitesTable user_session={user_session} />
+      <EventInvitesTable user_session={user_session} />
     </ModalComponent>
   );
 }
@@ -180,7 +180,7 @@ export const FriendRequestsModal = ({
             marginBottom: friend_request_vertical_margin,
             backgroundColor: 'grey'
           }} />
-        <Box id='box-accept-decline-friend-request' sx={{flexGrow: 1, position: 'relative', height: '100%' }}>
+        <Box id='box-accept-decline-friend-request' sx={{ flexGrow: 1, position: 'relative', height: '100%' }}>
           <FriendRequestsTable user_session={user_session} />
         </Box>
       </Box>
@@ -408,15 +408,16 @@ export const CreateEventDetailsModal = ({
 
 export const CreateUsernameModal = ({
   isVisible,
-  onRequestClose,
+  create_user_profile_context,
+  setCreateUserProfileContext,
   onUsernameAvailable,
+  onRequestClose,
 }) => {
 
   const [username, setUsername] = useState('');
   const [fetching_username_is_taken, setFetchingUsernameExists] = useState(false);
-  const { create_user_profile_context, setCreateUserProfileContext } = React.useContext(CreateUserProfileContext);
 
-  useFetchUsername(fetching_username_is_taken, username, setFetchingUsernameExists, setCreateUserProfileContext, create_user_profile_context, onUsernameAvailable);
+  useFetchUsername(fetching_username_is_taken, username, setFetchingUsernameExists, create_user_profile_context, setCreateUserProfileContext, onUsernameAvailable);
 
   const handleUsernameChange = (event) => {
     console.log("event", event)
@@ -454,16 +455,20 @@ export const CreateUsernameModal = ({
 
 export const SelectInterestsModal = ({
   isVisible,
-  onRequestClose,
+  create_user_profile_context,
+  setCreateUserProfileContext,
   onSubmitButtonClick,
-  updateSelectedUUIDs
+  onRequestClose,
 }) => {
 
   const [event_types_selected, setEventTypesSelected] = useState([]);
 
   const handleSubmitButtonClick = () => {
-    updateSelectedUUIDs(event_types_selected);
-    onSubmitButtonClick(event_types_selected);
+    setCreateUserProfileContext({
+      ...create_user_profile_context,
+      InterestUUIDs: event_types_selected
+    });
+    onSubmitButtonClick();
   }
 
   return (

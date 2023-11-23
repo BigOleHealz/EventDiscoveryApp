@@ -23,7 +23,7 @@ export function LoginPage() {
   const { create_user_profile_context, setCreateUserProfileContext } = React.useContext(CreateUserProfileContext);
   const { user_session, setUserSession } = React.useContext(UserSessionContext);
   // const { logger, setLogger } = React.useContext(LoggerContext);
-  const { user_auth_context, setUserAuthContext } = React.useContext(UserAuthContext);
+  const { authentication_context, setUserAuthContext } = React.useContext(UserAuthContext);
 
 
   const [fetching_google_profile, setFetchingGoogleProfile] = useState(false);
@@ -46,7 +46,7 @@ export function LoginPage() {
 
   useFetchGoogleProfile(fetching_google_profile, setFetchingGoogleProfile, google_access_token, setUserAuthContext);
   useAuthenticateUser(
-    user_auth_context,
+    authentication_context,
     setCreateUserProfileContext,
     setUserSession,
     resetLoginInfo,

@@ -10,11 +10,15 @@ import SearchIcon from '@mui/icons-material/Search';
 import NavbarButton from '../base_components/NavbarButton';
 
 import { UserSessionContext } from "../utils/Contexts";
+import { AuthenticationManager } from "../utils/AuthenticationManager";
+import { CreateUserProfileManager } from "../utils/CreateUserProfileManager";
 
 import { common_styles } from "../styles";
 
 export default function Navbar({
   navbarHeight,
+  is_create_user_profile_manager_active,
+  setIsCreateUserProfileManagerActive,
   is_left_panel_visible,
   setIsLeftPanelVisible,
   is_event_invites_modal_visible,
@@ -31,6 +35,7 @@ export default function Navbar({
 
 
   const { user_session, setUserSession } = React.useContext(UserSessionContext);
+  const { login } = AuthenticationManager({setIsCreateUserProfileManagerActive});
 
   const handleFindEventsButtonClick = () => {
     if (is_left_panel_visible === false) {
@@ -100,10 +105,13 @@ export default function Navbar({
 
               <NavbarButton
                 id="button-Login"
-                // onClick={handleEventInvitesButtonClick}
-                onClick={() => { console.log("Login button clicked") }}
+                onClick={login}
                 smallContent="Login"
                 largeContent="Login"
+              />
+              <CreateUserProfileManager
+                is_active={is_create_user_profile_manager_active}
+                setIsActive={setIsCreateUserProfileManagerActive}
               />
             </>) :
             (
