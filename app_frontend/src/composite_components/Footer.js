@@ -5,8 +5,9 @@ import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
 import Container from "@mui/material/Container";
 import Button from "@mui/material/Button";
+import { toast } from "react-toastify";
 
-import { AttendEventContext, CreateEventContext, UserSessionContext } from '../utils/Contexts';
+import { UserSessionContext } from '../utils/Contexts';
 import { removeUserSession } from '../utils/SessionManager';
 
 export default function Footer({
@@ -31,6 +32,7 @@ export default function Footer({
               id="button-logout"
               onClick={() => {
                 setUserSession(null)
+                toast.success("Successfully logged out!")
                 removeUserSession()
               }}
               sx={{ my: 2, color: "white", display: "block" }}
