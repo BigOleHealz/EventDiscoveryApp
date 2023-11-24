@@ -276,20 +276,28 @@ GET_NOTIFICATIONS = """
 #####################
 ###### CREATES ######
 #####################
-CREATE_PERSON_NODE = """
-    CREATE (n:Account:Person {{
-        FirstName: "{first_name}", 
-        LastName: "{last_name}",
-        Email: "{email}",
-        Username: "{username}",
-        UUID: "{uuid}",
+CREATE_PERSON_NODE = r"""
+    CREATE (person:Account:Person {
+        FirstName: $params.FirstName, 
+        LastName: $params.LastName,
+        Email: $params.Email,
+        Username: $params.Username,
+        UUID: apoc.create.uuid(),
         AccountCreatedTimestamp: apoc.date.format(apoc.date.currentTimestamp(), "ms", "yyyy-MM-dd'T'HH:mm:ss")
-    }})
-    FOREACH (interestUUID IN {interest_uuids} |
-        MERGE (e:EventType {{UUID: interestUUID}})
-        MERGE (n)-[:INTERESTED_IN {{UUID: apoc.create.uuid()}}]->(e)
-    )
-    RETURN n.UUID as UUID;
+    })
+    WITH person
+    UNWIND $params.InterestUUIDs AS interestUUID
+        MERGE (event_type:EventType {UUID: interestUUID})
+        MERGE (person)-[:INTERESTED_IN {UUID: apoc.create.uuid()}]->(event_type)
+    WITH person, COLLECT(event_type.UUID) AS InterestUUIDs
+    RETURN
+        person.FirstName as FirstName,
+        person.LastName as LastName,
+        person.Email as Email,
+        person.Username as Username,
+        person.UUID as UUID,
+        person.AccountCreatedTimestamp as AccountCreatedTimestamp, 
+        InterestUUIDs;
     """
 
 CHECK_IF_EVENT_EXISTS = r"""

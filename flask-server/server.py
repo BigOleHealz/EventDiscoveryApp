@@ -179,36 +179,28 @@ def create_server():
             email = body.get('Email')
             first_name = body.get('FirstName')
             last_name = body.get('LastName')
-            uuid = body.get('UUID')
             interest_uuids = body.get('InterestUUIDs')
 
             if not username:
-                return jsonify({"message": "Missing username"}), 400
+                return jsonify({"STATUS": "ERROR", "MESSAGE": "Missing username"}), 400
             elif not email:
-                return jsonify({"message": "Missing email"}), 400
+                return jsonify({"STATUS": "ERROR", "MESSAGE": "Missing email"}), 400
             elif not first_name:
-                return jsonify({"message": "Missing first_name"}), 400
+                return jsonify({"STATUS": "ERROR", "MESSAGE": "Missing first_name"}), 400
             elif not last_name:
-                return jsonify({"message": "Missing last_name"}), 400
-            elif not uuid:
-                return jsonify({"message": "Missing uuid"}), 400
+                return jsonify({"STATUS": "ERROR", "MESSAGE": "Missing last_name"}), 400
             elif not interest_uuids:
-                return jsonify({"message": "You must select at least one event type"}), 400
-            formatted_query = queries.CREATE_PERSON_NODE.format(username=username,
-                                                                email=email,
-                                                                first_name=first_name,
-                                                                last_name=last_name,
-                                                                uuid=uuid,
-                                                                interest_uuids=interest_uuids
-                                                            )
-            result = neo4j.execute_query(formatted_query)
+                return jsonify({"STATUS": "ERROR", "MESSAGE": "You must select at least one event type"}), 400
             
-            if 'UUID' in result[0]:
-                return jsonify({"success": True, "UUID": result[0]['UUID']})
+            result = neo4j.execute_query_with_params(query=queries.CREATE_PERSON_NODE, params=body)
+            
+            if len(result) == 0:
+                return jsonify({"STATUS": "ERROR", "MESSAGE": "User could not be created"}), 400
             else:
-                return jsonify({"success": False, "message": "Person node could not be created"}), 400
+                result = result[0]
+                return jsonify(result), 200
         except Exception as e:
-            return jsonify({"message": "An error occurred: " + str(e)}), 500
+            return jsonify({"STATUS": "ERROR", "MESSAGE": "An error occurred: " + str(e)}), 500
     
     @app.route('/create_friend_request_relationship_if_not_exists', methods=["POST"])
     def create_friend_request_relationship_if_not_exists():
