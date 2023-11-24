@@ -314,7 +314,6 @@ export const useCreateEventNode = (is_creating_event_node, create_event_context,
 };
 
 export const useCreatePersonNode = (is_creating_person_node, create_user_profile_context, setIsCreatingPersonNode, setUserSession, setCreateUserProfileManagerIsActive) => {
-  console.log("create_user_profile_context:", create_user_profile_context)
   useEffect(() => {
     if (is_creating_person_node) {
       fetch('/api/create_person_node', {
@@ -514,7 +513,6 @@ export const useAuthenticateUser = (
   // logger
 ) => {
 
-  console.log('authentication_context:', authentication_context)
   useEffect(() => {
     if (!authentication_context) {
       return;

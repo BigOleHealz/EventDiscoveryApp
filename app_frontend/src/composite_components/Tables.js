@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 
 import moment from 'moment';
 import { Box, Divider, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
@@ -115,8 +115,16 @@ export const EventTypesTable = ({
   setEventTypesSelected
 }) => {
 
+  const { user_session, setUserSession } = useContext(UserSessionContext);
+
   const [event_types, setEventTypes] = useState([]);
   const [first_run, setFirstRun] = useState(true);
+
+  useEffect(() => {
+    if (user_session === null) {
+      setEventTypesSelected(event_types.map((event_type) => event_type.UUID));
+    }
+  }, [event_types]);
 
   useFetchEventTypes(first_run, setFirstRun, setEventTypes, event_types_selected, setEventTypesSelected);
 
@@ -138,7 +146,7 @@ export const InviteFriendsToEventTable = ({
   setFriendsInvited,
 }) => {
 
-  const { user_session, setUserSession } = React.useContext(UserSessionContext);
+  const { user_session, setUserSession } = useContext(UserSessionContext);
   const [is_fetching_friends, setIsFetchingFriends] = useState(true);
 
   const [friends_list, setFriendsList] = useState([]);

@@ -420,12 +420,10 @@ export const CreateUsernameModal = ({
   useFetchUsername(fetching_username_is_taken, username, setFetchingUsernameExists, create_user_profile_context, setCreateUserProfileContext, onUsernameAvailable);
 
   const handleUsernameChange = (event) => {
-    console.log("event", event)
     setUsername(event.target.value);
   };
 
   const handleSubmitButtonClick = () => {
-    console.log('Username:', username)
     setFetchingUsernameExists(true);
   };
 

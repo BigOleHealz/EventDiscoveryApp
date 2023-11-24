@@ -46,9 +46,6 @@ export function CreateUserProfileManager({
   const [is_select_interests_modal_visible, setIsSelectInterestsModalVisible] = useState(false);
   const [is_creating_person_node, setIsCreatingPersonNode] = useState(false);
 
-  console.log('CreateUserProfileManager authentication_context = ', authentication_context);
-  console.log('CreateUserProfileManager create_user_profile_context = ', create_user_profile_context);
-
   useEffect(() => {
     setCreateUserProfileContext(authentication_context);
   }, [authentication_context]);
