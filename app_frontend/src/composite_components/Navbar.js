@@ -10,8 +10,8 @@ import SearchIcon from '@mui/icons-material/Search';
 import NavbarButton from '../base_components/NavbarButton';
 
 import { UserSessionContext } from "../utils/Contexts";
-import { AuthenticationManager } from "../utils/AuthenticationManager";
-import { CreateUserProfileManager } from "../utils/CreateUserProfileManager";
+import { AuthenticationManager } from "../utils/WorkflowManagers";
+import { CreateUserProfileManager } from "../utils/WorkflowManagers";
 
 import { common_styles } from "../styles";
 

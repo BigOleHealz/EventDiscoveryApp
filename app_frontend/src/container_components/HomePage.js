@@ -11,7 +11,10 @@ import { useFetchEvents, useFilterEvents } from '../utils/Hooks';
 export function HomePage() {
   const mapRef = useRef();
   // const { logger, setLogger } = React.useContext(LoggerContext);
+  const { attend_event_context, setAttendEventContext } = React.useContext(AttendEventContext);
+  const { create_event_context, setCreateEventContext } = React.useContext(CreateEventContext);
   const { user_session, setUserSession } = React.useContext(UserSessionContext);
+
   const [is_create_user_profile_manager_active, setIsCreateUserProfileManagerActive] = useState(false);
 
   const currentDateTime = new Date();
@@ -38,7 +41,6 @@ export function HomePage() {
   }, [find_event_selected_date]);
 
   const [create_event_stage, setCreateEventStage] = useState(0);
-  const { create_event_context, setCreateEventContext } = React.useContext(CreateEventContext);
 
   useFetchEvents(is_fetching_events, start_timestamp, end_timestamp, setMapEventsFullDay, setIsFetchingEvents);
   useFilterEvents(find_event_selected_date, find_event_start_time, find_event_end_time, map_events_full_day, event_types_selected, setMapEventsFiltered);
@@ -50,8 +52,6 @@ export function HomePage() {
 
   const [attend_event_stage, setAttendEventStage] = useState(0);
   const [attend_event_currently_active_data, setAttendEventCurrentlyActiveData] = useState(null);
-  const { attend_event_context, setAttendEventContext } = React.useContext(AttendEventContext);
-
 
   const initializeCreateEventMode = () => {
     resetAllStates();
