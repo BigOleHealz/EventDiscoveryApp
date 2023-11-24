@@ -316,7 +316,6 @@ export const useCreateEventNode = (is_creating_event_node, create_event_context,
 export const useCreatePersonNode = (is_creating_person_node, create_user_profile_context, setIsCreatingPersonNode, setUserSession, setCreateUserProfileManagerIsActive) => {
   useEffect(() => {
     if (is_creating_person_node) {
-      console.log('create_user_profile_context:', create_user_profile_context)
       fetch('/api/create_person_node', {
         method: 'POST',
         headers: {
@@ -473,7 +472,6 @@ export const useFetchGoogleProfile = (
       }).then(res => res.json())
         .then(data => {
           if (data) {
-            toast.success('google account retrieved!');
             setUserAuthContext({
               FirstName: data.given_name,
               LastName: data.family_name,
