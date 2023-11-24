@@ -4,13 +4,10 @@ import { ToastContainer } from 'react-toastify';
 import { LoadScript } from '@react-google-maps/api';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 
-import { LoginPage } from './pages/LoginPage';
-import { HomePage } from './pages/HomePage';
-import { CreateAccountPage } from './pages/CreateAccountPage';
+import { HomePage } from './container_components/HomePage';
 import {
   AttendEventProvider,
   CreateEventProvider,
-  CreateUserProfileContext,
   GoogleMapsApiKeyContext,
   AuthenticationContext,
   // LoggerContext,
@@ -71,8 +68,6 @@ export function AppHandler() {
                   <CreateEventProvider>
                     <Routes>
                       <Route path="/" element={<HomePage />} />
-                      <Route path="/login" element={<LoginPage />} />
-                      <Route path="/create-account" element={<CreateAccountPage />} />
                     </Routes>
                   </CreateEventProvider>
                 </AttendEventProvider>
