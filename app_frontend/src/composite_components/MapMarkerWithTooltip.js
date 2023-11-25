@@ -20,7 +20,12 @@ const MapMarkerWithTooltip = ({
 }) => {
   const [showTooltip, setShowTooltip] = useState(false);
   // const { logger, setLogger } = React.useContext(LoggerContext);
-  const icon = iconSvgObject(event.PinColor);
+  
+  
+  const icon = {
+    ...iconSvgObject(event.PinColor),
+    anchor: new google.maps.Point(11.5, 16)
+  }
 
   const position = { lat: event.Lat, lng: event.Lon };
 

@@ -30,7 +30,6 @@ export const CheckboxTableComponent = ({
     setSelected(newSelected);
   };
 
-
   return (
     rows.length > 0 ?
       <TableContainer component={Paper} sx={table_styles.table_container}>

@@ -79,7 +79,7 @@ export const common_styles = {
     backgroundColor: defaultBackgroundColor,
     color: defaultFontColor,
     borderBottom: 'none',
-    padding: 1,
+    padding: 0,
   }
 };
 
@@ -395,12 +395,15 @@ export const text_input_styles = {
 export const time_range_slider_styles = {
   container: {
     marginLeft: { xs: "10px", sm: "15px", md: "20px" },
-    marginRight: { xs: "10px", sm: "15px", md: "20px" }
+    marginRight: { xs: "10px", sm: "15px", md: "20px" },
+    padding: 0
+
   },
   text_labels: {
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-between',
+    paddingBottom: { xs: "5px", sm: "7px", md: "9px" },
   },
 };
 
@@ -489,6 +492,7 @@ export const table_styles = {
     top: 0,
     bottom: 0,
     backgroundColor: common_styles.appTheme.backgroundColor,
+    boxShadow: 24,
   },
   row: {
     backgroundColor: common_styles.appTheme.backgroundColor,
