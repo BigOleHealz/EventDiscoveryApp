@@ -52,15 +52,6 @@ export const TimeRangeSliderComponent = ({ startTime, endTime, setStartTime, set
     }
   };
 
-  function sliderValueToFormattedTime(value) {
-    if (value === 24) {
-      return '11:59 PM';
-    } else {
-      const hour = value % 12 === 0 ? 12 : value % 12;
-      const period = value < 12 ? 'AM' : 'PM';
-      return `${hour} ${period}`;
-    }
-  };
   const handleSliderChange = (event, newValue) => {
     handleStartTimeChange(newValue[0]);
     handleEndTimeChange(newValue[1]);

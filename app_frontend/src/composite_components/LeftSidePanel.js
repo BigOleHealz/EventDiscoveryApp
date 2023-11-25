@@ -54,7 +54,7 @@ export default function LeftSidePanel({
       <BoxComponent sx={{
         display: "flex",
         flexDirection: "column",
-        justifyContent: "space-between",
+        // justifyContent: "space-between",
         position: 'relative',
         height: '100%',
       }}>
