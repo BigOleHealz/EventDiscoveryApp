@@ -1,14 +1,12 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import _ from 'lodash';
 import Box from '@mui/material/Box';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import { GoogleMap, MarkerClusterer } from '@react-google-maps/api';
+import { GoogleMap, Marker, InfoWindow } from '@react-google-maps/api';
 
 import MapMarkerWithTooltip from './MapMarkerWithTooltip';
 
 import { LoggerContext } from '../utils/Contexts';
-import { defaultCenter } from '../utils/constants';
+import { defaultCenter, iconSvgObject } from '../utils/constants';
 import { useSetUserLocation } from '../utils/Hooks';
 
 
@@ -21,7 +19,9 @@ export default function Map({
 }) {
   // const { logger, setLogger } = React.useContext(LoggerContext);
   const [visibleMarkers, setVisibleMarkers] = useState([]);
-  const mapInstance = useRef(null); // To store the actual Google Map instance
+  const mapInstance = useRef(null);
+  const [mapCenter, setMapCenter] = useState(defaultCenter);
+
 
   // Use useCallback to memoize the function
   const updateVisibleMarkers = useCallback(() => {
@@ -50,26 +50,21 @@ export default function Map({
     debouncedUpdateVisibleMarkers();
   };
 
-  // Handle Map Events
-  const [mapCenter, setMapCenter] = useState(defaultCenter);
-  const [activePopup, setActivePopup] = useState(null);
-
 
   useSetUserLocation(setMapCenter);
-
-  const handleSetActivePopup = (uuid) => {
-    if (activePopup === uuid) {
-      setActivePopup(null);
-    } else {
-      setActivePopup(uuid);
-    }
-  };
 
   useEffect(() => {
     if (mapInstance.current) {
       debouncedUpdateVisibleMarkers();
     }
   }, [map_events_filtered, debouncedUpdateVisibleMarkers]);
+
+
+  const [activeMarker, setActiveMarker] = useState(null);
+  const handleActiveMarker = (uuid) => {
+    setActiveMarker(activeMarker === uuid ? null : uuid);
+  };
+
 
   return (
     <Box id="box-main-map"
@@ -84,7 +79,6 @@ export default function Map({
         justifyContent: 'center',
         alignItems: 'center'
       }}>
-      <ToastContainer />
       <GoogleMap
         mapContainerStyle={map_styles.mapContainerStyle}
         zoom={15}
@@ -102,17 +96,28 @@ export default function Map({
         }}
       >
         {
-          Array.isArray(visibleMarkers) && visibleMarkers.map(event => (
-            <MapMarkerWithTooltip
+          map_events_filtered.map(event => (
+            <Marker
               key={event.UUID}
-              event={event}
-              activePopup={activePopup}
-              onSetActivePopup={handleSetActivePopup}
-              {...props}
-            />
+              position={{ lat: event.Lat, lng: event.Lon }}
+              onClick={() => handleActiveMarker(event.UUID)}
+              icon={{
+                ...iconSvgObject(event.PinColor),
+                anchor: new google.maps.Point(11.5, 16)
+              }}
+            >
+              {activeMarker === event.UUID && (
+                <InfoWindow onCloseClick={() => setActiveMarker(null)}>
+                  <Box style={{ padding: '8px' }}>
+                    <div>{event.EventName}</div>
+                    {/* You can add more event details here */}
+                  </Box>
+                </InfoWindow>
+              )}
+            </Marker>
           ))
         }
       </GoogleMap>
     </Box>
   );
-};
+}
