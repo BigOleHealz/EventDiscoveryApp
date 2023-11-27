@@ -12,16 +12,21 @@ import { useSetUserLocation } from '../utils/Hooks';
 
 import { map_styles } from '../styles';
 
+
+
+
 export default function Map({
   mapRef,
   map_events_filtered,
   ...props
 }) {
+
   // const { logger, setLogger } = React.useContext(LoggerContext);
-  const [visibleMarkers, setVisibleMarkers] = useState([]);
+  const [visibleMarkers, setVisibleMarkers] = useState(map_events_filtered);
+  const [infoWindowContent, setInfoWindowContent] = useState(null);
   const mapInstance = useRef(null);
   const [mapCenter, setMapCenter] = useState(defaultCenter);
-
+  const [activeMarker, setActiveMarker] = useState(null);
 
   // Use useCallback to memoize the function
   const updateVisibleMarkers = useCallback(() => {
@@ -49,10 +54,7 @@ export default function Map({
   const onIdle = () => {
     debouncedUpdateVisibleMarkers();
   };
-
-
   useSetUserLocation(setMapCenter);
-
   useEffect(() => {
     if (mapInstance.current) {
       debouncedUpdateVisibleMarkers();
@@ -60,10 +62,21 @@ export default function Map({
   }, [map_events_filtered, debouncedUpdateVisibleMarkers]);
 
 
-  const [activeMarker, setActiveMarker] = useState(null);
-  const handleActiveMarker = (uuid) => {
-    setActiveMarker(activeMarker === uuid ? null : uuid);
+  const handleActiveMarker = (event_uuid) => {
+    console.log("handleActiveMarker marker:", event_uuid);
+    console.log("handleActiveMarker activeMarker:", activeMarker);
+
+    const selectedEvent = map_events_filtered.find(event => event.UUID === event_uuid);
+
+    if (event_uuid === activeMarker) {
+      setActiveMarker(null);
+      setInfoWindowContent(null); // Hide InfoWindow
+    } else {
+      setActiveMarker(event_uuid);
+      setInfoWindowContent(selectedEvent ? selectedEvent.EventName : null); // Set InfoWindow content
+    }
   };
+
 
 
   return (
@@ -96,7 +109,7 @@ export default function Map({
         }}
       >
         {
-          map_events_filtered.map(event => (
+          visibleMarkers.map(event => (
             <Marker
               key={event.UUID}
               position={{ lat: event.Lat, lng: event.Lon }}
@@ -105,18 +118,29 @@ export default function Map({
                 ...iconSvgObject(event.PinColor),
                 anchor: new google.maps.Point(11.5, 16)
               }}
-            >
-              {activeMarker === event.UUID && (
-                <InfoWindow onCloseClick={() => setActiveMarker(null)}>
-                  <Box style={{ padding: '8px' }}>
-                    <div>{event.EventName}</div>
-                    {/* You can add more event details here */}
-                  </Box>
-                </InfoWindow>
-              )}
-            </Marker>
+            />
+
           ))
         }
+        {activeMarker && infoWindowContent && (
+          <InfoWindow
+            position={
+              visibleMarkers.find(event => event.UUID === activeMarker)
+                ? {
+                  lat: visibleMarkers.find(event => event.UUID === activeMarker).Lat,
+                  lng: visibleMarkers.find(event => event.UUID === activeMarker).Lon
+                }
+                : { lat: 0, lng: 0 }
+            }
+            onCloseClick={() => {
+              setActiveMarker(null);
+              setInfoWindowContent(null);
+            }}
+            options={{ pixelOffset: new window.google.maps.Size(0, -22) }}
+          >
+            <div>{infoWindowContent}</div>
+          </InfoWindow>
+        )}
       </GoogleMap>
     </Box>
   );
