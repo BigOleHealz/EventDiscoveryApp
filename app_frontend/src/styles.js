@@ -216,6 +216,17 @@ export const map_styles = {
     alignItems: 'center',
     flexDirection: 'column',
   },
+  main_map_box: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    flexGrow: 1,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center'
+  }
 };
 
 const content_padding = { xs: "10px", sm: "12px", md: "15px", lg: "17px", xl: "20px" }
@@ -238,6 +249,7 @@ export const modal_component_styles = {
     bgcolor: 'background.paper',
     boxShadow: 24,
     padding: 0,
+    backgroundColor: common_styles.appTheme.backgroundColor,
   },
   parentContainer: {
     height: "100%",
@@ -488,7 +500,7 @@ export const event_invite_styles = {
 
 export const table_styles = {
   table_container: {
-    // position: 'absolute',
+    position: 'absolute',
     top: 0,
     bottom: 0,
     backgroundColor: common_styles.appTheme.backgroundColor,

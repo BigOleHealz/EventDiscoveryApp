@@ -1,5 +1,6 @@
 import React from "react";
 import Box from "@mui/material/Box";
+import { ToastContainer } from "react-toastify";
 
 import { CreateEventWorkflow } from '../composite_components/CreateEventWorkflow';
 import { AttendEventWorkflow } from '../composite_components/AttendEventWorkflow';
@@ -17,16 +18,18 @@ export default function ContentContainer({
 }) {
 
   return (
-    <Box id="content-container"
-      sx={{
-        position: 'absolute',
-        width: '100%',
-        height: '100%',
-        flexGrow: 1,
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center'
-      }}>
+    <>
+      <ToastContainer />
+      <Box id="content-container"
+        sx={{
+          position: 'absolute',
+          width: '100%',
+          height: '100%',
+          flexGrow: 1,
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center'
+        }}>
         <LeftSidePanel {...props} />
         <Map {...props} />
         <EventInvitesModal
@@ -41,7 +44,7 @@ export default function ContentContainer({
         />
         <CreateEventWorkflow {...props} />
         <AttendEventWorkflow {...props} />
-
-    </Box>
+      </Box>
+    </>
   )
 }

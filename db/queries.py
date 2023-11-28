@@ -455,17 +455,23 @@ RESPOND_TO_FRIEND_REQUEST_BY_FRIEND_REQUEST_UUID = r"""
 ATTEND_EVENT_AND_SEND_INVITES = r"""
     WITH $params as params, apoc.date.format(apoc.date.currentTimestamp(), "ms", "yyyy-MM-dd'T'HH:mm:ss") as response_timestamp
     MATCH (attendee:Person {UUID: params.AttendeeUUID}), (event:Event {UUID: params.EventUUID})
-    CREATE (attendee)-[:ATTENDING {UUID: apoc.create.uuid(), RESPONSE_TIMESTAMP: response_timestamp}]->(event)
-    WITH attendee, event, params, response_timestamp
-    FOREACH (friend_uuid IN params.InviteeUUIDs | 
-        MERGE (friend:Person {UUID: friend_uuid})-[event_invite:INVITED_TO_EVENT {INVITED_BY_UUID: attendee.UUID}]->(event)
+    MERGE (attendee)-[attending:ATTENDING]->(event)
+    ON CREATE SET
+         attending.UUID = apoc.create.uuid(),
+         attending.RESPONSE_TIMESTAMP = response_timestamp
+    WITH attendee, event, params.InviteeUUIDs as invitee_uuids, response_timestamp
+    UNWIND invitee_uuids as friend_uuid
+        OPTIONAL MATCH (friend:Person {UUID: friend_uuid})
+        WITH attendee, event, friend, response_timestamp
+        WHERE friend IS NOT NULL
+        MERGE (friend)-[event_invite:INVITED_TO_EVENT {INVITED_BY_UUID: attendee.UUID}]->(event)
         ON CREATE SET
             event_invite.UUID = apoc.create.uuid(),
             event_invite.INVITED_TIMESTAMP = response_timestamp,
             event_invite.STATUS = "PENDING"
-    )
     RETURN {STATUS: "SUCCESS", MESSAGE: "Invites Sent"} as result;
     """
+
 
 FETCH_EVENT_INVITES = r"""
     MATCH (invitee:Person {UUID: $params.InviteeUUID})-[invite:INVITED_TO_EVENT {STATUS: "PENDING"}]->(event:Event)

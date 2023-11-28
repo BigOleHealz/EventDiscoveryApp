@@ -8,10 +8,6 @@ import { storeUserSession } from './SessionManager';
 export const useFetchFriends = (user_uuid, is_fetching_friends, setIsFetchingFriends, setFriends) => {
   useEffect(() => {
     if (is_fetching_friends) {
-      console.log('useFetchFriends user_uuid: ' + user_uuid);
-      console.log('useFetchFriends is_fetching_friends: ' + is_fetching_friends);
-      console.log('useFetchFriends setIsFetchingFriends: ' + setIsFetchingFriends);
-      console.log('useFetchFriends setFriends: ' + setFriends);
       fetch('/api/fetch_friends', {
         method: 'POST',
         headers: {

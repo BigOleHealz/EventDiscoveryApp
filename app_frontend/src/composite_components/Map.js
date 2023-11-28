@@ -2,8 +2,9 @@ import React, { useState, useCallback, useRef, useEffect } from 'react';
 import _ from 'lodash';
 import Box from '@mui/material/Box';
 import { GoogleMap, Marker, InfoWindow } from '@react-google-maps/api';
+import { ToastContainer } from 'react-toastify';
 
-import MapMarkerWithTooltip from './MapMarkerWithTooltip';
+import EventInfoWindow from './EventInfoWindow';
 
 import { LoggerContext } from '../utils/Contexts';
 import { defaultCenter, iconSvgObject } from '../utils/constants';
@@ -46,7 +47,7 @@ export default function Map({
 
   const onLoad = useCallback((map) => {
     mapInstance.current = map;
-    mapRef.current = map; // Assuming you still need this for other purposes
+    mapRef.current = map;
   }, [mapRef]);
 
   const onIdle = () => {
@@ -70,52 +71,47 @@ export default function Map({
     }
   };
 
-
-
   return (
-    <Box id="box-main-map"
-      sx={map_styles.main_map_box}>
-      <GoogleMap
-        mapContainerStyle={map_styles.mapContainerStyle}
-        zoom={15}
-        center={mapCenter}
-        onLoad={onLoad}
-        onIdle={onIdle}
-        options={{
-          styles: [
-            {
-              featureType: 'poi',
-              elementType: 'labels',
-              stylers: [{ visibility: 'off' }],
-            },
-          ],
-        }}
-      >
-        {
-          visibleMarkers.map(event => (
-            <Marker
-              key={event.UUID}
-              position={{ lat: event.Lat, lng: event.Lon }}
-              onClick={() => handleActiveMarker(event)}
-              icon={{
-                ...iconSvgObject(event.PinColor),
-                anchor: new google.maps.Point(11.5, 16)
-              }}
+    <>
+      <Box id="box-main-map" sx={map_styles.main_map_box}>
+        <GoogleMap
+          mapContainerStyle={map_styles.mapContainerStyle}
+          zoom={15}
+          center={mapCenter}
+          onLoad={onLoad}
+          onIdle={onIdle}
+          options={{
+            styles: [
+              {
+                featureType: 'poi',
+                elementType: 'labels',
+                stylers: [{ visibility: 'off' }],
+              },
+            ],
+          }}
+        >
+          {
+            visibleMarkers.map(event => (
+              <Marker
+                key={event.UUID}
+                position={{ lat: event.Lat, lng: event.Lon }}
+                onClick={() => handleActiveMarker(event)}
+                icon={{
+                  ...iconSvgObject(event.PinColor),
+                  anchor: new google.maps.Point(11.5, 16)
+                }}
+              />
+            ))
+          }
+          {active_marker_event_data && (
+            <EventInfoWindow
+              active_marker_event_data={active_marker_event_data}
+              setActiveMarkerEventData={setActiveMarkerEventData}
+              {...props}
             />
-          ))
-        }
-        {active_marker_event_data && ( //  infoWindowContent && 
-          <InfoWindow
-            position={{ lat: active_marker_event_data.Lat, lng: active_marker_event_data.Lon }}
-            onCloseClick={() => {
-              setActiveMarkerEventData(null);
-            }}
-            options={{ pixelOffset: new window.google.maps.Size(0, -22) }}
-          >
-            <div>{active_marker_event_data.EventName}</div>
-          </InfoWindow>
-        )}
-      </GoogleMap>
-    </Box>
+          )}
+        </GoogleMap>
+      </Box>
+    </>
   );
 }

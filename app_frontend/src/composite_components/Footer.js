@@ -10,6 +10,8 @@ import { toast } from "react-toastify";
 import { UserSessionContext } from '../utils/Contexts';
 import { removeUserSession } from '../utils/SessionManager';
 
+import { common_styles } from "../styles";
+
 export default function Footer({
   ...props
 }) {
@@ -20,7 +22,7 @@ export default function Footer({
     <AppBar
       position="static"
       className="bg-quaternary text-primary font-heading shadow-none border-none w-full"
-      style={{ background: '#1E2022'}}
+      style={{ background: common_styles.appTheme.backgroundColor, color: 'white' }}
     >
       <Container maxWidth="xl">
         <Toolbar
