@@ -10,7 +10,7 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 
 import BoxComponent from '../base_components/BoxComponent';
 
-import { toolbar_height, modal_component_styles } from '../styles';
+import { modal_component_styles } from '../styles';
 
 const theme = createTheme({
   components: {

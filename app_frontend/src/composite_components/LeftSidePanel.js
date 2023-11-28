@@ -1,5 +1,6 @@
 import React from 'react';
 import SwipeableDrawer from '@mui/material/SwipeableDrawer';
+import Box from '@mui/material/Box';
 
 import BoxComponent from '../base_components/BoxComponent';
 import { CalendarComponent } from '../base_components/CalendarComponent';
@@ -69,10 +70,16 @@ export default function LeftSidePanel({
           endTime={find_event_end_time}
           setEndTime={setFindEventEndTime}
         />
-        <EventTypesTable
-          event_types_selected={event_types_selected}
-          setEventTypesSelected={setEventTypesSelected}
-        />
+        <Box sx={{
+          position: 'relative',
+          flexGrow: 1,
+          overflow: 'auto'
+        }}>
+          <EventTypesTable
+            event_types_selected={event_types_selected}
+            setEventTypesSelected={setEventTypesSelected}
+          />
+        </Box>
       </BoxComponent>
     </SwipeableDrawer>
   );

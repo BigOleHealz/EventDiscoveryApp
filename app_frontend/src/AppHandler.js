@@ -3,6 +3,7 @@ import { Route, Routes, useNavigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import { LoadScript } from '@react-google-maps/api';
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import 'react-toastify/dist/ReactToastify.css';
 
 import { HomePage } from './container_components/HomePage';
 import {

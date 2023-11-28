@@ -90,7 +90,7 @@ export const AcceptDeclineTable = ({ rows }) => {
                 </TableCell>
                 <TableCell 
                   align={'right'} sx={table_styles.accept_decline_cell}>
-                  <Box sx={{ display: { xs: 'block', sm: 'block', md: 'block', lg: 'flex', xl: 'flex' } }}>
+                  <Box sx={{ display: 'block' }}>
                     <Button
                       variant="contained"
                       color="primary"
