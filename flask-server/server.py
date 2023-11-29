@@ -20,6 +20,9 @@ session_loggers_cache = {}
 def create_server():
     app = Flask(__name__)
 
+    def __init__(self):
+        self.app.config = []
+
     @app.route('/get_aws_secret', methods=['POST'])
     def get_aws_secret():
         try:
@@ -79,7 +82,7 @@ def create_server():
     def get_event_type_mappings():
         try:
             result = neo4j.execute_query(queries.GET_EVENT_TYPE_NAMES_MAPPINGS)
-            return result
+            return result, 200
         except Exception as e:
             return jsonify({"message": "An error occurred: " + str(e)}), 500
 
@@ -97,8 +100,10 @@ def create_server():
             
             if len(result) == 0:
                 return jsonify([]), 200
-
-            return jsonify(result[0])
+            elif len(result) > 1:
+                return jsonify({"message": "More than one user found with email: " + email}), 500
+            else:
+                return jsonify(result[0]), 200
 
         except Exception as e:
             return jsonify({"message": "An error occurred: " + str(e)}), 500
@@ -144,7 +149,7 @@ def create_server():
 
             result = neo4j.execute_query(formatted_query)
 
-            return result[0]
+            return result[0], 200
 
         except Exception as e:
             return jsonify({"message": "An error occurred: " + str(e)}), 500
