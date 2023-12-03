@@ -186,7 +186,7 @@ class TestCreatePersonNode(BaseUnitTest):
                                         strings.email: "1",
                                         strings.first_name: "1",
                                         strings.last_name: "1",
-                                        strings.interests_uuids: event_type_uuids
+                                        strings.interest_uuids: event_type_uuids
                                     })
         if create_person_response.status_code != 200:
             print(create_person_response.data.decode())

@@ -4,7 +4,7 @@ email = 'Email'
 first_name = 'FirstName'
 last_name = 'LastName'
 interests = 'Interests'
-interests_uuids = 'InterestsUUIDs'
+interest_uuids = 'InterestUUIDs'
 
 # Event Types
 pin_color = 'PinColor'
