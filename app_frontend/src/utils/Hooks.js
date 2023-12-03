@@ -249,7 +249,7 @@ export const useFetchUsername = (
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          username: username
+          Username: username
         }),
       }).then(res => res.json())
         .then(data => {
@@ -346,14 +346,14 @@ export const useCreatePersonNode = (is_creating_person_node, create_user_profile
 export const useFetchEvents = (is_fetching_events, start_timestamp, end_timestamp, setMapEventsFullDay, setIsFetchingEvents) => {
   useEffect(() => {
     if (is_fetching_events) {
-      fetch('/api/events', {
+      fetch('/api/fetch_events', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          start_timestamp: start_timestamp,
-          end_timestamp: end_timestamp,
+          StartTimestamp: start_timestamp,
+          EndTimestamp: end_timestamp,
         }),
       }).then(res => res.json())
         .then(data => {
@@ -521,7 +521,7 @@ export const useAuthenticateUser = (
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          email: email
+          Email: email
         }),
       }).then(res => res.json())
         .then(data => {

@@ -10,7 +10,7 @@ from flask import Flask, request, jsonify
 from db.db_handler import Neo4jDB
 from db import queries
 from utils.logger import Logger
-
+import message_strings as strings
 
 api_logger = Logger(log_group_name=f"api")
 neo4j = Neo4jDB(logger=api_logger)
@@ -28,7 +28,7 @@ def create_server():
         try:
             body = request.get_json()
             if not body:
-                return jsonify({"message": "No input body provided"}), 400
+                return jsonify({"message": strings.no_input_body_provided}), 400
             secret_id = body.get('secret_id')
             if not secret_id:
                 return jsonify({"message": "No secret_id provided"}), 400
@@ -49,7 +49,7 @@ def create_server():
         try:
             body = request.get_json()
             if not body:
-                return jsonify({"message": "No input body provided"}), 400
+                return jsonify({"message": strings.no_input_body_provided}), 400
             log_message = body.get('log_message')
             log_level = body.get('log_level')
             log_group = body.get('log_group')
@@ -77,31 +77,33 @@ def create_server():
         except:
             api_logger.error(f"An error occurred: {traceback.format_exc()}")
             return {"message": f"An error occurred: {traceback.format_exc()}"}, 500
-            
+    
+    # tested
     @app.route("/get_event_type_mappings", methods=["GET"])
     def get_event_type_mappings():
         try:
             result = neo4j.execute_query(queries.GET_EVENT_TYPE_NAMES_MAPPINGS)
-            return result, 200
+            return jsonify(result), 200
         except Exception as e:
             return jsonify({"message": "An error occurred: " + str(e)}), 500
 
+    # tested
     @app.route("/get_user_profile", methods=["POST"])
     def get_user_profile():
         try:
             body = request.get_json()
             if not body:
-                return jsonify({"message": "No input body provided"}), 400
-            email = body.get('email')
+                return jsonify({"message": strings.no_input_body_provided}), 400
+            email = body.get(strings.email)
 
             if not email:
-                return jsonify({"message": "Missing email"}), 400
+                return jsonify({"message": strings.missing_email}), 400
             result = neo4j.execute_query_with_params(query=queries.GET_USER_PROFILE, params=body)
             
             if len(result) == 0:
                 return jsonify([]), 200
             elif len(result) > 1:
-                return jsonify({"message": "More than one user found with email: " + email}), 500
+                return jsonify({"message": "More than one user found with email: " + email}), 200
             else:
                 return jsonify(result[0]), 200
 
@@ -114,7 +116,7 @@ def create_server():
             body = request.get_json()
             print(body)
             if not body:
-                return jsonify({"message": "No input body provided"}), 400
+                return jsonify({"message": strings.no_input_body_provided}), 400
             access_token = body.get('access_token')
 
             if not access_token:
@@ -135,65 +137,70 @@ def create_server():
         except Exception as e:
             return jsonify({"message": "An error occurred: " + str(e)}), 500
 
+    # tested
     @app.route("/is_username_taken", methods=["POST"])
     def is_username_taken():
         try:
             body = request.get_json()
             if not body:
-                return jsonify({"message": "No input body provided"}), 400
-            username = body.get('username')
+                return jsonify({"message": strings.no_input_body_provided}), 400
+            username = body.get(strings.username)
 
             if not username:
-                return jsonify({"message": "Missing username"}), 400
-            formatted_query = queries.IS_USERNAME_TAKEN.format(username=username)
-
-            result = neo4j.execute_query(formatted_query)
-
-            return result[0], 200
+                return jsonify({"message": strings.missing_username}), 400
+            result = neo4j.execute_query_with_params(query=queries.IS_USERNAME_TAKEN, params=body)
+            if len(result) == 0:
+                return jsonify({"message": strings.length_of_response_0}), 400
+            elif len(result) > 1:
+                return jsonify({"message": strings.length_of_response_greater_than_1}), 400
+            else:
+                return jsonify(result[0]), 200
 
         except Exception as e:
             return jsonify({"message": "An error occurred: " + str(e)}), 500
-
-    @app.route('/events', methods=["POST"])
-    def events():
+    
+    # tested
+    @app.route('/fetch_events', methods=["POST"])
+    def fetch_events():
         try:
             body = request.get_json()
             if not body:
-                return jsonify({"message": "No input body provided"}), 400
-            start_timestamp = body.get('start_timestamp')
-            end_timestamp = body.get('end_timestamp')
-
-            if not start_timestamp or not end_timestamp:
-                return jsonify({"message": "Missing start_timestamp or end_timestamp"}), 400
-            formatted_query = queries.FETCH_EVENTS_FOR_MAP.format(start_timestamp=start_timestamp, end_timestamp=end_timestamp)
-
-            result = neo4j.execute_query(formatted_query)
+                return jsonify({"message": strings.no_input_body_provided}), 400
+            start_timestamp = body.get(strings.start_timestamp)
+            end_timestamp = body.get(strings.end_timestamp)
             
-            return result
+            if not start_timestamp:
+                return jsonify({"message": strings.missing_start_timestamp}), 400
+            elif not end_timestamp:
+                return jsonify({"message": strings.missing_end_timestamp}), 400
+            
+            result = neo4j.execute_query_with_params(query=queries.FETCH_EVENTS_FOR_MAP, params=body)
+            return jsonify(result), 200
 
         except Exception as e:
             return jsonify({"message": "An error occurred: " + str(e)}), 500
+        
     
     @app.route('/create_person_node', methods=["POST"])
     def create_person_node():
         try:
             body = request.get_json()
             if not body:
-                return jsonify({"message": "No input body provided"}), 400
-            username = body.get('Username')
-            email = body.get('Email')
-            first_name = body.get('FirstName')
-            last_name = body.get('LastName')
-            interest_uuids = body.get('InterestUUIDs')
+                return jsonify({"message": strings.no_input_body_provided}), 400
+            username = body.get(strings.username)
+            email = body.get(strings.email)
+            first_name = body.get(strings.first_name)
+            last_name = body.get(strings.last_name)
+            interest_uuids = body.get(strings.interests_uuids)
 
             if not username:
-                return jsonify({"STATUS": "ERROR", "MESSAGE": "Missing username"}), 400
+                return jsonify({"STATUS": "ERROR", "MESSAGE": strings.missing_username}), 400
             elif not email:
-                return jsonify({"STATUS": "ERROR", "MESSAGE": "Missing email"}), 400
+                return jsonify({"STATUS": "ERROR", "MESSAGE": strings.missing_email}), 400
             elif not first_name:
-                return jsonify({"STATUS": "ERROR", "MESSAGE": "Missing first_name"}), 400
+                return jsonify({"STATUS": "ERROR", "MESSAGE": strings.missing_first_name}), 400
             elif not last_name:
-                return jsonify({"STATUS": "ERROR", "MESSAGE": "Missing last_name"}), 400
+                return jsonify({"STATUS": "ERROR", "MESSAGE": strings.missing_last_name}), 400
             elif not interest_uuids:
                 return jsonify({"STATUS": "ERROR", "MESSAGE": "You must select at least one event type"}), 400
             
@@ -207,12 +214,31 @@ def create_server():
         except Exception as e:
             return jsonify({"STATUS": "ERROR", "MESSAGE": "An error occurred: " + str(e)}), 500
     
+    @app.route('/delete_node', methods=["POST"])
+    def delete_node():
+        try:
+            body = request.get_json()
+            if not body:
+                return jsonify({"message": strings.no_input_body_provided}), 400
+            uuid = body.get('UUID')
+
+            if not uuid:
+                return jsonify({"message": strings.missing_uuid}), 400
+            result = neo4j.execute_query_with_params(query=queries.DELETE_NODE_BY_UUID, params=body)
+            if len(result) == 0:
+                return jsonify({"message": "Node could not be deleted"}), 400
+            else:
+                result = result[0]
+                return jsonify(result), 200
+        except Exception as e:
+            return jsonify({"message": "An error occurred: " + str(e)}), 500
+    
     @app.route('/create_friend_request_relationship_if_not_exists', methods=["POST"])
     def create_friend_request_relationship_if_not_exists():
         try:
             body = request.get_json()
             if not body:
-                return jsonify({"STATUS": "ERROR", "MESSAGE": "No input body provided"}), 400
+                return jsonify({"STATUS": "ERROR", "MESSAGE": strings.no_input_body_provided}), 400
             username_sender = body.get('username_sender')
             username_recipient = body.get('username_recipient')
 
@@ -235,7 +261,7 @@ def create_server():
         try:
             body = request.get_json()
             if not body:
-                return jsonify({"STATUS": "ERROR", "MESSAGE": "No input body provided"}), 400
+                return jsonify({"STATUS": "ERROR", "MESSAGE": strings.no_input_body_provided}), 400
             friend_request_uuid = body.get('friend_request_uuid')
             response = body.get('response')
 
@@ -259,7 +285,7 @@ def create_server():
         try:
             body = request.get_json()
             if not body:
-                return jsonify({"STATUS": "ERROR", "MESSAGE": "No input body provided"}), 400
+                return jsonify({"STATUS": "ERROR", "MESSAGE": strings.no_input_body_provided}), 400
             username = body.get('Username')
 
             if not username:
@@ -275,7 +301,7 @@ def create_server():
         try:
             body = request.get_json()
             if not body:
-                return jsonify({"STATUS": "ERROR", "MESSAGE": "No input body provided"}), 400
+                return jsonify({"STATUS": "ERROR", "MESSAGE": strings.no_input_body_provided}), 400
             event_type_uuid = body.get('EventTypeUUID')
             event_lat = body.get('Lat')
             event_lon = body.get('Lon')
@@ -318,7 +344,7 @@ def create_server():
         try:
             body = request.get_json()
             if not body:
-                return jsonify({"STATUS": "ERROR", "MESSAGE": "No input body provided"}), 400
+                return jsonify({"STATUS": "ERROR", "MESSAGE": strings.no_input_body_provided}), 400
             event_uuid = body.get('EventUUID')
             attendee_uuid = body.get('AttendeeUUID')
             invite_uuids = body.get('InviteeUUIDs')
@@ -344,7 +370,7 @@ def create_server():
         try:
             body = request.get_json()
             if not body:
-                return jsonify({"STATUS": "ERROR", "MESSAGE": "No input body provided"}), 400
+                return jsonify({"STATUS": "ERROR", "MESSAGE": strings.no_input_body_provided}), 400
             invitee_uuid = body.get('InviteeUUID')
 
             if not invitee_uuid:
@@ -364,7 +390,7 @@ def create_server():
         try:
             body = request.get_json()
             if not body:
-                return jsonify({"STATUS": "ERROR", "MESSAGE": "No input body provided"}), 400
+                return jsonify({"STATUS": "ERROR", "MESSAGE": strings.no_input_body_provided}), 400
             event_invite_uuid = body.get('event_invite_uuid')
             response = body.get('response')
 
@@ -388,7 +414,7 @@ def create_server():
         try:
             body = request.get_json()
             if not body:
-                return jsonify({"STATUS": "ERROR", "MESSAGE": "No input body provided"}), 400
+                return jsonify({"STATUS": "ERROR", "MESSAGE": strings.no_input_body_provided}), 400
             
             attendee_uuid = body.get('AttendeeUUID')
             if not attendee_uuid:
@@ -408,7 +434,7 @@ def create_server():
         try:
             body = request.get_json()
             if not body:
-                return jsonify({"STATUS": "ERROR", "MESSAGE": "No input body provided"}), 400
+                return jsonify({"STATUS": "ERROR", "MESSAGE": strings.no_input_body_provided}), 400
             
             created_by_uuid = body.get('CreatedByUUID')
             if not created_by_uuid:
@@ -428,7 +454,7 @@ def create_server():
         try:
             body = request.get_json()
             if not body:
-                return jsonify({"STATUS": "ERROR", "MESSAGE": "No input body provided"}), 400
+                return jsonify({"STATUS": "ERROR", "MESSAGE": strings.no_input_body_provided}), 400
             
             attendee_uuid = body.get('AttendeeUUID')
             if not attendee_uuid:
@@ -448,11 +474,11 @@ def create_server():
         try:
             body = request.get_json()
             if not body:
-                return jsonify({"STATUS": "ERROR", "MESSAGE": "No input body provided"}), 400
+                return jsonify({"STATUS": "ERROR", "MESSAGE": strings.no_input_body_provided}), 400
             
             uuid = body.get('UUID')
             if not uuid:
-                return jsonify({"STATUS": "ERROR", "MESSAGE": "Missing UUID"}), 400
+                return jsonify({"STATUS": "ERROR", "MESSAGE": strings.missing_uuid}), 400
             
             try:
                 result = neo4j.execute_query_with_params(query=queries.FETCH_FRIENDS_BY_UUID, params=body)
