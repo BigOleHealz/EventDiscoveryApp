@@ -191,7 +191,7 @@ def create_server():
             email = body.get(strings.email)
             first_name = body.get(strings.first_name)
             last_name = body.get(strings.last_name)
-            interest_uuids = body.get(strings.interests_uuids)
+            interest_uuids = body.get(strings.interest_uuids)
 
             if not username:
                 return jsonify({"STATUS": "ERROR", "MESSAGE": strings.missing_username}), 400
