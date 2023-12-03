@@ -1,3 +1,5 @@
+import message_strings as strings
+
 ##### DELETES #####
 DELETE_ALL_NODES = "MATCH (n) DETACH DELETE n;"
 
@@ -5,25 +7,28 @@ DELETE_NODE_BY_ID = "MATCH (n) WHERE ID(n) = {node_id} DETACH DELETE n"
 
 DELETE_ALL_NODES_BY_LABEL = "MATCH (n:{label}) DETACH DELETE n;"
 
-DELETE_ATTENDING_RELATIONSHIP_BY_NODES_IDS = """
-                                MATCH (p:Person)-[rel:ATTENDING]->(e:Event)
-                                WHERE ID(p) = {person_id} AND ID(e) = {event_id}
-                                DELETE rel;
-                            """
+DELETE_NODE_BY_UUID = r"""
+OPTIONAL MATCH (node {UUID: $params.UUID})
+WITH node, CASE WHEN node IS NOT NULL THEN true ELSE false END as nodeExists
+DETACH DELETE node
+
+RETURN
+    CASE
+        WHEN nodeExists THEN
+            {STATUS: "SUCCESS", MESSAGE: "Node deleted successfully"}
+        ELSE 
+            {STATUS: "ERROR", MESSAGE: "Node not found"}
+    END;
+
+"""
+
 
 ################
 ##### GETS #####
 ################
 
 ##### GET ALL NODES#####
-GET_ALL_NODES = "MATCH (n) RETURN n;"
-
-GET_NODE_BY_ID = "MATCH (n) WHERE ID(n) = {node_id} RETURN n"
-
 GET_ALL_NODES_BY_LABEL = "MATCH (n:{label}) RETURN n;"
-
-##### GET ALL NODE IDS BY LABEL #####
-GET_ALL_NODE_IDS = "MATCH (n) RETURN n.UUID as UUID;"
 
 GET_ALL_NODE_UUIDS_BY_LABEL = "MATCH (n:{label}) RETURN n.UUID AS UUID;"
 
@@ -140,36 +145,36 @@ AUTHENTICATE_ACCOUNT_EMAIL_AND_PASSWORD = """
 #####################################
 ######## GET BY RELATIONSHIP ########
 #####################################
-FETCH_EVENTS_FOR_MAP = """
+FETCH_EVENTS_FOR_MAP = f"""
     MATCH (event:Event)
-    WHERE "{start_timestamp}" <= event.StartTimestamp <= "{end_timestamp}"
+    WHERE $params.{strings.start_timestamp} <= event.StartTimestamp <= $params.{strings.end_timestamp}
     OPTIONAL MATCH (event)-[r:ATTENDING]-()
     WITH event, count(r) as AttendeeCount
     MATCH (eventType:EventType)-[:RELATED_EVENT]->(event)
 
     RETURN
-        event.Address as Address,
+        event.{strings.address} as {strings.address},
         event.CreatedByUUID as CreatedByUUID,
         event.Host as Host,
-        event.Lon as Lon,
-        event.Lat as Lat,
-        event.StartTimestamp as StartTimestamp,
-        event.EndTimestamp as EndTimestamp,
-        event.EventName as EventName,
-        event.UUID as UUID,
+        event.{strings.lon} as {strings.lon},
+        event.{strings.lat} as {strings.lat},
+        event.{strings.start_timestamp} as {strings.start_timestamp},
+        event.{strings.end_timestamp} as {strings.end_timestamp},
+        event.{strings.event_name} as {strings.event_name},
+        event.{strings.uuid} as {strings.uuid},
         event.EventURL as EventURL,
-        event.Price as Price,
+        event.{strings.price} as {strings.price},
         event.FreeEventFlag as FreeEventFlag,
-        event.EventTypeUUID as EventTypeUUID,
+        event.{strings.event_type_uuid} as {strings.event_type_uuid},
         eventType.EventType as EventType,
         eventType.IconURI as EventTypeIconURI,
-        eventType.PinColor as PinColor,
+        eventType.{strings.pin_color} as {strings.pin_color},
         AttendeeCount;
     """
 
 GET_USER_PROFILE = r"""
                 MATCH (account:Account)
-                WHERE toLower(account.Email) = toLower($params.email)
+                WHERE toLower(account.Email) = toLower($params.Email)
                 OPTIONAL MATCH (account)-[:INTERESTED_IN]->(eventType:EventType)
                 WITH account, collect(DISTINCT eventType.UUID) as Interests
                 RETURN
@@ -181,9 +186,9 @@ GET_USER_PROFILE = r"""
                     Interests;
                 """
 
-IS_USERNAME_TAKEN = """
+IS_USERNAME_TAKEN = r"""
                     MATCH (account:Account)
-                    WHERE toLower(account.Username) = toLower('{username}')
+                    WHERE toLower(account.Username) = toLower($params.Username)
                     RETURN COUNT(account) > 0 AS usernameExists;
                     """
 
@@ -205,36 +210,6 @@ GET_ALL_EVENT_INVITED = """
                         RETURN e;
                         """
 
-GET_EVENTS_PERSON_IS_ATTENDING = """
-                                MATCH (p:Person {{Email: "{email}"}})-[:ATTENDING]->(e:Event)
-                                RETURN p, e;
-                                """
-
-GET_PERSON_INTERESTS = """
-                    MATCH (u:Person {{Email: "{email}"}})-[:INTERESTED_IN]->(et:EventType)
-                    RETURN et;
-                    """
-
-GET_RECOMMENDED_EVENTS = """
-                        MATCH (u:Person {{Email: "{email}"}})-[:INTERESTED_IN]->(et:EventType)
-                        WITH u, et
-                        MATCH (et:EventType)-[:RELATED_EVENT]->(e:Event)
-                        WHERE NOT (u)-[:ATTENDING]->(e)
-                        AND (
-                            datetime(e.StartTimestamp) > datetime()
-                                AND
-                            datetime(e.StartTimestamp) <= datetime() + duration({{days: 7}})
-                            )
-                        RETURN e;
-                        """
-
-GET_ATTENDEE_COUNT_FOR_EVENTS_BY_ID = """
-                                        WITH {event_id_list} as event_id_list
-                                        UNWIND event_id_list as event_id
-                                        MATCH (e:Event) WHERE ID(e) = event_id
-                                        OPTIONAL MATCH (u:Person)-[r:ATTENDING]->(e)
-                                        RETURN ID(e) as EventID, COALESCE(count(r), 0) as AttendeeCount;
-                                        """
 
 GET_PENDING_FRIEND_REQUESTS = """
                             MATCH (p:Person)<-[r:FRIEND_REQUEST]-(q:Person)
@@ -257,21 +232,8 @@ GET_PENDING_EVENT_INVITES = """
                             RETURN r AS RELATIONSHIP, NOTIFICATION_TYPE, NOTIFICATION_DETAILS;
                             """
 
-GET_NOTIFICATIONS = """
-                    MATCH (p2:Person)
-                    WHERE
-                        p2.Email = "{email}"
-                    WITH p2
-                    MATCH (p1:Person)-[r:FRIEND_REQUEST]->(p2)
-                    WHERE
-                        r.STATUS = "PENDING"
-                    RETURN type(r) AS NOTIFICATION_TYPE, p1 AS NOTIFICATION_DETAILS          
-                    UNION
-                    MATCH (p2)-[r:INVITED]->(e:Event)
-                    WHERE
-                        r.STATUS = "PENDING"
-                    RETURN type(r) AS NOTIFICATION_TYPE, e AS NOTIFICATION_DETAILS;
-                    """
+
+
 
 #####################
 ###### CREATES ######
@@ -362,16 +324,6 @@ CREATE_ACCOUNT_INTERESTED_IN_RELATIONSHIPS_BY_MANUALLY_ASSIGNED_ID = """
                                                                     CREATE (a)-[:INTERESTED_IN]->(et);
                                                                     """
 
-CREATE_FRIENDSHIP = """
-                    MATCH (a:Person), (b:Person)
-                    WHERE ID(a) = {node_a_id} AND ID(b) = {node_b_id}
-                    WITH a, b, datetime() as dt
-                    CREATE (a)-[abr:FRIENDS_WITH {properties}]->(b)
-                    SET abr.FRIENDS_SINCE = dt
-                    CREATE (b)-[bar:FRIENDS_WITH {properties}]->(a)
-                    SET bar.FRIENDS_SINCE = dt
-                    RETURN abr, bar;
-                    """
 
 CREATE_FRIEND_REQUEST_RELATIONSHIP_IF_NOT_EXISTS = r"""
     MATCH (sender:Person {Username: $params.username_sender})
