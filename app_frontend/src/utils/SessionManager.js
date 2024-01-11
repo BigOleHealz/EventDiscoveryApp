@@ -1,10 +1,8 @@
-// Using localStorage instead of AsyncStorage
-
-export const storeUserSession = async (user, setUserSession) => {
+export const storeUserSession = async (user_session_data, setUserSession) => {
   try {
-    localStorage.setItem('userSession', JSON.stringify(user));
-    setUserSession(user);
-    console.log('User session stored');
+    localStorage.setItem('user_session', JSON.stringify(user_session_data));
+    setUserSession(user_session_data);
+    console.log('User session stored: ', user_session_data);
   } catch (error) {
     console.error('Error storing user session:', error);
   }
@@ -13,20 +11,22 @@ export const storeUserSession = async (user, setUserSession) => {
 // Retrieve user session data
 export const getUserSession = () => {
   try {
-    const userSession = localStorage.getItem('userSession');
-    return userSession ? JSON.parse(userSession) : null;
+    const user_session = localStorage.getItem('user_session');
+    return user_session ? JSON.parse(user_session) : null;
   } catch (error) {
     console.error('Error retrieving user session:', error);
     return null;
   }
 };
+// SessionManager.js
+export const removeUserSession = () => {
 
-// Remove user session data (for logout)
-export const removeUserSession = (setUserSession) => {
-  try {
-    localStorage.removeItem('userSession');
-    setUserSession(null);
-  } catch (error) {
-    console.error('Error removing user session:', error);
+  return () => {
+    try {
+      localStorage.removeItem('user_session');
+      console.log('User session removed');
+    } catch (error) {
+      console.error('Error removing user session:', error);
+    }
   }
 };
