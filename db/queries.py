@@ -1,4 +1,4 @@
-import message_strings as strings
+import db.message_strings as strings
 
 ##### DELETES #####
 DELETE_ALL_NODES = "MATCH (n) DETACH DELETE n;"
@@ -8,19 +8,19 @@ DELETE_NODE_BY_ID = "MATCH (n) WHERE ID(n) = {node_id} DETACH DELETE n"
 DELETE_ALL_NODES_BY_LABEL = "MATCH (n:{label}) DETACH DELETE n;"
 
 DELETE_NODE_BY_UUID = r"""
-OPTIONAL MATCH (node {UUID: $params.UUID})
-WITH node, CASE WHEN node IS NOT NULL THEN true ELSE false END as nodeExists
-DETACH DELETE node
+    OPTIONAL MATCH (node {UUID: $params.UUID})
+    WITH node, CASE WHEN node IS NOT NULL THEN true ELSE false END as nodeExists
+    DETACH DELETE node
 
-RETURN
-    CASE
-        WHEN nodeExists THEN
-            {STATUS: "SUCCESS", MESSAGE: "Node deleted successfully"}
-        ELSE 
-            {STATUS: "ERROR", MESSAGE: "Node not found"}
-    END;
+    RETURN
+        CASE
+            WHEN nodeExists THEN
+                {STATUS: "SUCCESS", MESSAGE: "Node deleted successfully"}
+            ELSE 
+                {STATUS: "ERROR", MESSAGE: "Node not found"}
+        END;
 
-"""
+    """
 
 
 ################

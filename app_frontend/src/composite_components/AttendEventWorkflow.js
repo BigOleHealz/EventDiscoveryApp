@@ -23,13 +23,18 @@ export const AttendEventWorkflow = ({
 
 
   const handleAttendEventButtonClick = () => {
-    setAttendEventCurrentlyActiveData({
-      ...attend_event_currently_active_data,
-      EventUUID: attend_event_currently_active_data.UUID,
-      AttendeeUUID: user_session.UUID,
-      attending_stage: 2
-    })
-    setAttendEventStage(2);
+    if (!user_session) {
+      alert("You must be logged in to attend an event");
+      return;
+    } else {
+      setAttendEventCurrentlyActiveData({
+        ...attend_event_currently_active_data,
+        EventUUID: attend_event_currently_active_data.UUID,
+        AttendeeUUID: user_session.UUID,
+        attending_stage: 2
+      })
+      setAttendEventStage(2);
+    }
   }
 
   const handleInviteFriendsToEventButtonClick = () => {

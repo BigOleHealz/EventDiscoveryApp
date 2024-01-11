@@ -32,7 +32,6 @@ export const EventViewerModal = ({
   onRequestClose,
   ...props
 }) => {
-
   return (
     <ModalComponent
       isVisible={isVisible}
