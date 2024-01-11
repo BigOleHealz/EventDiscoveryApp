@@ -34,7 +34,7 @@ export default function Footer({
               id="button-logout"
               onClick={() => {
                 setUserSession(null)
-                toast.success("Successfully logged out!")
+                // toast.success("Successfully logged out!")
                 removeUserSession()
               }}
               sx={{ my: 2, color: "white", display: "block" }}

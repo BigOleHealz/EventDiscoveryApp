@@ -56,10 +56,10 @@ export const CheckboxTableComponent = ({
                   <Checkbox
                     checked={isSelected(row.id)}
                     onChange={() => handleClick(row.id)}
-                    style={{ color: row.checkboxColor || null }}
+                    style={{ color: row.checkboxColor || null, marginLeft: '10px' }}
                   />
                 </TableCell>
-                <TableCell sx={{paddingLeft: '3px', ...table_styles.label_cell}}>
+                <TableCell sx={table_styles.label_cell}>
                   {row.label}
                 </TableCell>
               </TableRow>

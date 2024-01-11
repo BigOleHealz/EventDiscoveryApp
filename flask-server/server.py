@@ -10,7 +10,7 @@ from flask import Flask, request, jsonify
 from db.db_handler import Neo4jDB
 from db import queries
 from utils.logger import Logger
-import message_strings as strings
+import db.message_strings as strings
 
 api_logger = Logger(log_group_name=f"api")
 neo4j = Neo4jDB(logger=api_logger)
@@ -226,7 +226,7 @@ def create_server():
                 return jsonify({"message": strings.missing_uuid}), 400
             result = neo4j.execute_query_with_params(query=queries.DELETE_NODE_BY_UUID, params=body)
             if len(result) == 0:
-                return jsonify({"message": "Node could not be deleted"}), 400
+                return jsonify({"message": strings.delete_node_not_found}), 400
             else:
                 result = result[0]
                 return jsonify(result), 200

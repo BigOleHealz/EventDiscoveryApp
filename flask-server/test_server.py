@@ -5,7 +5,7 @@ from datetime import timedelta, datetime as dt
 sys.path.append('/app')
 
 from server import create_server
-import message_strings as strings
+import db.message_strings as strings
 from utils import constants
 
 class BaseUnitTest(unittest.TestCase):
@@ -199,14 +199,14 @@ class TestCreatePersonNode(BaseUnitTest):
                                         strings.uuid: create_person_response_data[strings.uuid]
                                     })
         delete_person_response_data = json.loads(delete_person_response.data.decode())
-        self.assetEqual(delete_person_response_data['message'], strings.delete_node_success)
+        self.assertEqual(delete_person_response_data['message'], strings.delete_node_success)
         
         delete_person_second_response = self.client.post('/delete_node',
                                     json={
                                         strings.uuid: create_person_response_data[strings.uuid]
                                     })
         delete_person_second_response_data = json.loads(delete_person_second_response.data.decode())
-        self.assetEqual(delete_person_second_response_data['message'], strings.delete_node_not_found)
+        self.assertEqual(delete_person_second_response_data['message'], strings.delete_node_not_found)
         
 
 if __name__ == '__main__':
