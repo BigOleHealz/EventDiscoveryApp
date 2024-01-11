@@ -7,3 +7,6 @@ botocore
 pandas
 requests
 PyJWT==2.8.0
+pytest
+Flask-Testing
+requests-mock

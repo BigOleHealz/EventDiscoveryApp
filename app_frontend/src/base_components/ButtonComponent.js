@@ -8,7 +8,8 @@ export const ButtonComponent = ({
   onPress,
   style,
   icon,
-  isMenuButton,
+  isMenuButton=false,
+  ...props
 }) => {
   const thisButtonStyle = isMenuButton
     ? button_styles.menu_button_styles
@@ -25,6 +26,7 @@ export const ButtonComponent = ({
     <button
       style={combinedStyle}
       onClick={onPress}  // Notice this change
+      {...props}
     >
       {icon ? (
         <img src={icon} style={button_styles.icon} alt="button-icon"/>

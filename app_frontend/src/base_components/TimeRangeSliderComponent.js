@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import Box from '@mui/material/Box';
+
 import Slider from '@mui/material/Slider';
+
 import { day_end_time } from '../utils/constants';
 import { TextComponent } from './TextComponent';
+import BoxComponent from './BoxComponent';
 import { time_range_slider_styles } from '../styles';
 
 export const TimeRangeSliderComponent = ({ startTime, endTime, setStartTime, setEndTime }) => {
@@ -50,67 +52,26 @@ export const TimeRangeSliderComponent = ({ startTime, endTime, setStartTime, set
     }
   };
 
-  function sliderValueToFormattedTime(value) {
-    if (value === 24) {
-      return '11:59 PM';
-    } else {
-      const hour = value % 12 === 0 ? 12 : value % 12;
-      const period = value < 12 ? 'AM' : 'PM';
-      return `${hour} ${period}`;
-    }
-  };
   const handleSliderChange = (event, newValue) => {
     handleStartTimeChange(newValue[0]);
     handleEndTimeChange(newValue[1]);
   };
 
   return (
-    <div>
-    <Box style={time_range_slider_styles.view}>
+    <BoxComponent style={time_range_slider_styles.container}>
       <Slider
         value={[convertTimeStringToHour(start), convertTimeStringToHour(end)]}
         onChange={handleSliderChange}
         min={0}
         max={24}
         step={1}
-        style={time_range_slider_styles.container_style}
         valueLabelDisplay="auto"
       />
-      <div style={time_range_slider_styles.timeSliderView}>
-        <TextComponent style={time_range_slider_styles.text}>{formatTime(start)}</TextComponent>
-        <TextComponent style={time_range_slider_styles.text}>{formatTime(end)}</TextComponent>
-      </div>
-    </Box>
-    </div>
+      <BoxComponent style={time_range_slider_styles.text_labels}>
+        <TextComponent>{formatTime(start)}</TextComponent>
+        <TextComponent>{formatTime(end)}</TextComponent>
+      </BoxComponent>
+    </BoxComponent>
 		
 	);
 };
-
-	{/* <Slider
-				// min={0}
-				// max={24}
-				// step={1}
-				// fromValueOnChange={handleStartTimeChange}
-				// toValueOnChange={handleEndTimeChange}
-				// lineWidth={3}
-				// thumbRadius={15}
-				// thumbBorderWidth={1}
-				// thumbBorderColor="#ddd"
-				// selectedColor="#2196F3"
-				// unselectedColor="#ddd"
-				// containerStyle={time_range_slider_styles.container_style}
-        // handleLabel={sliderValueToFormattedTime}
-				// handleLabelStyle={time_range_slider_styles.handle_label_style}
-				// handleLabelVisible={false}
-				// labelStyle={time_range_slider_styles.label_style}
-				// labelPrefix="Time: "
-				// labelSuffix=" hrs"
-				// initialFromValue={0}
-				// initialToValue={24}
-        // showRangeLabels={false}
-			/>
-      <div style={time_range_slider_styles.timeSliderView}>
-				<TextComponent style={time_range_slider_styles.text}>{formatTime(start)}</TextComponent>
-				<TextComponent style={time_range_slider_styles.text}>{formatTime(end)}</TextComponent>
-			</div>
-		</div> */}
