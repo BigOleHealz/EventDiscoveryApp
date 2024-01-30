@@ -20,8 +20,8 @@ const MapMarkerWithTooltip = ({
 }) => {
   const [showTooltip, setShowTooltip] = useState(false);
   // const { logger, setLogger } = React.useContext(LoggerContext);
-  
-  
+
+
   const icon = {
     ...iconSvgObject(event.PinColor),
     anchor: new google.maps.Point(11.5, 16)
@@ -70,6 +70,10 @@ const MapMarkerWithTooltip = ({
               <TableRow>
                 <TableCell style={tooltip_styles.label}>Address:</TableCell>
                 <TableCell style={tooltip_styles.value}>{event.Address}</TableCell>
+              </TableRow>
+              <TableRow TableRow style={event_details_display_styles.row}>
+                <TableCell style={event_details_display_styles.label}>Date:</TableCell>
+                <TableCell style={event_details_display_styles.value}>{moment(convertUTCDateToLocalDate(event.StartTimestamp)).format('ddd MMM D, YYYY')}</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell style={tooltip_styles.label}>Time:</TableCell>

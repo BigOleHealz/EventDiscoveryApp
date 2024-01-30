@@ -151,9 +151,10 @@ FETCH_EVENTS_FOR_MAP = f"""
     OPTIONAL MATCH (event)-[r:ATTENDING]-()
     WITH event, count(r) as AttendeeCount
     MATCH (eventType:EventType)-[:RELATED_EVENT]->(event)
-
+    OPTIONAL MATCH (account:Account) WHERE account.UUID = event.CreatedByUUID
     RETURN
         event.{strings.address} as {strings.address},
+        account.Username as CreatedByUsername,
         event.CreatedByUUID as CreatedByUUID,
         event.Host as Host,
         event.{strings.lon} as {strings.lon},
@@ -161,6 +162,8 @@ FETCH_EVENTS_FOR_MAP = f"""
         event.{strings.start_timestamp} as {strings.start_timestamp},
         event.{strings.end_timestamp} as {strings.end_timestamp},
         event.{strings.event_name} as {strings.event_name},
+        event.{strings.event_summary} as {strings.event_summary},
+        event.{strings.event_description} as {strings.event_description},
         event.{strings.uuid} as {strings.uuid},
         event.EventURL as EventURL,
         event.{strings.price} as {strings.price},
@@ -560,3 +563,22 @@ FETCH_UPCOMING_EVENTS_FOR_USER = r"""
         eventType.EventType as EventType;
     """
 
+
+
+# WITH
+#     apoc.create.uuid() as friendship_uuid,
+#     apoc.date.format(apoc.date.currentTimestamp(), "ms", "yyyy-MM-dd'T'HH:mm:ss") AS friends_since
+# MATCH (person1:Person {Username: "yaboi"}), (person2:Person {Username: "gabesmith"})
+
+
+#     MERGE (person1)-[toRecipient:FRIENDS_WITH]->(person2)
+#     ON CREATE SET
+#         toRecipient.UUID = friendship_uuid,
+#         toRecipient.FRIENDS_SINCE = friends_since
+#     MERGE (person2)-[toSender:FRIENDS_WITH]->(person1)
+#     ON CREATE SET
+#         toSender.UUID = friendship_uuid,
+#         toSender.FRIENDS_SINCE = friends_since
+
+
+# RETURN {STATUS: "SUCCESS", MESSAGE: "Response Sent"} as result;

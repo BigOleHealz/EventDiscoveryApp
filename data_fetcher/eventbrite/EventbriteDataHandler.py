@@ -54,23 +54,35 @@ class EventbriteDataHandler(DataRecordHandler):
 
                 soup = BeautifulSoup(html_source, 'lxml')
                 scripts = soup.find_all('script', attrs={'type': self.event_data_script_type})
+                
+                scripts = [script for script in scripts if script.get('url') is not None]
+                
 
-                for i, script in enumerate(scripts):
-                    event_data_raw = json.loads(script.string)
-                    url = event_data_raw['url']
-                    source_event_id = url.split('-')[-1]
-                    
-                    output_file_key = os.path.join(output_key_prefix, source_event_id)
+                if len(scripts) == 0:
+                    self.update_ingestion_attempt(uuid=self.uuid, status="NO_EVENTS_FOUND")
+                else:
+                    for i, script in enumerate(scripts):
+                        event_data_raw = json.loads(script.string)
+                        
+                        try:
+                            url = event_data_raw['url']
+                            source_event_id = url.split('-')[-1]
+                            
+                            output_file_key = os.path.join(output_key_prefix, source_event_id)
 
-                    file_exists_boolean = self.aws_handler.check_if_s3_file_exists(bucket=self.bucket_name, key=output_file_key)
-                    if file_exists_boolean:
-                        self.logger.info(f"File {output_file_key} already exists in S3. Skipping...")
-                        continue
-                    
-                    self.driver.get(url)
-                    html_source = self.driver.page_source
+                            file_exists_boolean = self.aws_handler.check_if_s3_file_exists(bucket=self.bucket_name, key=output_file_key)
+                            if file_exists_boolean:
+                                self.logger.info(f"File {output_file_key} already exists in S3. Skipping...")
+                                continue
+                            
+                            self.driver.get(url)
+                            html_source = self.driver.page_source
 
-                    self.aws_handler.write_to_s3(bucket=self.bucket_name, key=output_file_key, data=html_source)
+                            self.aws_handler.write_to_s3(bucket=self.bucket_name, key=output_file_key, data=html_source)
+                        except Exception as e:
+                            pass
+        
+        
         except Exception as e:
             self.logger.error(msg=f"Error parsing homepages")
             self.logger.error(msg=e)

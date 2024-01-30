@@ -454,6 +454,56 @@ export const tooltip_styles = {
   },
 };
 
+export const event_details_display_styles = {
+  container: {
+    display: 'flex',
+    flexDirection: 'column',
+    borderRadius: '4px',
+    margin: 0,
+  },
+  table: {
+    borderCollapse: 'collapse',
+    width: '100%',
+    borderColor: common_styles.appTheme.backgroundColor
+  },
+  title: {
+    ...common_styles.h1,
+  },
+  body: {
+    backgroundColor: common_styles.appTheme.backgroundColor,
+    borderColor: common_styles.appTheme.backgroundColor
+  },
+  row: {
+    padding: '2px',
+    backgroundColor: common_styles.appTheme.backgroundColor,
+    borderColor: common_styles.appTheme.backgroundColor
+  },
+  label: {
+    whiteSpace: 'nowrap',
+    fontWeight: 600,
+    marginRight: '4px',
+    paddingTop: '2px',
+    paddingBottom: '2px',
+    textAlign: 'right',
+    backgroundColor: common_styles.appTheme.backgroundColor,
+    color: common_styles.appTheme.color,
+    borderColor: common_styles.appTheme.backgroundColor
+  },
+  value: {
+    padding: '2px',
+    backgroundColor: common_styles.appTheme.backgroundColor,
+    color: common_styles.appTheme.color,
+    borderColor: common_styles.appTheme.backgroundColor
+  },
+  buttonStyle: {
+    backgroundColor: '#2196F3',
+  },
+  infoWindowStyle: {
+    padding: 0,
+    margin: 0,
+  },
+};
+
 export const event_invite_styles = {
   container: {
     display: 'flex',

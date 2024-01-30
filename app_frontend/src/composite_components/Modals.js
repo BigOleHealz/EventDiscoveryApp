@@ -15,6 +15,8 @@ import { SelectInterestsScrollView } from './SelectInterestsScrollview';
 import { SwitchComponent } from './SwitchComponent';
 import { EventInvitesTable, EventTypesTable, InviteFriendsToEventTable } from './Tables';
 
+import EventDetailsTable from './EventDetailsTable';
+
 import { day_start_time, day_end_time, day_format } from '../utils/constants';
 import { AttendEventContext, AuthenticationContext, CreateEventContext, CreateUserProfileContext, UserSessionContext } from '../utils/Contexts';
 import { convertUTCDateToLocalDate } from '../utils/HelperFunctions';
@@ -32,6 +34,7 @@ export const EventViewerModal = ({
   onRequestClose,
   ...props
 }) => {
+
   return (
     <ModalComponent
       isVisible={isVisible}
@@ -41,15 +44,21 @@ export const EventViewerModal = ({
       onSubmitButtonClick={handleSubmitButtonClick}
     >
       <BoxComponent style={{ width: '100%', height: '100%' }}>
-        {event ? <iframe
-          src={event.EventURL}
-          title="Event Content"
-          style={{
-            border: 'none',
-            width: '100%',
-            height: '100%'
-          }}
-        /> : <div>Event URL not found.</div>}
+        {event && event.EventURL ? (
+          <iframe
+            srcDoc={modifiedContent}
+            title="Event Content"
+            style={{
+              border: 'none',
+              width: '100%',
+              height: '100%'
+            }}
+          />
+        ) : event ? (
+          <EventDetailsTable event={event} />
+        ) : (
+          <div>Event URL not found.</div>
+        )}
       </BoxComponent>
     </ModalComponent>
   );
