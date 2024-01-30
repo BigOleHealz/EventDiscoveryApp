@@ -196,6 +196,38 @@ export const FriendRequestsModal = ({
   );
 }
 
+export const CreateEventInviteFriendsModal = ({
+  isVisible,
+  handleSubmitButtonClick,
+  onRequestClose,
+  ...props
+}) => {
+  const { create_event_context, setCreateEventContext } = React.useContext(CreateEventContext);
+  const [ friends_invited, setFriendsInvited ] = useState([]);
+
+  const addFriendInvitesToCreateEventContext = () => {
+    setCreateEventContext({
+      ...create_event_context,
+      FriendsInvited: friends_invited
+    })
+    handleSubmitButtonClick();
+  };
+
+  return (
+    <ModalComponent
+      isVisible={isVisible}
+      onRequestClose={onRequestClose}
+      title="Invite Friends to Event"
+      submitButtonText="Send Invites"
+      onSubmitButtonClick={addFriendInvitesToCreateEventContext}
+    >
+      <InviteFriendsToEventTable
+        friends_invited={friends_invited}
+        setFriendsInvited={setFriendsInvited}
+      />
+    </ModalComponent>
+  );
+}
 export const CreateEventDatetimeModal = ({
   isVisible,
   handleSubmitButtonClick,
@@ -343,7 +375,6 @@ export const CreateEventDetailsModal = ({
     }
     setCreateEventContext(new_data);
     handleSubmitButtonClick()
-    resetCreateEventDetails();
   };
 
   const handleEventNameChange = (text) => {

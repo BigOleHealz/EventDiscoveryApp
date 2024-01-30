@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { CreateEventLocationSelector } from './CreateEventLocationSelector';
-import { CreateEventDatetimeModal, CreateEventSelectEventTypeModal, CreateEventDetailsModal } from './Modals';
+import { CreateEventDatetimeModal, CreateEventSelectEventTypeModal, CreateEventDetailsModal, CreateEventInviteFriendsModal } from './Modals';
 
 import { CreateEventContext, LoggerContext, UserSessionContext } from '../utils/Contexts';
 import { useCreateEventNode } from '../utils/Hooks';
@@ -48,6 +48,11 @@ export const CreateEventWorkflow = ({
       />
       <CreateEventDetailsModal
         isVisible={create_event_stage === 4}
+        handleSubmitButtonClick={() => setCreateEventStage(5)}
+        onRequestClose={exitCreateEventMode}
+      />
+      <CreateEventInviteFriendsModal
+        isVisible={create_event_stage === 5}
         handleSubmitButtonClick={handleEventCreation}
         onRequestClose={exitCreateEventMode}
       />

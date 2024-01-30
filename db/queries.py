@@ -286,7 +286,17 @@ CREATE_USER_CREATED_EVENT=r"""
                             MERGE (et)-[:RELATED_EVENT]->(e)
                             WITH e, params
                             OPTIONAL MATCH (a:Account {UUID: params.CreatedByUUID})
-                            MERGE (a)-[:CREATED_EVENT]->(e);
+                            MERGE (a)-[:CREATED_EVENT]->(e)
+                            WITH e, params, apoc.date.format(apoc.date.currentTimestamp(), "ms", "yyyy-MM-dd'T'HH:mm:ss") as response_timestamp
+                            UNWIND params.FriendsInvited as friend_uuid
+                            OPTIONAL MATCH (friend:Person {UUID: friend_uuid})
+                            WITH e, friend, params, response_timestamp
+                            WHERE friend IS NOT NULL
+                            MERGE (friend)-[event_invite:INVITED_TO_EVENT {INVITED_BY_UUID: params.CreatedByUUID}]->(e)
+                            ON CREATE SET
+                                event_invite.UUID = apoc.create.uuid(),
+                                event_invite.INVITED_TIMESTAMP = response_timestamp,
+                                event_invite.STATUS = "PENDING"
                             """
 
 CREATE_EVENT_WITH_RELATIONSHIPS = """MERGE (event:Event {properties})
@@ -426,7 +436,6 @@ ATTEND_EVENT_AND_SEND_INVITES = r"""
             event_invite.STATUS = "PENDING"
     RETURN {STATUS: "SUCCESS", MESSAGE: "Invites Sent"} as result;
     """
-
 
 FETCH_EVENT_INVITES = r"""
     MATCH (invitee:Person {UUID: $params.InviteeUUID})-[invite:INVITED_TO_EVENT {STATUS: "PENDING"}]->(event:Event)

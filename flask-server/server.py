@@ -308,6 +308,7 @@ def create_server():
             event_start_timestamp = body.get('StartTimestamp')
             event_end_timestamp = body.get('EndTimestamp')
             created_by_uuid = body.get('CreatedByUUID')
+            friends_invited = body.get('FriendsInvited')
 
             if not event_type_uuid:
                 return jsonify({"STATUS": "ERROR", "MESSAGE": "Missing event_type_uuid"}), 400
@@ -321,6 +322,8 @@ def create_server():
                 return jsonify({"STATUS": "ERROR", "MESSAGE": "Missing event_end_timestamp"}), 400
             elif not created_by_uuid:
                 return jsonify({"STATUS": "ERROR", "MESSAGE": "Missing created_by_uuid"}), 400
+            elif not friends_invited:
+                return jsonify({"STATUS": "ERROR", "MESSAGE": "Missing friends_invited"}), 400
 
             event_data = body
             uuid = str(uuid4())

@@ -44,7 +44,6 @@ export default function Navbar({
     } else {
       setIsLeftPanelVisible(false);
     }
-    console.log('handleFindEventsButtonClick: is_left_panel_visible = ', is_left_panel_visible);
   };
 
   const handleEventInvitesButtonClick = () => {
@@ -54,7 +53,6 @@ export default function Navbar({
     } else {
       setIsEventInvitesModalVisible(false);
     }
-    console.log('handleEventInvitesButtonClick: is_event_invites_modal_visible = ', is_event_invites_modal_visible);
   };
 
   const handleFriendRequestsButtonClick = () => {
@@ -64,7 +62,6 @@ export default function Navbar({
     } else {
       setIsFriendRequestsModalVisible(false);
     }
-    console.log('handleFriendRequestsButtonClick: is_friend_requests_modal_visible = ', is_friend_requests_modal_visible);
   };
 
   const handleCreateEventButtonClick = () => {

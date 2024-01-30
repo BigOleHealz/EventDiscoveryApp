@@ -82,7 +82,6 @@ export const useFetchPendingEventInvites = (recipient, fetching_pending_event_in
         body: JSON.stringify({ InviteeUUID: recipient.UUID }),
       }).then(res => res.json())
         .then(data => {
-          console.log("useFetchPendingEventInvites data:", data);
           if (data) {
             setPendingEventInvites(data);
           } else {
