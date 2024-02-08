@@ -1,5 +1,5 @@
 {
-  "name": "my-app",
+  "name": "frontend",
   "version": "0.1.0",
   "proxy": "https://still-retreat-74647-ffbb5da2e206.herokuapp.com/",
   "private": true,
