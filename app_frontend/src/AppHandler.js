@@ -6,16 +6,16 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 import 'react-toastify/dist/ReactToastify.css';
 
 import { HomePage } from './container_components/HomePage';
-import {
-  AttendEventProvider,
-  CreateEventProvider,
-  GoogleMapsApiKeyContext,
-  AuthenticationContext,
-  // LoggerContext,
-  UserSessionContext,
-} from './utils/Contexts';
-import { useFetchGoogleMapsApiKey, useSetGoogleClientId } from './utils/Hooks';
-import { getUserSession } from './utils/SessionManager';
+// import {
+//   AttendEventProvider,
+//   CreateEventProvider,
+//   GoogleMapsApiKeyContext,
+//   AuthenticationContext,
+//   // LoggerContext,
+//   UserSessionContext,
+// } from './utils/Contexts';
+// import { useFetchGoogleMapsApiKey, useSetGoogleClientId } from './utils/Hooks';
+// import { getUserSession } from './utils/SessionManager';
 
 export function AppHandler() {
   const [user_session, setUserSession] = useState(null);
@@ -32,30 +32,30 @@ export function AppHandler() {
   const navigate = useNavigate();
 
 
-  useEffect(() => {
-    (async () => {
-      const session = await getUserSession();
-      console.log(session)
-      setUserSession(session);
-    })();
-  }, []);
+  // useEffect(() => {
+  //   (async () => {
+  //     const session = await getUserSession();
+  //     console.log(session)
+  //     setUserSession(session);
+  //   })();
+  // }, []);
 
-  useEffect(() => {
-    navigate('/');
-  }, [user_session]);
+  // useEffect(() => {
+  //   navigate('/');
+  // }, [user_session]);
 
-  useEffect(() => {
-    if (google_client_id === false) {
-      setFetchingGoogleClientId(true);
-    }
-  }, [google_client_id]);
+  // useEffect(() => {
+  //   if (google_client_id === false) {
+  //     setFetchingGoogleClientId(true);
+  //   }
+  // }, [google_client_id]);
 
-  useFetchGoogleMapsApiKey(fetching_google_maps_api_key, setGoogleMapsApiKey, setFetchingGoogleMapsApiKey);
-  useSetGoogleClientId(fetching_google_client_id, setFetchingGoogleClientId, setGoogleClientId);
+  // useFetchGoogleMapsApiKey(fetching_google_maps_api_key, setGoogleMapsApiKey, setFetchingGoogleMapsApiKey);
+  // useSetGoogleClientId(fetching_google_client_id, setFetchingGoogleClientId, setGoogleClientId);
 
   return (
     <>
-      {google_maps_api_key && <LoadScript
+      {/* {google_maps_api_key && <LoadScript
         id="script-loader"
         googleMapsApiKey={google_maps_api_key}
         language="en"
@@ -67,9 +67,9 @@ export function AppHandler() {
               <UserSessionContext.Provider value={{ user_session, setUserSession }}>
                 <AttendEventProvider>
                   <CreateEventProvider>
-                    <Routes>
+                    <Routes> */}
                       <Route path="/" element={<HomePage />} />
-                    </Routes>
+                    {/* </Routes>
                   </CreateEventProvider>
                 </AttendEventProvider>
               </UserSessionContext.Provider>
@@ -77,7 +77,7 @@ export function AppHandler() {
           </GoogleMapsApiKeyContext.Provider>
         </GoogleOAuthProvider>
       </LoadScript>
-      }
+      } */}
     </>
   );
 };
