@@ -13,7 +13,8 @@ import backend.db.message_strings as strings
 load_dotenv()
 
 app = Flask(__name__, static_folder='../frontend/build', static_url_path='')
-CORS(app)
+CORS(app, resources={r"/api/*": {"origins": "https://still-retreat-74647-ffbb5da2e206.herokuapp.com/"}})
+
 
 @app.route('/api/get_secret', methods=['POST'])
 @cross_origin()
