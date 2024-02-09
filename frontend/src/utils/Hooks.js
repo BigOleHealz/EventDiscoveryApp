@@ -413,13 +413,13 @@ export const useFetchGoogleMapsApiKey = (
 ) => {
   useEffect(() => {
     if (fetching_google_maps_api_key) {
-      fetch('/api/get_aws_secret', {
+      fetch('/api/get_secret', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          secret_id: 'google_maps_api_key',
+          secret_id: 'GOOGLE_MAPS_API_KEY',
         }),
       }).then(res => res.json())
         .then(data => {

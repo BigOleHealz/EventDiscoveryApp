@@ -1,0 +1,7 @@
+@import url('common.css');
+
+.view {
+  /* color: var(--default-font-color);
+  padding: var(--default-padding); */
+  align-items: center;
+}
