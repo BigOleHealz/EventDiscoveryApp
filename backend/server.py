@@ -28,17 +28,11 @@ def get_secret():
         print("secret_id: ", secret_id)
         if not secret_id:
             return jsonify({"message": "No secret_id provided"}), 400
-        if secret_id not in ["GOOGLE_MAPS_API_KEY", "google_oauth_credentials"]:
+        if secret_id not in ["GOOGLE_MAPS_API_KEY", "GOOGLE_OAUTH_CREDENTIALS"]:
             return jsonify({"message": "Invalid secret_id provided. None of your business. Get off of my website scammer."}), 400
-        # client = boto3.client('secretsmanager', region_name='us-east-1')
-        # response = client.get_secret_value(SecretId=secret_id)
-        # secret_string = response['SecretString']
         secret_string = os.getenv(secret_id)
         
         return jsonify({secret_id: secret_string}), 200
-        # secret_dict = json.loads(secret_string)
-
-        # return jsonify(secret_dict), 200
     except Exception as e:
         # api_logger.error(f"An error occurred: {traceback.format_exc()}")
         return {"message": f"An error occurred: {traceback.format_exc()}"}, 500
