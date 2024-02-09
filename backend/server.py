@@ -20,7 +20,7 @@ import db.message_strings as strings
 load_dotenv()
 
 
-api_logger = Logger(log_group_name=f"api")
+api_logger = Logger(name=f"api")
 neo4j = Neo4jDB(logger=api_logger)
 
 app = Flask(__name__, static_folder='../frontend/build', static_url_path='')

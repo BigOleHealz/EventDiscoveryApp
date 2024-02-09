@@ -14,7 +14,7 @@ from utils.logger import Logger
 class MetadataHandler(abc.ABC):
     def __init__(self, aws_handler: AWSHandler=None, logger: Logger=None):
         if logger is None:
-            logger = Logger(log_group_name=f"metadata_handler")
+            logger = Logger(name=f"metadata_handler")
         self.logger = logger
         if aws_handler is None:
             aws_handler = AWSHandler(logger=self.logger)
