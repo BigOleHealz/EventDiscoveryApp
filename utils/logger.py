@@ -17,15 +17,15 @@ class Logger(logging.Logger):
 
         # try:
         try:
-            self.cloudwatch_logs.describe_log_groups(logGroupNamePrefix=self.log_group_name)
-        except self.cloudwatch_logs.exceptions.ResourceNotFoundException:
+        #     self.cloudwatch_logs.describe_log_groups(logGroupNamePrefix=self.log_group_name)
+        # except self.cloudwatch_logs.exceptions.ResourceNotFoundException:
             self.cloudwatch_logs.create_log_group(logGroupName=self.log_group_name)
-        # except ClientError as e:
-        #     if e.response['Error']['Code'] == 'ResourceAlreadyExistsException':
-        #         print(f'Log Group already exists: {self.log_group_name}\nError{e}')
-        #     else:
-        #         print(f'Error creating log group: {e}')
-        #         raise Exception(f'Traceback: {traceback.format_exc()}')
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'ResourceAlreadyExistsException':
+                print(f'Log Group already exists: {self.log_group_name}\nError{e}')
+            else:
+                print(f'Error creating log group: {e}')
+                raise Exception(f'Traceback: {traceback.format_exc()}')
 
         try:
             self.cloudwatch_logs.create_log_stream(logGroupName=self.log_group_name, logStreamName=self.log_stream_name)

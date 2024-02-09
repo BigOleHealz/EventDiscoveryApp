@@ -26,11 +26,11 @@ export function HomePage() {
 
   const [event_types_selected, setEventTypesSelected] = useState([]);
 
-  useEffect(() => {
-    if (user_session && user_session.Interests) {
-      setEventTypesSelected(user_session.Interests);
-    }
-  }, [user_session]);
+  // useEffect(() => {
+  //   if (user_session && user_session.Interests) {
+  //     setEventTypesSelected(user_session.Interests);
+  //   }
+  // }, [user_session]);
 
   // const [is_fetching_events, setIsFetchingEvents] = useState(true);
   // const [map_events_full_day, setMapEventsFullDay] = useState([]);
