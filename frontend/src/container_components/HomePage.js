@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { format } from 'date-fns';
 
-import Layout from './Layout';
+// import Layout from './Layout';
 import { day_start_time, day_end_time, day_format } from '../utils/constants';
 import { AttendEventContext, CreateEventContext, UserSessionContext } from '../utils/Contexts';
 import { convertUTCDateToLocalDate } from '../utils/HelperFunctions';
@@ -84,7 +84,7 @@ export function HomePage() {
 
   return (
     <div>
-      <h1>Test2 Home Page</h1>
+      <h1>Test2fasefa Home Page</h1>
     </div>
     // <Layout
     //   //Navbar props
