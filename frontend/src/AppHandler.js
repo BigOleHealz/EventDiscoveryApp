@@ -18,7 +18,6 @@ import {
   // LoggerContext,
   UserSessionContext,
 } from './utils/Contexts';
-// import { useFetchGoogleMapsApiKey, useSetGoogleClientId } from './utils/Hooks';
 
 import { useFetchGoogleMapsApiKey, useSetGoogleClientId } from './utils/Hooks';
 
@@ -39,7 +38,7 @@ export default function AppHandler() {
   const navigate = useNavigate();
 
   useFetchGoogleMapsApiKey(fetching_google_maps_api_key, setGoogleMapsApiKey, setFetchingGoogleMapsApiKey);
-  // useSetGoogleClientId(fetching_google_client_id, setFetchingGoogleClientId, setGoogleClientId);
+  useSetGoogleClientId(fetching_google_client_id, setFetchingGoogleClientId, setGoogleClientId);
 
 
   return (
@@ -51,9 +50,9 @@ export default function AppHandler() {
       >
         <ToastContainer />
         <GoogleOAuthProvider clientId={google_client_id}>
-          {/* <GoogleMapsApiKeyContext.Provider value={google_maps_api_key}> */}
-            {/* <AuthenticationContext.Provider value={{ authentication_context, setAuthenticationContext }}> */}
-              {/* <UserSessionContext.Provider value={{ user_session, setUserSession }}> */}
+          <GoogleMapsApiKeyContext.Provider value={google_maps_api_key}>
+            <AuthenticationContext.Provider value={{ authentication_context, setAuthenticationContext }}>
+              <UserSessionContext.Provider value={{ user_session, setUserSession }}>
                 {/* <AttendEventProvider> */}
                   {/* <CreateEventProvider> */}
                     <Routes>
@@ -61,9 +60,9 @@ export default function AppHandler() {
                     </Routes>
                   {/* </CreateEventProvider> */}
                 {/* </AttendEventProvider> */}
-              {/* </UserSessionContext.Provider> */}
-            {/* </AuthenticationContext.Provider> */}
-          {/* </GoogleMapsApiKeyContext.Provider> */}
+              </UserSessionContext.Provider>
+            </AuthenticationContext.Provider>
+          </GoogleMapsApiKeyContext.Provider>
         </GoogleOAuthProvider>
       </LoadScript>
       }
