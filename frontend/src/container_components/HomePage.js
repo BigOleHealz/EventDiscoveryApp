@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { format } from 'date-fns';
 
-// import Layout from './Layout';
+import Layout from './Layout';
 import { day_start_time, day_end_time, day_format } from '../utils/constants';
 import { AttendEventContext, CreateEventContext, UserSessionContext } from '../utils/Contexts';
 import { convertUTCDateToLocalDate } from '../utils/HelperFunctions';
@@ -13,7 +13,7 @@ export function HomePage() {
   // const { logger, setLogger } = React.useContext(LoggerContext);
   // const { attend_event_context, setAttendEventContext } = React.useContext(AttendEventContext);
   // const { create_event_context, setCreateEventContext } = React.useContext(CreateEventContext);
-  // const { user_session, setUserSession } = React.useContext(UserSessionContext);
+  const { user_session, setUserSession } = React.useContext(UserSessionContext);
 
   const [is_create_user_profile_manager_active, setIsCreateUserProfileManagerActive] = useState(false);
 
@@ -26,11 +26,11 @@ export function HomePage() {
 
   const [event_types_selected, setEventTypesSelected] = useState([]);
 
-  // useEffect(() => {
-  //   if (user_session && user_session.Interests) {
-  //     setEventTypesSelected(user_session.Interests);
-  //   }
-  // }, [user_session]);
+  useEffect(() => {
+    if (user_session && user_session.Interests) {
+      setEventTypesSelected(user_session.Interests);
+    }
+  }, [user_session]);
 
   // const [is_fetching_events, setIsFetchingEvents] = useState(true);
   // const [map_events_full_day, setMapEventsFullDay] = useState([]);
@@ -83,56 +83,56 @@ export function HomePage() {
   // };
 
   return (
-    <div>
-      <h1>Test2fasefa Home Page</h1>
-    </div>
-    // <Layout
-    //   //Navbar props
-    //   resetAllStates={resetAllStates}
-    //   is_create_user_profile_manager_active={is_create_user_profile_manager_active}
-    //   setIsCreateUserProfileManagerActive={setIsCreateUserProfileManagerActive}
+    // <div>
+    //   <h1>Test2fasefa Home Page</h1>
+    // </div>
+    <Layout
+      //Navbar props
+      // resetAllStates={resetAllStates}
+      // is_create_user_profile_manager_active={is_create_user_profile_manager_active}
+      // setIsCreateUserProfileManagerActive={setIsCreateUserProfileManagerActive}
 
-    //   // Find Events props
-    //   is_left_panel_visible={is_left_panel_visible}
-    //   setIsLeftPanelVisible={setIsLeftPanelVisible}
+      // // Find Events props
+      // is_left_panel_visible={is_left_panel_visible}
+      // setIsLeftPanelVisible={setIsLeftPanelVisible}
 
-    //   // Event Invites props
-    //   is_event_invites_modal_visible={is_event_invites_modal_visible}
-    //   setIsEventInvitesModalVisible={setIsEventInvitesModalVisible}
+      // // Event Invites props
+      // is_event_invites_modal_visible={is_event_invites_modal_visible}
+      // setIsEventInvitesModalVisible={setIsEventInvitesModalVisible}
 
-    //   // Friend Requests props
-    //   is_friend_requests_modal_visible={is_friend_requests_modal_visible}
-    //   setIsFriendRequestsModalVisible={setIsFriendRequestsModalVisible}
+      // // Friend Requests props
+      // is_friend_requests_modal_visible={is_friend_requests_modal_visible}
+      // setIsFriendRequestsModalVisible={setIsFriendRequestsModalVisible}
 
-    //   // CreateEvent props
-    //   create_event_stage={create_event_stage}
-    //   setCreateEventStage={setCreateEventStage}
-    //   initializeCreateEventMode={initializeCreateEventMode}
-    //   exitCreateEventMode={exitCreateEventMode}
-    //   is_fetching_events={is_fetching_events}
-    //   setIsFetchingEvents={setIsFetchingEvents}
+      // // CreateEvent props
+      // create_event_stage={create_event_stage}
+      // setCreateEventStage={setCreateEventStage}
+      // initializeCreateEventMode={initializeCreateEventMode}
+      // exitCreateEventMode={exitCreateEventMode}
+      // is_fetching_events={is_fetching_events}
+      // setIsFetchingEvents={setIsFetchingEvents}
 
-    //   // Map props
-    //   mapRef={mapRef}
-    //   map_events_filtered={map_events_filtered}
+      // // Map props
+      // mapRef={mapRef}
+      // map_events_filtered={map_events_filtered}
 
-    //   // LeftSidePanel props
-    //   find_event_selected_date={find_event_selected_date}
-    //   setFindEventSelectedDate={setFindEventSelectedDate}
-    //   find_event_start_time={find_event_start_time}
-    //   setFindEventStartTime={setFindEventStartTime}
-    //   find_event_end_time={find_event_end_time}
-    //   setFindEventEndTime={setFindEventEndTime}
-    //   event_types_selected={event_types_selected}
-    //   setEventTypesSelected={setEventTypesSelected}
+      // // LeftSidePanel props
+      // find_event_selected_date={find_event_selected_date}
+      // setFindEventSelectedDate={setFindEventSelectedDate}
+      // find_event_start_time={find_event_start_time}
+      // setFindEventStartTime={setFindEventStartTime}
+      // find_event_end_time={find_event_end_time}
+      // setFindEventEndTime={setFindEventEndTime}
+      // event_types_selected={event_types_selected}
+      // setEventTypesSelected={setEventTypesSelected}
 
-    //   // AttendEvent props
-    //   attend_event_stage={attend_event_stage}
-    //   setAttendEventStage={setAttendEventStage}
-    //   attend_event_currently_active_data={attend_event_currently_active_data}
-    //   setAttendEventCurrentlyActiveData={setAttendEventCurrentlyActiveData}
-    //   initializeAttendEventMode={initializeAttendEventMode}
-    //   exitAttendEventMode={exitAttendEventMode}
-    // />
+      // // AttendEvent props
+      // attend_event_stage={attend_event_stage}
+      // setAttendEventStage={setAttendEventStage}
+      // attend_event_currently_active_data={attend_event_currently_active_data}
+      // setAttendEventCurrentlyActiveData={setAttendEventCurrentlyActiveData}
+      // initializeAttendEventMode={initializeAttendEventMode}
+      // exitAttendEventMode={exitAttendEventMode}
+    />
   );
 };
