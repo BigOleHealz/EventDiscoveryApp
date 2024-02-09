@@ -1,32 +1,22 @@
-import logo from './logo.svg';
-import './App.css';
-import { useState, useEffect } from 'react';
-import { useFetchGoogleMapsApiKey } from './utils/Hooks';
+import { BrowserRouter as Router } from 'react-router-dom';
 
-function App() {
-
-  const [state, setState] = useState({});
+import { AppHandler } from './AppHandler';
+import ErrorBoundary from './utils/ErrorBoundary';
+import './styles/globals.css';
 
 
-  const [fetching_google_maps_api_key, setFetchingGoogleMapsApiKey] = useState(true);
-  const [google_maps_api_key, setGoogleMapsApiKey] = useState(null);
-
-  useFetchGoogleMapsApiKey(fetching_google_maps_api_key, setGoogleMapsApiKey, setFetchingGoogleMapsApiKey);
-
-
+function MainComponent() {
   return (
-    <div className="App">
-      {google_maps_api_key ? (
-        <div>
-          {google_maps_api_key}
-        </div>) : (
-        <div>
-          Loading...
-        </div>
-      )
-      }
-    </div>
+    <Router>
+      <AppHandler />
+    </Router>
   );
 }
 
-export default App;
+export default function App() {
+  return (
+    <ErrorBoundary>
+      <MainComponent />
+    </ErrorBoundary>
+  );
+}
