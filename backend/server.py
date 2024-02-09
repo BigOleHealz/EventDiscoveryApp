@@ -48,27 +48,27 @@ def get_secret():
         # api_logger.error(f"An error occurred: {traceback.format_exc()}")
         return {"message": f"An error occurred: {traceback.format_exc()}"}, 500
 
-@app.route("/get_user_profile", methods=["POST"])
-def get_user_profile():
-    try:
-        body = request.get_json()
-        if not body:
-            return jsonify({"message": strings.no_input_body_provided}), 400
-        email = body.get(strings.email)
+# @app.route("/get_user_profile", methods=["POST"])
+# def get_user_profile():
+#     try:
+#         body = request.get_json()
+#         if not body:
+#             return jsonify({"message": strings.no_input_body_provided}), 400
+#         email = body.get(strings.email)
 
-        if not email:
-            return jsonify({"message": strings.missing_email}), 400
-        result = neo4j.execute_query_with_params(query=queries.GET_USER_PROFILE, params=body)
+#         if not email:
+#             return jsonify({"message": strings.missing_email}), 400
+#         result = neo4j.execute_query_with_params(query=queries.GET_USER_PROFILE, params=body)
         
-        if len(result) == 0:
-            return jsonify([]), 200
-        elif len(result) > 1:
-            return jsonify({"message": "More than one user found with email: " + email}), 200
-        else:
-            return jsonify(result[0]), 200
+#         if len(result) == 0:
+#             return jsonify([]), 200
+#         elif len(result) > 1:
+#             return jsonify({"message": "More than one user found with email: " + email}), 200
+#         else:
+#             return jsonify(result[0]), 200
 
-    except Exception as e:
-        return jsonify({"message": "An error occurred: " + str(e)}), 500
+#     except Exception as e:
+#         return jsonify({"message": "An error occurred: " + str(e)}), 500
         
 @app.route('/')
 @cross_origin()

@@ -1,8 +1,9 @@
-import os, traceback, sys
+import os, traceback, sys, json
 from uuid import uuid4
 from datetime import datetime
 from typing import Mapping, Union
 
+from dotenv import load_dotenv
 from py2neo import Graph, Node, Relationship
 from db import queries
 from utils.constants import datetime_format
@@ -10,13 +11,17 @@ from utils.logger import Logger
 from utils.aws_handler import AWSHandler
 from utils.helper_functions import hash_password
 
+load_dotenv()
+
+
 class Neo4jDB:
     def __init__(self, logger: Logger):
         self.logger = logger
         
         # Connection string for the Neo4j database
         aws_handler = AWSHandler(logger=self.logger)
-        neo4j_secrets = aws_handler.get_secret('neo4j_credentials')
+        # neo4j_secrets = aws_handler.get_secret('NEO4J_CREDENTIALS')
+        neo4j_secrets = json.loads(os.getenv('NEO4J_CREDENTIALS'))
         
         self.graph = Graph(neo4j_secrets['CONNECTION_STRING'],
                            auth=(neo4j_secrets['USER'],
