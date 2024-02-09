@@ -1,0 +1,9 @@
+/* variables.css */
+:root {
+  --default-background-color: #333333;
+  --default-font-color: #ffffff;
+  --default-padding: 10px;
+  --default-margin: 10px;
+  --default-border-radius: 8px;
+  --bright-blue-color: #2196F3;
+}

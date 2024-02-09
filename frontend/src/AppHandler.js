@@ -9,17 +9,37 @@ import { LoadScript } from '@react-google-maps/api';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import 'react-toastify/dist/ReactToastify.css';
 
-import { useFetchGoogleMapsApiKey } from './utils/Hooks';
+import { HomePage } from './container_components/HomePage';
+import {
+  AttendEventProvider,
+  CreateEventProvider,
+  GoogleMapsApiKeyContext,
+  AuthenticationContext,
+  // LoggerContext,
+  UserSessionContext,
+} from './utils/Contexts';
+// import { useFetchGoogleMapsApiKey, useSetGoogleClientId } from './utils/Hooks';
 
-function App() {
+import { useFetchGoogleMapsApiKey, useSetGoogleClientId } from './utils/Hooks';
 
-  const [state, setState] = useState({});
+export default function AppHandler() {
 
+  const [user_session, setUserSession] = useState(null);
+  const [logger, setLogger] = useState(null);
+  const [authentication_context, setAuthenticationContext] = useState({});
+
+  const [create_user_profile_context, setCreateUserProfileContext] = useState(null);
 
   const [fetching_google_maps_api_key, setFetchingGoogleMapsApiKey] = useState(true);
   const [google_maps_api_key, setGoogleMapsApiKey] = useState(null);
 
+
+  const [fetching_google_client_id, setFetchingGoogleClientId] = useState(false);
+  const [google_client_id, setGoogleClientId] = useState(false);
+  const navigate = useNavigate();
+
   useFetchGoogleMapsApiKey(fetching_google_maps_api_key, setGoogleMapsApiKey, setFetchingGoogleMapsApiKey);
+  useSetGoogleClientId(fetching_google_client_id, setFetchingGoogleClientId, setGoogleClientId);
 
 
   return (
@@ -31,24 +51,22 @@ function App() {
       >
         <ToastContainer />
         <GoogleOAuthProvider clientId={google_client_id}>
-          {/* <GoogleMapsApiKeyContext.Provider value={google_maps_api_key}>
+          <GoogleMapsApiKeyContext.Provider value={google_maps_api_key}>
             <AuthenticationContext.Provider value={{ authentication_context, setAuthenticationContext }}>
               <UserSessionContext.Provider value={{ user_session, setUserSession }}>
-                <AttendEventProvider>
-                  <CreateEventProvider> */}
+                {/* <AttendEventProvider> */}
+                  {/* <CreateEventProvider> */}
                     <Routes>
                       <Route path="/" element={<HomePage />} />
                     </Routes>
-                  {/* </CreateEventProvider>
-                </AttendEventProvider>
+                  {/* </CreateEventProvider> */}
+                {/* </AttendEventProvider> */}
               </UserSessionContext.Provider>
             </AuthenticationContext.Provider>
-          </GoogleMapsApiKeyContext.Provider> */}
+          </GoogleMapsApiKeyContext.Provider>
         </GoogleOAuthProvider>
       </LoadScript>
       }
     </>
   );
 }
-
-export default App;
