@@ -3,7 +3,7 @@ import Box from "@mui/material/Box";
 import { ToastContainer } from "react-toastify";
 
 import { CreateEventWorkflow } from '../composite_components/CreateEventWorkflow';
-// import { AttendEventWorkflow } from '../composite_components/AttendEventWorkflow';
+import { AttendEventWorkflow } from '../composite_components/AttendEventWorkflow';
 import {
   EventInvitesModal,
   FriendRequestsModal
@@ -46,7 +46,7 @@ export default function ContentContainer({
           {...props}
         />
         <CreateEventWorkflow {...props} />
-        {/* <AttendEventWorkflow {...props} /> */}
+        <AttendEventWorkflow {...props} />
       </Box>
     </>
   )
