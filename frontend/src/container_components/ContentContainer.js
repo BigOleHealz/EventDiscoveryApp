@@ -5,7 +5,7 @@ import { ToastContainer } from "react-toastify";
 // import { CreateEventWorkflow } from '../composite_components/CreateEventWorkflow';
 // import { AttendEventWorkflow } from '../composite_components/AttendEventWorkflow';
 // import { EventInvitesModal, FriendRequestsModal } from '../composite_components/Modals';
-// import LeftSidePanel from '../composite_components/LeftSidePanel';
+import LeftSidePanel from '../composite_components/LeftSidePanel';
 import Map from '../composite_components/Map';
 
 export default function ContentContainer({
@@ -30,7 +30,7 @@ export default function ContentContainer({
           justifyContent: 'center',
           alignItems: 'center'
         }}>
-        {/* <LeftSidePanel {...props} /> */}
+        <LeftSidePanel {...props} />
         <Map {...props} />
         {/* <EventInvitesModal
           isVisible={is_event_invites_modal_visible}

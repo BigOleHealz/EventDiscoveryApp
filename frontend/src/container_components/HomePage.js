@@ -7,7 +7,7 @@ import Layout from './Layout';
 import { day_start_time, day_end_time, day_format } from '../utils/constants';
 import { AttendEventContext, CreateEventContext, UserSessionContext } from '../utils/Contexts';
 import { convertUTCDateToLocalDate } from '../utils/HelperFunctions';
-// import { useFetchEvents, useFilterEvents } from '../utils/Hooks';
+import { useFetchEvents, useFilterEvents } from '../utils/Hooks';
 
 export function HomePage() {
   const mapRef = useRef();
@@ -22,31 +22,31 @@ export function HomePage() {
   const [find_event_start_time, setFindEventStartTime] = useState(day_start_time);
   const [find_event_end_time, setFindEventEndTime] = useState(day_end_time);
   const [find_event_selected_date, setFindEventSelectedDate] = useState(format(currentDateTime, day_format));
-  // const start_timestamp = convertUTCDateToLocalDate(new Date(`${find_event_selected_date}T${day_start_time}`));
-  // const end_timestamp = convertUTCDateToLocalDate(new Date(`${find_event_selected_date}T${day_end_time}`));
+  const start_timestamp = convertUTCDateToLocalDate(new Date(`${find_event_selected_date}T${day_start_time}`));
+  const end_timestamp = convertUTCDateToLocalDate(new Date(`${find_event_selected_date}T${day_end_time}`));
 
   const [event_types_selected, setEventTypesSelected] = useState([]);
 
   console.log("ContentContainer.js")
 
-  // useEffect(() => {
-  //   if (user_session && user_session.Interests) {
-  //     setEventTypesSelected(user_session.Interests);
-  //   }
-  // }, [user_session]);
+  useEffect(() => {
+    if (user_session && user_session.Interests) {
+      setEventTypesSelected(user_session.Interests);
+    }
+  }, [user_session]);
 
   const [is_fetching_events, setIsFetchingEvents] = useState(true);
   const [map_events_full_day, setMapEventsFullDay] = useState([]);
   const [map_events_filtered, setMapEventsFiltered] = useState([]);
 
-  // useEffect(() => {
-  //   setIsFetchingEvents(true);
-  // }, [find_event_selected_date]);
+  useEffect(() => {
+    setIsFetchingEvents(true);
+  }, [find_event_selected_date]);
 
   const [create_event_stage, setCreateEventStage] = useState(0);
 
-  // useFetchEvents(is_fetching_events, start_timestamp, end_timestamp, setMapEventsFullDay, setIsFetchingEvents);
-  // useFilterEvents(find_event_selected_date, find_event_start_time, find_event_end_time, map_events_full_day, event_types_selected, setMapEventsFiltered);
+  useFetchEvents(is_fetching_events, start_timestamp, end_timestamp, setMapEventsFullDay, setIsFetchingEvents);
+  useFilterEvents(find_event_selected_date, find_event_start_time, find_event_end_time, map_events_full_day, event_types_selected, setMapEventsFiltered);
 
   // Handle left side panel
   const [is_left_panel_visible, setIsLeftPanelVisible] = useState(false);
@@ -92,9 +92,9 @@ export function HomePage() {
       is_create_user_profile_manager_active={is_create_user_profile_manager_active}
       setIsCreateUserProfileManagerActive={setIsCreateUserProfileManagerActive}
 
-    //   // // Find Events props
-    //   // is_left_panel_visible={is_left_panel_visible}
-    //   // setIsLeftPanelVisible={setIsLeftPanelVisible}
+      // Find Events props
+      is_left_panel_visible={is_left_panel_visible}
+      setIsLeftPanelVisible={setIsLeftPanelVisible}
 
     //   // // Event Invites props
     //   // is_event_invites_modal_visible={is_event_invites_modal_visible}
@@ -116,15 +116,15 @@ export function HomePage() {
       mapRef={mapRef}
       map_events_filtered={map_events_filtered}
 
-    //   // // LeftSidePanel props
-    //   // find_event_selected_date={find_event_selected_date}
-    //   // setFindEventSelectedDate={setFindEventSelectedDate}
-    //   // find_event_start_time={find_event_start_time}
-    //   // setFindEventStartTime={setFindEventStartTime}
-    //   // find_event_end_time={find_event_end_time}
-    //   // setFindEventEndTime={setFindEventEndTime}
-    //   // event_types_selected={event_types_selected}
-    //   // setEventTypesSelected={setEventTypesSelected}
+      // LeftSidePanel props
+      find_event_selected_date={find_event_selected_date}
+      setFindEventSelectedDate={setFindEventSelectedDate}
+      find_event_start_time={find_event_start_time}
+      setFindEventStartTime={setFindEventStartTime}
+      find_event_end_time={find_event_end_time}
+      setFindEventEndTime={setFindEventEndTime}
+      event_types_selected={event_types_selected}
+      setEventTypesSelected={setEventTypesSelected}
 
     //   // // AttendEvent props
     //   // attend_event_stage={attend_event_stage}

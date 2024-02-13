@@ -344,7 +344,9 @@ export const useCreatePersonNode = (is_creating_person_node, create_user_profile
 
 export const useFetchEvents = (is_fetching_events, start_timestamp, end_timestamp, setMapEventsFullDay, setIsFetchingEvents) => {
   useEffect(() => {
+    console.log('is_fetching_events:', is_fetching_events);
     if (is_fetching_events) {
+      console.log('fetching events');
       fetch('/api/fetch_events', {
         method: 'POST',
         headers: {
@@ -549,7 +551,7 @@ export const useAuthenticateUser = (
 
 export const useBypassLoginIfInDebugMode = (setEmail, setFirstName, setLastName) => {
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
+    const urlParams = new URLSearchParams(window.location.hostname);
     const isDebugMode = urlParams.get('debug');
     if (isDebugMode === 'true') {
       setEmail('matt.t.healy1994@gmail.com');

@@ -1,3 +1,4 @@
+
 import json, traceback, logging, os, sys
 
 from dotenv import load_dotenv
@@ -36,7 +37,6 @@ def get_secret():
         if not body:
             return jsonify({"message": strings.no_input_body_provided}), 400
         secret_id = body.get('secret_id')
-        api_logger.info(f"secret_id: {secret_id}")
         if not secret_id:
             return jsonify({"message": "No secret_id provided"}), 400
         if secret_id not in ["GOOGLE_MAPS_API_KEY", "client_id"]:
@@ -48,28 +48,61 @@ def get_secret():
         # api_logger.error(f"An error occurred: {traceback.format_exc()}")
         return {"message": f"An error occurred: {traceback.format_exc()}"}, 500
 
-# @app.route("/get_user_profile", methods=["POST"])
-# def get_user_profile():
-#     try:
-#         body = request.get_json()
-#         if not body:
-#             return jsonify({"message": strings.no_input_body_provided}), 400
-#         email = body.get(strings.email)
+@app.route("/api/get_user_profile", methods=["POST"])
+@cross_origin()
+def get_user_profile():
+    try:
+        body = request.get_json()
+        if not body:
+            return jsonify({"message": strings.no_input_body_provided}), 400
+        email = body.get(strings.email)
 
-#         if not email:
-#             return jsonify({"message": strings.missing_email}), 400
-#         result = neo4j.execute_query_with_params(query=queries.GET_USER_PROFILE, params=body)
+        if not email:
+            return jsonify({"message": strings.missing_email}), 400
+        result = neo4j.execute_query_with_params(query=queries.GET_USER_PROFILE, params=body)
         
-#         if len(result) == 0:
-#             return jsonify([]), 200
-#         elif len(result) > 1:
-#             return jsonify({"message": "More than one user found with email: " + email}), 200
-#         else:
-#             return jsonify(result[0]), 200
+        if len(result) == 0:
+            return jsonify([]), 200
+        elif len(result) > 1:
+            return jsonify({"message": "More than one user found with email: " + email}), 200
+        else:
+            return jsonify(result[0]), 200
 
-#     except Exception as e:
-#         return jsonify({"message": "An error occurred: " + str(e)}), 500
+    except Exception as e:
+        return jsonify({"message": "An error occurred: " + str(e)}), 500
+
+
+@app.route("/api/get_event_type_mappings", methods=["GET"])
+@cross_origin()
+def get_event_type_mappings():
+    try:
+        api_logger.info("Fetching event type mappings")
+        result = neo4j.execute_query(queries.GET_EVENT_TYPE_NAMES_MAPPINGS)
+        return jsonify(result), 200
+    except Exception as e:
+        return jsonify({"message": "An error occurred: " + str(e)}), 500
+
+@app.route('/api/fetch_events', methods=["POST"])
+@cross_origin()
+def fetch_events():
+    try:
+        body = request.get_json()
+        if not body:
+            return jsonify({"message": strings.no_input_body_provided}), 400
+        start_timestamp = body.get(strings.start_timestamp)
+        end_timestamp = body.get(strings.end_timestamp)
         
+        if not start_timestamp:
+            return jsonify({"message": strings.missing_start_timestamp}), 400
+        elif not end_timestamp:
+            return jsonify({"message": strings.missing_end_timestamp}), 400
+        
+        result = neo4j.execute_query_with_params(query=queries.FETCH_EVENTS_FOR_MAP, params=body)
+        return jsonify(result), 200
+
+    except Exception as e:
+        return jsonify({"message": "An error occurred: " + str(e)}), 500
+    
 @app.route('/')
 @cross_origin()
 def serve():

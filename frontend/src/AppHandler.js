@@ -64,9 +64,6 @@ export default function AppHandler() {
   useFetchGoogleMapsApiKey(fetching_google_maps_api_key, setGoogleMapsApiKey, setFetchingGoogleMapsApiKey);
   useSetGoogleClientId(fetching_google_client_id, setFetchingGoogleClientId, setGoogleClientId);
 
-  console.log("google_maps_api_key", google_maps_api_key)
-  console.log("google_client_id", google_client_id)
-
   return (
     <>
       {google_maps_api_key && <LoadScript

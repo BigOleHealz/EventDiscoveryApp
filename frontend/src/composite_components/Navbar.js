@@ -11,7 +11,7 @@ import NavbarButton from '../base_components/NavbarButton';
 
 import { UserSessionContext } from "../utils/Contexts";
 import { AuthenticationManager } from "../utils/WorkflowManagers";
-// import { CreateUserProfileManager } from "../utils/WorkflowManagers";
+import { CreateUserProfileManager } from "../utils/WorkflowManagers";
 
 import { common_styles } from "../styles";
 
@@ -106,10 +106,10 @@ export default function Navbar({
                 smallContent="Login"
                 largeContent="Login"
               />
-              {/* <CreateUserProfileManager
+              <CreateUserProfileManager
                 is_active={is_create_user_profile_manager_active}
                 setIsActive={setIsCreateUserProfileManagerActive}
-              /> */}
+              />
             </>) :
             (
               <>
