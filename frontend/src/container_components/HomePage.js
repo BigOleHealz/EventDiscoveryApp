@@ -98,9 +98,9 @@ export function HomePage() {
     //   // is_event_invites_modal_visible={is_event_invites_modal_visible}
     //   // setIsEventInvitesModalVisible={setIsEventInvitesModalVisible}
 
-    //   // // Friend Requests props
-    //   // is_friend_requests_modal_visible={is_friend_requests_modal_visible}
-    //   // setIsFriendRequestsModalVisible={setIsFriendRequestsModalVisible}
+      // Friend Requests props
+      is_friend_requests_modal_visible={is_friend_requests_modal_visible}
+      setIsFriendRequestsModalVisible={setIsFriendRequestsModalVisible}
 
       // CreateEvent props
       create_event_stage={create_event_stage}

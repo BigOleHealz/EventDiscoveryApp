@@ -4,7 +4,10 @@ import { ToastContainer } from "react-toastify";
 
 import { CreateEventWorkflow } from '../composite_components/CreateEventWorkflow';
 // import { AttendEventWorkflow } from '../composite_components/AttendEventWorkflow';
-// import { EventInvitesModal, FriendRequestsModal } from '../composite_components/Modals';
+import {
+  // EventInvitesModal,
+  FriendRequestsModal
+} from '../composite_components/Modals';
 import LeftSidePanel from '../composite_components/LeftSidePanel';
 import Map from '../composite_components/Map';
 
@@ -37,11 +40,11 @@ export default function ContentContainer({
           onRequestClose={() => setIsEventInvitesModalVisible(false)}
           {...props}
         /> */}
-        {/* <FriendRequestsModal
+        <FriendRequestsModal
           isVisible={is_friend_requests_modal_visible}
           onRequestClose={() => setIsFriendRequestsModalVisible(false)}
           {...props}
-        /> */}
+        />
         <CreateEventWorkflow {...props} />
         {/* <AttendEventWorkflow {...props} /> */}
       </Box>
