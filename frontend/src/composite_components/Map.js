@@ -1,14 +1,16 @@
+/* global google */
+
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import _ from 'lodash';
 import Box from '@mui/material/Box';
 import { GoogleMap, Marker, InfoWindow } from '@react-google-maps/api';
 import { ToastContainer } from 'react-toastify';
 
-// import EventInfoWindow from './EventInfoWindow';
+import EventInfoWindow from './EventInfoWindow';
 
 import { LoggerContext } from '../utils/Contexts';
 import { defaultCenter, iconSvgObject } from '../utils/constants';
-// import { useSetUserLocation } from '../utils/Hooks';
+import { useSetUserLocation } from '../utils/Hooks';
 
 
 import { map_styles } from '../styles';
@@ -50,27 +52,27 @@ export default function Map({
     mapRef.current = map;
   }, [mapRef]);
 
-  // const onIdle = () => {
-  //   debouncedUpdateVisibleMarkers();
-  // };
+  const onIdle = () => {
+    debouncedUpdateVisibleMarkers();
+  };
 
-  // useSetUserLocation(setMapCenter);
-  // useEffect(() => {
-  //   if (mapInstance.current) {
-  //     debouncedUpdateVisibleMarkers();
-  //   }
-  // }, [map_events_filtered, debouncedUpdateVisibleMarkers]);
+  useSetUserLocation(setMapCenter);
+  useEffect(() => {
+    if (mapInstance.current) {
+      debouncedUpdateVisibleMarkers();
+    }
+  }, [map_events_filtered, debouncedUpdateVisibleMarkers]);
 
 
-  // const handleActiveMarker = (selected_event_data) => {
-  //   if (active_marker_event_data === null) {
-  //     setActiveMarkerEventData(selected_event_data);
-  //   } else if (selected_event_data.UUID === active_marker_event_data.UUID) {
-  //     setActiveMarkerEventData(null);
-  //   } else {
-  //     setActiveMarkerEventData(selected_event_data);
-  //   }
-  // };
+  const handleActiveMarker = (selected_event_data) => {
+    if (active_marker_event_data === null) {
+      setActiveMarkerEventData(selected_event_data);
+    } else if (selected_event_data.UUID === active_marker_event_data.UUID) {
+      setActiveMarkerEventData(null);
+    } else {
+      setActiveMarkerEventData(selected_event_data);
+    }
+  };
 
   return (
     <>
@@ -80,7 +82,7 @@ export default function Map({
           zoom={15}
           center={mapCenter}
           onLoad={onLoad}
-          // onIdle={onIdle}
+          onIdle={onIdle}
           options={{
             styles: [
               {
@@ -91,7 +93,7 @@ export default function Map({
             ],
           }}
         >
-          {/* {
+          {
             visibleMarkers.map(event => (
               <Marker
                 key={event.UUID}
@@ -103,14 +105,14 @@ export default function Map({
                 }}
               />
             ))
-          } */}
-          {/* {active_marker_event_data && (
+          }
+          {active_marker_event_data && (
             <EventInfoWindow
               active_marker_event_data={active_marker_event_data}
               setActiveMarkerEventData={setActiveMarkerEventData}
               {...props}
             />
-          )} */}
+          )}
         </GoogleMap>
       </Box>
     </>
