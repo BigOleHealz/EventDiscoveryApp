@@ -46,9 +46,9 @@ export default function AppHandler() {
     })();
   }, []);
 
-  // useEffect(() => {
-  //   navigate('/');
-  // }, [user_session]);
+  useEffect(() => {
+    navigate('/');
+  }, [user_session]);
 
 
   // useEffect(() => {
