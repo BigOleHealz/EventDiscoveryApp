@@ -480,17 +480,19 @@ export const useFetchGoogleProfile = (
 export const useSetGoogleClientId = (fetching_google_client_id, setFetchingGoogleClientId, setGoogleClientId) => {
   useEffect(() => {
     if (fetching_google_client_id) {
-      fetch('/api/get_aws_secret', {
+      console.log('fetching_google_client_id:', fetching_google_client_id);
+      fetch('/api/get_secret', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          secret_id: 'google_oauth_credentials',
+          secret_id: 'client_id',
         }),
       }).then(res => res.json())
         .then(data => {
           if (data) {
+            console.log('data:', data);
             setGoogleClientId(data.client_id);
           }
         }).catch((error) => {

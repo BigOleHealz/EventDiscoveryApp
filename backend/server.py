@@ -36,10 +36,10 @@ def get_secret():
         if not body:
             return jsonify({"message": strings.no_input_body_provided}), 400
         secret_id = body.get('secret_id')
-        print("secret_id: ", secret_id)
+        api_logger.info(f"secret_id: {secret_id}")
         if not secret_id:
             return jsonify({"message": "No secret_id provided"}), 400
-        if secret_id not in ["GOOGLE_MAPS_API_KEY", "GOOGLE_OAUTH_CREDENTIALS"]:
+        if secret_id not in ["GOOGLE_MAPS_API_KEY", "client_id"]:
             return jsonify({"message": "Invalid secret_id provided. None of your business. Get off of my website scammer."}), 400
         secret_string = os.getenv(secret_id)
         

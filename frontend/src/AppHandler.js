@@ -37,6 +37,12 @@ export default function AppHandler() {
   const [google_client_id, setGoogleClientId] = useState(false);
   const navigate = useNavigate();
 
+  useEffect(() => {
+    if (google_client_id === false) {
+      setFetchingGoogleClientId(true);
+    }
+  }, [google_client_id]);
+
   useFetchGoogleMapsApiKey(fetching_google_maps_api_key, setGoogleMapsApiKey, setFetchingGoogleMapsApiKey);
   useSetGoogleClientId(fetching_google_client_id, setFetchingGoogleClientId, setGoogleClientId);
 
@@ -53,13 +59,13 @@ export default function AppHandler() {
           <GoogleMapsApiKeyContext.Provider value={google_maps_api_key}>
             <AuthenticationContext.Provider value={{ authentication_context, setAuthenticationContext }}>
               <UserSessionContext.Provider value={{ user_session, setUserSession }}>
-                {/* <AttendEventProvider> */}
-                  {/* <CreateEventProvider> */}
+                <AttendEventProvider>
+                  <CreateEventProvider>
                     <Routes>
                       <Route path="/" element={<HomePage />} />
                     </Routes>
-                  {/* </CreateEventProvider> */}
-                {/* </AttendEventProvider> */}
+                  </CreateEventProvider>
+                </AttendEventProvider>
               </UserSessionContext.Provider>
             </AuthenticationContext.Provider>
           </GoogleMapsApiKeyContext.Provider>
