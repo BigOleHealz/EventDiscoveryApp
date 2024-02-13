@@ -48,6 +48,34 @@ def get_secret():
         # api_logger.error(f"An error occurred: {traceback.format_exc()}")
         return {"message": f"An error occurred: {traceback.format_exc()}"}, 500
 
+@app.route("/api/get_google_profile", methods=["POST"])
+@cross_origin()
+def get_google_profile():
+    try:
+        body = request.get_json()
+        print(body)
+        if not body:
+            return jsonify({"message": strings.no_input_body_provided}), 400
+        access_token = body.get('access_token')
+
+        if not access_token:
+            return jsonify({"message": "Missing access_token"}), 400
+        
+        url = f"https://www.googleapis.com/oauth2/v1/userinfo?access_token={access_token}"
+        headers = {
+            "Authorization": f"Bearer {access_token}",
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+        }
+
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()  # This will raise an HTTPError if the HTTP request returned an unsuccessful status code
+        profile = response.json()
+        return profile, 200
+
+    except Exception as e:
+        return jsonify({"message": "An error occurred: " + str(e)}), 500
+
 @app.route("/api/get_user_profile", methods=["POST"])
 @cross_origin()
 def get_user_profile():
