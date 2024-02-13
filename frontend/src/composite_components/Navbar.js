@@ -37,6 +37,8 @@ export default function Navbar({
   const { user_session, setUserSession } = React.useContext(UserSessionContext);
   const { login } = AuthenticationManager({setIsCreateUserProfileManagerActive});
 
+  console.log('Navbar user_session:', user_session);
+
   const handleFindEventsButtonClick = () => {
     if (is_left_panel_visible === false) {
       resetAllStates();

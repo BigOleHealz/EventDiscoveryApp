@@ -126,11 +126,8 @@ export const FriendRequestsModal = ({
   const [friend_request_username, setFriendRequestUsername] = useState('');
   const [sending_friend_request, setSendingFriendRequest] = useState(false);
 
-  useCreateFriendRequestRelationshipIfNotExist(user_session.Username, friend_request_username, sending_friend_request, setSendingFriendRequest, setFriendRequestUsername);
+  useCreateFriendRequestRelationshipIfNotExist(user_session?.Username, friend_request_username, sending_friend_request, setSendingFriendRequest, setFriendRequestUsername);
 
-    if (!user_session) {
-      return null;
-    }
 
   const handleFriendRequestUsernameChange = (text) => {
     setFriendRequestUsername(text.target.value);
