@@ -18,7 +18,6 @@ from db.db_handler import Neo4jDB
 from db import queries
 from utils.logger import Logger
 import db.message_strings as strings
-# import db.message_strings as strings
 
 
 load_dotenv()
@@ -72,7 +71,7 @@ def get_google_profile():
         }
 
         response = requests.get(url, headers=headers)
-        response.raise_for_status()  # This will raise an HTTPError if the HTTP request returned an unsuccessful status code
+        response.raise_for_status()
         profile = response.json()
         return profile, 200
 
@@ -201,6 +200,253 @@ def fetch_friends():
 
     except Exception as e:
         return jsonify({"STATUS": "ERROR", "MESSAGE": "An error occurred: " + str(e)}), 500
+
+@app.route('/api/fetch_pending_friend_requests', methods=["POST"])
+@cross_origin()
+def fetch_pending_friend_requests():
+    try:
+        body = request.get_json()
+        if not body:
+            return jsonify({"STATUS": "ERROR", "MESSAGE": strings.no_input_body_provided}), 400
+        username = body.get('Username')
+
+        if not username:
+            return jsonify({"STATUS": "ERROR", "MESSAGE": "Missing username"}), 400
+
+        result = neo4j.execute_query_with_params(query=queries.GET_PENDING_FRIEND_REQUESTS_BY_RECIPIENT_UUID, params=body)
+        return jsonify(result), 200
+    except Exception as e:
+        return jsonify({"STATUS": "ERROR", "MESSAGE": "An error occurred: " + str(e)}), 500
+
+
+@app.route('/api/respond_to_friend_request', methods=["POST"])
+@cross_origin()
+def respond_to_friend_request():
+    try:
+        body = request.get_json()
+        if not body:
+            return jsonify({"STATUS": "ERROR", "MESSAGE": strings.no_input_body_provided}), 400
+        friend_request_uuid = body.get('friend_request_uuid')
+        response = body.get('response')
+
+        if not friend_request_uuid:
+            return jsonify({"STATUS": "ERROR", "MESSAGE": "Missing friend_request_uuid"}), 400
+        elif not response:
+            return jsonify({"STATUS": "ERROR", "MESSAGE": "Missing response"}), 400
+        
+        result = neo4j.execute_query_with_params(query=queries.RESPOND_TO_FRIEND_REQUEST_BY_FRIEND_REQUEST_UUID, params=body)
+        if len(result) == 0:
+            return jsonify({"STATUS": "ERROR", "MESSAGE": "Friendship could not be created"}), 400
+        else:
+            result = result[0]
+            return jsonify(result), 200
+
+    except Exception as e:
+        return jsonify({"STATUS": "ERROR", "MESSAGE": "An error occurred: " + str(e)}), 500
+
+
+
+# @app.route('/api/attend_event_and_send_invites', methods=["POST"])
+# @cross_origin()
+# def attend_event_and_send_invites():
+#     try:
+#         body = request.get_json()
+#         if not body:
+#             return jsonify({"STATUS": "ERROR", "MESSAGE": strings.no_input_body_provided}), 400
+#         event_uuid = body.get('EventUUID')
+#         attendee_uuid = body.get('AttendeeUUID')
+#         invite_uuids = body.get('InviteeUUIDs')
+
+#         if not event_uuid:
+#             return jsonify({"STATUS": "ERROR", "MESSAGE": "Missing event_uuid"}), 400
+#         elif not attendee_uuid:
+#             return jsonify({"STATUS": "ERROR", "MESSAGE": "Missing attendee_uuid"}), 400
+#         elif not invite_uuids:
+#             return jsonify({"STATUS": "ERROR", "MESSAGE": "Missing invite_uuids"}), 400
+
+#         try:
+#             result = neo4j.execute_query_with_params(query=queries.ATTEND_EVENT_AND_SEND_INVITES, params=body)
+#             return jsonify({"STATUS": "SUCCESS", "MESSAGE": "Event attendance and invites sent successfully"}), 200
+#         except Exception as e:
+#             return jsonify({"STATUS": "ERROR", "MESSAGE": "An error occurred: " + str(e)}), 500
+
+#     except Exception as e:
+#         return jsonify({"STATUS": "ERROR", "MESSAGE": "An error occurred: " + str(e)}), 500
+
+@app.route('/api/create_friend_request_relationship_if_not_exists', methods=["POST"])
+@cross_origin()
+def create_friend_request_relationship_if_not_exists():
+    try:
+        body = request.get_json()
+        if not body:
+            return jsonify({"STATUS": "ERROR", "MESSAGE": strings.no_input_body_provided}), 400
+        username_sender = body.get('username_sender')
+        username_recipient = body.get('username_recipient')
+
+        if not username_sender:
+            return jsonify({"STATUS": "ERROR", "MESSAGE": "Missing username_sender"}), 400
+        elif not username_recipient:
+            return jsonify({"STATUS": "ERROR", "MESSAGE": "Missing username_recipient"}), 400
+
+        result = neo4j.execute_query_with_params(query=queries.CREATE_FRIEND_REQUEST_RELATIONSHIP_IF_NOT_EXISTS, params=body)
+        if len(result) == 0:
+            return jsonify({"STATUS": "ERROR", "MESSAGE": "Friend request relationship could not be created"}), 400
+        else:
+            result = result[0]
+            return jsonify(result), 200
+    except Exception as e:
+        return jsonify({"STATUS": "ERROR", "MESSAGE": "An error occurred: " + str(e)}), 500
+
+# @app.route('/api/fetch_event_invites', methods=["POST"])
+# @cross_origin()
+# def fetch_event_invites():
+#     try:
+#         body = request.get_json()
+#         if not body:
+#             return jsonify({"STATUS": "ERROR", "MESSAGE": strings.no_input_body_provided}), 400
+#         invitee_uuid = body.get('InviteeUUID')
+
+#         if not invitee_uuid:
+#             return jsonify({"STATUS": "ERROR", "MESSAGE": "Missing InviteUUID"}), 400
+
+#         try:
+#             result = neo4j.execute_query_with_params(query=queries.FETCH_EVENT_INVITES, params=body)
+#             return jsonify(result), 200
+#         except Exception as e:
+#             return jsonify({"STATUS": "ERROR", "MESSAGE": "An error occurred: " + str(e)}), 500
+
+#     except Exception as e:
+#         return jsonify({"STATUS": "ERROR", "MESSAGE": "An error occurred: " + str(e)}), 500
+        
+# @app.route('/api/respond_to_event_invite', methods=["POST"])
+# @cross_origin()
+# def respond_to_event_invite():
+#     try:
+#         body = request.get_json()
+#         if not body:
+#             return jsonify({"STATUS": "ERROR", "MESSAGE": strings.no_input_body_provided}), 400
+#         event_invite_uuid = body.get('event_invite_uuid')
+#         response = body.get('response')
+
+#         if not event_invite_uuid:
+#             return jsonify({"STATUS": "ERROR", "MESSAGE": "Missing event_invite_uuid"}), 400
+#         elif not response:
+#             return jsonify({"STATUS": "ERROR", "MESSAGE": "Missing response"}), 400
+        
+#         result = neo4j.execute_query_with_params(query=queries.RESPOND_TO_EVENT_INVITE_BY_EVENT_INVITE_UUID, params=body)
+#         if len(result) == 0:
+#             return jsonify({"STATUS": "ERROR", "MESSAGE": "Response could not be sent"}), 400
+#         else:
+#             result = result[0]
+#             return jsonify(result), 200
+
+#     except Exception as e:
+#         return jsonify({"STATUS": "ERROR", "MESSAGE": "An error occurred: " + str(e)}), 500
+    
+# @app.route('/api/fetch_events_attended_by_user', methods=["POST"])
+# @cross_origin()
+# def fetch_events_attended_by_user():
+#     try:
+#         body = request.get_json()
+#         if not body:
+#             return jsonify({"STATUS": "ERROR", "MESSAGE": strings.no_input_body_provided}), 400
+        
+#         attendee_uuid = body.get('AttendeeUUID')
+#         if not attendee_uuid:
+#             return jsonify({"STATUS": "ERROR", "MESSAGE": "Missing AttendeeUUID"}), 400
+        
+#         try:
+#             result = neo4j.execute_query_with_params(query=queries.FETCH_EVENTS_ATTENDED_BY_USER, params=body)
+#             return jsonify(result), 200
+#         except Exception as e:
+#             return jsonify({"STATUS": "ERROR", "MESSAGE": "An error occurred: " + str(e)}), 500
+
+#     except Exception as e:
+#         return jsonify({"STATUS": "ERROR", "MESSAGE": "An error occurred: " + str(e)}), 500
+
+# @app.route('/api/fetch_events_created_by_user', methods=["POST"])
+# @cross_origin()
+# def fetch_events_created_by_user():
+#     try:
+#         body = request.get_json()
+#         if not body:
+#             return jsonify({"STATUS": "ERROR", "MESSAGE": strings.no_input_body_provided}), 400
+        
+#         created_by_uuid = body.get('CreatedByUUID')
+#         if not created_by_uuid:
+#             return jsonify({"STATUS": "ERROR", "MESSAGE": "Missing CreatedByUUID"}), 400
+        
+#         try:
+#             result = neo4j.execute_query_with_params(query=queries.FETCH_EVENTS_CREATED_BY_USER, params=body)
+#             return jsonify(result), 200
+#         except Exception as e:
+#             return jsonify({"STATUS": "ERROR", "MESSAGE": "An error occurred: " + str(e)}), 500
+
+#     except Exception as e:
+#         return jsonify({"STATUS": "ERROR", "MESSAGE": "An error occurred: " + str(e)}), 500
+
+@app.route("/api/is_username_taken", methods=["POST"])
+@cross_origin()
+def is_username_taken():
+    try:
+        body = request.get_json()
+        if not body:
+            return jsonify({"message": strings.no_input_body_provided}), 400
+        username = body.get(strings.username)
+
+        if not username:
+            return jsonify({"message": strings.missing_username}), 400
+        result = neo4j.execute_query_with_params(query=queries.IS_USERNAME_TAKEN, params=body)
+        if len(result) == 0:
+            return jsonify({"message": strings.length_of_response_0}), 400
+        elif len(result) > 1:
+            return jsonify({"message": strings.length_of_response_greater_than_1}), 400
+        else:
+            return jsonify(result[0]), 200
+
+    except Exception as e:
+        return jsonify({"message": "An error occurred: " + str(e)}), 500
+
+# @app.route('/api/fetch_upcoming_events_for_user', methods=["POST"])
+# @cross_origin()
+# def fetch_upcoming_events_for_user():
+#     try:
+#         body = request.get_json()
+#         if not body:
+#             return jsonify({"STATUS": "ERROR", "MESSAGE": strings.no_input_body_provided}), 400
+        
+#         attendee_uuid = body.get('AttendeeUUID')
+#         if not attendee_uuid:
+#             return jsonify({"STATUS": "ERROR", "MESSAGE": "Missing AttendeeUUID"}), 400
+        
+#         try:
+#             result = neo4j.execute_query_with_params(query=queries.FETCH_UPCOMING_EVENTS_FOR_USER, params=body)
+#             return jsonify(result), 200
+#         except Exception as e:
+#             return jsonify({"STATUS": "ERROR", "MESSAGE": "An error occurred: " + str(e)}), 500
+
+#     except Exception as e:
+#         return jsonify({"STATUS": "ERROR", "MESSAGE": "An error occurred: " + str(e)}), 500
+
+# @app.route('/api/delete_node', methods=["POST"])
+# @cross_origin()
+# def delete_node():
+#     try:
+#         body = request.get_json()
+#         if not body:
+#             return jsonify({"message": strings.no_input_body_provided}), 400
+#         uuid = body.get('UUID')
+
+#         if not uuid:
+#             return jsonify({"message": strings.missing_uuid}), 400
+#         result = neo4j.execute_query_with_params(query=queries.DELETE_NODE_BY_UUID, params=body)
+#         if len(result) == 0:
+#             return jsonify({"message": strings.delete_node_not_found}), 400
+#         else:
+#             result = result[0]
+#             return jsonify(result), 200
+#     except Exception as e:
+#         return jsonify({"message": "An error occurred: " + str(e)}), 500
 
 @app.route('/')
 @cross_origin()

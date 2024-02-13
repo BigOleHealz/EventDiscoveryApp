@@ -112,89 +112,89 @@ import { friend_request_styles } from '../styles';
 //   );
 // }
 
-// export const FriendRequestsModal = ({
-//   isVisible,
-//   onRequestClose,
-//   ...props
-// }) => {
+export const FriendRequestsModal = ({
+  isVisible,
+  onRequestClose,
+  ...props
+}) => {
+  const { user_session, setUserSession } = useContext(UserSessionContext);
 
-//   const { user_session, setUserSession } = useContext(UserSessionContext);
-//   if (!user_session) {
-//     return null;
-//   }
+  const height_text_input_and_button = { xs: '40px', sm: '45px', md: '50px', lg: '55px', xl: '60px' };
+  const margin_text_input_and_button = { xs: '3px', sm: '4px', md: '5px', lg: '6px', xl: '7px' };
+  const friend_request_vertical_margin = { xs: '5px', sm: '10px', md: '15px', lg: '20px', xl: '25px' }
 
-//   const height_text_input_and_button = { xs: '40px', sm: '45px', md: '50px', lg: '55px', xl: '60px' };
-//   const margin_text_input_and_button = { xs: '3px', sm: '4px', md: '5px', lg: '6px', xl: '7px' };
-//   const friend_request_vertical_margin = { xs: '5px', sm: '10px', md: '15px', lg: '20px', xl: '25px' }
+  const [friend_request_username, setFriendRequestUsername] = useState('');
+  const [sending_friend_request, setSendingFriendRequest] = useState(false);
 
-//   const [friend_request_username, setFriendRequestUsername] = useState('');
-//   const [sending_friend_request, setSendingFriendRequest] = useState(false);
+  useCreateFriendRequestRelationshipIfNotExist(user_session.Username, friend_request_username, sending_friend_request, setSendingFriendRequest, setFriendRequestUsername);
 
-//   useCreateFriendRequestRelationshipIfNotExist(user_session.Username, friend_request_username, sending_friend_request, setSendingFriendRequest, setFriendRequestUsername);
+    if (!user_session) {
+      return null;
+    }
 
-//   const handleFriendRequestUsernameChange = (text) => {
-//     setFriendRequestUsername(text.target.value);
-//   };
+  const handleFriendRequestUsernameChange = (text) => {
+    setFriendRequestUsername(text.target.value);
+  };
 
-//   const handleSendFriendRequestButtonClick = () => {
-//     if (friend_request_username === '') {
-//       toast.error('Please enter a username.');
-//     } else if (friend_request_username === user_session.Username) {
-//       toast.error('You cannot send a friend request to yourself.');
-//     } else {
-//       setSendingFriendRequest(true);
-//     }
-//   };
+  const handleSendFriendRequestButtonClick = () => {
+    if (friend_request_username === '') {
+      toast.error('Please enter a username.');
+    } else if (friend_request_username === user_session.Username) {
+      toast.error('You cannot send a friend request to yourself.');
+    } else {
+      setSendingFriendRequest(true);
+    }
+  };
 
-//   return (
-//     <ModalComponent
-//       isVisible={isVisible}
-//       onRequestClose={onRequestClose}
-//       title="Manage Friends"
-//       submitButtonText="Close"
-//       onSubmitButtonClick={onRequestClose}
-//     >
-//       <Box sx={friend_request_styles.contentContainer}>
-//         <Box label='box-send-friend-request' sx={friend_request_styles.sendRequestContainer}>
-//           <TextInputComponent
-//             id="input-friend-request-username"
-//             label="Enter Friend's Username"
-//             value={friend_request_username}
-//             onChangeText={handleFriendRequestUsernameChange}
-//             style={{
-//               flexGrow: 1,
-//               marginRight: margin_text_input_and_button,
-//               height: height_text_input_and_button,
-//               padding: 0
-//             }}
-//           />
-//           <Button
-//             id="button-friend-request-submit"
-//             variant="contained"
-//             color="primary"
-//             onClick={handleSendFriendRequestButtonClick}
-//             sx={{
-//               marginLeft: margin_text_input_and_button,
-//               height: height_text_input_and_button,
-//               width: { xs: '120px', sm: '125px', md: '130px', lg: '140px', xl: '160px' }
-//             }}
-//           >
-//             Send Request
-//           </Button>
-//         </Box>
-//         <Divider
-//           sx={{
-//             marginTop: friend_request_vertical_margin,
-//             marginBottom: friend_request_vertical_margin,
-//             backgroundColor: 'grey'
-//           }} />
-//         <Box id='box-accept-decline-friend-request' sx={{ flexGrow: 1, position: 'relative', height: '100%' }}>
-//           <FriendRequestsTable user_session={user_session} />
-//         </Box>
-//       </Box>
-//     </ModalComponent>
-//   );
-// }
+  return (
+    <ModalComponent
+      isVisible={isVisible}
+      onRequestClose={onRequestClose}
+      title="Manage Friends"
+      submitButtonText="Close"
+      onSubmitButtonClick={onRequestClose}
+    >
+      <Box sx={friend_request_styles.contentContainer}>
+        <Box label='box-send-friend-request' sx={friend_request_styles.sendRequestContainer}>
+          <TextInputComponent
+            id="input-friend-request-username"
+            label="Enter Friend's Username"
+            value={friend_request_username}
+            onChangeText={handleFriendRequestUsernameChange}
+            style={{
+              flexGrow: 1,
+              marginRight: margin_text_input_and_button,
+              height: height_text_input_and_button,
+              padding: 0
+            }}
+          />
+          <Button
+            id="button-friend-request-submit"
+            variant="contained"
+            color="primary"
+            onClick={handleSendFriendRequestButtonClick}
+            sx={{
+              marginLeft: margin_text_input_and_button,
+              height: height_text_input_and_button,
+              width: { xs: '120px', sm: '125px', md: '130px', lg: '140px', xl: '160px' }
+            }}
+          >
+            Send Request
+          </Button>
+        </Box>
+        <Divider
+          sx={{
+            marginTop: friend_request_vertical_margin,
+            marginBottom: friend_request_vertical_margin,
+            backgroundColor: 'grey'
+          }} />
+        <Box id='box-accept-decline-friend-request' sx={{ flexGrow: 1, position: 'relative', height: '100%' }}>
+          <FriendRequestsTable user_session={user_session} />
+        </Box>
+      </Box>
+    </ModalComponent>
+  );
+}
 
 export const CreateEventInviteFriendsModal = ({
   isVisible,
@@ -203,7 +203,7 @@ export const CreateEventInviteFriendsModal = ({
   ...props
 }) => {
   const { create_event_context, setCreateEventContext } = React.useContext(CreateEventContext);
-  const [ friends_invited, setFriendsInvited ] = useState([]);
+  const [friends_invited, setFriendsInvited] = useState([]);
 
   const addFriendInvitesToCreateEventContext = () => {
     setCreateEventContext({
