@@ -344,7 +344,6 @@ export const useCreatePersonNode = (is_creating_person_node, create_user_profile
 
 export const useFetchEvents = (is_fetching_events, start_timestamp, end_timestamp, setMapEventsFullDay, setIsFetchingEvents) => {
   useEffect(() => {
-    console.log('is_fetching_events:', is_fetching_events);
     if (is_fetching_events) {
       console.log('fetching events');
       fetch('/api/fetch_events', {
@@ -414,7 +413,6 @@ export const useFetchGoogleMapsApiKey = (
   setFetchingGoogleMapsApiKey,
 ) => {
   useEffect(() => {
-    console.log('fetching_google_maps_api_key:', fetching_google_maps_api_key);
     if (fetching_google_maps_api_key) {
       fetch('/api/get_secret', {
         method: 'POST',
