@@ -5,7 +5,7 @@ import { ToastContainer } from "react-toastify";
 import { CreateEventWorkflow } from '../composite_components/CreateEventWorkflow';
 // import { AttendEventWorkflow } from '../composite_components/AttendEventWorkflow';
 import {
-  // EventInvitesModal,
+  EventInvitesModal,
   FriendRequestsModal
 } from '../composite_components/Modals';
 import LeftSidePanel from '../composite_components/LeftSidePanel';
@@ -35,11 +35,11 @@ export default function ContentContainer({
         }}>
         <LeftSidePanel {...props} />
         <Map {...props} />
-        {/* <EventInvitesModal
+        <EventInvitesModal
           isVisible={is_event_invites_modal_visible}
           onRequestClose={() => setIsEventInvitesModalVisible(false)}
           {...props}
-        /> */}
+        />
         <FriendRequestsModal
           isVisible={is_friend_requests_modal_visible}
           onRequestClose={() => setIsFriendRequestsModalVisible(false)}
