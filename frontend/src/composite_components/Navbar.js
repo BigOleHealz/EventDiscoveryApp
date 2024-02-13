@@ -10,7 +10,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import NavbarButton from '../base_components/NavbarButton';
 
 import { UserSessionContext } from "../utils/Contexts";
-// import { AuthenticationManager } from "../utils/WorkflowManagers";
+import { AuthenticationManager } from "../utils/WorkflowManagers";
 // import { CreateUserProfileManager } from "../utils/WorkflowManagers";
 
 import { common_styles } from "../styles";
@@ -35,7 +35,7 @@ export default function Navbar({
 
 
   const { user_session, setUserSession } = React.useContext(UserSessionContext);
-  // const { login } = AuthenticationManager({setIsCreateUserProfileManagerActive});
+  const { login } = AuthenticationManager({setIsCreateUserProfileManagerActive});
 
   const handleFindEventsButtonClick = () => {
     if (is_left_panel_visible === false) {
@@ -102,7 +102,7 @@ export default function Navbar({
 
               <NavbarButton
                 id="button-Login"
-                // onClick={login}
+                onClick={login}
                 smallContent="Login"
                 largeContent="Login"
               />

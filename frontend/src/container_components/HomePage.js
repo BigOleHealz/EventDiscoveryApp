@@ -11,8 +11,8 @@ import { convertUTCDateToLocalDate } from '../utils/HelperFunctions';
 export function HomePage() {
   const mapRef = useRef();
   // const { logger, setLogger } = React.useContext(LoggerContext);
-  // const { attend_event_context, setAttendEventContext } = React.useContext(AttendEventContext);
-  // const { create_event_context, setCreateEventContext } = React.useContext(CreateEventContext);
+  const { attend_event_context, setAttendEventContext } = React.useContext(AttendEventContext);
+  const { create_event_context, setCreateEventContext} = React.useContext(CreateEventContext);
   const { user_session, setUserSession } = React.useContext(UserSessionContext);
 
   const [is_create_user_profile_manager_active, setIsCreateUserProfileManagerActive] = useState(false);
@@ -32,65 +32,62 @@ export function HomePage() {
     }
   }, [user_session]);
 
-  // const [is_fetching_events, setIsFetchingEvents] = useState(true);
-  // const [map_events_full_day, setMapEventsFullDay] = useState([]);
-  // const [map_events_filtered, setMapEventsFiltered] = useState([]);
+  const [is_fetching_events, setIsFetchingEvents] = useState(true);
+  const [map_events_full_day, setMapEventsFullDay] = useState([]);
+  const [map_events_filtered, setMapEventsFiltered] = useState([]);
 
   // useEffect(() => {
   //   setIsFetchingEvents(true);
   // }, [find_event_selected_date]);
 
-  // const [create_event_stage, setCreateEventStage] = useState(0);
+  const [create_event_stage, setCreateEventStage] = useState(0);
 
   // useFetchEvents(is_fetching_events, start_timestamp, end_timestamp, setMapEventsFullDay, setIsFetchingEvents);
   // useFilterEvents(find_event_selected_date, find_event_start_time, find_event_end_time, map_events_full_day, event_types_selected, setMapEventsFiltered);
 
-  // // Handle left side panel
-  // const [is_left_panel_visible, setIsLeftPanelVisible] = useState(false);
-  // const [is_event_invites_modal_visible, setIsEventInvitesModalVisible] = useState(false);
-  // const [is_friend_requests_modal_visible, setIsFriendRequestsModalVisible] = useState(false);
+  // Handle left side panel
+  const [is_left_panel_visible, setIsLeftPanelVisible] = useState(false);
+  const [is_event_invites_modal_visible, setIsEventInvitesModalVisible] = useState(false);
+  const [is_friend_requests_modal_visible, setIsFriendRequestsModalVisible] = useState(false);
 
-  // const [attend_event_stage, setAttendEventStage] = useState(0);
-  // const [attend_event_currently_active_data, setAttendEventCurrentlyActiveData] = useState(null);
+  const [attend_event_stage, setAttendEventStage] = useState(0);
+  const [attend_event_currently_active_data, setAttendEventCurrentlyActiveData] = useState(null);
 
-  // const initializeCreateEventMode = () => {
-  //   resetAllStates();
-  //   setCreateEventStage(1);
-  // };
+  const initializeCreateEventMode = () => {
+    resetAllStates();
+    setCreateEventStage(1);
+  };
 
-  // const exitCreateEventMode = () => {
-  //   setCreateEventContext({});
-  //   setCreateEventStage(0);
-  // };
+  const exitCreateEventMode = () => {
+    setCreateEventContext({});
+    setCreateEventStage(0);
+  };
 
-  // const initializeAttendEventMode = () => {
-  //   resetAllStates();
-  //   setAttendEventStage(1);
-  // };
+  const initializeAttendEventMode = () => {
+    resetAllStates();
+    setAttendEventStage(1);
+  };
 
-  // const exitAttendEventMode = () => {
-  //   setAttendEventContext({});
-  //   setAttendEventCurrentlyActiveData(null);
-  //   setAttendEventStage(0);
-  // };
+  const exitAttendEventMode = () => {
+    setAttendEventContext({});
+    setAttendEventCurrentlyActiveData(null);
+    setAttendEventStage(0);
+  };
 
-  // const resetAllStates = () => {
-  //   setIsLeftPanelVisible(false);
-  //   setIsEventInvitesModalVisible(false);
-  //   setIsFriendRequestsModalVisible(false);
-  //   exitCreateEventMode();
-  //   exitAttendEventMode();
-  // };
+  const resetAllStates = () => {
+    setIsLeftPanelVisible(false);
+    setIsEventInvitesModalVisible(false);
+    setIsFriendRequestsModalVisible(false);
+    exitCreateEventMode();
+    exitAttendEventMode();
+  };
 
   return (
-    // <div>
-    //   <h1>Test2fasefa Home Page</h1>
-    // </div>
     <Layout
       //Navbar props
-      // resetAllStates={resetAllStates}
-      // is_create_user_profile_manager_active={is_create_user_profile_manager_active}
-      // setIsCreateUserProfileManagerActive={setIsCreateUserProfileManagerActive}
+      resetAllStates={resetAllStates}
+      is_create_user_profile_manager_active={is_create_user_profile_manager_active}
+      setIsCreateUserProfileManagerActive={setIsCreateUserProfileManagerActive}
 
       // // Find Events props
       // is_left_panel_visible={is_left_panel_visible}
@@ -112,9 +109,9 @@ export function HomePage() {
       // is_fetching_events={is_fetching_events}
       // setIsFetchingEvents={setIsFetchingEvents}
 
-      // // Map props
-      // mapRef={mapRef}
-      // map_events_filtered={map_events_filtered}
+      // Map props
+      mapRef={mapRef}
+      map_events_filtered={map_events_filtered}
 
       // // LeftSidePanel props
       // find_event_selected_date={find_event_selected_date}
