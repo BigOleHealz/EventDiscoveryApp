@@ -102,13 +102,13 @@ export function HomePage() {
     //   // is_friend_requests_modal_visible={is_friend_requests_modal_visible}
     //   // setIsFriendRequestsModalVisible={setIsFriendRequestsModalVisible}
 
-    //   // // CreateEvent props
-    //   // create_event_stage={create_event_stage}
-    //   // setCreateEventStage={setCreateEventStage}
-    //   // initializeCreateEventMode={initializeCreateEventMode}
-    //   // exitCreateEventMode={exitCreateEventMode}
-    //   // is_fetching_events={is_fetching_events}
-    //   // setIsFetchingEvents={setIsFetchingEvents}
+      // CreateEvent props
+      create_event_stage={create_event_stage}
+      setCreateEventStage={setCreateEventStage}
+      initializeCreateEventMode={initializeCreateEventMode}
+      exitCreateEventMode={exitCreateEventMode}
+      is_fetching_events={is_fetching_events}
+      setIsFetchingEvents={setIsFetchingEvents}
 
       // Map props
       mapRef={mapRef}

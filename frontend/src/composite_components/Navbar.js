@@ -99,7 +99,6 @@ export default function Navbar({
                 smallContent="Find Events"
                 largeContent="Find Events"
               />
-
               <NavbarButton
                 id="button-Login"
                 onClick={login}
