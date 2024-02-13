@@ -124,13 +124,13 @@ export function HomePage() {
       event_types_selected={event_types_selected}
       setEventTypesSelected={setEventTypesSelected}
 
-    //   // // AttendEvent props
-    //   // attend_event_stage={attend_event_stage}
-    //   // setAttendEventStage={setAttendEventStage}
-    //   // attend_event_currently_active_data={attend_event_currently_active_data}
-    //   // setAttendEventCurrentlyActiveData={setAttendEventCurrentlyActiveData}
-    //   // initializeAttendEventMode={initializeAttendEventMode}
-    //   // exitAttendEventMode={exitAttendEventMode}
+      // AttendEvent props
+      attend_event_stage={attend_event_stage}
+      setAttendEventStage={setAttendEventStage}
+      attend_event_currently_active_data={attend_event_currently_active_data}
+      setAttendEventCurrentlyActiveData={setAttendEventCurrentlyActiveData}
+      initializeAttendEventMode={initializeAttendEventMode}
+      exitAttendEventMode={exitAttendEventMode}
     />
   );
 };

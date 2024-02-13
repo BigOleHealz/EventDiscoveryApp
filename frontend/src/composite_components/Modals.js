@@ -27,68 +27,68 @@ import {
 
 import { friend_request_styles } from '../styles';
 
-// export const EventViewerModal = ({
-//   isVisible,
-//   handleSubmitButtonClick,
-//   event,
-//   onRequestClose,
-//   ...props
-// }) => {
+export const EventViewerModal = ({
+  isVisible,
+  handleSubmitButtonClick,
+  event,
+  onRequestClose,
+  ...props
+}) => {
 
-//   return (
-//     <ModalComponent
-//       isVisible={isVisible}
-//       onRequestClose={onRequestClose}
-//       title="Event Viewer"
-//       submitButtonText="Attend Event"
-//       onSubmitButtonClick={handleSubmitButtonClick}
-//     >
-//       <BoxComponent style={{ width: '100%', height: '100%' }}>
-//         {event && event.EventURL ? (
-//           <iframe
-//             srcDoc={modifiedContent}
-//             title="Event Content"
-//             style={{
-//               border: 'none',
-//               width: '100%',
-//               height: '100%'
-//             }}
-//           />
-//         ) : event ? (
-//           <EventDetailsTable event={event} />
-//         ) : (
-//           <div>Event URL not found.</div>
-//         )}
-//       </BoxComponent>
-//     </ModalComponent>
-//   );
-// };
+  return (
+    <ModalComponent
+      isVisible={isVisible}
+      onRequestClose={onRequestClose}
+      title="Event Viewer"
+      submitButtonText="Attend Event"
+      onSubmitButtonClick={handleSubmitButtonClick}
+    >
+      <BoxComponent style={{ width: '100%', height: '100%' }}>
+        {event && event.EventURL ? (
+          <iframe
+            src={event.EventURL}
+            title="Event Content"
+            style={{
+              border: 'none',
+              width: '100%',
+              height: '100%'
+            }}
+          />
+        ) : event ? (
+          <EventDetailsTable event={event} />
+        ) : (
+          <div>Event URL not found.</div>
+        )}
+      </BoxComponent>
+    </ModalComponent>
+  );
+};
 
 
-// export const InviteFriendsToEventModal = ({
-//   isVisible,
-//   friends_invited,
-//   setFriendsInvited,
-//   handleSubmitButtonClick,
-//   onRequestClose,
-//   ...props
-// }) => {
+export const InviteFriendsToEventModal = ({
+  isVisible,
+  friends_invited,
+  setFriendsInvited,
+  handleSubmitButtonClick,
+  onRequestClose,
+  ...props
+}) => {
 
-//   return (
-//     <ModalComponent
-//       isVisible={isVisible}
-//       onRequestClose={onRequestClose}
-//       title="Invite Friends to Event"
-//       submitButtonText="Send Invites"
-//       onSubmitButtonClick={handleSubmitButtonClick}
-//     >
-//       <InviteFriendsToEventTable
-//         friends_invited={friends_invited}
-//         setFriendsInvited={setFriendsInvited}
-//       />
-//     </ModalComponent>
-//   );
-// }
+  return (
+    <ModalComponent
+      isVisible={isVisible}
+      onRequestClose={onRequestClose}
+      title="Invite Friends to Event"
+      submitButtonText="Send Invites"
+      onSubmitButtonClick={handleSubmitButtonClick}
+    >
+      <InviteFriendsToEventTable
+        friends_invited={friends_invited}
+        setFriendsInvited={setFriendsInvited}
+      />
+    </ModalComponent>
+  );
+}
 
 
 export const EventInvitesModal = ({
