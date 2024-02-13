@@ -112,3 +112,24 @@ class AWSHandler:
             self.logger.emit(msg=error)
             self.logger.emit(msg=f'Traceback: {traceback.format_exc()}')
             raise ValueError(error)
+<<<<<<< HEAD
+=======
+
+    def invoke_api_gateway_endpoint(self):
+        try:
+            client = boto3.client('apigateway')
+
+            https_response = requests.get(
+                'https://0kj5kbx4e7.execute-api.us-east-1.amazonaws.com/test/neo4j-query',
+                params={'node_id': 1219}
+            )
+            
+            return https_response
+            
+        except ClientError as e:
+            raise e
+            
+        except Exception as error:
+            self.logger.emit(msg=error)
+            raise ValueError(error)
+>>>>>>> origin/Develop_1.0

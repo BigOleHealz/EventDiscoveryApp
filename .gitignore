@@ -12,7 +12,10 @@ app_frontend/package-lock.json
 .vscode*
 flask-server/db/*
 flask-server/utils/*
+<<<<<<< HEAD
 my-app/node_modules*
 frontend/node_modules*
 venv*
 .env
+=======
+>>>>>>> origin/Develop_1.0
