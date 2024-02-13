@@ -95,7 +95,10 @@ export const AcceptDeclineTable = ({ rows }) => {
                       variant="contained"
                       color="primary"
                       onClick={() => row.onAccept(row)}
-                      sx={{ marginBottom: button_margins, width: '100px' }}
+                      sx={{
+                        // marginBottom: button_margins,
+                        width: '100px'
+                      }}
                     >
                       Accept
                     </Button>
@@ -104,7 +107,7 @@ export const AcceptDeclineTable = ({ rows }) => {
                       sx={{
                         backgroundColor: '#FF0000',
                         color: '#FFFFFF',
-                        marginTop: button_margins,
+                        // marginTop: button_margins,
                         width: '100px'
                       }}
                       onClick={() => row.onDecline(row)}
