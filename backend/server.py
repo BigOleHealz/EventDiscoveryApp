@@ -1,5 +1,7 @@
 
 import json, traceback, logging, os, sys
+from datetime import datetime
+from uuid import uuid4
 import requests
 
 from dotenv import load_dotenv
@@ -131,7 +133,75 @@ def fetch_events():
 
     except Exception as e:
         return jsonify({"message": "An error occurred: " + str(e)}), 500
-    
+
+@app.route('/api/create_event_node', methods=["POST"])
+@cross_origin()
+def create_event_node():
+    try:
+        body = request.get_json()
+        if not body:
+            return jsonify({"STATUS": "ERROR", "MESSAGE": strings.no_input_body_provided}), 400
+        event_type_uuid = body.get('EventTypeUUID')
+        event_lat = body.get('Lat')
+        event_lon = body.get('Lon')
+        event_start_timestamp = body.get('StartTimestamp')
+        event_end_timestamp = body.get('EndTimestamp')
+        created_by_uuid = body.get('CreatedByUUID')
+        friends_invited = body.get('FriendsInvited')
+
+        if not event_type_uuid:
+            return jsonify({"STATUS": "ERROR", "MESSAGE": "Missing event_type_uuid"}), 400
+        elif not event_lat:
+            return jsonify({"STATUS": "ERROR", "MESSAGE": "Missing event_lat"}), 400
+        elif not event_lon:
+            return jsonify({"STATUS": "ERROR", "MESSAGE": "Missing event_lon"}), 400
+        elif not event_start_timestamp:
+            return jsonify({"STATUS": "ERROR", "MESSAGE": "Missing event_start_timestamp"}), 400
+        elif not event_end_timestamp:
+            return jsonify({"STATUS": "ERROR", "MESSAGE": "Missing event_end_timestamp"}), 400
+        elif not created_by_uuid:
+            return jsonify({"STATUS": "ERROR", "MESSAGE": "Missing created_by_uuid"}), 400
+        elif not friends_invited:
+            return jsonify({"STATUS": "ERROR", "MESSAGE": "Missing friends_invited"}), 400
+
+        event_data = body
+        uuid = str(uuid4())
+        event_data['UUID'] = uuid
+        event_data['Source'] = 'user_created'
+        event_data['SourceEventID'] = uuid
+        event_data['Summary'] = body.get('EventDescription', '')
+
+        try:
+            result = neo4j.execute_query_with_params(query=queries.CREATE_USER_CREATED_EVENT, params=event_data)
+            return jsonify({"STATUS": "SUCCESS", "MESSAGE": "Event node created successfully"}), 200
+        except Exception as e:
+            return jsonify({"STATUS": "ERROR", "MESSAGE": "An error occurred: " + str(e)}), 500
+
+    except Exception as e:
+        return jsonify({"STATUS": "ERROR", "MESSAGE": "An error occurred: " + str(e)}), 500
+
+
+@app.route('/api/fetch_friends', methods=["POST"])
+@cross_origin()
+def fetch_friends():
+    try:
+        body = request.get_json()
+        if not body:
+            return jsonify({"STATUS": "ERROR", "MESSAGE": strings.no_input_body_provided}), 400
+        
+        uuid = body.get('UUID')
+        if not uuid:
+            return jsonify({"STATUS": "ERROR", "MESSAGE": strings.missing_uuid}), 400
+        
+        try:
+            result = neo4j.execute_query_with_params(query=queries.FETCH_FRIENDS_BY_UUID, params=body)
+            return result
+        except Exception as e:
+            return jsonify({"STATUS": "ERROR", "MESSAGE": "An error occurred: " + str(e)}), 500
+
+    except Exception as e:
+        return jsonify({"STATUS": "ERROR", "MESSAGE": "An error occurred: " + str(e)}), 500
+
 @app.route('/')
 @cross_origin()
 def serve():
