@@ -412,6 +412,7 @@ export const useFetchGoogleMapsApiKey = (
   setFetchingGoogleMapsApiKey,
 ) => {
   useEffect(() => {
+    console.log('fetching_google_maps_api_key:', fetching_google_maps_api_key);
     if (fetching_google_maps_api_key) {
       fetch('/api/get_secret', {
         method: 'POST',
@@ -424,6 +425,7 @@ export const useFetchGoogleMapsApiKey = (
       }).then(res => res.json())
         .then(data => {
           if (data) {
+            console.log('fetch_google_maps_api_key data:', data)
             setGoogleMapsApiKey(data.GOOGLE_MAPS_API_KEY);
           }
         }).catch((error) => {

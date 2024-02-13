@@ -20,6 +20,7 @@ import {
 } from './utils/Contexts';
 
 import { useFetchGoogleMapsApiKey, useSetGoogleClientId } from './utils/Hooks';
+import { getUserSession } from './utils/SessionManager';
 
 export default function AppHandler() {
 
@@ -38,6 +39,23 @@ export default function AppHandler() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    (async () => {
+      const session = await getUserSession();
+      console.log(session)
+      setUserSession(session);
+    })();
+  }, []);
+
+  // useEffect(() => {
+  //   navigate('/');
+  // }, [user_session]);
+
+
+  // useEffect(() => {
+  //   navigate('/');
+  // }, []);
+
+  useEffect(() => {
     if (google_client_id === false) {
       setFetchingGoogleClientId(true);
     }
@@ -46,6 +64,8 @@ export default function AppHandler() {
   useFetchGoogleMapsApiKey(fetching_google_maps_api_key, setGoogleMapsApiKey, setFetchingGoogleMapsApiKey);
   useSetGoogleClientId(fetching_google_client_id, setFetchingGoogleClientId, setGoogleClientId);
 
+  console.log("google_maps_api_key", google_maps_api_key)
+  console.log("google_client_id", google_client_id)
 
   return (
     <>
