@@ -133,6 +133,40 @@ def fetch_events():
     except Exception as e:
         return jsonify({"message": "An error occurred: " + str(e)}), 500
 
+@app.route('/api/create_person_node', methods=["POST"])
+@cross_origin()
+def create_person_node():
+    try:
+        body = request.get_json()
+        if not body:
+            return jsonify({"message": strings.no_input_body_provided}), 400
+        username = body.get(strings.username)
+        email = body.get(strings.email)
+        first_name = body.get(strings.first_name)
+        last_name = body.get(strings.last_name)
+        interest_uuids = body.get(strings.interest_uuids)
+
+        if not username:
+            return jsonify({"STATUS": "ERROR", "MESSAGE": strings.missing_username}), 400
+        elif not email:
+            return jsonify({"STATUS": "ERROR", "MESSAGE": strings.missing_email}), 400
+        elif not first_name:
+            return jsonify({"STATUS": "ERROR", "MESSAGE": strings.missing_first_name}), 400
+        elif not last_name:
+            return jsonify({"STATUS": "ERROR", "MESSAGE": strings.missing_last_name}), 400
+        elif not interest_uuids:
+            return jsonify({"STATUS": "ERROR", "MESSAGE": "You must select at least one event type"}), 400
+        
+        result = neo4j.execute_query_with_params(query=queries.CREATE_PERSON_NODE, params=body)
+        
+        if len(result) == 0:
+            return jsonify({"STATUS": "ERROR", "MESSAGE": "User could not be created"}), 400
+        else:
+            result = result[0]
+            return jsonify(result), 200
+    except Exception as e:
+        return jsonify({"STATUS": "ERROR", "MESSAGE": "An error occurred: " + str(e)}), 500
+
 @app.route('/api/create_event_node', methods=["POST"])
 @cross_origin()
 def create_event_node():
