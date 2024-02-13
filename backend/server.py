@@ -1,5 +1,6 @@
 
 import json, traceback, logging, os, sys
+import requests
 
 from dotenv import load_dotenv
 
