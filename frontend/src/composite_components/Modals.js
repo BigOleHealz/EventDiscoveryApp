@@ -91,26 +91,26 @@ import { friend_request_styles } from '../styles';
 // }
 
 
-// export const EventInvitesModal = ({
-//   isVisible,
-//   onRequestClose,
-//   ...props
-// }) => {
+export const EventInvitesModal = ({
+  isVisible,
+  onRequestClose,
+  ...props
+}) => {
 
-//   const { user_session, setUserSession } = useContext(UserSessionContext);
+  const { user_session, setUserSession } = useContext(UserSessionContext);
 
-//   return (
-//     <ModalComponent
-//       isVisible={isVisible}
-//       onRequestClose={onRequestClose}
-//       title="Event Invites"
-//       submitButtonText="Close"
-//       onSubmitButtonClick={onRequestClose}
-//     >
-//       <EventInvitesTable user_session={user_session} />
-//     </ModalComponent>
-//   );
-// }
+  return (
+    <ModalComponent
+      isVisible={isVisible}
+      onRequestClose={onRequestClose}
+      title="Event Invites"
+      submitButtonText="Close"
+      onSubmitButtonClick={onRequestClose}
+    >
+      <EventInvitesTable user_session={user_session} />
+    </ModalComponent>
+  );
+}
 
 export const FriendRequestsModal = ({
   isVisible,

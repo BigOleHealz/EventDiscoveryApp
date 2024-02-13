@@ -94,9 +94,9 @@ export function HomePage() {
       is_left_panel_visible={is_left_panel_visible}
       setIsLeftPanelVisible={setIsLeftPanelVisible}
 
-    //   // // Event Invites props
-    //   // is_event_invites_modal_visible={is_event_invites_modal_visible}
-    //   // setIsEventInvitesModalVisible={setIsEventInvitesModalVisible}
+      // Event Invites props
+      is_event_invites_modal_visible={is_event_invites_modal_visible}
+      setIsEventInvitesModalVisible={setIsEventInvitesModalVisible}
 
       // Friend Requests props
       is_friend_requests_modal_visible={is_friend_requests_modal_visible}
