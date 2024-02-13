@@ -122,7 +122,6 @@ export const button_styles = {
   menu_button_styles: {
     backgroundColor: brightBlueColor,
     color: 'white',
-    borderRadius: defaultBorderRadius,
     padding: { xs: "5px", sm: "7px", md: "9px", lg: "11px", xl: "13px" },
     borderRadius: { xs: "5px", sm: "7px", md: "9px", lg: "11px", xl: "13px" },
     alignItems: 'center',

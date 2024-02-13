@@ -27,8 +27,6 @@ export function HomePage() {
 
   const [event_types_selected, setEventTypesSelected] = useState([]);
 
-  console.log("ContentContainer.js")
-
   useEffect(() => {
     if (user_session && user_session.Interests) {
       setEventTypesSelected(user_session.Interests);
