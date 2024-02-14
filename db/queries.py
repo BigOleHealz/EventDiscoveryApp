@@ -437,10 +437,6 @@ ATTEND_EVENT_AND_SEND_INVITES = r"""
     RETURN {STATUS: "SUCCESS", MESSAGE: "Invites Sent"} as result;
     """
 
-<<<<<<< HEAD
-=======
-
->>>>>>> origin/Develop_1.0
 FETCH_EVENT_INVITES = r"""
     MATCH (invitee:Person {UUID: $params.InviteeUUID})-[invite:INVITED_TO_EVENT {STATUS: "PENDING"}]->(event:Event)
     WHERE event.EndTimestamp > apoc.date.format(apoc.date.currentTimestamp(), "ms", "yyyy-MM-dd'T'HH:mm:ss")
