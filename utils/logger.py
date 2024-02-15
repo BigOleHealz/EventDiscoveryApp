@@ -5,18 +5,22 @@ from datetime import datetime
 class Logger(logging.Logger):
 
     def __init__(self, name: str):
-        super().__init__(name)
+        super().__init__(name, level=logging.DEBUG)
 
         self.timestamp = datetime.now().strftime('%Y-%m-%dT%H-%M-%S')
 
-        # Set up basic configuration for the logger to output to STDOUT
-        logging.basicConfig(
-            level=logging.INFO,
-            format="%(asctime)s [%(levelname)s] - %(name)s - %(message)s",
-            handlers=[
-                logging.StreamHandler(sys.stdout)  # Ensures log output goes to STDOUT
-            ]
-        )
+        stream_handler = logging.StreamHandler(sys.stdout)
+        stream_handler.setLevel(logging.DEBUG)  # Set the level to DEBUG to capture all logs
+
+        # Set a formatter
+        formatter = logging.Formatter("%(asctime)s [%(levelname)s] - %(name)s - %(message)s")
+        stream_handler.setFormatter(formatter)
+
+        # Add the handler to the logger
+        self.addHandler(stream_handler)
+
+        self.setLevel(logging.DEBUG)
+
         
     def emit(self, level, msg, *args, **kwargs):
         if level not in [logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL]:
@@ -43,5 +47,8 @@ if __name__ == "__main__":
     logger_name = 'heroku_app_logger'
     logger = Logger(name=logger_name)
 
-    logger.info(logging.INFO, "This is an info log.")
-    logger.error(logging.ERROR, "This is an error log.")
+    logger.info("This is an info log.")
+    logger.debug("This is a debug log.")
+    logger.warning("This is a warning log.")
+    logger.critical("This is a critical log.")
+    logger.error("This is an error log.")

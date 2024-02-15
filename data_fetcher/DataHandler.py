@@ -17,9 +17,9 @@ source_handler_mapping = {
 }
 class DataIngestionHandler(MetadataHandler, abc.ABC):
     def __init__(self):
-        self.logger = Logger(log_group_name=f"data_ingestion")
+        self.logger = Logger(name=f"data_ingestion")
         self.aws_handler = AWSHandler(logger=self.logger)
-        super().__init__(aws_handler=self.aws_handler, logger=self.logger)
+        super().__init__(logger=self.logger)
 
     def run(self):
         df_ingestions_to_be_performed = self.get_ingestions_to_attempt()
