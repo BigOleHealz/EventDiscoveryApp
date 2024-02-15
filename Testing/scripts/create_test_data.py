@@ -5,8 +5,8 @@ from uuid import uuid4
 from datetime import datetime as dt, timedelta
 import pandas as pd
 
-from random_word import RandomWords
-rw = RandomWords()
+
+from dotenv import load_dotenv
 
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
@@ -16,10 +16,11 @@ sys.path.append(home)
 from db.db_handler import Neo4jDB
 from db import queries
 from utils.logger import Logger
-from utils.aws_handler import AWSHandler
 from utils.helper_functions import HelperFunctions
 from utils.constants import CITY_DATA, datetime_format
 
+
+load_dotenv()
 
 
 min_date = dt.today().date()
@@ -43,8 +44,7 @@ class CreateTestData:
         self.neo4j = Neo4jDB(logger=self.logger)
         self.helper_functions = HelperFunctions(logger=self.logger)
         
-        aws_handler = AWSHandler(logger=self.logger)
-        self.google_maps_api_key = aws_handler.get_secret('google_maps_api_key')['GOOGLE_MAPS_API_KEY']
+        self.google_maps_api_key = os.getenv('GOOGLE_MAPS_API_KEY')
         
     
 

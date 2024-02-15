@@ -1,19 +1,19 @@
-import base64, hashlib, requests, functools, traceback
+import base64, hashlib, requests, functools, traceback, os
 import time
 from typing import Mapping
 
-from utils.aws_handler import AWSHandler
+from dotenv import load_dotenv
+# from utils.aws_handler import AWSHandler
 from utils.constants import ICON_SIZE, CITY_DATA
 from utils.logger import Logger
 
+load_dotenv()
 
 class HelperFunctions:
     def __init__(self, logger: Logger):
         self.logger = logger
-        self.aws_handler = AWSHandler(logger=self.logger)
-        self.google_maps_api_key = self.aws_handler.get_secret("google_maps_api_key")[
-            "GOOGLE_MAPS_API_KEY"
-        ]
+        # self.aws_handler = AWSHandler(logger=self.logger)
+        self.google_maps_api_key = os.getenv("GOOGLE_MAPS_API_KEY")
 
     def get_lat_lon_from_address(self, address: str):
         url = f"https://maps.googleapis.com/maps/api/geocode/json?address={address}&key={self.google_maps_api_key}"

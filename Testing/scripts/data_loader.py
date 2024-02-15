@@ -11,7 +11,7 @@ sys.path.append(home)
 # sys.path.append('../../db')
 from db.db_handler import Neo4jDB
 from db import queries
-from create_test_data import CreateTestData
+# from create_test_data import CreateTestData
 from utils.logger import Logger
 from utils.helper_functions import hash_password
 
@@ -24,29 +24,29 @@ class DataLoader:
         self.neo4j = Neo4jDB(logger=self.logger)
     
     def wipe_data(self):
-        self.logger.emit("Wiping Data")
+        self.logger.info("Wiping Data")
         self.neo4j.run_command(queries.DELETE_ALL_NODES)
         
     def wipe_events(self):
-        self.logger.emit("Wiping Events")
+        self.logger.info("Wiping Events")
         self.neo4j.run_command(queries.DELETE_ALL_NODES_BY_LABEL.format(label='Event'))
     
     def load_event_types_to_neo4j_db(self):
-        self.logger.emit('Loading Event Types')
+        self.logger.info('Loading Event Types')
         df = pd.read_csv(os.path.join(self.enriched_data_folder_path, 'event_types.csv'))
         # df['UUID'] = df['UUID'].apply(lambda x: str(uuid4()) if pd.isna(x) else x)
         for _, row in df.iterrows():
             self.neo4j.create_event_type_node(properties=row.to_dict())
 
     def load_businesses_to_neo4j_db(self):
-        self.logger.emit('Loading Businesses')
+        self.logger.info('Loading Businesses')
         df = pd.read_csv(os.path.join(self.enriched_data_folder_path, 'businesses.csv'))
         df['UUID'] = df['UUID'].apply(lambda x: str(uuid4()) if pd.isna(x) else x)
         for _, row in df.iterrows():
             self.neo4j.create_business_node(properties=row.to_dict())
     
     def load_persons_to_neo4j_db(self):
-        self.logger.emit('Loading Persons')
+        self.logger.info('Loading Persons')
         df = pd.read_csv(os.path.join(self.enriched_data_folder_path, 'persons.csv'))
         df['UUID'] = df['UUID'].apply(lambda x: str(uuid4()) if pd.isna(x) else x)
         person_properties_list = ['FirstName','LastName','Username','Email', 'UUID']
@@ -73,7 +73,7 @@ class DataLoader:
                 
     
     def load_events_to_neo4j_db(self):
-        self.logger.emit('Loading Events')
+        self.logger.info('Loading Events')
         df = pd.read_csv(os.path.join(self.enriched_data_folder_path, 'events.csv'))
 
         property_label_list = ['CreatedByUUID', 'Lat', 'Lon', 'StartTimestamp', 'EndTimestamp', 'PublicEventFlag', 'EventTypeUUID', 'EventCreatedAt', 'EventName', "Host", "Address"]
@@ -86,7 +86,7 @@ class DataLoader:
             self.neo4j.create_event_with_relationships(creator_node=creator_node, properties=properties, friends_invited=eval(row['InviteList']))
             
     def load_attending_relationships(self):
-        self.logger.emit('Loading Attending Relationships')
+        self.logger.info('Loading Attending Relationships')
         persons = self.neo4j.execute_query(queries.GET_ALL_NODES_BY_LABEL.format(label='Person'))
         
         invited_flags = [True, False, False]

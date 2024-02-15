@@ -4,6 +4,8 @@ from uuid import uuid4
 import pandas as pd
 
 from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.options import Options
 
 current = os.path.dirname(os.path.realpath(__file__))
@@ -34,7 +36,7 @@ class DataRecordHandler(MetadataHandler, abc.ABC):
         self.date=self.row['date']
         self.source_event_type_id=self.row['source_event_type_id']
 
-        self.logger = Logger(log_group_name=f"data_handler/{self.row['source']}", log_stream_name=f"{self.date}_{self.city_code}_{self.source_event_type_id}_{self.uuid}")
+        self.logger = Logger(name=f"data_handler/{self.row['source']}_{self.date}_{self.city_code}_{self.source_event_type_id}_{self.uuid}")
         self.aws_handler = AWSHandler(logger=self.logger)
         super().__init__(logger=self.logger)
         self.neo4j = Neo4jDB(logger=self.logger)
@@ -53,7 +55,11 @@ class DataRecordHandler(MetadataHandler, abc.ABC):
         chrome_options = Options()
         chrome_options.add_argument("--headless")
 
-        self.driver = webdriver.Chrome(options=chrome_options)
+        self.driver = webdriver.Chrome(
+                                        service=Service(ChromeDriverManager().install()), 
+                                        options=chrome_options
+                                    )
+
 
         self.event_data = {}
         self.neo4j_datetime_format = "%Y-%m-%dT%H:%M:%S"

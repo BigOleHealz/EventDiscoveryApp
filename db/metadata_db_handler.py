@@ -1,50 +1,36 @@
 #! /usr/bin/python3.8
-import abc, traceback
+import abc, traceback, os
 from datetime import datetime, timedelta
 import pandas as pd
 
-import pymysql
+
+from dotenv import load_dotenv
+import psycopg2
 
 from  db import rds_queries
-from utils.aws_handler import AWSHandler
 from utils.logger import Logger
 from utils.constants import DATE_FORMAT
 from utils.logger import Logger
 
+load_dotenv()
+
 class MetadataHandler(abc.ABC):
-    def __init__(self, aws_handler: AWSHandler=None, logger: Logger=None):
+    def __init__(self, logger: Logger=None):
         if logger is None:
-            logger = Logger(log_group_name=f"metadata_handler")
+            logger = Logger(name=f"metadata_handler")
         self.logger = logger
-        if aws_handler is None:
-            aws_handler = AWSHandler(logger=self.logger)
-        self.aws_handler = aws_handler
 
-        connection_details = {}
         try:
-            db_credentials = self.aws_handler.get_secret(secret_name="rds!cluster-cacb36b2-20f8-4aaa-9966-9b6f1e39756d")
-            db_endpoint_data = self.aws_handler.get_secret(secret_name="dev_metadata_db_endpoint")
+            database_url = os.getenv('POSTGRES_CONNECTION_STRING')
+            if not database_url:
+                raise Exception("Database URL not found in environment variables")
 
-            db_username = db_credentials['username']
-            db_password = db_credentials['password']
-            db_host = db_endpoint_data['host']
-            db_port = int(db_endpoint_data['port'])
-            database = db_endpoint_data['database']
-            connection_details = {
-                'user': db_username,
-                'password': db_password,
-                'host': db_host,
-                'port': db_port,
-                'database': database
-            }
         except Exception as error:
             self.logger.error(msg=error)
             self.logger.error(msg=f"An error occurred while getting the database credentials from AWS Secrets Manager: {traceback.format_exc()}")
             raise error
-        if not connection_details:
-            raise Exception("connection_details cannot be empty")
         try:    
-            self.connection = pymysql.connect(**connection_details)
+            self.connection = psycopg2.connect(database_url)
             self.cursor = self.connection.cursor()
 
         except Exception as error:
@@ -151,7 +137,6 @@ class MetadataHandler(abc.ABC):
             UUID=uuid,
             status=status
         )
-        
         self.cursor.execute(query)
         self.connection.commit()
     
@@ -179,23 +164,53 @@ class MetadataHandler(abc.ABC):
         self.connection.commit()
     
     def insert_raw_event(self, record: dict):
-        data = (
-            record['UUID'], record['source'], record['source_id'], record['event_url'],
-            record['ingestion_status'], record['ingestion_uuid'], record['region_id'],
-            record['event_start_date'], record['s3_link'], record.get('error_message', '')
-        )
-        self.cursor.execute(rds_queries.INSERT_RAW_EVENT, data)
-        self.connection.commit()
+        try:
+            data = (
+                record['UUID'],
+                record['source'],
+                record['source_id'],
+                record['event_url'],
+                record['ingestion_status'],
+                record['ingestion_uuid'],
+                record['region_id'],
+                record['event_start_date'],
+                record['s3_link'],
+                record.get('error_message', ''),
+            )
+            formatted_query = self.cursor.mogrify(rds_queries.INSERT_RAW_EVENT, data)
+            self.logger.info(f"Formatted SQL Query: {formatted_query}")
+            self.cursor.execute(formatted_query)
+            self.connection.commit()
+        except Exception as e:
+            self.logger.error(f"Failed to insert raw event: {e}")
+            raise
     
     def insert_event_successfully_ingested(self, record: dict):
         data = (
-            record['UUID'], record['Address'], record['EventType'],
-            record['EventTypeUUID'], record['StartTimestamp'], record['EndTimestamp'],
-            record['ImageURL'], record['Host'], record['Lon'], record['Lat'],
-            record['Summary'], record['PublicEventFlag'], record['FreeEventFlag'],
-            record['Price'], record['EventDescription'], record['EventName'],
-            record['SourceEventID'], record['EventPageURL']
+            record['UUID'],
+            record['Address'],
+            record['EventType'],
+            record['EventTypeUUID'],
+            record['StartTimestamp'],
+            record['EndTimestamp'],
+            record['ImageURL'],
+            record['Host'],
+            record['Lon'],
+            record['Lat'],
+            record['Summary'],
+            record['PublicEventFlag'],
+            record['FreeEventFlag'],
+            record['Price'],
+            record['EventDescription'],
+            record['EventName'],
+            record['SourceEventID'],
+            record['EventPageURL'],
         )
-
-        self.cursor.execute(rds_queries.INSERT_EVENT_SUCCESSFULLY_INGESTED, data)
-        self.connection.commit()
+        try:
+            self.cursor.execute(rds_queries.INSERT_EVENT_SUCCESSFULLY_INGESTED, data)
+            self.connection.commit()
+        except Exception as error:
+            self.logger.error(msg=error)
+            self.logger.error(msg=f"An error occurred while inserting the following record: {record}")
+            self.logger.error(msg=traceback.format_exc())
+            raise error

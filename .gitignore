@@ -12,3 +12,6 @@ app_frontend/package-lock.json
 .vscode*
 flask-server/db/*
 flask-server/utils/*
+frontend/node_modules*
+venv*
+.env

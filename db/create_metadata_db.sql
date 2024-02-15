@@ -1,17 +1,20 @@
-DROP TABLE IF EXISTS metadata.events_successful;
-DROP TABLE IF EXISTS metadata.events_raw;
-DROP TABLE IF EXISTS metadata.ingestions;
-DROP TABLE IF EXISTS metadata.event_type_source_mappings;
-DROP TABLE IF EXISTS metadata.event_types;
-DROP TABLE IF EXISTS metadata.regions;
-DROP TABLE IF EXISTS metadata.sources;
+DROP VIEW IF EXISTS events_joined_view;
+DROP VIEW IF EXISTS ingestions_joined_view;
 
-DROP TABLE IF EXISTS metadata.sessions;
-DROP TABLE IF EXISTS metadata.users;
+DROP TABLE IF EXISTS events_successful;
+DROP TABLE IF EXISTS events_raw;
+DROP TABLE IF EXISTS ingestions;
+DROP TABLE IF EXISTS event_type_source_mappings;
+DROP TABLE IF EXISTS event_types;
+DROP TABLE IF EXISTS regions;
+DROP TABLE IF EXISTS sources;
+
+DROP TABLE IF EXISTS sessions;
+DROP TABLE IF EXISTS users;
 
 -- Data Ingestion Metadata
 CREATE TABLE sources (
-  _id integer AUTO_INCREMENT PRIMARY KEY,
+  _id SERIAL PRIMARY KEY,
   source varchar(255),
   source_url varchar(300)
 );
@@ -30,7 +33,7 @@ CREATE TABLE ingestions (
 );
 
 CREATE TABLE regions (
-  _id integer AUTO_INCREMENT PRIMARY KEY,
+  _id SERIAL PRIMARY KEY,
   city_code varchar(255),
   state_code varchar(255),
   country_code varchar(255)
@@ -43,7 +46,7 @@ CREATE TABLE event_types (
 );
 
 CREATE TABLE event_type_source_mappings (
-  _id integer AUTO_INCREMENT PRIMARY KEY,
+  _id SERIAL PRIMARY KEY,
   source_id integer,
   target_event_type_uuid varchar(255),
   source_event_type_id varchar(255),
@@ -61,12 +64,12 @@ CREATE TABLE events_raw (
   region_id integer,
   event_start_date date,
   s3_link varchar(255),
-  error_message varchar(255)
+  error_message varchar(1500)
 );
 
 CREATE TABLE events_successful (
   UUID varchar(255) PRIMARY KEY,
-  Address varchar(255),
+  Address varchar(500),
   EventType varchar(255),
   EventTypeUUID varchar(255),
   StartTimestamp timestamp,
@@ -81,7 +84,7 @@ CREATE TABLE events_successful (
   Price varchar(255),
   EventDescription text,
   EventName varchar(255),
-  SourceEventID integer,
+  SourceEventID BIGINT,
   EventPageURL varchar(255)
 );
 
@@ -115,7 +118,7 @@ ALTER TABLE events_raw ADD FOREIGN KEY (SourceID) REFERENCES sources (_id) ON DE
 ALTER TABLE events_raw ADD FOREIGN KEY (region_id) REFERENCES regions (_id) ON DELETE CASCADE;
 ALTER TABLE events_raw ADD FOREIGN KEY (ingestion_uuid) REFERENCES ingestions (UUID) ON DELETE CASCADE;
 -- 
-ALTER TABLE events_successful ADD FOREIGN KEY (UUID) REFERENCES events_raw (UUID) ON DELETE CASCADE;
+-- ALTER TABLE events_successful ADD FOREIGN KEY (UUID) REFERENCES events_raw (UUID) ON DELETE CASCADE;
 -- 
 ALTER TABLE sessions ADD FOREIGN KEY (account_uuid) REFERENCES users (UUID) ON DELETE CASCADE;
 --
@@ -129,8 +132,8 @@ INSERT INTO sources (source,source_url) VALUES
 INSERT INTO regions (city_code,state_code,country_code) VALUES
   ('boston','ma','us'),
   ('philadelphia','pa','us'),
-  ('miami','fl','us'),
-  ('atlantic city','nj','us');
+  ('miami','fl','us')
+;
 
 -- event_types
 INSERT INTO event_types (UUID,EventType,PinColor) VALUES
@@ -148,14 +151,16 @@ INSERT INTO event_type_source_mappings (source_id,target_event_type_uuid,source_
   (1,'7abfc211-b49b-4572-8646-acb8fdfffb6c','food-and-drink','food-and-drink'),
   (1,'29c65158-0a9f-4b14-8606-4f6bd4798e11','health','health'),
   (1,'29c65158-0a9f-4b14-8606-4f6bd4798e11','sports-and-fitness','sports-and-fitness'),
-  (1,'1f1d1c1b-1b1b-4e6e-8e0e-1e1e1d1c1b1b','science-and-tech','science-and-tech'),
-  (2,'9f730660-bf2e-40a9-9b04-33831eb91471','405','Career & Business'),
-  (2,'29c65158-0a9f-4b14-8606-4f6bd4798e11','511','Health & Wellbeing'),
-  (2,'8e2fa9d6-62d9-4439-a3ce-e22d0efd389f','395','Music'),
-  (2,'1f1d1c1b-1b1b-4e6e-8e0e-1e1e1d1c1b1b','436','Science & Education'),
-  (2,'29c65158-0a9f-4b14-8606-4f6bd4798e11','482','Sports & Fitness'),
-  (2,'1f1d1c1b-1b1b-4e6e-8e0e-1e1e1d1c1b1b','546','Technology'),
-  (2,'501c8388-b139-485e-9095-8bec01fa9945','652','Social Activites');
+  (1,'1f1d1c1b-1b1b-4e6e-8e0e-1e1e1d1c1b1b','science-and-tech','science-and-tech')
+  -- ,
+  -- (2,'9f730660-bf2e-40a9-9b04-33831eb91471','405','Career & Business'),
+  -- (2,'29c65158-0a9f-4b14-8606-4f6bd4798e11','511','Health & Wellbeing'),
+  -- (2,'8e2fa9d6-62d9-4439-a3ce-e22d0efd389f','395','Music'),
+  -- (2,'1f1d1c1b-1b1b-4e6e-8e0e-1e1e1d1c1b1b','436','Science & Education'),
+  -- (2,'29c65158-0a9f-4b14-8606-4f6bd4798e11','482','Sports & Fitness'),
+  -- (2,'1f1d1c1b-1b1b-4e6e-8e0e-1e1e1d1c1b1b','546','Technology'),
+  -- (2,'501c8388-b139-485e-9095-8bec01fa9945','652','Social Activites')
+;
 
 INSERT INTO users (UUID, Email, Username, FirstName, LastName, AccountCreatedTimestamp, TestUser) VALUES 
   ('ebd65e41-8146-40ed-9e8d-fc4ff7b75a3d', 'matt@gmail.com', 'bigolehealz', 'Matt', 'Smith', NOW(), TRUE),
@@ -172,4 +177,59 @@ INSERT INTO users (UUID, Email, Username, FirstName, LastName, AccountCreatedTim
   ('63626a7f-d32d-4f90-831c-fe3716870cd9', 'dante@gmail.com', 'dantesmith', 'Dante', 'Smith', NOW(), TRUE),
   ('7987238-47e3-4132-adc6-78555dfdaac4', 'manisha@gmail.com', 'manishasmith', 'Manisha', 'Smith', NOW(), TRUE),
   ('0c816c74-5412-4c44-81d1-7c1e9d39dc62', 'scott@gmail.com', 'scottsmith', 'Scott', 'Smith', NOW(), TRUE),
-  ('ae36de82-eee0-4a45-b332-afcdd30685ac', 'dummy@gmail.com', 'dummyuser', 'Dummy', 'User', NOW(), TRUE);
+  ('ae36de82-eee0-4a45-b332-afcdd30685ac', 'dummy@gmail.com', 'dummyuser', 'Dummy', 'User', NOW(), TRUE)
+;
+
+
+CREATE or REPLACE VIEW events_joined_view AS
+SELECT 
+    i.ingestion_status as i_status,
+    i.ingestions_start_ts AS ingestion_start_ts,
+    COALESCE(r.UUID, s.UUID) AS event_uuid,
+    r.Source,
+    r.SourceID,
+    r.EventURL,
+    r.ingestion_status,
+    r.ingestion_uuid,
+    r.region_id,
+    r.event_start_date,
+    r.s3_link,
+    r.error_message,
+    s.Address,
+    s.EventType,
+    s.EventTypeUUID,
+    s.StartTimestamp,
+    s.EndTimestamp,
+    s.ImageURL,
+    s.Host,
+    s.Lon,
+    s.Lat,
+    s.Summary,
+    s.PublicEventFlag,
+    s.FreeEventFlag,
+    s.Price,
+    s.EventDescription,
+    s.EventName,
+    s.SourceEventID,
+    s.EventPageURL
+FROM events_raw r
+LEFT JOIN events_successful s ON r.UUID = s.UUID
+LEFT JOIN ingestions i ON r.ingestion_uuid = i.UUID;
+
+CREATE or REPLACE VIEW ingestions_joined_view AS
+SELECT 
+  i.date,
+  r.city_code,
+  r.state_code,
+  s.source,
+  i.UUID,
+  etsm.source_event_type_string,
+  i.ingestion_status,
+  i.ingestions_start_ts,
+  i.success_count,
+  i.error_count,
+  i.virtual_count
+FROM ingestions i
+LEFT JOIN regions r ON r._id = i.region_id
+LEFT JOIN event_type_source_mappings etsm on i.source_event_type_mapping_id = etsm._id
+LEFT JOIN sources s on s._id = etsm.source_id;

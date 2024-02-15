@@ -44,7 +44,7 @@ SELECT_INGESTION_ATTEMPTS_FOR_DATES_AFTER_TODAY = """
         source_event_type_mapping_id
     FROM
         ingestions
-    WHERE date >= {start_date}
+    WHERE date >= '{start_date}'
         AND
     ingestion_status = 'SUCCESS';
 """
@@ -70,6 +70,16 @@ UPDATE_INGESTION_ATTEMPT_STATUS = """
     WHERE UUID='{UUID}';
 """
 
+CHECK_IF_EVENT_EXISTS = """
+
+    SELECT
+        UUID
+    FROM
+        events_successful
+    WHERE
+        SourceEventID = {SourceEventID};
+"""
+    
 CLOSE_INGESTION_ATTEMPT = """
     UPDATE ingestions
     SET ingestion_status='{status}',
@@ -91,10 +101,11 @@ INSERT_RAW_EVENT = """
         event_start_date,
         s3_link,
         error_message
-    ) VALUES(
+    ) VALUES( 
         %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
     );
 """
+
 
 UPDATE_RAW_EVENT_INGESTION_STATUS = """
     UPDATE events_raw
@@ -106,9 +117,24 @@ UPDATE_RAW_EVENT_INGESTION_STATUS = """
 
 INSERT_EVENT_SUCCESSFULLY_INGESTED = """
     INSERT INTO events_successful (
-        UUID, Address, EventType, EventTypeUUID, StartTimestamp, EndTimestamp,
-        ImageURL, Host, Lon, Lat, Summary, PublicEventFlag, FreeEventFlag,
-        Price, EventDescription, EventName, SourceEventID, EventPageURL
+        UUID,
+        Address,
+        EventType,
+        EventTypeUUID,
+        StartTimestamp,
+        EndTimestamp,
+        ImageURL,
+        Host,
+        Lon,
+        Lat,
+        Summary,
+        PublicEventFlag,
+        FreeEventFlag,
+        Price,
+        EventDescription,
+        EventName,
+        SourceEventID,
+        EventPageURL
     ) VALUES (
         %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
     );

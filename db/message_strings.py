@@ -21,6 +21,8 @@ lat = 'Lat'
 event_name = 'EventName'
 price = 'Price'
 event_type_uuid = 'EventTypeUUID'
+event_summary = 'Summary'
+event_description = 'EventDescription'
 
 no_input_body_provided = "No input body provided"
 

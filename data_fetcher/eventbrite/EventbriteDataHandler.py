@@ -13,7 +13,8 @@ from utils.aws_handler import AWSHandler
 
 from bs4 import BeautifulSoup
 
-        
+number_of_pages = 4
+
 class EventbriteDataHandler(DataRecordHandler):
     def __init__(self, row: pd.Series, aws_handler: AWSHandler):
         self.event_data_script_type = "application/ld+json"
@@ -22,7 +23,8 @@ class EventbriteDataHandler(DataRecordHandler):
         super().__init__(row=row)
 
     def download_homepages(self):
-        for page_no in range(1,4):
+        page_no_start = 1
+        for page_no in range(1, page_no_start+number_of_pages):
             output_file_key = os.path.join(self.homepage_prefix, f"homepage_{page_no}.html")
             url = self.row['source_url'].format(
                     state_code=self.row['state_code'],
@@ -57,20 +59,24 @@ class EventbriteDataHandler(DataRecordHandler):
 
                 for i, script in enumerate(scripts):
                     event_data_raw = json.loads(script.string)
-                    url = event_data_raw['url']
-                    source_event_id = url.split('-')[-1]
-                    
-                    output_file_key = os.path.join(output_key_prefix, source_event_id)
+                    url = event_data_raw.get('url')
+                    if url:
+                        source_event_id = url.split('-')[-1]
+                        
+                        output_file_key = os.path.join(output_key_prefix, source_event_id)
 
-                    file_exists_boolean = self.aws_handler.check_if_s3_file_exists(bucket=self.bucket_name, key=output_file_key)
-                    if file_exists_boolean:
-                        self.logger.info(f"File {output_file_key} already exists in S3. Skipping...")
+                        file_exists_boolean = self.aws_handler.check_if_s3_file_exists(bucket=self.bucket_name, key=output_file_key)
+                        if file_exists_boolean:
+                            self.logger.info(f"File {output_file_key} already exists in S3. Skipping...")
+                            continue
+                        
+                        self.driver.get(url)
+                        html_source = self.driver.page_source
+
+                        self.aws_handler.write_to_s3(bucket=self.bucket_name, key=output_file_key, data=html_source)
+                    else:
                         continue
-                    
-                    self.driver.get(url)
-                    html_source = self.driver.page_source
 
-                    self.aws_handler.write_to_s3(bucket=self.bucket_name, key=output_file_key, data=html_source)
         except Exception as e:
             self.logger.error(msg=f"Error parsing homepages")
             self.logger.error(msg=e)

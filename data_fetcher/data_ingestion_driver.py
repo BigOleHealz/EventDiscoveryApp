@@ -7,7 +7,6 @@ sys.path.append(parent)
 
 from db.metadata_db_handler import MetadataHandler
 from DataHandler import DataIngestionHandler
-from utils.aws_handler import AWSHandler
 from utils.logger import Logger
 
 def run():
