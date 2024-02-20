@@ -62,6 +62,7 @@ class DataRecordHandler(MetadataHandler, abc.ABC):
                                         options=chrome_options
                                     )
 
+        self.driver.set_page_load_timeout(30)
 
         self.event_data = {}
         self.neo4j_datetime_format = "%Y-%m-%dT%H:%M:%S"
