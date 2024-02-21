@@ -54,14 +54,18 @@ class DataRecordHandler(MetadataHandler, abc.ABC):
 
         chrome_options = Options()
         chrome_options.add_argument("--headless")
-        chrome_options.add_argument("--disable-gpu")
-        chrome_options.add_argument("--no-sandbox")
+        chrome_options.add_argument("--disable-gpu")  # May be unnecessary for newer versions of Chrome
+        chrome_options.add_argument("--no-sandbox")  # This option is necessary for Heroku
+        chrome_options.add_argument("--disable-dev-shm-usage")  
 
         self.driver = webdriver.Chrome(
                                         service=Service(ChromeDriverManager().install()), 
                                         options=chrome_options
                                     )
 
+        chrome_bin = os.environ.get("GOOGLE_CHROME_BIN", "chromedriver")
+        chrome_options.binary_location = chrome_bin
+        
         self.driver.set_page_load_timeout(30)
 
         self.event_data = {}
