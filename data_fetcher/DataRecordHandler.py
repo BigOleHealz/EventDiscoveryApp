@@ -63,10 +63,9 @@ class DataRecordHandler(MetadataHandler, abc.ABC):
                                         options=chrome_options
                                     )
 
-        chrome_bin = os.environ.get("GOOGLE_CHROME_BIN", "chromedriver")
-        chrome_options.binary_location = chrome_bin
-        
-        self.driver.set_page_load_timeout(30)
+        if os.environ.get("GOOGLE_CHROME_BIN"):
+            chrome_bin = os.environ.get("GOOGLE_CHROME_BIN", "chromedriver")
+            chrome_options.binary_location = chrome_bin
 
         self.event_data = {}
         self.neo4j_datetime_format = "%Y-%m-%dT%H:%M:%S"

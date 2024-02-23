@@ -184,8 +184,7 @@ class EventbriteDataHandler(DataRecordHandler):
                         else:
                             self.success_record_count += 1
                             output_file_key = full_file_key_success
-                        
-                        self.aws_handler.write_to_s3(bucket=self.bucket_name, key=output_file_key, data=json.dumps(event_data_dict, indent=4))
+                            self.aws_handler.write_to_s3(bucket=self.bucket_name, key=output_file_key, data=json.dumps(event_data_dict, indent=4))
 
             except json.decoder.JSONDecodeError as e:
                 output_file_key = os.path.join(self.event_data_json_error_prefix, event_filename)
