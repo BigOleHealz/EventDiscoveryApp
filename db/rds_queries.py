@@ -1,7 +1,6 @@
 
 SELECT_SOURCES = """
     SELECT
-        _id as source_id,
         source,
         source_url
     FROM
@@ -10,11 +9,9 @@ SELECT_SOURCES = """
 
 SELECT_EVENT_TYPE_SOURCE_MAPPINGS = """
     SELECT
-        _id as source_event_type_mapping_id,
-        source_id,
-        target_event_type_uuid,
-        source_event_type_id,
-        source_event_type_string
+        source_event_type,
+        source,
+        target_event_type_uuid
     FROM
         event_type_source_mappings;
 """
@@ -38,10 +35,10 @@ SELECT_REGIONS = """
 """
 SELECT_INGESTION_ATTEMPTS_FOR_DATES_AFTER_TODAY = """
     SELECT
-        source_id,
+        source,
         region_id,
         date,
-        source_event_type_mapping_id
+        source_event_type
     FROM
         ingestions
     WHERE date >= '{start_date}'
@@ -52,7 +49,7 @@ SELECT_INGESTION_ATTEMPTS_FOR_DATES_AFTER_TODAY = """
 INSERT_INGESTION_ATTEMPT = """
     INSERT INTO ingestions (
         UUID,
-        source_id,
+        source,
         region_id,
         date,
         source_event_type_mapping_id,
@@ -89,31 +86,6 @@ CLOSE_INGESTION_ATTEMPT = """
     WHERE UUID='{UUID}';
 """
 
-INSERT_RAW_EVENT = """
-    INSERT INTO events_raw(
-        UUID,
-        Source,
-        SourceID,
-        EventURL,
-        ingestion_status,
-        ingestion_uuid,
-        region_id,
-        event_start_date,
-        s3_link,
-        error_message
-    ) VALUES( 
-        %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
-    );
-"""
-
-
-UPDATE_RAW_EVENT_INGESTION_STATUS = """
-    UPDATE events_raw
-    SET
-        ingestion_status='{status}',
-        error_message='{error_message}'
-    WHERE UUID='{UUID}';
-"""
 
 INSERT_EVENT_SUCCESSFULLY_INGESTED = """
     INSERT INTO events_successful (

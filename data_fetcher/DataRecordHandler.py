@@ -25,13 +25,13 @@ class DataRecordHandler(MetadataHandler, abc.ABC):
         self.row = row
         self.uuid = str(uuid4())
         self.row['UUID'] = self.uuid
-        self.bucket_name = "evently-data-scraper"
+        self.bucket_name = "functionfinder-data-scraper"
 
         self.root_dir = self.row['source']
         self.homepages_dir = os.path.join(self.root_dir, 'homepages')
         self.eventpages_dir = os.path.join(self.root_dir, 'eventpages')
         self.event_data_json_dir = os.path.join(self.root_dir, 'event_data_json')
-
+        
         self.city_code=self.row['city_code']
         self.date=self.row['date']
         self.source_event_type_id=self.row['source_event_type_id']

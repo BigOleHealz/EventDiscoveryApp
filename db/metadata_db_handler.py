@@ -14,6 +14,7 @@ from utils.logger import Logger
 
 load_dotenv()
 
+days = 0
 class MetadataHandler(abc.ABC):
     def __init__(self, logger: Logger=None):
         if logger is None:
@@ -60,7 +61,7 @@ class MetadataHandler(abc.ABC):
     
     def get_event_type_source_mappings(self):
         event_source_mappings = self.fetchall(rds_queries.SELECT_EVENT_TYPE_SOURCE_MAPPINGS)
-        df = pd.DataFrame(event_source_mappings, columns=['source_event_type_mapping_id', 'source_id', 'target_event_type_uuid', 'source_event_type_id', 'source_event_type_string'])
+        df = pd.DataFrame(event_source_mappings, columns=['source_event_type', 'source', 'target_event_type_uuid'])
         return df
     
     def get_event_types(self):
@@ -70,12 +71,12 @@ class MetadataHandler(abc.ABC):
     
     def get_sources(self):
         sources = self.fetchall(rds_queries.SELECT_SOURCES)
-        df = pd.DataFrame(sources, columns=['source_id', 'source', 'source_url'])
+        df = pd.DataFrame(sources, columns=['source', 'source_url'])
         return df
     
     def calculate_dates_to_be_ingested(self):
         start_date = datetime.today()
-        end_date = start_date + timedelta(days=3)
+        end_date = start_date + timedelta(days=days)
         date_list = [(start_date + timedelta(days=x)).strftime(DATE_FORMAT) for x in range((end_date-start_date).days + 1)]
         df = pd.DataFrame(date_list, columns=['date'])
         return df
@@ -88,7 +89,7 @@ class MetadataHandler(abc.ABC):
     def get_relevant_ingestion_attempts(self, start_date: str):
         ingestion_attemps = self.fetchall(rds_queries.SELECT_INGESTION_ATTEMPTS_FOR_DATES_AFTER_TODAY.format(start_date=start_date))
 
-        df = pd.DataFrame(ingestion_attemps, columns=['source_id', 'region_id', 'date', 'source_event_type_mapping_id'])
+        df = pd.DataFrame(ingestion_attemps, columns=['source', 'region_id', 'date', 'source_event_type'])
         df['date'] = df['date'].astype(str)
         return df
 
@@ -108,14 +109,14 @@ class MetadataHandler(abc.ABC):
         df_regions = self.get_regions()
 
         df_event_type_source_mappings = pd.merge(df_event_type_source_mappings, df_event_types, left_on='target_event_type_uuid', right_on='event_type_uuid', how='left').drop('event_type_uuid', axis=1)
-        df_sources_mapped_to_event_type_mappings = pd.merge(df_sources, df_event_type_source_mappings, on='source_id')
+        df_sources_mapped_to_event_type_mappings = pd.merge(df_sources, df_event_type_source_mappings, on='source')
         df = self.cartesian_product(df_sources_mapped_to_event_type_mappings, df_regions)
         df = self.cartesian_product(df, df_dates_to_be_ingested)
 
         df_relevant_ingestion_attempts = self.get_relevant_ingestion_attempts(start_date=datetime.today().strftime(DATE_FORMAT))
         df_relevant_ingestion_attempts['ingestion_completed'] = True
                 
-        result_df = df.merge(df_relevant_ingestion_attempts, on=['source_id', 'region_id', 'date', 'source_event_type_mapping_id'], how='left')
+        result_df = df.merge(df_relevant_ingestion_attempts, on=['source', 'region_id', 'date', 'source_event_type'], how='left')
         result_df = result_df[result_df['ingestion_completed'] != True].reset_index(drop=True).drop('ingestion_completed', axis=1)
         
         return result_df

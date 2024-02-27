@@ -1,6 +1,10 @@
 import base64, hashlib, requests, functools, traceback, os
 import time
 from typing import Mapping
+from datetime import datetime
+
+from timezonefinder import TimezoneFinder
+import pytz
 
 from dotenv import load_dotenv
 # from utils.aws_handler import AWSHandler
@@ -16,11 +20,16 @@ class HelperFunctions:
         self.google_maps_api_key = os.getenv("GOOGLE_MAPS_API_KEY")
 
     def get_lat_lon_from_address(self, address: str):
-        url = f"https://maps.googleapis.com/maps/api/geocode/json?address={address}&key={self.google_maps_api_key}"
-        response = requests.get(url)
-        resp_json_payload = response.json()
-        lat_lon = resp_json_payload["results"][0]["geometry"]["location"]
-        return lat_lon
+        try:
+            url = f"https://maps.googleapis.com/maps/api/geocode/json?address={address}&key={self.google_maps_api_key}"
+            response = requests.get(url)
+            resp_json_payload = response.json()
+            lat_lon = resp_json_payload["results"][0]["geometry"]["location"]
+            return lat_lon
+        except Exception as e:
+            self.logger.error(f"Error getting lat lon from address: {e}")
+            self.logger.error(traceback.print_exc())
+            return None
 
     def get_address_from_lat_lon(self, lat: float, lon: float):
         url = f"https://maps.googleapis.com/maps/api/geocode/json?latlng={lat},{lon}&key={self.google_maps_api_key}"
@@ -67,6 +76,29 @@ class HelperFunctions:
         timezone = data['timeZoneId']
 
         return timezone
+    
+    @staticmethod
+    def get_timezone_from_lat_lng(latitude: float, longitude: float):
+        tf = TimezoneFinder()
+        timezone_str = tf.timezone_at(lat=latitude, lng=longitude)  # Find the timezone string
+        return timezone_str
+    
+    @staticmethod
+    def convert_to_utc(datetime_obj: datetime, timezone_str: str):
+        # For Python versions before 3.9
+        timezone = pytz.timezone(timezone_str)
+        localized_datetime = timezone.localize(datetime_obj)
+        datetime_utc = localized_datetime.astimezone(pytz.utc)
+        
+        # For Python 3.9 or newer, use this instead:
+        # timezone = ZoneInfo(timezone_str)
+        # datetime_with_zone = datetime_obj.replace(tzinfo=timezone)
+        # datetime_utc = datetime_with_zone.astimezone(ZoneInfo("UTC"))
+        
+        return datetime_utc
+
+
+
 
 
 def format_decode_image(path: str):
