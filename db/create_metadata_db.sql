@@ -1,8 +1,7 @@
 DROP VIEW IF EXISTS events_joined_view;
 DROP VIEW IF EXISTS ingestions_joined_view;
 
-DROP TABLE IF EXISTS events_successful;
-DROP TABLE IF EXISTS events_raw;
+DROP TABLE IF EXISTS events;
 DROP TABLE IF EXISTS ingestions;
 DROP TABLE IF EXISTS event_type_source_mappings;
 DROP TABLE IF EXISTS event_types;
