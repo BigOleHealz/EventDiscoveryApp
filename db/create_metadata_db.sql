@@ -112,7 +112,7 @@ ALTER TABLE sessions ADD FOREIGN KEY (account_uuid) REFERENCES users (UUID) ON D
 
 
 INSERT INTO sources (source,source_url) VALUES
-  ('google_events_api','https://api.scrape-it.cloud/scrape/google/events?q={event_type} Events in {city_code}&location={city_code}%2C{state_code}%2C{country_code}&date:week&start={start}')
+  ('google_events_api','https://api.scrape-it.cloud/scrape/google/events?q={event_type} Events in {city_code}&location={city_code}%2C{state_code}%2C{country_code}&date:{date}&start={start}')
 ;
 
 INSERT INTO regions (_id,city_code,state_code,country_code) VALUES
