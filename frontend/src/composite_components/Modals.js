@@ -8,6 +8,7 @@ import Divider from '@mui/material/Divider';
 import BoxComponent from '../base_components/BoxComponent';
 import { CalendarComponent } from '../base_components/CalendarComponent';
 import { ModalComponent } from '../base_components/ModalComponent';
+import { TextComponent } from '../base_components/TextComponent';
 import { TextInputComponent } from '../base_components/TextInputComponent';
 import { TimeRangeSliderComponent } from '../base_components/TimeRangeSliderComponent';
 import { FriendRequestsTable } from './Tables';
@@ -25,7 +26,7 @@ import {
   useFetchUsername
 } from '../utils/Hooks';
 
-import { friend_request_styles } from '../styles';
+import { button_styles, friend_request_styles } from '../styles';
 
 export const EventViewerModal = ({
   isVisible,
@@ -34,7 +35,7 @@ export const EventViewerModal = ({
   onRequestClose,
   ...props
 }) => {
-
+  console.log("event", event)
   return (
     <ModalComponent
       isVisible={isVisible}
@@ -45,15 +46,31 @@ export const EventViewerModal = ({
     >
       <BoxComponent style={{ width: '100%', height: '100%' }}>
         {event && event.EventURL ? (
-          <iframe
-            src={event.EventURL}
-            title="Event Content"
-            style={{
-              border: 'none',
-              width: '100%',
-              height: '100%'
-            }}
-          />
+          event.EmbeddableFlag === false ? (
+            <BoxComponent style={{ display: 'flex', justifyContent: 'center', flexDirection: 'column', alignItems: 'center' }}>
+              <TextComponent>
+                This site does not let us embed their webpage on our site. But if you click on this button, we will redirect you to their website.
+              </TextComponent>
+              <Button
+                onClick={() => window.open(event.EventURL, '_blank')}
+                sx={{margin: { xs: '7px', sm: '9px', md: '11px', lg: '13px', xl: '15px' },
+                      ...button_styles.menu_button_styles
+                    }}
+              >
+                Go to Website
+              </Button>
+            </BoxComponent>
+          ) : (
+            <iframe
+              src={event.EventURL}
+              title="Event Content"
+              style={{
+                border: 'none',
+                width: '100%',
+                height: '100%'
+              }}
+            />
+          )
         ) : event ? (
           <EventDetailsTable event={event} />
         ) : (

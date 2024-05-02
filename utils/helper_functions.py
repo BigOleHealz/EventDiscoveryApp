@@ -1,6 +1,8 @@
 import base64, hashlib, requests, functools, traceback, os
 import time
 from typing import Mapping
+from urllib.parse import urlencode
+
 
 from dotenv import load_dotenv
 # from utils.aws_handler import AWSHandler
@@ -16,11 +18,22 @@ class HelperFunctions:
         self.google_maps_api_key = os.getenv("GOOGLE_MAPS_API_KEY")
 
     def get_lat_lon_from_address(self, address: str):
-        url = f"https://maps.googleapis.com/maps/api/geocode/json?address={address}&key={self.google_maps_api_key}"
-        response = requests.get(url)
-        resp_json_payload = response.json()
-        lat_lon = resp_json_payload["results"][0]["geometry"]["location"]
-        return lat_lon
+        try:
+            base_url = "https://maps.googleapis.com/maps/api/geocode/json"
+            params = {
+                "address": address,
+                "key": self.google_maps_api_key
+            }
+            encoded_params = urlencode(params)
+            full_url = f"{base_url}?{encoded_params}"
+            
+            response = requests.get(full_url)
+            resp_json_payload = response.json()
+            lat_lon = resp_json_payload["results"][0]["geometry"]["location"]
+            return lat_lon
+        except Exception as e:
+            import pdb; pdb.set_trace()
+            
 
     def get_address_from_lat_lon(self, lat: float, lon: float):
         url = f"https://maps.googleapis.com/maps/api/geocode/json?latlng={lat},{lon}&key={self.google_maps_api_key}"

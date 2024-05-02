@@ -1,0 +1,166 @@
+[
+  {
+      "host": "Sweet Liberty Drinks & Supply Company",
+      "address": "237-B 20th St, Miami Beach 33139",
+      "start_time": "16:00:00",
+      "end_time": "20:00:00",
+      "days": [0,1,2,3,4,5,6],
+      "website_link": "https://mysweetliberty.com/",
+      "embeddable_flag": true,
+      "phone_number": "305-763-8217",
+      "description": "When oysters are less than a buck, it’s your duty to order them by the dozen. Sweet Liberty affords you that luxury, with East Coast oysters for $.95. Splurge for bivalves from the West Coast for $1.95, and wash it all down with $10 cocktails (some of the best in town), $8 wine and $6 beer. There are numerous other specials, including bubbles and a shot of the day to get your night started strong. Order this: Watermelons Etc, made with vodka, fresh watermelon, pressed lemon, torn mint and San Pellegrino."
+  },
+  {
+      "host": "River Oyster Bar",
+      "address": "33 SE 7TH STREET, SUITE 100, MIAMI, FL 33131",
+      "start_time": "16:30:00",
+      "end_time": "19:00:00",
+      "days": [0,1,2,3,4,5,6],
+      "website_link": "https://www.therivermiami.com/",
+      "embeddable_flag": false,
+      "phone_number": "305-530-1915",
+      "description": "For an oyster happy hour where the oyster is truly the star, grab a seat at the bar area or lounge and order up a dozen (or two) of the chef's selection for $1.75 each. Other deals include La Rubia draft beer for $5 a pint, $8 wine, $8 well cocktails and basic martinis, $11 specialty wells and lots of yummy snacks, like deviled eggs with caviar for $12. Order this: If a dirty martini is your thing, this one is served with some of the freshest blue cheese olives we’ve encountered."
+  },
+  {
+      "host": "Mac’s Club Deuce",
+      "address": "222 14th St, Miami 33139",
+      "start_time": "08:00:00",
+      "end_time": "17:00:00",
+      "days": [0,1,2,3,4,5,6],
+      "website_link": "https://www.macsclubdeuce.com/",
+      "embeddable_flag": true,
+      "phone_number": "305-531-6200",
+      "description": "Mac’s iconic all-day, two-for-one happy hour makes every other happy hour look very short. Order up and the bartender will give you a poker chip along with your drink. Don’t lose it. When you’re ready for round two, hand it over to the bartender at Miami’s oldest bar and enjoy another cold one on the house."
+  },
+  {
+      "host": "Uchi Miami",
+      "address": "252 NW 25th St, Miami 33127-4341",
+      "start_time": "17:00:00",
+      "end_time": "18:30:00",
+      "days": [0,1,2,3,4,5,6],
+      "website_link": "https://uchi.uchirestaurants.com/location/miami/",
+      "embeddable_flag": false,
+      "description": "Grab a seat at the bar or an outdoor table to enjoy this Michelin-starred Austin import's buzzy happy hour. With discounted nigiri, makimono, tastings and even a dessert option, you can explore many of the restaurant’s coveted dishes while sipping refreshing cocktails like the Uchi G&T, made with gin, yuzu cordial and tonic. Score half-off all sparkling wine and champagne; $10 select signature cocktails; $8 wine and $9 sake; plus discounted bites."
+  },
+  {
+      "host": "The Corner",
+      "address": "1035 N Miami Ave, Miami, FL 33136",
+      "start_time": "16:00:00",
+      "end_time": "20:00:00",
+      "days": [1,2,3,4,5],
+      "website_link": "https://www.thecornermiami.com/",
+      "embeddable_flag": true,
+      "description": "The Corner is an infamous after-hours bar, but its happy hour crowd is often just as lively and eclectic. It also makes for a great spot to hit before a game at the arena or a show at the Arsht Center, both of which are within walking distance. The draw here are the $3 cans, from which there are dozens of craft varieties to choose. Well drinks go for half-off and there's also a very tempting $3 Chicago dog on offer."
+  },
+  {
+      "host": "The Sylvester",
+      "address": "3456 N Miami Ave, Miami, FL 33127",
+      "start_time": "17:00:00",
+      "end_time": "20:00:00",
+      "days": [2,3,4,5,6],
+      "website_link": "https://www.thesylvesterbar.com/",
+      "embeddable_flag": true,
+      "description": "Kick back at the long bar or on one of the vintage couches at The Sylvester, where it feels like you’re hanging at the house of a buddy with excellent mixology skills and a penchant for tropical wallpaper. Pick from a selection of $5 beer, $6 wine and $8 cocktails made by some of the best mixologists around. Order this: For an after-work pick-me-up, the Diesel, made with Jim Beam whiskey, cafecito bitters and demerara."
+  },
+  {
+      "host": "Monty's Raw Bar",
+      "address": "2550 S Bayshore Dr, Miami, FL 33133",
+      "start_time": "16:00:00",
+      "end_time": "19:00:00",
+      "days": [1,2,3,4,5],
+      "website_link": "https://www.montysrawbar.com/",
+      "embeddable_flag": false,
+      "description": "When you want your happy hour cocktails strong and with a healthy dose of live music and rowdy scene, look no further than this picturesque waterfront raw bar that really comes alive on Thursday and Friday afternoons. Happy hour specials include $8 Pain Removers, $7 margaritas and frozen cocktails; $6 wines and well drinks; $4 domestic draft beers, and $5 imports and craft beers. Order discounted shrimp, clams and stone crab claws from their famous raw bar boat through May 1."
+  },
+  {
+      "host": "Jaguar Sun",
+      "address": "230 NE 4th Street, Miami, FL 33132",
+      "start_time": "17:00:00",
+      "end_time": "19:00:00",
+      "days": [0,1,2,3,4,5,6],
+      "website_link": "https://jaguarsunmia.com/",
+      "embeddable_flag": true,
+      "description": "The secret’s been out on one of our favorite cocktail bars in Miami. Still, Jaguar Sun’s more mellow happy hour allows you to indulge in a perfectly shaken daiquiri and fresh oysters in relative peace. The daily specials kick off at 5pm and include a selection of cocktails for $10 and half-off oysters served with yuzu kosho or pineapple habanero mignonettes. Order this: Martini, Mini(ish)"
+  },
+  {
+      "host": "Taquerias El Mexicano",
+      "address": "521 SW 8th St, Miami, FL 33130",
+      "start_time": "15:00:00",
+      "end_time": "19:00:00",
+      "days": [1,2,3,4,5],
+      "website_link": "https://www.taqueriamexicano.com/",
+      "embeddable_flag": true,
+      "description": "Walk into Little Havana's Taquerias El Mexicano and you’ll feel like you’ve walked into a shop in Mexico City. The old-school restaurant got an extensive renovation from the Ball & Chain team, including a slightly more modern menu. But the happy hour prices ($3 Coronas, $4 margs and bites ranging from $3 to $5) are still delightfully retro. Order this: Mango margarita and guacamole de la casa"
+  },
+  {
+      "host": "Fox's Lounge",
+        "address": "6030 S Dixie Hwy, South Miami 33143",
+      "start_time": "16:00:00",
+      "end_time": "19:00:00",
+      "days": [0,1,2,3,4,5,6],
+      "website_link": "https://www.foxslounge.com/",
+      "embeddable_flag": true,
+      "description": "Proudly Miami’s darkest bar, Fox’s changes nothing about its midnight-level lighting at happy hour. Once your eyes adjust, order $7 select classics and well cocktails and $5 beer and wine. A selection of snacks go for $6.99 each, like the potato skins, shrimp cocktail and 1/2 grilled cheese and fries."
+  },
+  {
+      "host": "Motek Café",
+      "address": "36 NE 1st St, Miami, FL 33132",
+      "start_time": "15:00:00",
+      "end_time": "19:00:00",
+      "days": [1,2,3,4],
+      "website_link": "https://motekcafe.com/downtown/",
+      "embeddable_flag": true,
+      "description": "Motek rivals the hip cafés of Tel Aviv with its bright, inviting space and stacked menu of authentic Israeli delights. Available exclusively at the bar, the bustling happy hour features half-off beer and glasses of wine, classic cocktails for $8 and half-sandwiches for $7 and mezzes for $5 (think falafel, halloumi, baba ganoush and chicken shawarma)."
+  },
+
+  {
+    "host": "Motek Café",
+      "address": "36 NE 1st St, Miami, FL 33132",
+    "start_time": "16:00:00",
+    "end_time": "19:00:00",
+    "days": [5],
+    "website_link": "https://motekcafe.com/downtown/",
+    "embeddable_flag": true,
+    "description": "Motek rivals the hip cafés of Tel Aviv with its bright, inviting space and stacked menu of authentic Israeli delights. Available exclusively at the bar, the bustling happy hour features half-off beer and glasses of wine, classic cocktails for $8 and half-sandwiches for $7 and mezzes for $5 (think falafel, halloumi, baba ganoush and chicken shawarma)."
+},
+  {
+      "host": "Magic 13 Brewing Co.",
+      "address": "340 NE 61st St, Miami, FL 33137",
+      "start_time": "12:00:00",
+      "end_time": "18:00:00",
+      "days": [1,2,3,4,5],
+      "website_link": "https://magic13brewing.com/",
+      "embeddable_flag": true,
+      "description": "This independently-owned brewery, taproom and beer garden in Little River is an ideal spot to finish your last remote work meeting with a beer or cocktail in hand. Happy hour kicks off weekdays at noon and includes two-for-one craft beers, wine and cocktails made with house-distilled spirits. Outside, find provisions from the Meat n Bone Kitchen food truck, lounge seating, games and live music most nights."
+  },
+  {
+      "host": "The Taurus",
+        "address": "3540 Main Hwy, Miami 33133",
+      "start_time": "17:00:00",
+      "end_time": "19:00:00",
+      "days": [0,1,2,3,4,5,6],
+      "website_link": "https://thetauruscoconutgrove.com/",
+      "embeddable_flag": true,
+      "description": "This cool little whiskey joint taken over by Michelin-starred Michael Beltran is one of Coconut Grove’s longest-standing locales, serving an extensive selection of scotches, bourbons and all sorts of caramel-colored spirits. During happy hour, the bar keeps it friendly with two-for-one house liquors, $13 boiler makers and two-for-one draft beers, among other specials. Order this: The Taurus Happy Meal ($15) comes with a Scrap Burger with fries and a 12oz Monopolio beer."
+  },
+  {
+      "host": "Lost Boy",
+        "address": "157 E Flagler St, Miami 33131",
+      "start_time": "16:00:00",
+      "end_time": "19:00:00",
+      "days": [1,2,3,4,5],
+      "website_link": "https://www.lostboydrygoods.com/",
+      "embeddable_flag": true,
+      "description": "This relaxed pub functions as an ideal happy hour spot with the price of the entire drinks menu (and they’re all delicious) cut in half (about $7 to $8 for cocktails, $2 to $4 for beer and $4 to $10 for wine). On Fridays, happy hour is reliably slammed."
+  },
+  {
+      "host": "Terras",
+        "address": "528 SW Ninth Ave Miami, FL 33130",
+      "start_time": "16:00:00",
+      "end_time": "19:00:00",
+      "days": [3,4,5],
+      "website_link": "https://www.lifehousehotels.com/hotels/miami/little-havana/restaurant/terras",
+      "embeddable_flag": true,
+      "description": "Little Havana’s trendy rooftop bar atop the Life House Hotel serves up a lively hora feliz with amazing views to Downtown and Brickell, especially as the sun begins to set. The deals include $5 beers, $9 wines and a rotating lineup of craft cocktails for $10, like the Rooftop Rye Old Fashioned or Smokey Habanero Rum & Coke. Order this: Tajin-seasoned fries with a chipotle dipping sauce ($6) to help soak up the booze."
+  }
+]

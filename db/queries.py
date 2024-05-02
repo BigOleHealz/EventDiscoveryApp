@@ -165,10 +165,12 @@ FETCH_EVENTS_FOR_MAP = f"""
         event.{strings.event_summary} as {strings.event_summary},
         event.{strings.event_description} as {strings.event_description},
         event.{strings.uuid} as {strings.uuid},
-        event.EventURL as EventURL,
+        event.{strings.event_url} as {strings.event_url},
         event.{strings.price} as {strings.price},
         event.FreeEventFlag as FreeEventFlag,
         event.{strings.event_type_uuid} as {strings.event_type_uuid},
+        event.{strings.embeddable_flag} as {strings.embeddable_flag},
+        event.{strings.s3_link} as {strings.s3_link},
         eventType.EventType as EventType,
         eventType.IconURI as EventTypeIconURI,
         eventType.{strings.pin_color} as {strings.pin_color},
@@ -272,6 +274,14 @@ CHECK_IF_EVENT_EXISTS = r"""
 
 CREATE_EVENT_IF_NOT_EXISTS=r"""
                             MERGE (e:Event {Source: $params.Source, SourceEventID: $params.SourceEventID})
+                            ON CREATE SET e += $params
+                            WITH e, $params as params
+                            MATCH (et:EventType {UUID: params.EventTypeUUID})
+                            MERGE (et)-[:RELATED_EVENT]->(e);
+                            """
+
+CREATE_HAPPY_HOUR_EVENT_IF_NOT_EXISTS=r"""
+                            MERGE (e:Event {Source: $params.Source, SourceEventID: $params.SourceEventID, StartTimestamp: $params.StartTimestamp, Host: $params.Host})
                             ON CREATE SET e += $params
                             WITH e, $params as params
                             MATCH (et:EventType {UUID: params.EventTypeUUID})

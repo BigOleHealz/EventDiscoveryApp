@@ -22,7 +22,10 @@ event_name = 'EventName'
 price = 'Price'
 event_type_uuid = 'EventTypeUUID'
 event_summary = 'Summary'
+event_url = 'EventURL'
 event_description = 'EventDescription'
+embeddable_flag = 'EmbeddableFlag'
+s3_link = 'S3Link'
 
 no_input_body_provided = "No input body provided"
 

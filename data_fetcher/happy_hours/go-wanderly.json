@@ -1,0 +1,123 @@
+[
+    {
+        "host": "American Social",
+        "start_time": "16:00:00",
+        "end_time": "20:00:00",
+        "days": [0, 1, 2, 3, 4, 5, 6],
+        "website_link": "https://americansocialbar.com/locations/miami/",
+        "embeddable_flag": true,
+        "address": "690 SW 1st Ct, Miami, FL 33130",
+        "description": "Ready for one of the best happy hour experiences in Miami? Let us introduce you to American Social. Known for its vibrant atmosphere and delectable offerings, this place will knock your socks off. When it comes to finding the perfect drink, their happy hour menu is bursting with variety, from beer and wine to tempting cocktails, starting at just $6. Feast your eyes on some customer favorites, like Pinot Grigio or Angry Orchard. Don’t forget to try their Deviled Eggs and Artichoke Dip. Cheers to that, right?"
+    },
+    {
+        "host": "Beaker & Gray",
+        "start_time": "16:30:00",
+        "end_time": "18:30:00",
+        "days": [0,1,3,4,5,6],
+        "website_link": "https://www.beakerandgray.com/",
+        "embeddable_flag": true,
+        "address": "2637 N Miami Ave, Miami, FL 33127",
+        "description": "Oh boy, have you stumbled upon a gem in Miami’s happy hour scene! Beaker & Gray is the hotspot everyone needs to check out. This trendy eatery is nestled right in the heart of Wynwood, offering you globally-inspired shareable plates paired with award-winning cocktails. When it comes to menu favorites, don’t miss their delectable bottomless brunch which is nothing short of sensational. But the excitement doesn’t stop there; their happy hour from Wednesday-Monday 4:30-6:30PM is something to write home about. Munch on Lo Mein while sipping on a Rosie Sour."
+    },
+    {
+        "host": "The Key Club",
+        "start_time": "16:00:00",
+        "end_time": "20:00:00",
+        "days": [2,3,4,5],
+        "website_link": "https://thekeyclub.com/",
+        "embeddable_flag": true,
+        "address": "3015 Grand Ave, Coconut Grove, FL 33133",
+        "description": "Oh, Miami, the land of sun, sand and unforgettable Happy Hours! Next time you’re in town, make your way to The Key Club in Coconut Grove for an experience that you’ll keep coming back to. Their modern twist on classic American bar and grill vibes makes it the perfect spot to loosen up after a long day. Expect nothing less than amazing creations like their signature spicy tuna hand rolls and crispy oysters. But, don’t worry if seafood isn’t your thing; there’s something for everyone at this gem of a spot. With crisp wings and delish sliders, you’ll be spoiled for choice. Their Happy Hour specials are from 4 PM to 8 PM on Tuesday to Friday, so you’ll have plenty of time to bask in the joy of fabulous food and cocktails."
+    },
+    {
+        "host": "Baby Jane",
+        "start_time": "16:00:00",
+        "end_time": "19:00:00",
+        "days": [0, 1, 2, 3, 4, 5, 6],
+        "website_link": "https://www.babyjanemiami.com/",
+        "embeddable_flag": true,
+        "address": "500 Brickell Ave 105E, Miami, FL 33131",
+        "description": "Baby Jane is where a delightful happy hour scene steals the show in Miami’s bustling Brickell neighborhood. With its quirky and appealing atmosphere, this spot stands out among the crowd as a must-visit destination. Their happy hour isn’t limited to just drinks but also includes scrumptious food deals that make the experience even more irresistible. We bet you’ll be drooling over some of the stellar menu items that customers can’t stop raving about. Think along the lines of tuna poke tacos with shallots, mint, sesame, and macadamia dust, or perhaps the mouthwatering pork bun featuring chashu, cabbage, ginger slaw, cilantro, and togarashi aioli. Gather your friends from 4-7 PM and embark on an evening at Baby Jane – a place where fun and flavor join forces and steal your heart."
+    },
+    {
+        "host": "Mama Tried",
+        "start_time": "00:00:00",
+        "end_time": "20:00:00",
+        "days": [0, 1, 2, 3, 4, 5, 6],
+        "website_link": "http://mamatriedmia.com/",
+        "embeddable_flag": true,
+        "address": "207 NE 1st St, Miami, FL 33132",
+        "description": "Mama Tried is a cozy spot amidst the bustling Downtown Miami life. This place is a delightful throwback that offers an affordable experience without compromising on excitement. Nestled in the heart of the city, it’s the ultimate destination for a chill happy hour and some late-night fun. The menu? Simply spectacular! Customer favorites range from artisan cocktails to wine and daily shots of whiskey that keep patrons coming back for more. Mama Tried isn’t just about the food and drinks – it’s also about the ambiance. With its award-winning happy hour till 8 PM every day, you’ll quickly come to appreciate the laid-back vibes and top-notch service. Oh, and did we mention it’s open until 5 AM? That’s right, it’s the perfect location for letting loose and celebrating life in Miami!"
+    },
+    {
+        "host": "Phuc Yea",
+        "start_time": "17:00:00",
+        "end_time": "19:00:00",
+        "days": [0, 1, 2, 3, 4, 5, 6],
+        "website_link": "https://www.phucyea.com/",
+        "embeddable_flag": false,
+        "address": "7100 Biscayne Blvd, Miami, FL 33138",
+        "description": "Phuc Yea is a modern Vietnamese eatery with a unique twist: it’s a fusion of Colombian and Vietnamese flavors served up with 100% Miami swagger. This culinary gem is the home to Miami’s finest Pho – it’s like a beautiful symphony in your mouth. You’re in for a special treat at Phuc Yea’s happy hour, every day from 5-7 PM, featuring mouthwatering delights such as the crispy “Chai Gio” imperial roll. Seriously, these rolls might be the eighth wonder of the world! There’s also the scrumptious P.Y. Noodles. Want the inside scoop on a unique happy hour treasure? Jade Goddess with Askur gin, ginger, herbage, and egg white. Trust us, you won’t find anything else like it in Miami."
+    },
+    {
+      "host": "Cantina La Veinte",
+      "start_time": "17:00:00",
+      "end_time": "19:00:00",
+      "days": [0, 1, 2, 3, 4, 5, 6],
+      "website_link": "https://cantinala20.com/",
+      "embeddable_flag": true,
+      "address": "495 Brickell Ave, Miami, FL 33131",
+      "description": "Cantina La Veinte is where authentic Mexican cuisine and exquisite cocktails come together in the heart of Brickell, Miami. Located in the W Miami this vibrant spot leaps out at you, thanks to its carefully selected Mexican Art Deco architecture and brilliant black and golden colors. Ready to treat your senses? Delight in customer favorites like their famous margaritas, or savor their oh-so-fresh chips and guacamole. Can’t choose between their creative cocktails? Ask the staff for recommendations – they’ll help you find the perfect drink. And the best part? You can score these goodies at a discounted price during happy hour from 5-7 PM."
+    },
+    {
+      "host": "Nusr-Et Steakhouse Miami",
+      "start_time": "12:00:00",
+      "end_time": "17:00:00",
+      "days": [0, 1, 2, 3, 4, 5, 6],
+      "website_link": "https://www.nusr-et.com.tr/venues/miami",
+      "embeddable_flag": true,
+      "address": "999 Brickell Ave, Miami, FL 33131",
+      "description": "Nusr-Et Steakhouse Miami is where the city’s finest dine like kings and queens. This elegant steakhouse is known for its mouthwatering menu and enchanting atmosphere, so prepare for a happy hour unlike any other from 12-5 PM. While not a traditional happy hour spot, you can get a 3-course meal for a great deal! Dive into customer favorites like their juicy Wagyu burger or succulent filet mignon. Need a little something extra? The pairing of traditional Turkish ice cream will make your taste journey complete. Now, let us let you in on a little secret: Nusr-Et is not just any steakhouse, it’s owned by the famous “Salt Bae” himself! Yes, that’s right – you might just catch a glimpse of the iconic chef seasoning your meal with his signature style."
+    },
+    {
+      "host": "Veza Sur",
+      "start_time": "16:00:00",
+      "end_time": "19:00:00",
+      "days": [2,3,4,5],
+      "website_link": "https://vezasur.com/",
+      "embeddable_flag": false,
+      "address": "55 NW 25th St, Miami, FL 33127",
+      "phone_number": "Not provided",
+      "description": "Oh, Miami! There’s nothing like kicking back after a long day with an ice-cold brew in hand, soaking up the atmosphere in the trendy Wynwood neighborhood. You’re in luck, because Veza Sur is the spot you simply must visit! This Latin-inspired craft brewery brims with a laid-back vibe that instantly beckons you to unwind. What sets Veza Sur apart? The glorious fusion of Miami-born and Latin American flavors, along with live music, food, and drinks that’ll make your heart sing. So, what goodies can you expect from their menu? Adventurous taste-seekers rave about their South Coast IPA and Guava Passion Blonde Ale."
+    },
+    {
+      "host": "Gramps",
+      "start_time": "16:00:00",
+      "end_time": "20:00:00",
+      "days": [1,2,3,4,5],
+      "website_link": "https://gramps.com/",
+      "embeddable_flag": false,
+      "address": "176 NW 24th St, Miami, FL 33127",
+      "description": "Gramps is a trendy Miami spot that is perfect for your happy hour cravings. With a fantastic atmosphere that radiates good vibes, Gramps goes above and beyond by offering live music, DJs, and even drag bingo! Quench your thirst with some half-price cocktails and satisfy your appetite with their much-loved pizza. Don’t be surprised if you find yourself craving more after your first visit – it happens to the best of us."
+    },
+    {
+      "host": "Gramps",
+      "start_time": "11:00:00",
+      "end_time": "23:59:59",
+      "days": [0,1,2,3],
+      "website_link": "https://gramps.com/",
+      "embeddable_flag": false,
+      "address": "176 NW 24th St, Miami, FL 33127",
+      "description": "Gramps is a trendy Miami spot that is perfect for your happy hour cravings. With a fantastic atmosphere that radiates good vibes, Gramps goes above and beyond by offering live music, DJs, and even drag bingo! Quench your thirst with some half-price cocktails and satisfy your appetite with their much-loved pizza. Don’t be surprised if you find yourself craving more after your first visit – it happens to the best of us."
+    },
+    {
+      "host": "Gramps",
+      "start_time": "00:00:00",
+      "end_time": "01:00:00",
+      "days": [1,2,3,4],
+      "website_link": "https://gramps.com/",
+      "embeddable_flag": false,
+      "address": "176 NW 24th St, Miami, FL 33127",
+      "description": "Gramps is a trendy Miami spot that is perfect for your happy hour cravings. With a fantastic atmosphere that radiates good vibes, Gramps goes above and beyond by offering live music, DJs, and even drag bingo! Quench your thirst with some half-price cocktails and satisfy your appetite with their much-loved pizza. Don’t be surprised if you find yourself craving more after your first visit – it happens to the best of us."
+    }
+]

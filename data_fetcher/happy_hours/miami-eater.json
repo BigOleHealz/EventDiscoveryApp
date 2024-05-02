@@ -1,0 +1,178 @@
+[
+    {
+        "host": "The New Schnitzel House",
+        "address": "1085 NE 79th St, Miami, FL 33138",
+        "start_time": "17:00:00",
+        "end_time": "19:00:00",
+        "days": [1,2,3,4,5],
+        "website_link": "https://www.thenewschnitzelhouse.com/", 
+        "embeddable_flag": false,
+        "phone_number": "(305) 675-4287",
+        "description": "Schnitzel House has debuted its 'Schnitzy’s Many Happy Hours,' offering an array of discounted beverages to toast the workday’s end—or its late-night wind-down. The happy hour menu features $9 glasses of wine, $8 classic cocktails, and $6 options for both wells and beers. The full dinner menu is also available during these hours for those looking to pair their drinks with a meal or snack."
+    },
+    {
+        "host": "The New Schnitzel House",
+        "address": "1085 NE 79th St, Miami, FL 33138",
+        "start_time": "10:30:00",
+        "end_time": "23:59:59",
+        "days": [0,1,2,3,4,5,6],
+        "website_link": "https://www.thenewschnitzelhouse.com/",
+        "embeddable_flag": false,
+        "phone_number": "(305) 675-4287",
+        "description": "Schnitzel House has debuted its 'Schnitzy’s Many Happy Hours,' offering an array of discounted beverages to toast the workday’s end—or its late-night wind-down. The happy hour menu features $9 glasses of wine, $8 classic cocktails, and $6 options for both wells and beers. The full dinner menu is also available during these hours for those looking to pair their drinks with a meal or snack."
+    },
+    {
+        "host": "Branja",
+        "address": "5010 NE 2nd Ave Unit 201, Miami, FL 33137",
+        "start_time": "17:00:00",
+        "end_time": "20:00:00",
+        "days": [2,3,4,5],
+        "website_link": "https://www.branjamiami.com/",
+        "embeddable_flag": true,
+        "phone_number": "(786) 765-5555",
+        "description": "At Branja, go retro during its happy hour, available Tuesday to Friday from 5 p.m. to 8 p.m. Sip on a selection of $10 signature cocktails such as Spicy Rituals, Nana Spritz, and Aphrodita, alongside $8 classic drinks, $9 select wines, and $5 beer. Complement your drinks with various bites, including a $11 artisanal bread and dip spread, $7 falafish, $9 fish and bread, $8 lunchero empanadas, and $5 calimero potatoes."
+    },
+    {
+        "host": "Tacombi",
+        "address": "3930 NE 2nd Ave Suite #100, Miami, FL 33137",
+        "start_time": "16:00:00",
+        "end_time": "19:00:00",
+        "days": [1,2,3,4,5],
+        "website_link": "https://www.tacombi.com/?utm_source=googlebusinessprofile&utm_medium=gbpinfo&utm_campaign=gmbg",
+        "embeddable_flag": true,
+        "phone_number": "(786) 558-5607",
+        "description": "Tacombi has introduced two-for-one tacos during its happy hour every weekday from 4 p.m. to 7 p.m. at its Design District location. Dine on tacos filled with proteins like al pastor, black bean and sweet potato, and crispy fish, all for under $7, and wash it all back with drink specials like $9 margaritas and $5 Micheladas."
+    },
+    {
+        "host": "COTE Miami",
+        "address": "3900 NE 2nd Ave, Miami, FL 33137",
+        "start_time": "17:00:00",
+        "end_time": "19:00:00",
+        "days": [0,1,2,3,4,5,6],
+        "website_link":  "https://www.cotekoreansteakhouse.com/",
+        "embeddable_flag": false,
+        "phone_number": "(305) 434-4668",
+        "description": "Michelin-starred, Korean steakhouse favorite Cote has launched its first-ever happy hour. Available daily from 5 p.m. to 7 p.m., it offers wines by the glass, specialty Miami-inspired cocktails, and small bites for $8.88 each. The menu highlights lobster fritters, Korean bacon, and rice cake gnocchi, all meant to pair with cocktails like the Vice City, a martini made with Grey Goose, Bombay Sapphire, Noilly Pratt, and St. Germain."
+    },
+    {
+        "host": "STK Steakhouse",
+        "address": "2305 Collins Ave, Miami Beach, FL 33139",
+        "start_time": "22:00:00",
+        "end_time": "23:59:59",
+        "days": [0,1,2,3,4],
+        "website_link": "https://stksteakhouse.com/venues/south-beach/",
+        "embeddable_flag": true,
+        "phone_number": "(305) 604-6988",
+        "description": "STK recently introduced a late-night happy hour every Sunday to Thursday from 10 p.m. until close featuring $3 to $9 bites like oysters and beef tartare and $9 cocktails such as the Cucumber Stiletto and Strawberry Cobbler."
+    },
+    {
+        "host": "Mignonette Downtown",
+        "address": "210 NE 18th St, Miami, FL 33132",
+        "start_time": "17:00:00",
+        "end_time": "18:30:00",
+        "days": [1,2,3,4,5],
+        "website_link": "https://www.mignonettemiami.com/",
+        "embeddable_flag": false,
+        "phone_number": "(305) 374-4635",
+        "description": "After an extended hiatus, Mignonette’s happy hour is back every weekday from 5 p.m. to 6:30 p.m. Guests can sip on $6 draft beers and $9 pours of Portuguese, French, and Italian wines while dining on discounted menu favorites like clams casino, lobster deviled eggs, and, of course, plenty of oysters."
+    },
+    {
+        "host": "The Drexel",
+        "address": "1436 Drexel Ave, Miami Beach, FL 33139",
+        "start_time": "17:30:00",
+        "end_time": "19:00:00",
+        "days": [1,2,3,4,5],
+        "website_link": "https://www.drexelmiami.com/",
+        "embeddable_flag": false,
+        "phone_number": "(305) 692-0992",
+        "description": "The Drexel now offers a special Sundowner Happy Hour, every weekday from 5:30 p.m. to 7 p.m. and weekends from 5 p.m. to 7 p.m., featuring $10 cocktails, wine, and appetizers, alongside $5 beers. Sip on cocktails like the Greek Goddess or the Drexel Margarita while indulging in Mediterranean-inspired bites—from Italian fennel sausage with homemade mustard to Margherita pizzettas. The views are pretty hard to beat, too."
+    },
+    {
+        "host": "The Drexel",
+        "address": "1436 Drexel Ave, Miami Beach, FL 33139",
+        "start_time": "17:00:00",
+        "end_time": "19:00:00",
+        "days": [0,6],
+        "website_link": "https://www.drexelmiami.com/",
+        "embeddable_flag": false,
+        "phone_number": "(305) 692-0992",
+        "description": "The Drexel now offers a special Sundowner Happy Hour, every weekday from 5:30 p.m. to 7 p.m. and weekends from 5 p.m. to 7 p.m., featuring $10 cocktails, wine, and appetizers, alongside $5 beers. Sip on cocktails like the Greek Goddess or the Drexel Margarita while indulging in Mediterranean-inspired bites—from Italian fennel sausage with homemade mustard to Margherita pizzettas. The views are pretty hard to beat, too."
+    },
+    {
+        "host": "Editor Pizza",
+        "address": "803 5th St, Miami Beach, FL 33139",
+        "start_time": "21:00:00",
+        "end_time": "23:00:00",
+        "days": [0,1,2,3,4,5,6],
+        "website_link": "https://editorristorante.com/",
+        "embeddable_flag": false,
+        "phone_number": "(305) 763-8106",
+        "description": "Happy hour, but make it reversed. The new restaurant by the Urbanica Hotels team offers a late-night happy hour nightly from 9 p.m. to 11 p.m. where guests can enjoy $7 glasses of Pinot Grigio, Montepulciano, and Las Perdices Extra Brut; $7 margarita; $5 Peroni, and $9 house cocktails."
+    },
+    {
+        "host": "Rosa Sky",
+        "address": "115 SW 8th St 22nd Floor, Miami, FL 33130",
+        "start_time": "16:30:00",
+        "end_time": "19:00:00",
+        "days": [2,3,4,5,6],
+        "website_link": "https://rosaskyrooftop.com/",
+        "embeddable_flag": true,
+        "phone_number": "(786) 628-1515",
+        "description": "Perched among Brickell’s towering skyscrapers, Rosa Sky offers an exciting rooftop lounge experience. Happy hour, running Tuesday to Saturday from 4:30 p.m. to 7 p.m., features a variety of offerings, from Rosé Wine & sparkling specials, $10 select specialty cocktails, liquor, and bites, to $5 select draft beer. Complement your drink with a diverse range of bites such as pao de queijo, Cuban cigars, black bean queso dip, and buffalo chicken empanadas, each priced at $10."
+    },
+    {
+        "host": "Calle Dragones Miami",
+        "address": "1036 SW 8th St, Miami, FL 33130",
+        "start_time": "16:00:00",
+        "end_time": "19:00:00",
+        "days": [3,4,5],
+        "website_link": "http://calledragones.com/home-english/",
+        "embeddable_flag": true,
+        "phone_number": "(786) 722-8370",
+        "description": "At this Cuban cabaret, every Wednesday through Friday from 4 p.m. to 7 p.m., guests can stop by for happy hour to enjoy bites such as empanadillas de lechón, papas bravas, and kimchi rice spring rolls for $6, or Chinese pork belly and maduros for $8. To drink? Think $6 Stella Artois, $7 wines or $8 cocktails like the mojito and margarita."
+    },
+    {
+        "host": "Sexy Fish Miami",
+        "address": "1001 S Miami Ave, Miami, FL 33130",
+        "start_time": "17:00:00",
+        "end_time": "19:00:00",
+        "days": [1,2,3,4,5],
+        "website_link": "https://sexyfishmiami.com/?utm_source=YextGoogle&utm_medium=Organic",
+        "embeddable_flag": true,
+        "phone_number": "(305) 889-7888",
+        "description": "Sexy Fish Miami has launched its 'Vinyl Voyage' happy hour, offering five $12 cocktails and bites every weekday from 5 p.m. to 7 p.m. Against a backdrop of vinyl sounds, the menu includes dishes like the Sexy Fish croquette and toro caviar maki, alongside cocktails ranging from the fruity Making Waves to the tangy A Drop in the Ocean."
+    },
+    {
+        "host": "Fi'lia",
+        "address": "4315, 1300 S Miami Ave suite 100, Miami, FL 33130",
+        "start_time": "16:00:00",
+        "end_time": "19:00:00",
+        "days": [0,1,2,3,4,5,6],
+        "website_link": "https://www.sbe.com/",
+        "embeddable_flag": true,
+        "phone_number": "(305) 239-1330",
+        "description": "Fi’lia’s newly launched Aperitivo Hour offers daily deals from 4 p.m. to 7 p.m., yes, including the weekends. Dine on discounted dishes like bruschetta and meatballs, washed back by $9 cocktails and wines, $8 spritzes, and $4 beers."
+    },
+    {
+        "host": "Motek Coral Gables - Mediterranean Restaurant",
+        "address": "45 Miracle Mile, Miami, FL 33134",
+        "start_time": "15:00:00",
+        "end_time": "18:00:00",
+        "days": [1,2,3,4,5],
+        "website_link": "https://motekcafe.com/",
+        "embeddable_flag": true,
+        "phone_number": "(305) 396-8547",
+        "description": "Every Monday through Friday from 3 p.m. to 6 p.m., Israeli Mediterranean hotspot Motek offers guests half-priced cocktails and select wines along with a selection of house favorite dishes priced at $5. Motek’s happy hour menu includes cocktails by Bar Lab and a selection of dishes from hot and cold mezze to half sandwiches with items including hummus tehina, Moroccan cigars, falafel pita, and chicken shawarma."
+    },
+    {
+        "host": "Rusty Pelican - Miami",
+        "address": "3201 Rickenbacker Causeway, Key Biscayne, FL 33149",
+        "start_time": "16:00:00",
+        "end_time": "18:30:00",
+        "days": [1,2,3,4],
+        "website_link": "https://www.therustypelican.com/", 
+        "embeddable_flag": false,
+        "phone_number": "(305) 361-3818",
+        "description": "Famous for its sparkling views of the Miami skyline, this longstanding seafood spot now offers happy hour every Monday through Thursday from 4 p.m. to 6:30 p.m. Sip on $8 select cocktails and dine on half-off food items such as the calamari, crab cakes, and chilled oysters."
+    }
+]
