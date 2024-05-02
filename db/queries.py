@@ -156,7 +156,7 @@ FETCH_EVENTS_FOR_MAP = f"""
         event.{strings.address} as {strings.address},
         account.Username as CreatedByUsername,
         event.CreatedByUUID as CreatedByUUID,
-        event.Host as Host,
+        event.{strings.host} as {strings.host},
         event.{strings.lon} as {strings.lon},
         event.{strings.lat} as {strings.lat},
         event.{strings.start_timestamp} as {strings.start_timestamp},

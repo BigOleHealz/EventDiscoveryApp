@@ -49,7 +49,7 @@ export const EventViewerModal = ({
           event.EmbeddableFlag === false ? (
             <BoxComponent style={{ display: 'flex', justifyContent: 'center', flexDirection: 'column', alignItems: 'center' }}>
               <TextComponent>
-                This site does not let us embed their webpage on our site. But if you click on this button, we will redirect you to their website.
+                {event.Host} does not let us embed their webpage on our site. But if you click on this button, we will redirect you to their website.
               </TextComponent>
               <Button
                 onClick={() => window.open(event.EventURL, '_blank')}

@@ -294,6 +294,7 @@ export const modal_component_styles = {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: brightBlueColor,
     borderRadius: { xs: "5px", sm: "7px", md: "9px", lg: "11px", xl: "13px" },
   },
 
