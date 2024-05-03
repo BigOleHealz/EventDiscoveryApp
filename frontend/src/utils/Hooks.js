@@ -605,6 +605,8 @@ export const useSetUserLocation = (setMapCenter) => {
         setMapCenter({
           lat: latitude,
           lng: longitude
+          // lat: 25.7602,
+          // lng: -80.1959
         });
       },
       (error) => {
