@@ -23,7 +23,8 @@ from utils.constants import DATETIME_FORMAT
 from utils.helper_functions import HelperFunctions
 from utils.logger import Logger
 
-sources = ['go-wanderly', 'miami-eater', 'timeout']
+sources = ['go-wanderly', 'miami-eater', 'timeout', 'philly_happy_hours']
+# sources = ['philly_happy_hours']
 start_date = dt.now() - timedelta(days=dt.now().weekday() + 1)
 number_of_weeks = 1
 
@@ -65,10 +66,10 @@ class HappyHourParser:
         s3_file_key = os.path.join(cleaned_website_link, "index.html")
         
         print(f"{website_link=}")
-        self.driver.get(website_link)
-        html_source = self.driver.page_source
+        # self.driver.get(website_link)
+        # html_source = self.driver.page_source
         
-        self.aws_handler.write_to_s3(bucket=self.__s3_bucket_name, key=s3_file_key, data=html_source)
+        # self.aws_handler.write_to_s3(bucket=self.__s3_bucket_name, key=s3_file_key, data=html_source)
         
         for i in range(number_of_weeks):
           start_of_week_date = start_date + timedelta(weeks=i)

@@ -1,0 +1,963 @@
+[
+  {
+      "start_time": "16:00:00",
+      "end_time": "19:00:00",
+      "days": [0,1,2,3,4,5,6],
+      "website_link": "https://www.yelp.com/biz/the-bayou-bar-and-grill-philadelphia",
+      "address": "4245 Main St #1602, Philadelphia, PA 19127",
+      "host": "Bayou Bar & Grill",
+      "embeddable_flag": true,
+      "description": "Has to have one of the largest and least expensive happy hour food menus in the city!! In total they have 24 food items in their menu starting at just $2.98 for fries! We really enjoyed their 10 buffalo wings for just $6.98! And they have Happy Hour 7 Days a week!"
+  },
+  {
+      "start_time": "16:00:00",
+      "end_time": "18:00:00",
+      "days": [0,1,2,3,4,5,6],
+      "website_link": "https://www.villagewhiskey.com/",
+      "address": "118 S 20th St, Philadelphia, PA 19103",
+      "host": "Village Whiskey",
+      "embeddable_flag": false,
+      "description": "$5 food specials for Happy Hour everyday of the week! Village Whiskey is serving up some tasty happy hour treats. That along with their $7 cocktails makes Village Whiskey an amazing happy hour!"
+  },
+  {
+      "start_time": "16:00:00",
+      "end_time": "18:00:00",
+      "days": [2,3,4,5],
+      "website_link": "http://www.malbecsteakhouse.com/",
+      "address": "400 S 2nd St, Philadelphia, PA 19147",
+      "host": "Malbec Argentine Steakhouse",
+      "embeddable_flag": true,
+      "description": "$3.50 Empanadas!!! PLUS 6 hours of Happy Hour on Sundays. Malbec Argentine Steakhouse serves up a happy hour feast with burgers, chorizo, mussels and skewers. While you're there try imported Argentinian beer for just $4!"
+  },
+  {
+      "start_time": "13:00:00",
+      "end_time": "19:00:00",
+      "days": [0],
+      "website_link": "http://www.malbecsteakhouse.com/",
+      "address": "400 S 2nd St, Philadelphia, PA 19147",
+      "host": "Malbec Argentine Steakhouse",
+      "embeddable_flag": true,
+      "description": "$3.50 Empanadas!!! PLUS 6 hours of Happy Hour on Sundays. Malbec Argentine Steakhouse serves up a happy hour feast with burgers, chorizo, mussels and skewers. While you're there try imported Argentinian beer for just $4!"
+  },
+  {
+      "start_time": "16:00:00",
+      "end_time": "18:00:00",
+      "days": [2,3,4,5],
+      "website_link": "https://www.insatiablephilly.com/",
+      "address": "1200 S 21st St, Philadelphia, PA 19146",
+      "host": "Insatiable",
+      "embeddable_flag": true,
+      "description": "If you're looking for chef level food at happy hour prices you have to stop in to Insatiable. Chef Denise serves up a delicious happy hour at this new local spot including an $8 charcuterie board!"
+  },
+  {
+      "start_time": "14:00:00",
+      "end_time": "20:00:00",
+      "days": [0],
+      "website_link": "https://www.insatiablephilly.com/",
+      "address": "1200 S 21st St, Philadelphia, PA 19146",
+      "host": "Insatiable",
+      "embeddable_flag": true,
+      "description": "If you're looking for chef level food at happy hour prices you have to stop in to Insatiable. Chef Denise serves up a delicious happy hour at this new local spot including an $8 charcuterie board!"
+  },
+  {
+      "start_time": "16:00:00",
+      "end_time": "18:00:00",
+      "days": [1,2,3,4,5],
+      "website_link": "https://www.miaragazzaphilly.com/",
+      "address": "4411 Main St, Philadelphia, PA 19127",
+      "host": "Mia Ragazza",
+      "embeddable_flag": false,
+      "description": "$8 Pizza and Pasta Happy Hour! Mia in Manayunk is serving up authentic Italian favorites at happy hour with a great selection of dishes, all $8!! Plus huge $8 pizzas and colorful $7 cocktails!"
+  },
+  {
+      "start_time": "16:30:00",
+      "end_time": "18:30:00",
+      "days": [1,2,3,4,5],
+      "website_link": "https://locations.bonchon.com/ll/US/PA/Philadelphia/1020-Cherry-St",
+      "address": "1020 Cherry St, Philadelphia, PA 19123",
+      "host": "Bonchon Philadelphia",
+      "embeddable_flag": true,
+      "description": "A Happy Hour menu starting at $4 and Soju drinks! You have to check out happy hour at Bonchon Chinatown. Cool Korean is the vibe with lots of food choices and cheap stiff cocktails."
+  },
+  {
+      "start_time": "16:00:00",
+      "end_time": "19:00:00",
+      "days": [1,2,3,4,5],
+      "website_link": "https://prohibitiontaproom.com/",
+      "address": "501 N 13th St, Philadelphia, PA 19123",
+      "host": "Prohibition Taproom",
+      "embeddable_flag": true,
+      "description": "Cocktails and popcorn chicken Happy Hour at Prohibition Taproom! Try the handcrafted cocktails at happy hour that goes until 7pm each weekday. The popcorn chicken is also a must try!"
+  },
+  {
+      "start_time": "16:00:00",
+      "end_time": "19:00:00",
+      "days": [1,2,3,4,5],
+      "website_link": "https://www.toptomatophilly.com/",
+      "address": "116 S 11th St, Philadelphia, PA 19107",
+      "host": "Top Tomato Bar & Pizza",
+      "embeddable_flag": true,
+      "description": "It's $5 food mania over at Top Tomato Bar. They have a huge happy hour food menu and almost everything is just $5!!! If you're looking for a new Center City hang, you need to check them out."
+  },
+  {
+      "start_time": "15:00:00",
+      "end_time": "18:00:00",
+      "days": [0,1,2,3,4,5,6],
+      "website_link": "https://www.yelp.com/biz/bar1010-philadelphia",
+      "address": "701 N 2nd St, Philadelphia, PA 19123",
+      "host": "BAR 1010",
+      "embeddable_flag": true,
+      "description": "Call us crazy but a pizza happy hour is what you've been missing in your life! Bar 1010 in NoLibs has some of the best authentic artisanal pizza in the city! They use imported ingredients from Italy to make their pies."
+  },
+  {
+      "start_time": "17:00:00",
+      "end_time": "19:00:00",
+      "days": [1,2,3,4,5],
+      "website_link": "https://www.thewayward.com/",
+      "address": "1170 Ludlow St, Philadelphia, PA 19107",
+      "host": "The Wayward",
+      "embeddable_flag": true,
+      "description": "If you're looking for a sophisticated happy hour with chef made food The Wayward in Center City needs to be your next happy hour spot! Strong drinks, colorful art deco vibes and amazing food options. The Fried Oysters are a must try!"
+  },
+  {
+      "start_time": "16:00:00",
+      "end_time": "18:00:00",
+      "days": [1,2,3,4,5],
+      "website_link": "https://tioflores.com/",
+      "address": "1600 South St, Philadelphia, PA 19146",
+      "host": "Tio Flores",
+      "embeddable_flag": true,
+      "description": "Looking for a fun local Mexican Happy Hour? Tio Flores on South is just the place you've been looking for! Tasty tostadas, a citywide and good vibes plus lots of cool plants."
+  },
+  {
+      "start_time": "17:00:00",
+      "end_time": "19:00:00",
+      "days": [1,2,3,4,5],
+      "website_link": "https://fettesauphilly.com/",
+      "address": "1208 Frankford Ave, Philadelphia, PA 19125",
+      "host": "Fette Sau",
+      "embeddable_flag": true,
+      "description": "BBQ Happy Hour at Fette Sau Philly is a hidden gem in Fishtown. The food is flavor packed and they have a huge cocktail menu! Not to mention their unique outdoor seating, you'll forget you're even in the city."
+  },
+  {
+      "start_time": "14:00:00",
+      "end_time": "16:00:00",
+      "days": [0,6],
+      "website_link": "https://fettesauphilly.com/",
+      "address": "1208 Frankford Ave, Philadelphia, PA 19125",
+      "host": "Fette Sau",
+      "embeddable_flag": true,
+      "description": "BBQ Happy Hour at Fette Sau Philly is a hidden gem in Fishtown. The food is flavor packed and they have a huge cocktail menu! Not to mention their unique outdoor seating, you'll forget you're even in the city."
+  },
+  {
+      "start_time": "17:00:00",
+      "end_time": "19:00:00",
+      "days": [1,2,3,4,5],
+      "website_link": "https://podrestaurant.com/",
+      "address": "3636 Sansom St, Philadelphia, PA 19104",
+      "host": "Pod",
+      "embeddable_flag": true,
+      "description": "Chef Kevin Yanaga is serving up an amazing happy hour at Pod Restaurant! This happy hour has everything from top notch sushi to delicious small bites and a ton of happy hour drink specials!"
+  },
+  {
+      "start_time": "17:00:00",
+      "end_time": "19:00:00",
+      "days": [0],
+      "website_link": "https://podrestaurant.com/",
+      "address": "3636 Sansom St, Philadelphia, PA 19104",
+      "host": "Pod",
+      "embeddable_flag": true,
+      "description": "Chef Kevin Yanaga is serving up an amazing happy hour at Pod Restaurant! This happy hour has everything from top notch sushi to delicious small bites and a ton of happy hour drink specials!"
+  },
+  {
+      "start_time": "17:00:00",
+      "end_time": "19:00:00",
+      "days": [4],
+      "website_link": "https://www.fourhumourswhiskey.com/",
+      "address": "1712 N Hancock St, Philadelphia, PA 19122",
+      "host": "Four Humours",
+      "embeddable_flag": true,
+      "description": "Rare Happy Hour. Four Humours is one of the best cocktail bars in the city. Now you can try one of their many handcrafted cocktails during happy hour! We also recommend the deviled eggs while you're there. We think they are the best in the city!"
+  },
+  {
+      "start_time": "16:00:00",
+      "end_time": "18:00:00",
+      "days": [5],
+      "website_link": "https://www.fourhumourswhiskey.com/",
+      "address": "1712 N Hancock St, Philadelphia, PA 19122",
+      "host": "Four Humours",
+      "embeddable_flag": true,
+      "description": "Rare Happy Hour. Four Humours is one of the best cocktail bars in the city. Now you can try one of their many handcrafted cocktails during happy hour! We also recommend the deviled eggs while you're there. We think they are the best in the city!"
+  },
+  {
+      "start_time": "11:00:00",
+      "end_time": "23:00:00",
+      "days": [2],
+      "website_link": "https://theblacksheeppub.com/menu/",
+      "address": "247 S 17th St, Philadelphia, PA 19103",
+      "host": "The Black Sheep Pub & Restaurant",
+      "embeddable_flag": true,
+      "description": "ALL DAY TACO TUESDAY!! If you're looking for awesome tacos and drink deals all day every Tuesday you have to check out The Black Sheep Philly. The $6 Margs and Palomas are HUGE!"
+  },
+  {
+      "start_time": "16:00:00",
+      "end_time": "18:00:00",
+      "days": [1,2,3,4,5],
+      "website_link": "https://santuccispizza.com/santuccis-menu/",
+      "address": "655 N BROAD STREET",
+      "host": "Santucci's Original Square Pizza",
+      "embeddable_flag": true,
+      "description": "If you're looking for an awesome outdoor space to grab happy hour you have to check out Santucci's Pizza on Broad Street! They have tons of great happy hour food specials and $5 margaritas in so many flavors."
+  },
+  {
+      "start_time": "16:00:00",
+      "end_time": "18:00:00",
+      "days": [1,2,3,4,5],
+      "website_link": "https://www.royalboucherie.com/",
+      "address": "52 S 2nd St, Philadelphia, PA 19106",
+      "host": "Royal Boucherie",
+      "embeddable_flag": false,
+      "description": "If you're looking for a Happy Hour treat, treat yourself to a French food Happy Hour! Royal Boucherie transports you to Paris with their delicious Parisian fare and tasty cocktails."
+  },
+  {
+      "start_time": "18:00:00",
+      "end_time": "22:00:00",
+      "days": [3],
+      "website_link": "https://www.brooklynbowl.com/philadelphia/",
+      "address": "1009 Canal St, Philadelphia, PA 19123",
+      "host": "Brooklyn Bowl Philadelphia",
+      "embeddable_flag": true,
+      "description": "Wednesdays just got a whole lot better with FREE BOWLING and tons of food and drinks specials at Brooklyn Bowl Philly!"
+  },
+  {
+      "start_time": "16:00:00",
+      "end_time": "18:00:00",
+      "days": [2,3,4,5],
+      "website_link": "https://www.themulberryphl.com/",
+      "address": "1835 Arch St, Philadelphia, PA 19103",
+      "host": "The Mulberry",
+      "embeddable_flag": true,
+      "description": "If you're looking for a lively Center City happy hour, Mulberry has got you covered with drink deals and a huge spread of happy hour food items!"
+  },
+  {
+      "start_time": "17:00:00",
+      "end_time": "19:00:00",
+      "days": [1,2,3,4],
+      "website_link": "https://southhousephilly.com/",
+      "address": "2535 S. 13th St. Philadelphia, PA 19148",
+      "host": "SouthHouse Philly",
+      "embeddable_flag": true,
+      "description": "If you're looking for a Happy Hour with a signature menu item you have to head to Soho Philly. Their Caramel Dessert Fries are sweet potato fries covered in caramel and powdered sugar! We haven't had anything this sweet at happy hour in a while! They also have extended Happy Hour on Fridays!!"
+  },
+  {
+      "start_time": "16:00:00",
+      "end_time": "20:00:00",
+      "days": [5],
+      "website_link": "https://southhousephilly.com/",
+      "address": "2535 S. 13th St. Philadelphia, PA 19148",
+      "host": "SouthHouse Philly",
+      "embeddable_flag": true,
+      "description": "If you're looking for a Happy Hour with a signature menu item you have to head to Soho Philly. Their Caramel Dessert Fries are sweet potato fries covered in caramel and powdered sugar! We haven't had anything this sweet at happy hour in a while! They also have extended Happy Hour on Fridays!!"
+  },
+  {
+      "start_time": "16:00:00",
+      "end_time": "18:00:00",
+      "days": [3,4,5],
+      "website_link": "https://www.atticorooftop.com/",
+      "address": "219 S Broad St, Philadelphia, PA 19107",
+      "host": "Attico Rooftop",
+      "embeddable_flag": true,
+      "description": "Rooftop bar Happy Hour! This Happy Hour will have you buzzing hanging out at Attico Rooftop. Not only is it insta worthy they have a fantastic spread of happy hour food and drink items!"
+  },
+  {
+      "start_time": "16:00:00",
+      "end_time": "18:00:00",
+      "days": [1,2,3,4,5],
+      "website_link": "https://www.thesidecarbar.com/",
+      "address": "2201 Christian St, Philadelphia, PA 19146",
+      "host": "The Sidecar Bar & Grille",
+      "embeddable_flag": true,
+      "description": "Twice a day Happy Hour!! Sidecar Bar has a huge section of amazing happy hour food including burgers, chicken sandwiches, pizza and very tasty mussels. They also have fantastic drink deals like $2.50 domestic beer and $5 well cocktails!"
+  },
+  {
+      "start_time": "22:00:00",
+      "end_time": "23:59:59",
+      "days": [1,2,3,4,5],
+      "website_link": "https://www.thesidecarbar.com/",
+      "address": "2201 Christian St, Philadelphia, PA 19146",
+      "host": "The Sidecar Bar & Grille",
+      "embeddable_flag": true,
+      "description": "Twice a day Happy Hour!! Sidecar Bar has a huge section of amazing happy hour food including burgers, chicken sandwiches, pizza and very tasty mussels. They also have fantastic drink deals like $2.50 domestic beer and $5 well cocktails!"
+  },
+  {
+      "start_time": "17:00:00",
+      "end_time": "19:00:00",
+      "days": [0,1,2,3,4,5,6],
+      "website_link": "https://vedaphilly.com/",
+      "address": "1920 Chestnut St, Philadelphia, PA 19103",
+      "host": "Veda - Modern Indian Bistro",
+      "embeddable_flag": true,
+      "description": "A posh Happy Hour 7 days a week! Located in Center City, Veda Philly has amazing tasty food at a fantastic value for happy hour. They also have the best looking, and very tasty, Old Fashioned on Happy Hour along with a number of other drinks."
+  },
+  {
+      "start_time": "16:00:00",
+      "end_time": "18:00:00",
+      "days": [0,3,4,5,6],
+      "website_link": "https://www.stockyardphilly.com/",
+      "address": "1541 Spring Garden St, Philadelphia, PA 19130",
+      "host": "Stockyard Sandwich Co",
+      "embeddable_flag": true,
+      "description": "Looking for a refreshing happy hour? Try a crisp, hard cider from Stockyard Philly located on Spring Garden. They make their own hard ciders on site. They also have a pretty great Happy Hour featuring $1 wings, $2 oysters and $5 burger!"
+  },
+  {
+      "start_time": "11:00:00",
+      "end_time": "15:00:00",
+      "days": [0,6],
+      "website_link": "https://theblacksheeppub.com/",
+      "address": "247 S 17th St, Philadelphia, PA 19103",
+      "host": "The Black Sheep Pub & Restaurant",
+      "embeddable_flag": true,
+      "description": "Who doesn't love a Bottomless Brunch?! Black Sheep in Rittenhouse has Bottomless Brunch every weekend! Come down and check it out. It's worth the wait!"
+  },
+  {
+      "start_time": "17:00:00",
+      "end_time": "19:00:00",
+      "days": [2,3,4,5,6],
+      "website_link": "https://www.restaurantaleksandar.com/",
+      "address": "126 S 19th St, Philadelphia, PA 19103",
+      "host": "Restaurant Aleksandar",
+      "embeddable_flag": false,
+      "description": "If you're looking for sexy first date vibes with the most beautiful happy hour food in the city then you need to check out Restaurant Aleksandar in Rittenhouse!"
+  },
+  {
+      "start_time": "16:00:00",
+      "end_time": "19:00:00",
+      "days": [1,2,3,4],
+      "website_link": "https://www.junophilly.com/",
+      "address": "1033 Spring Garden St, Philadelphia, PA 19123",
+      "host": "Juno",
+      "embeddable_flag": true,
+      "description": "How does everything for $5 sound? That's what you get at this insta worthy Happy Hour spot at Juno Philly! Great vibes, great food and it's all just $5!"
+  },
+  {
+      "start_time": "16:00:00",
+      "end_time": "18:00:00",
+      "days": [1,2,3,4,5],
+      "website_link": "https://pierbarphilly.com/",
+      "address": "2025 Fairmount Ave, Philadelphia, PA 19130",
+      "host": "Pier Bar",
+      "embeddable_flag": false,
+      "description": "Enjoy a Surf and Turf Happy Hour outside at Pier Bar Philly in Fairmount! Situated just across from Eastern State Penitentiary this happy hour features boozy summer cocktails along with a solid selection of tasty happy hour food options."
+  },
+  {
+      "start_time": "15:00:00",
+      "end_time": "18:00:00",
+      "days": [0,1,2,3,4,5,6],
+      "website_link": "http://www.bar-ly.com/",
+      "address": "101 N 11th St, Philadelphia, PA 19107",
+      "host": "Bar-Ly Chinatown",
+      "embeddable_flag": true,
+      "description": "Ten years ago Buu Ly had the dream of having a Sports Bar Restaurant located in Philadelphia's Chinatown, Bar-Ly. A place where it would showcase 60 draft beers spanning from popular domestics, imports, microbrews and more. Bar-Ly is best known for their diverse daily happy hour offerings from wings, cheese steak spring rolls, calamari, dumplings and the list goes on."
+  },
+  {
+      "start_time": "16:00:00",
+      "end_time": "19:00:00",
+      "days": [2,3,4,5],
+      "website_link": "https://www.southgatephilly.com/",
+      "address": "1801 Lombard St, Philadelphia, PA 19146",
+      "host": "SouthGate",
+      "embeddable_flag": true,
+      "description": "SouthGate owner Peter Hwang is a Korean American, born and raised in the Philadelphia area. With years of experience in business, technology, and hospitality he had the opportunity to start a new restaurant business in 2015 and used it to fill an underserved area in the local dining scene - contemporary Korean."
+  },
+  {
+      "start_time": "14:00:00",
+      "end_time": "19:00:00",
+      "days": [0,6],
+      "website_link": "https://www.southgatephilly.com/",
+      "address": "1801 Lombard St, Philadelphia, PA 19146",
+      "host": "SouthGate",
+      "embeddable_flag": true,
+      "description": "SouthGate owner Peter Hwang is a Korean American, born and raised in the Philadelphia area. With years of experience in business, technology, and hospitality he had the opportunity to start a new restaurant business in 2015 and used it to fill an underserved area in the local dining scene - contemporary Korean."
+  },
+  {
+      "start_time": "17:00:00",
+      "end_time": "19:00:00",
+      "days": [2,3,4,5],
+      "website_link": "https://bodegaphilly.com/",
+      "address": "1223 Walnut St, Philadelphia, PA 19107",
+      "host": "Bodega Bar & Kitchen",
+      "embeddable_flag": true,
+      "description": "Looking for a fun Center City Happy Hour? Bodega Bar, located at 12th and Walnut Streets, has both vibes and a great happy hour with every being just $7! Grab some friends and check them out."
+  },
+  {
+      "start_time": "15:00:00",
+      "end_time": "17:00:00",
+      "days": [6],
+      "website_link": "https://bodegaphilly.com/",
+      "address": "1223 Walnut St, Philadelphia, PA 19107",
+      "host": "Bodega Bar & Kitchen",
+      "embeddable_flag": true,
+      "description": "Looking for a fun Center City Happy Hour? Bodega Bar, located at 12th and Walnut Streets, has both vibes and a great happy hour with every being just $7! Grab some friends and check them out."
+  },
+  {
+      "start_time": "16:00:00",
+      "end_time": "18:00:00",
+      "days": [0,2,3,4,5,6],
+      "website_link": "https://www.banhmiandbottles.com/",
+      "address": "712-14 South St, Philadelphia, PA 19147",
+      "host": "Banh Mi and Bottles",
+      "embeddable_flag": false,
+      "description": "Banh Mi and Bottles first opened their door over 7 years ago in the winter of 2016 by a husband and wife team Tuan and Olivia Phung. It is an ambitious triconcept that won them best of Philly in 2017, a Vietnamese modern eatery, crafted cocktail bar and a unique craft beer selections."
+  },
+  {
+      "start_time": "16:00:00",
+      "end_time": "18:00:00",
+      "days": [0,1,2,3,4],
+      "website_link": "https://www.triaphilly.com/",
+      "address": "123 S 18th St, Philadelphia, PA 19103",
+      "host": "Tria",
+      "embeddable_flag": true,
+      "description": "In the mood for a cheese and wine kind of happy hour? Tria's got you covered!"
+  },
+  {
+      "start_time": "16:00:00",
+      "end_time": "18:00:00",
+      "days": [0,1,2,3,4,5,6],
+      "website_link": "https://www.theoldebar.com/",
+      "address": "125 Walnut St, Philadelphia, PA 19106",
+      "host": "The Olde Bar",
+      "embeddable_flag": false,
+      "description": "If you're looking for $6 craft cocktails and seafood, Olde Bar in Old City needs to be your next happy hour! With plenty of outdoor seating you can't go wrong."
+  },
+  {
+      "start_time": "16:00:00",
+      "end_time": "18:00:00",
+      "days": [1,2,3,4,5],
+      "website_link": "https://www.theintlbar.com/",
+      "address": "1624 N Front St, Philadelphia, PA 19122",
+      "host": "The International Bar",
+      "embeddable_flag": true,
+      "description": "It's outdoor happy hour season and The International Bar in Olde Kensington has plenty of outdoor seating!"
+  },
+  {
+      "start_time": "19:00:00",
+      "end_time": "21:00:00",
+      "days": [4],
+      "website_link": "https://www.craftconceptsgroup.com/tradesmans",
+      "address": "1322 Chestnut St, Philadelphia, PA 19107",
+      "host": "Tradesman's Barbecue",
+      "embeddable_flag": true,
+      "description": "If you're looking for the best Thursday night happy hour deal, Tradesman's from 7-9pm is the place to be!"
+  },
+  {
+      "start_time": "17:00:00",
+      "end_time": "19:00:00",
+      "days": [1,2,3,4],
+      "website_link": "https://www.osteriaphilly.com/",
+      "address": "640 N Broad St, Philadelphia, PA 19130",
+      "host": "Osteria",
+      "embeddable_flag": true,
+      "description": "Who doesn't love Italian food?!? Well, Italian food is even better during happy hours at Osteria!"
+  },
+  {
+      "start_time": "16:00:00",
+      "end_time": "19:00:00",
+      "days": [6],
+      "website_link": "https://www.osteriaphilly.com/",
+      "address": "640 N Broad St, Philadelphia, PA 19130",
+      "host": "Osteria",
+      "embeddable_flag": true,
+      "description": "Who doesn't love Italian food?!? Well, Italian food is even better during happy hours at Osteria!"
+  },
+  {
+      "start_time": "16:00:00",
+      "end_time": "18:00:00",
+      "days": [0],
+      "website_link": "https://www.osteriaphilly.com/",
+      "address": "640 N Broad St, Philadelphia, PA 19130",
+      "host": "Osteria",
+      "embeddable_flag": true,
+      "description": "Who doesn't love Italian food?!? Well, Italian food is even better during happy hours at Osteria!"
+  },
+  {
+      "start_time": "16:00:00",
+      "end_time": "23:59:59",
+      "days": [2],
+      "website_link": "https://suenophilly.com/",
+      "address": "114 S 12th St, Philadelphia, PA 19107",
+      "host": "Sueño",
+      "embeddable_flag": true,
+      "description": "$2 Taco Tuesdays at Sueño! Enjoy discounted tacos, margs, and beers every Tuesday."
+  },
+  {
+      "start_time": "15:00:00",
+      "end_time": "18:00:00",
+      "days": [0,1,2,3,4],
+      "website_link": "https://kookburgerbar.com/",
+      "address": "2102 Market St Floor 1, Philadelphia, PA 19103",
+      "host": "Kook Burger & Bar",
+      "embeddable_flag": false,
+      "description": "If you're looking for a sweet happy hour, you've got to try the new Kook Burger & Bar. Their shakes are to die for and they've got great deals on food and drinks for their twice a day happy hour!"
+  },
+  {
+      "start_time": "22:00:00",
+      "end_time": "23:59:59",
+      "days": [0,1,2,3,4],
+      "website_link": "https://kookburgerbar.com/",
+      "address": "2102 Market St Floor 1, Philadelphia, PA 19103",
+      "host": "Kook Burger & Bar",
+      "embeddable_flag": true,
+      "description": "If you're looking for a sweet happy hour, you've got to try the new Kook Burger & Bar. Their shakes are to die for and they've got great deals on food and drinks for their twice a day happy hour!"
+  },
+  {
+      "start_time": "16:00:00",
+      "end_time": "19:00:00",
+      "days": [0,1,2,3,4,5,6],
+      "website_link": "https://www.pearlandmary.com/",
+      "address": "114 S 13th St, Philadelphia, PA 19107",
+      "host": "Pearl and Mary Oyster Bar",
+      "embeddable_flag": false,
+      "description": "Seafood lovers rejoice because we have a Happy Hour for you! Pearl and Mary has happy hour options galore 7 days a week! Get there early though, it's bar only."
+  },
+  {
+      "start_time": "17:00:00",
+      "end_time": "19:00:00",
+      "days": [1,2,3,4,5],
+      "website_link": "https://cedarpointbarandkitchen.com/",
+      "address": "2370 E Norris St, Philadelphia, PA 19125",
+      "host": "Cedar Point Bar & Kitchen",
+      "embeddable_flag": true,
+      "description": "If you're looking for a happy hour with some unique food items Cedar Point in Fishtown is the place to go. They have $5 Frog Legs and a $5 Chicken and Waffles Slider. They also happen to be celebrating their 10 year anniversary!"
+  },
+  {
+      "start_time": "16:00:00",
+      "end_time": "23:59:59",
+      "days": [2],
+      "website_link": "https://suenophilly.com/",
+      "address": "114 S 12th St, Philadelphia, PA 19107",
+      "host": "Sueño",
+      "embeddable_flag": true,
+      "description": "A good Taco Tuesday spot is a must for any Philly happy hour enthusiast. Tuesdays at Sueño in Center City, they have ALL DAY HAPPY HOUR!!"
+  },
+  {
+      "start_time": "16:00:00",
+      "end_time": "18:00:00",
+      "days": [0,1,2,3,4,5,6],
+      "website_link": "https://loscamaradas.com/",
+      "address": "918 S 22nd St, Philadelphia, PA 19146",
+      "host": "Los Camaradas",
+      "embeddable_flag": false,
+      "description": "If you're looking for margs or a burrito/beer happy hour, Los Camaradas in Grad Hospital has Happy Hour 7 days a week!"
+  },
+  {
+      "start_time": "19:00:00",
+      "end_time": "21:00:00",
+      "days": [4],
+      "website_link": "https://www.craftconceptsgroup.com/tradesmans",
+      "address": "1322 Chestnut St, Philadelphia, PA 19107",
+      "host": "Tradesman's Barbecue",
+      "embeddable_flag": true,
+      "description": "Calling all Espresso Martini lovers! Every Thursday from 7-9pm at Tradesman's Espresso Martinis are just $6!! Come grab a drink (or 2) with your bestie and also some of their $2 sliders."
+  },
+  {
+      "start_time": "16:00:00",
+      "end_time": "18:00:00",
+      "days": [1,2,3,4,5],
+      "website_link": "https://lloydwhiskeybar.com/",
+      "address": "529 E Girard Ave, Philadelphia, PA 19125",
+      "host": "Lloyd",
+      "embeddable_flag": false,
+      "description": "Lloyd in Fishtown has lots of great bites and a strong Old Fashioned as part of their happy hour lineup."
+  },
+  {
+      "start_time": "16:00:00",
+      "end_time": "18:00:00",
+      "days": [1,2,3,4,5],
+      "website_link": "https://www.moriartyspub.com/",
+      "address": "1116 Walnut St, Philadelphia, PA 19107",
+      "host": "Moriarty's Restaurant",
+      "embeddable_flag": true,
+      "description": "Looking for a happy hour that makes you feel like you're in Dublin? Look no further than Moriarty's in Center City! This ornate bar and beautiful stained glass light fixtures will make you believe you're on the Emerald Isle."
+  },
+  {
+      "start_time": "16:00:00",
+      "end_time": "19:00:00",
+      "days": [2,3,4,5],
+      "website_link": "https://www.southgatephilly.com/",
+      "address": "1801 Lombard St, Philadelphia, PA 19146",
+      "host": "SouthGate",
+      "embeddable_flag": true,
+      "description": "SouthGate (Rittenhouse) is a great happy hour spot with lots of good eats on the happy hour menu as well as a fun citywide with Soju. The Bulgogi Burger is a must when you're there!"
+  },
+  {
+      "start_time": "14:00:00",
+      "end_time": "19:00:00",
+      "days": [0,6],
+      "website_link": "https://www.southgatephilly.com/",
+      "address": "1801 Lombard St, Philadelphia, PA 19146",
+      "host": "SouthGate",
+      "embeddable_flag": true,
+      "description": "SouthGate (Rittenhouse) is a great happy hour spot with lots of good eats on the happy hour menu as well as a fun citywide with Soju. The Bulgogi Burger is a must when you're there!"
+  },
+  {
+      "start_time": "17:00:00",
+      "end_time": "19:00:00",
+      "days": [1,2,3,4,5],
+      "website_link": "https://www.urbansaloon.com/",
+      "address": "2120 Fairmount Ave, Philadelphia, PA 19130",
+      "host": "Urban Saloon",
+      "embeddable_flag": true,
+      "description": "If you haven't been out to Fairmount in a while we suggest checking out Urban Saloon. They have tons of space and a great happy hour offering on $6 bites."
+  },
+  {
+      "start_time": "16:00:00",
+      "end_time": "18:00:00",
+      "days": [0,3,4,5,6],
+      "website_link": "https://www.theluckywellinc.com/",
+      "address": "990 Spring Garden St, Philadelphia, PA 19123",
+      "host": "The Lucky Well - Incubator",
+      "embeddable_flag": true,
+      "description": "If you haven't been to The Lucky Well Philly yet you're missing out on one of the best happy hours in the city! Amazing $6 happy hour plates like the smoked wings, loaded tots, meatballs and mac n cheese. Not to mention the beautiful $6 cocktails!"
+  },
+  {
+      "start_time": "17:00:00",
+      "end_time": "19:00:00",
+      "days": [1,2,3,4,5],
+      "website_link": "https://mccrossens.com/",
+      "address": "529 N 20th St, Philadelphia, PA 19130",
+      "host": "McCrossen's Tavern",
+      "embeddable_flag": false,
+      "description": "McCrossen's Tavern is a great family owned bar in the Art Museum/Fairmount neighborhood. They dish out tasty food and their kitchen is open until midnight everyday. And for the wine lovers, they are the official Tasting Room of Decibel Wine."
+  },
+  {
+      "start_time": "16:00:00",
+      "end_time": "18:00:00",
+      "days": [2,3,4,5],
+      "website_link": "https://moreaphilly.com/",
+      "address": "110 S 11th St, Philadelphia, PA 19107",
+      "host": "Morea",
+      "embeddable_flag": true,
+      "description": "Some of the prettiest drinks in the city can be found at @moreaphilly. Their happy hour includes $8 cocktails, small plates and specials in beer and wine."
+  },
+  {
+      "start_time": "16:00:00",
+      "end_time": "18:00:00",
+      "days": [0,1,2,3,4,5,6],
+      "website_link": "https://www.indebluerestaurant.com/",
+      "address": "65 Barclay Farms Shopping Center, Cherry Hill, NJ 08034",
+      "host": "Indeblue Modern Indian",
+      "embeddable_flag": true,
+      "description": "If you're looking for some spice in your life check out @indeblue. Their happy hour includes $7 cocktails like my favorite the indebluetini pictured here. It's made with citrus, vodka, mango, cardamom and lemon. Their happy hour also includes small plates and specials on beer and wine."
+  },
+  {
+      "start_time": "16:30:00",
+      "end_time": "18:30:00",
+      "days": [1,2,3,4,5],
+      "website_link": "https://locations.bonchon.com/ll/US/PA/Philadelphia/1020-Cherry-St",
+      "address": "1020 Cherry St, Philadelphia, PA 19123",
+      "host": "Bonchon Philadelphia",
+      "embeddable_flag": true,
+      "description": "If you're looking for unique cocktails try @bonchon.chinatown in Chinatown. In addition to boozy beverages they also have that Korean double fried chicken."
+  },
+  {
+      "start_time": "16:00:00",
+      "end_time": "18:00:00",
+      "days": [1,2,3,4,5],
+      "website_link": "https://lovecitybrewing.com/",
+      "address": "1023 Hamilton St, Philadelphia, PA 19123",
+      "host": "Love City Brewing",
+      "embeddable_flag": true,
+      "description": "A great spot for local brews is @lovecitybrewing. Their unique space both indoors and outdoors provides a chill atmosphere to sip the many microbrews on tap."
+  },
+  {
+      "start_time": "16:00:00",
+      "end_time": "19:00:00",
+      "days": [1,2,3,4,5],
+      "website_link": "https://www.strangelovesbeerbar.com/",
+      "address": "216 S 11th St, Philadelphia, PA 19107",
+      "host": "Strangelove's",
+      "embeddable_flag": true,
+      "description": "Most of you probably haven't heard of @strangelovesphilly but this quirky neighborhood joint can show you a good time. With $5 double well drinks, specials on beer, wine and food, they have a solid happy hour."
+  },
+  {
+      "start_time": "16:00:00",
+      "end_time": "18:00:00",
+      "days": [1,2,3,4,5],
+      "website_link": "https://nemirestaurant.com/",
+      "address": "2636 Ann St, Philadelphia, PA 19134",
+      "host": "Nemi",
+      "embeddable_flag": true,
+      "description": "Some of the best fresh Mexican food you can find in the city is @nemirestaurant. This upscale modern, Mexican is just what you need to cure your taco craving."
+  },
+  {
+      "start_time": "17:00:00",
+      "end_time": "19:00:00",
+      "days": [1,2,3,4,5],
+      "website_link": "https://www.qujapan1635.com/",
+      "address": "1635 Market St # 103, Philadelphia, PA 19103",
+      "host": "QU JAPAN BISTRO & BAR",
+      "embeddable_flag": true,
+      "description": "Sushi happy hour? Yes please. @qujapan_phl is one of the best happy hours around. Located just steps away from city hall they offer a huge variety of $6 bites, rolls and drinks."
+  },
+  {
+      "start_time": "13:00:00",
+      "end_time": "17:00:00",
+      "days": [6],
+      "website_link": "https://www.qujapan1635.com/",
+      "address": "1635 Market St # 103, Philadelphia, PA 19103",
+      "host": "QU JAPAN BISTRO & BAR",
+      "embeddable_flag": true,
+      "description": "Sushi happy hour? Yes please. @qujapan_phl is one of the best happy hours around. Located just steps away from city hall they offer a huge variety of $6 bites, rolls and drinks."
+  },
+  {
+      "start_time": "17:00:00",
+      "end_time": "19:00:00",
+      "days": [1,2,3,4,5],
+      "website_link": "https://www.fishtowntavern.com/",
+      "address": "1301 Frankford Ave, Philadelphia, PA 19125",
+      "host": "Fishtown Tavern",
+      "embeddable_flag": true,
+      "description": "We don't see cocktails in pint glasses very often but we're here for it! That's what you'll find at @fishtowntavern like this Dark and Stormy."
+  },
+  {
+      "start_time": "16:00:00",
+      "end_time": "18:00:00",
+      "days": [0,1,2,3,4,5,6],
+      "website_link": "https://www.themulberryphl.com/",
+      "address": "1835 Arch St, Philadelphia, PA 19103",
+      "host": "The Mulberry",
+      "embeddable_flag": true,
+      "description": "Wine lovers will love this happy hour. If you're looking for the upscale feel without the upscale price, check out @themulberryphl happy hour. Happy hour specials include beer, a generous list of wines and an $8 cocktail of the day like this rum and pineapple mule."
+  },
+  {
+      "start_time": "16:00:00",
+      "end_time": "19:00:00",
+      "days": [1,2,3,4,5,6],
+      "website_link": "https://www.spice28.com/",
+      "address": "1228 Chestnut St, Philadelphia, PA 19107",
+      "host": "Spice 28",
+      "embeddable_flag": true,
+      "description": "Who's looking for a good happy hour in Center City? If so you need to check out Spice 28. They have an extensive list of happy hour cocktails for $7 and lots of fantastic food options ranging from just $2 to $5."
+  },
+  {
+      "start_time": "16:00:00",
+      "end_time": "18:00:00",
+      "days": [0,3,4,5,6],
+      "website_link": "https://www.theluckywellinc.com/",
+      "address": "990 Spring Garden St, Philadelphia, PA 19123",
+      "host": "The Lucky Well - Incubator",
+      "embeddable_flag": true,
+      "description": "One of the best happy hours in the city right now is @theluckywell on Spring Garden. Not only does their celebrity chef make killer BBQ, they have $6 cocktails!! 😮 Oh and they make cocktails with honey from the bees on their roof. How adorable is that?"
+  },
+  {
+      "start_time": "16:00:00",
+      "end_time": "19:00:00",
+      "days": [0,1,2,3,4,5,6],
+      "website_link": "https://prohibitiontaproom.com/",
+      "address": "501 N 13th St, Philadelphia, PA 19123",
+      "host": "Prohibition Taproom",
+      "embeddable_flag": true,
+      "description": "Popcorn chicken might be the best bar snack and @prohibition_taproom has some of the best around! They also happen to have happy hour everyday which includes this $7 cocktail of the day which was a Hibiscus Tea Punch and $5 popcorn chicken."
+  },
+  {
+      "start_time": "17:00:00",
+      "end_time": "20:00:00",
+      "days": [4,5,6],
+      "website_link": "https://thewinstonphilly.com/",
+      "address": "461 N 3rd St Suite 100, Philadelphia, PA 19123",
+      "host": "The Winston Social Club",
+      "embeddable_flag": true,
+      "description": "We're not sure if we'd label @thewinstonphl a sports bar, neighborhood bar or an upscale bar because it's kind of a combination of all 3. But we're definitely all about their happy hour which includes sliders, wings, @titosvodka cocktails and espresso martinis!"
+  },
+  {
+      "start_time": "16:00:00",
+      "end_time": "18:30:00",
+      "days": [1,2,3,4,5],
+      "website_link": "https://www.butcherbarphilly.com/",
+      "address": "2034 Chestnut St, Philadelphia, PA 19103",
+      "host": "Butcher Bar",
+      "embeddable_flag": true,
+      "description": "You might not think of baby back ribs when you think of happy hour but these fall off the bone ribs are just $4 during happy hour @butcherbarphl."
+  },
+  {
+      "start_time": "16:00:00",
+      "end_time": "18:30:00",
+      "days": [2,3,4,5],
+      "website_link": "https://www.barhygge.com/",
+      "address": "1720 Fairmount Ave, Philadelphia, PA 19130",
+      "host": "Bar Hygge",
+      "embeddable_flag": true,
+      "description": "In our opinion boards and brews makes for a pretty good happy hour. Luckily for us @bar_hygge restarted their happy hour this week. You can mix and match your board including this Crispy Rice Hamachi Nigri."
+  },
+  {
+      "start_time": "16:00:00",
+      "end_time": "18:00:00",
+      "days": [1,2,3,4,5,6],
+      "website_link": "https://vargabar.com/",
+      "address": "941 Spruce St, Philadelphia, PA 19107",
+      "host": "Varga Bar",
+      "embeddable_flag": true,
+      "description": "We love a classic like these Old Fashioned cocktails from @vargabar. And they have to be in the running for most interesting ceiling."
+  },
+  {
+      "start_time": "16:00:00",
+      "end_time": "18:00:00",
+      "days": [1,2,3,4,5],
+      "website_link": "https://continentalmidtown.com/",
+      "address": "1801 Chestnut St, Philadelphia, PA 19103",
+      "host": "The Continental Mid-town",
+      "embeddable_flag": true,
+      "description": "Not just for summer. @continental_midtown is still one of our favorite spots all year round. Their happy hour features $6 drinks like the very mezcal forward 'Smoking Section' made from Hornitos plata, Banhez mezcal, grapefruit, and agave."
+  },
+  {
+      "start_time": "17:00:00",
+      "end_time": "19:00:00",
+      "days": [1,2,3,4,5],
+      "website_link": "https://www.giovanisbarandgrill.com/",
+      "address": "1533 Chestnut St, Philadelphia, PA 19102",
+      "host": "Giovani's Bar & Grill",
+      "embeddable_flag": false,
+      "description": "Great things come in threes like the 'Pink Lady' from @giovanisbarandgrill. The Pink Lady is Espolon Blanco, Triple Sec, Orange Juice, Cranberry Juice, Lime. And like all their cocktails, it's $2 off during happy hour."
+  },
+  {
+      "start_time": "15:00:00",
+      "end_time": "18:00:00",
+      "days": [0,1,2,3,4,5,6],
+      "website_link": "http://www.bar-ly.com/",
+      "address": "101 N 11th St, Philadelphia, PA 19107",
+      "host": "Bar-Ly Chinatown",
+      "embeddable_flag": true,
+      "description": "With one of the most comprehensive happy hours in the city, @barly_philly has daily happy hour from 3-6pm. Specials range from $4.25 beer, $5.50 cocktails, $5 sake and a ton of food options."
+  },
+  {
+      "start_time": "16:00:00",
+      "end_time": "19:00:00",
+      "days": [2,3,4,5,6],
+      "website_link": "https://harpcrown.com/",
+      "address": "1525 Sansom St, Philadelphia, PA 19102",
+      "host": "Harp & Crown",
+      "embeddable_flag": true,
+      "description": "Ambience for days at Harp & Crown. This center city happy hour is one of our favs as it offers top notch cocktails with a great vibe."
+  },
+  {
+      "start_time": "16:00:00",
+      "end_time": "18:00:00",
+      "days": [2,3,4,5,6],
+      "website_link": "https://www.amadarestaurant.com/",
+      "address": "217-219 Chestnut St, Philadelphia, PA 19106",
+      "host": "Amada",
+      "embeddable_flag": false,
+      "description": "Looking for fancy happy hour without the fancy price? Amada in Old City delivers with excellent service and high quality ingredients."
+  },
+  {
+      "start_time": "15:00:00",
+      "end_time": "18:00:00",
+      "days": [1,2,3,4],
+      "website_link": "https://www.yelp.com/biz/el-purepecha-philadelphia",
+      "address": "315 N 12th St, Philadelphia, PA 19107",
+      "host": "El Purepecha",
+      "embeddable_flag": true,
+      "description": "We absolutely love Margs for happy hour and @el.purepecha.inc continues to be a local favorite of ours with great bites and delicious drinks."
+  },
+  {
+      "start_time": "16:00:00",
+      "end_time": "18:00:00",
+      "days": [1,2,3,4,5],
+      "website_link": "https://charliewasasinner.com/",
+      "address": "131 S 13th St, Philadelphia, PA 19107",
+      "host": "Charlie was a sinner.",
+      "embeddable_flag": true,
+      "description": "Treat your vegan or vegetarian friend to a happy hour where they can eat and drink everything on the menu! @charlie_was has an amazing happy hour. The 'Crab Cake' Sliders are a must. And all the cocktails are not only beautiful, they are very tasty too!"
+  },
+  {
+      "start_time": "17:00:00",
+      "end_time": "19:00:00",
+      "days": [1,2,3,4,5],
+      "website_link": "https://www.forsythiaphilly.com/",
+      "address": "233 Chestnut St, Philadelphia, PA 19105",
+      "host": "Forsythia",
+      "embeddable_flag": true,
+      "description": "Have Happy Hour from a James Beard Chef! @forsythia_philly has to be one of the best Happy Hour deals in the city! Treat your taste buds to amazingly crafted dishes from @christopherkearse! If you want value for money, dishes start at just $6!"
+  },
+  {
+      "start_time": "17:00:00",
+      "end_time": "21:00:00",
+      "days": [0],
+      "website_link": "https://www.forsythiaphilly.com/",
+      "address": "233 Chestnut St, Philadelphia, PA 19105",
+      "host": "Forsythia",
+      "embeddable_flag": true,
+      "description": "Have Happy Hour from a James Beard Chef! @forsythia_philly has to be one of the best Happy Hour deals in the city! Treat your taste buds to amazingly crafted dishes from @christopherkearse! If you want value for money, dishes start at just $6!"
+  },
+  {
+      "start_time": "17:00:00",
+      "end_time": "19:00:00",
+      "days": [1,2,3,4,5],
+      "website_link": "https://www.cavsrittenhouse.com/",
+      "address": "1913 Sansom St, Philadelphia, PA 19103",
+      "host": "Cavanaugh's Rittenhouse",
+      "embeddable_flag": true,
+      "description": "All food just $6 in Rittenhouse! Now that's a happy hour we can get excited about. @cavsritt has tons of TVs and a huge wrap around bar great for socializing. Also, their well Vodka is Absolut!"
+  },
+  {
+      "start_time": "16:00:00",
+      "end_time": "18:00:00",
+      "days": [1,2,3],
+      "website_link": "https://barbombon.com/",
+      "address": "133 S 18th St, Philadelphia, PA 19103",
+      "host": "Bar Bombón",
+      "embeddable_flag": true,
+      "description": "If you're feeling fancy head over to the hip Latin Happy Hour at @barbombon. Their happy hour has a variety of tasty small plates that go perfect with their margaritas! The Korean Taco is a can't miss dish. And Bar Bombon is all plant based (you won't even notice)."
+  },
+  {
+      "start_time": "15:00:00",
+      "end_time": "18:00:00",
+      "days": [4,5],
+      "website_link": "https://barbombon.com/",
+      "address": "133 S 18th St, Philadelphia, PA 19103",
+      "host": "Bar Bombón",
+      "embeddable_flag": true,
+      "description": "If you're feeling fancy head over to the hip Latin Happy Hour at @barbombon. Their happy hour has a variety of tasty small plates that go perfect with their margaritas! The Korean Taco is a can't miss dish. And Bar Bombon is all plant based (you won't even notice)."
+  },
+  {
+      "start_time": "17:00:00",
+      "end_time": "19:00:00",
+      "days": [0,3,4,5,6],
+      "website_link": "https://yuhirosushi.com/",
+      "address": "2146 E Susquehanna Ave, Philadelphia, PA 19125",
+      "host": "Yuhiro Omakase Sushi",
+      "embeddable_flag": true,
+      "description": "Check out this cool new happy hour spot in Fishtown @yuhirosushi. Their handrolls are fresh and huge and they pair great with a Japanese beer or the sake flight!"
+  },
+  {
+      "start_time": "16:00:00",
+      "end_time": "19:00:00",
+      "days": [1,2,3,4,5],
+      "website_link": "https://www.yelp.ca/biz/ding-feng-tang-philadelphia",
+      "address": "1021 Arch St FL1, Philadelphia, PA 19107",
+      "host": "Ding Feng Tang",
+      "embeddable_flag": true,
+      "description": "New and authentic! @dingfengtangphilly Happy Hour blew us away! A huge $5 happy hour food menu and all the food is authentic. Like you're in China authentic. Plus they have a ton of tasty $7 cocktails on happy hour too!"
+  },
+  {
+      "start_time": "16:00:00",
+      "end_time": "18:00:00",
+      "days": [1,2,3,4],
+      "website_link": "https://www.cantinafeliz.com/la-calaca-feliz",
+      "address": "2321 Fairmount Ave, Philadelphia, PA 19130",
+      "host": "Cantina \"Calaca\" Feliz",
+      "embeddable_flag": true,
+      "description": "If you're looking for a feast you have to check out @cantinafelizfairmount. Tons of tacos, quesadillas and nachos all on Happy Hour. Plus 7 types of margaritas for Happy Hour too. If you're looking to spice it up more shots of Espolon are just $3!"
+  },
+  {
+      "start_time": "16:30:00",
+      "end_time": "18:30:00",
+      "days": [2,3,4,5],
+      "website_link": "https://themorrisphilly.com/",
+      "address": "225 S 8th St, Philadelphia, PA 19106",
+      "host": "The Morris Restaurant",
+      "embeddable_flag": false,
+      "description": "Your favorite new date night spot is @themorrisphil! They have one of the best drink programs in the city and during happy hour all of their craft cocktails are all just $8!!! So many cocktails to choose from. You HAVE to try the Beet Cocktail."
+  }
+  
+]
