@@ -113,7 +113,7 @@ def get_event_type_mappings():
         result = neo4j_handler.neo4j.execute_query(queries.GET_EVENT_TYPE_NAMES_MAPPINGS)
         return jsonify(result), 200
     except Exception as error:
-        if str(e) == 'Cannot connect to any known routers':
+        if str(error) == 'Cannot connect to any known routers':
             neo4j_handler.logger.error(f"An error occurred: {error}")
             neo4j_handler.logger.error(f"traceback: {traceback.format_exc()}")
             neo4j_handler = Neo4jHandler()
