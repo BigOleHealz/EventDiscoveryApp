@@ -1,7 +1,8 @@
 DROP VIEW IF EXISTS events_joined_view;
 DROP VIEW IF EXISTS ingestions_joined_view;
 
-DROP TABLE IF EXISTS events;
+DROP TABLE IF EXISTS events_raw;
+DROP TABLE IF EXISTS events_successful;
 DROP TABLE IF EXISTS ingestions;
 DROP TABLE IF EXISTS event_type_source_mappings;
 DROP TABLE IF EXISTS event_types;
@@ -77,7 +78,7 @@ CREATE TABLE events_successful (
   Host varchar(255),
   Lon decimal(10, 8),
   Lat decimal(10, 8),
-  Summary varchar(255),
+  Summary text,
   PublicEventFlag boolean,
   FreeEventFlag boolean,
   Price varchar(255),
@@ -129,7 +130,7 @@ INSERT INTO sources (source,source_url) VALUES
 
 -- Regions
 INSERT INTO regions (city_code,state_code,country_code) VALUES
-  ('boston','ma','us'),
+  -- ('boston','ma','us'),
   ('philadelphia','pa','us'),
   ('miami','fl','us')
 ;
@@ -150,15 +151,14 @@ INSERT INTO event_type_source_mappings (source_id,target_event_type_uuid,source_
   (1,'7abfc211-b49b-4572-8646-acb8fdfffb6c','food-and-drink','food-and-drink'),
   (1,'29c65158-0a9f-4b14-8606-4f6bd4798e11','health','health'),
   (1,'29c65158-0a9f-4b14-8606-4f6bd4798e11','sports-and-fitness','sports-and-fitness'),
-  (1,'1f1d1c1b-1b1b-4e6e-8e0e-1e1e1d1c1b1b','science-and-tech','science-and-tech')
-  -- ,
-  -- (2,'9f730660-bf2e-40a9-9b04-33831eb91471','405','Career & Business'),
-  -- (2,'29c65158-0a9f-4b14-8606-4f6bd4798e11','511','Health & Wellbeing'),
-  -- (2,'8e2fa9d6-62d9-4439-a3ce-e22d0efd389f','395','Music'),
-  -- (2,'1f1d1c1b-1b1b-4e6e-8e0e-1e1e1d1c1b1b','436','Science & Education'),
-  -- (2,'29c65158-0a9f-4b14-8606-4f6bd4798e11','482','Sports & Fitness'),
-  -- (2,'1f1d1c1b-1b1b-4e6e-8e0e-1e1e1d1c1b1b','546','Technology'),
-  -- (2,'501c8388-b139-485e-9095-8bec01fa9945','652','Social Activites')
+  (1,'1f1d1c1b-1b1b-4e6e-8e0e-1e1e1d1c1b1b','science-and-tech','science-and-tech'),
+  (2,'9f730660-bf2e-40a9-9b04-33831eb91471','405','Career & Business'),
+  (2,'29c65158-0a9f-4b14-8606-4f6bd4798e11','511','Health & Wellbeing'),
+  (2,'8e2fa9d6-62d9-4439-a3ce-e22d0efd389f','395','Music'),
+  (2,'1f1d1c1b-1b1b-4e6e-8e0e-1e1e1d1c1b1b','436','Science & Education'),
+  (2,'29c65158-0a9f-4b14-8606-4f6bd4798e11','482','Sports & Fitness'),
+  (2,'1f1d1c1b-1b1b-4e6e-8e0e-1e1e1d1c1b1b','546','Technology'),
+  (2,'501c8388-b139-485e-9095-8bec01fa9945','652','Social Activites')
 ;
 
 INSERT INTO users (UUID, Email, Username, FirstName, LastName, AccountCreatedTimestamp, TestUser) VALUES 

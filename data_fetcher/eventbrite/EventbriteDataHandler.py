@@ -47,37 +47,63 @@ class EventbriteDataHandler(DataRecordHandler):
 
     def parse_homepages(self, file_list: list):
         try:
+            # Iterate through each file in the list of homepage files
             for filename in file_list:
+                # Extract the page number from the filename
                 page_no = os.path.splitext(filename.split('/')[-1])[0].split("_")[1]
+                # Construct the output key prefix for storing event pages
                 output_key_prefix = os.path.join(self.eventpages_dir, self.date, self.city_code, self.source_event_type_id)
                 
                 self.logger.info(f"Parsing homepage for Page #: {page_no}")
+                # Read the HTML content of the homepage from S3
                 html_source = self.aws_handler.read_from_s3(bucket=self.bucket_name, key=filename)
 
+                # Parse the HTML content using BeautifulSoup
                 soup = BeautifulSoup(html_source, 'lxml')
+                # Find all script tags with the specified event data type
                 scripts = soup.find_all('script', attrs={'type': self.event_data_script_type})
 
+                # Iterate through each script tag
                 for i, script in enumerate(scripts):
+                    # Parse the JSON content of the script tag
                     event_data_raw = json.loads(script.string)
-                    url = event_data_raw.get('url')
-                    if url:
-                        source_event_id = url.split('-')[-1]
-                        
-                        output_file_key = os.path.join(output_key_prefix, source_event_id)
-
-                        file_exists_boolean = self.aws_handler.check_if_s3_file_exists(bucket=self.bucket_name, key=output_file_key)
-                        if file_exists_boolean:
-                            self.logger.info(f"File {output_file_key} already exists in S3. Skipping...")
-                            continue
-                        
-                        self.driver.get(url)
-                        html_source = self.driver.page_source
-
-                        self.aws_handler.write_to_s3(bucket=self.bucket_name, key=output_file_key, data=html_source)
-                    else:
+                    
+                    # Skip if the event data is a list (not the expected format)
+                    if type(event_data_raw) == list:
                         continue
+                    else:
+                        # Extract the list of event items
+                        item_list_element = event_data_raw.get('itemListElement')
+                    
+                    # Process each event item
+                    for item in item_list_element:
+                        # Get the URL of the event
+                        url = item.get('item', {}).get('url')
+                    
+                        if url:
+                            # Extract the event ID from the URL
+                            source_event_id = url.split('-')[-1]
+                            
+                            # Construct the output file key for the event page
+                            output_file_key = os.path.join(output_key_prefix, source_event_id)
+
+                            # Check if the event page already exists in S3
+                            file_exists_boolean = self.aws_handler.check_if_s3_file_exists(bucket=self.bucket_name, key=output_file_key)
+                            if file_exists_boolean:
+                                self.logger.info(f"File {output_file_key} already exists in S3. Skipping...")
+                                continue
+                            
+                            # Fetch the event page using Selenium
+                            self.driver.get(url)
+                            html_source = self.driver.page_source
+
+                            # Save the event page HTML to S3
+                            self.aws_handler.write_to_s3(bucket=self.bucket_name, key=output_file_key, data=html_source)
+                        else:
+                            continue
 
         except Exception as e:
+            # Log any errors that occur during the parsing process
             self.logger.error(msg=f"Error parsing homepages")
             self.logger.error(msg=e)
             self.logger.error(msg=traceback.format_exc())
