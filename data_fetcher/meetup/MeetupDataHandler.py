@@ -62,11 +62,14 @@ class MeetupDataHandler(DataRecordHandler):
                     important_data = page_props.get('__APOLLO_STATE__')
                     if important_data is None:
                         continue
-                    event_keys = [key for key in important_data.keys() if key.startswith("Event:")]
-                    raw_event_data = {key : important_data[key] for key in event_keys}
+                    event_key_list = [key for key in important_data.keys() if key.startswith("Event:")]
+                    raw_event_data = {key : important_data[key] for key in event_key_list}
 
                     for key, value in raw_event_data.items():
-                        url = value['eventUrl']
+                        
+                        url = value.get('eventUrl')
+                        if not url:
+                            continue
                         source_event_id = value['id']
                         output_file_key = os.path.join(output_key_prefix, source_event_id)
 
@@ -131,7 +134,7 @@ class MeetupDataHandler(DataRecordHandler):
                 )
                 event_description = important_data["description"]
                 event_url = important_data["eventUrl"]
-
+                
                 event_data_dict = {
                     "UUID": event_uuid,
                     "StartTimestamp" : datetime.fromisoformat(important_data["dateTime"]).astimezone(pytz.UTC).strftime(self.neo4j_datetime_format),
@@ -147,10 +150,10 @@ class MeetupDataHandler(DataRecordHandler):
                     "PublicEventFlag" : True,
                     "EventDescription" : event_description,
                     "Summary" : event_description,
-                    "ImageURL": important_data["imageUrl"],
+                    "ImageURL": important_data.get("imageUrl", ""),
                     "EventPageURL": event_url,
                     "Price": '$0',
-                    "FreeEventFlag": 'Free',
+                    "FreeEventFlag": True,
                     "EventTypeUUID": self.row['target_event_type_uuid'],
                     "EventType": self.row['target_event_type_string'],
                     "S3Link": f"s3://{self.bucket_name}/{file_key}",
