@@ -144,14 +144,12 @@ export const EventTypesTable = ({
 export const InviteFriendsToEventTable = ({
   friends_invited,
   setFriendsInvited,
+  friends_list=[]
 }) => {
 
   const { user_session, setUserSession } = useContext(UserSessionContext);
   const [is_fetching_friends, setIsFetchingFriends] = useState(true);
 
-  const [friends_list, setFriendsList] = useState([]);
-
-  useFetchFriends(user_session.UUID, is_fetching_friends, setIsFetchingFriends, setFriendsList);
 
   const rows = friends_list.map((friend) => {
     return {

@@ -88,6 +88,7 @@ export const InviteFriendsToEventModal = ({
   setFriendsInvited,
   handleSubmitButtonClick,
   onRequestClose,
+  friends_list = [],
   ...props
 }) => {
 
@@ -102,6 +103,7 @@ export const InviteFriendsToEventModal = ({
       <InviteFriendsToEventTable
         friends_invited={friends_invited}
         setFriendsInvited={setFriendsInvited}
+        friends_list={friends_list}
       />
     </ModalComponent>
   );

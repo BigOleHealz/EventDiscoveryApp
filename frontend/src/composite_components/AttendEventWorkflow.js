@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { EventViewerModal, InviteFriendsToEventModal } from './Modals';
-import { useAttendEventAndSendInvites } from '../utils/Hooks';
+import {
+  useAttendEventAndSendInvites,
+  useFetchFriends,
+ } from '../utils/Hooks';
 
 import { AttendEventContext, UserSessionContext } from '../utils/Contexts';
 
@@ -21,19 +24,42 @@ export const AttendEventWorkflow = ({
 
   const [ is_creating_attending_event_relationship, setIsCreatingAttendingEventRelationship ] = useState(false);
 
+  const [is_fetching_friends, setIsFetchingFriends] = useState(false);
+  const [friends_list, setFriendsList] = useState([]);
+
+  useEffect(() => {
+    if (user_session && user_session.UUID) {
+      setIsFetchingFriends(true);
+    }
+  }, [user_session]);
+
+  useFetchFriends(user_session?.UUID, is_fetching_friends, setIsFetchingFriends, setFriendsList);
 
   const handleAttendEventButtonClick = () => {
     if (!user_session) {
       alert("You must be logged in to attend an event");
       return;
     } else {
-      setAttendEventCurrentlyActiveData({
-        ...attend_event_currently_active_data,
-        EventUUID: attend_event_currently_active_data.UUID,
+      console.log("handleAttendEventButtonClicked")
+      setAttendEventCurrentlyActiveData(prevData => ({
+        ...prevData,
+        EventUUID: prevData.UUID,
         AttendeeUUID: user_session.UUID,
         attending_stage: 2
-      })
-      setAttendEventStage(2);
+      }));
+      if (is_fetching_friends === false && friends_list.length > 0) {
+        console.log("is_fetching_friends === false && friends_list.length > 0")
+        setAttendEventStage(2);
+      } else {
+        console.log("is_fetching_friends === true || friends_list.length === 0")
+        setAttendEventCurrentlyActiveData(prevData => ({
+          ...prevData,
+          InviteeUUIDs: []
+        }));
+
+        console.log("attend_event_currently_active_data", attend_event_currently_active_data)
+        setIsCreatingAttendingEventRelationship(true);
+      }
     }
   }
 
@@ -62,6 +88,7 @@ export const AttendEventWorkflow = ({
         setFriendsInvited={setFriendsInvited}
         handleSubmitButtonClick={handleInviteFriendsToEventButtonClick}
         onRequestClose={exitAttendEventMode}
+        friends_list={friends_list}
       />
     </>
   );
