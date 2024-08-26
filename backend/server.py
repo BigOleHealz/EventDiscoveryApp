@@ -302,8 +302,8 @@ def attend_event_and_send_invites():
             return jsonify({"STATUS": "ERROR", "MESSAGE": "Missing event_uuid"}), 400
         elif not attendee_uuid:
             return jsonify({"STATUS": "ERROR", "MESSAGE": "Missing attendee_uuid"}), 400
-        elif not invite_uuids:
-            return jsonify({"STATUS": "ERROR", "MESSAGE": "Missing invite_uuids"}), 400
+        # elif not invite_uuids:
+        #     return jsonify({"STATUS": "ERROR", "MESSAGE": "Missing invite_uuids"}), 400
 
         try:
             result = neo4j.execute_query_with_params(query=queries.ATTEND_EVENT_AND_SEND_INVITES, params=body)
