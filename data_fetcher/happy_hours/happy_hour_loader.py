@@ -23,10 +23,17 @@ from utils.constants import DATETIME_FORMAT
 from utils.helper_functions import HelperFunctions
 from utils.logger import Logger
 
-sources = ['go-wanderly', 'miami-eater', 'timeout', 'philly_happy_hours']
-# sources = ['philly_happy_hours']
+# sources = ['go-wanderly', 'miami-eater', 'timeout', 'philly_happy_hours'] # US/Eastern
+sources = {
+    "go-wanderly": "US/Eastern",
+    "miami-eater": "US/Eastern",
+    "timeout": "US/Eastern",
+    "philly_happy_hours": "US/Eastern",
+    "barcelona2": "Europe/Madrid"
+}
+# sources = ['barcelona2'] # Europe/Madrid
 start_date = dt.now() - timedelta(days=dt.now().weekday() + 1)
-number_of_weeks = 1
+number_of_weeks = 2
 
 class HappyHourParser:
   def __init__(self):
@@ -65,6 +72,8 @@ class HappyHourParser:
         cleaned_website_link = website_link.replace('https://', '').replace('http://', '')
         s3_file_key = os.path.join(cleaned_website_link, "index.html")
         
+        lat_lon = self.helper_functions.get_lat_lon_from_address(happy_hour["address"])
+        
         print(f"{website_link=}")
         # self.driver.get(website_link)
         # html_source = self.driver.page_source
@@ -75,8 +84,6 @@ class HappyHourParser:
           start_of_week_date = start_date + timedelta(weeks=i)
 
           
-          print(happy_hour)
-          lat_lon = self.helper_functions.get_lat_lon_from_address(happy_hour["address"])
           
           for weekday_num in happy_hour["days"]:
             hh_date = start_of_week_date + timedelta(days=weekday_num)

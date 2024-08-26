@@ -4,14 +4,15 @@ from datetime import datetime
 from typing import Mapping, Union
 
 from dotenv import load_dotenv
+from pathlib import Path
+env_path = Path('../.env')
 from py2neo import Graph, Node, Relationship
 from db import queries
 from utils.constants import datetime_format
 from utils.logger import Logger
 from utils.helper_functions import hash_password
 
-load_dotenv()
-
+load_dotenv(dotenv_path=env_path)
 
 class Neo4jDB:
     def __init__(self, logger: Logger):
