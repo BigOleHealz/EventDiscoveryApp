@@ -222,7 +222,6 @@ export const CreateEventInviteFriendsModal = ({
   ...props
 }) => {
   const { create_event_context, setCreateEventContext } = React.useContext(CreateEventContext);
-  const [friends_invited, setFriendsInvited] = useState([]);
 
   const addFriendInvitesToCreateEventContext = () => {
     setCreateEventContext({
