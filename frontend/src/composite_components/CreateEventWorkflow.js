@@ -3,7 +3,10 @@ import { CreateEventLocationSelector } from './CreateEventLocationSelector';
 import { CreateEventDatetimeModal, CreateEventSelectEventTypeModal, CreateEventDetailsModal, CreateEventInviteFriendsModal } from './Modals';
 
 import { CreateEventContext, LoggerContext, UserSessionContext } from '../utils/Contexts';
-import { useCreateEventNode } from '../utils/Hooks';
+import {
+  useCreateEventNode, 
+  useFetchFriends
+} from '../utils/Hooks';
 
 export const CreateEventWorkflow = ({
   create_event_stage,
@@ -16,6 +19,9 @@ export const CreateEventWorkflow = ({
 }) => {
   const { user_session, setUserSession } = React.useContext(UserSessionContext);
   const { create_event_context, setCreateEventContext } = React.useContext(CreateEventContext);
+  const [friends_invited, setFriendsInvited] = useState([]);
+  const [is_fetching_friends, setIsFetchingFriends] = useState(false);
+  const [friends_list, setFriendsList] = useState([]);
   const [is_creating_event_node, setIsCreatingEventNode] = useState(false);
 
   const handleEventCreation = () => {
@@ -27,6 +33,13 @@ export const CreateEventWorkflow = ({
     setIsCreatingEventNode(true);
   }
 
+  useEffect(() => {
+    if (user_session && user_session.UUID) {
+      setIsFetchingFriends(true);
+    }
+  }, [user_session]);
+
+  useFetchFriends(user_session?.UUID, is_fetching_friends, setIsFetchingFriends, setFriendsList);
   useCreateEventNode(is_creating_event_node, create_event_context, setIsCreatingEventNode, setCreateEventStage, setIsFetchingEvents);
 
   return (
@@ -53,8 +66,11 @@ export const CreateEventWorkflow = ({
       />
       <CreateEventInviteFriendsModal
         isVisible={create_event_stage === 5}
+        friends_invited={friends_invited}
+        setFriendsInvited={setFriendsInvited}
         handleSubmitButtonClick={handleEventCreation}
         onRequestClose={exitCreateEventMode}
+        friends_list={friends_list}
       />
     </>
   );
