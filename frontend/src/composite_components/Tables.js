@@ -148,8 +148,6 @@ export const InviteFriendsToEventTable = ({
 }) => {
 
   const { user_session, setUserSession } = useContext(UserSessionContext);
-  const [is_fetching_friends, setIsFetchingFriends] = useState(true);
-
 
   const rows = friends_list.map((friend) => {
     return {

@@ -218,7 +218,7 @@ export const CreateEventInviteFriendsModal = ({
   setFriendsInvited,
   handleSubmitButtonClick,
   onRequestClose,
-  // friends_list = [],
+  friends_list,
   ...props
 }) => {
   const { create_event_context, setCreateEventContext } = React.useContext(CreateEventContext);
@@ -242,7 +242,7 @@ export const CreateEventInviteFriendsModal = ({
       <InviteFriendsToEventTable
         friends_invited={friends_invited}
         setFriendsInvited={setFriendsInvited}
-        // friends_list={friends_list}
+        friends_list={friends_list}
       />
     </ModalComponent>
   );

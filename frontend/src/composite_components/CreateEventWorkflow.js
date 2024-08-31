@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { CreateEventLocationSelector } from './CreateEventLocationSelector';
 import { CreateEventDatetimeModal, CreateEventSelectEventTypeModal, CreateEventDetailsModal, CreateEventInviteFriendsModal } from './Modals';
 
@@ -41,7 +41,6 @@ export const CreateEventWorkflow = ({
     console.log('handleEventCreation: create_event_context = ', create_event_context);
     setIsCreatingEventNode(true);
   }
-
 
   useFetchFriends(user_session?.UUID, is_fetching_friends, setIsFetchingFriends, setFriendsList);
   useCreateEventNode(is_creating_event_node, create_event_context, setIsCreatingEventNode, setCreateEventStage, setIsFetchingEvents);
