@@ -20,10 +20,10 @@ export const AttendEventWorkflow = ({
 }) => {
   const { attend_event_context, setAttendEventContext } = React.useContext(AttendEventContext);
   const { user_session, setUserSession } = React.useContext(UserSessionContext);
-  const [friends_invited, setFriendsInvited] = useState([]);
-
+  
   const [ is_creating_attending_event_relationship, setIsCreatingAttendingEventRelationship ] = useState(false);
-
+  
+  const [friends_invited, setFriendsInvited] = useState([]);
   const [is_fetching_friends, setIsFetchingFriends] = useState(false);
   const [friends_list, setFriendsList] = useState([]);
 
@@ -33,8 +33,7 @@ export const AttendEventWorkflow = ({
     }
   }, [user_session]);
 
-  useFetchFriends(user_session?.UUID, is_fetching_friends, setIsFetchingFriends, setFriendsList);
-
+  
   const handleAttendEventButtonClick = () => {
     if (!user_session) {
       alert("You must be logged in to attend an event");
@@ -48,21 +47,18 @@ export const AttendEventWorkflow = ({
         attending_stage: 2
       }));
       if (is_fetching_friends === false && friends_list.length > 0) {
-        console.log("is_fetching_friends === false && friends_list.length > 0")
         setAttendEventStage(2);
       } else {
-        console.log("is_fetching_friends === true || friends_list.length === 0")
         setAttendEventCurrentlyActiveData(prevData => ({
           ...prevData,
           InviteeUUIDs: []
         }));
-
-        console.log("attend_event_currently_active_data", attend_event_currently_active_data)
+        
         setIsCreatingAttendingEventRelationship(true);
       }
     }
   }
-
+  
   const handleInviteFriendsToEventButtonClick = () => {
     setAttendEventCurrentlyActiveData({
       ...attend_event_currently_active_data,
@@ -71,9 +67,10 @@ export const AttendEventWorkflow = ({
     console.log("friends_invited", friends_invited)
     setIsCreatingAttendingEventRelationship(true);
   }
-
+  
+  useFetchFriends(user_session?.UUID, is_fetching_friends, setIsFetchingFriends, setFriendsList);
   useAttendEventAndSendInvites(is_creating_attending_event_relationship, attend_event_currently_active_data, setIsCreatingAttendingEventRelationship, setFriendsInvited, exitAttendEventMode);
-
+  
   return (
     <>
       <EventViewerModal
