@@ -19,7 +19,6 @@ import {
   UserSessionContext,
 } from './utils/Contexts';
 
-import { getDeviceToken } from '../utils/pushNotifications';
 import { useFetchGoogleMapsApiKey, useSetGoogleClientId } from './utils/Hooks';
 import { getUserSession } from './utils/SessionManager';
 
@@ -58,16 +57,6 @@ export default function AppHandler() {
     }
   }, [google_client_id]);
 
-  useEffect(() => {
-    const initializeNotifications = async () => {
-      const token = await getDeviceToken();
-      if (token) {
-        console.log('Successfully acquired and sent device token');
-      }
-    };
-
-    initializeNotifications();
-  }, []);
 
   useFetchGoogleMapsApiKey(fetching_google_maps_api_key, setGoogleMapsApiKey, setFetchingGoogleMapsApiKey);
   useSetGoogleClientId(fetching_google_client_id, setFetchingGoogleClientId, setGoogleClientId);
