@@ -110,13 +110,7 @@ class DataLoader:
 if __name__ == '__main__':
     dl = DataLoader()
     
-    dl.wipe_data()
-    dl.load_event_types_to_neo4j_db()
+    # dl.wipe_data()
+    # dl.load_event_types_to_neo4j_db()
     dl.load_persons_to_neo4j_db()
-    dl.load_businesses_to_neo4j_db()
-    
-    # dl.wipe_events()
-    # ctd = CreateTestData()
-    # ctd.create_events_csv()
-    # dl.load_events_to_neo4j_db()
-    # dl.load_attending_relationships()
+    # dl.load_businesses_to_neo4j_db()

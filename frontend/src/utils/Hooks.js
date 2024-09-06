@@ -5,7 +5,12 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { storeUserSession } from './SessionManager';
 
-export const useFetchFriends = (user_uuid, is_fetching_friends, setIsFetchingFriends, setFriends) => {
+export const useFetchFriends = (
+  user_uuid,
+  is_fetching_friends,
+  setIsFetchingFriends,
+  setFriends
+) => {
   useEffect(() => {
     if (is_fetching_friends) {
       fetch('/api/fetch_friends', {
@@ -36,7 +41,11 @@ export const useFetchFriends = (user_uuid, is_fetching_friends, setIsFetchingFri
   }, [is_fetching_friends]);
 };
 
-export const useRespondToEventInvite = (event_invite_response, setEventInviteResponse, setFetchingPendingEventInvites) => {
+export const useRespondToEventInvite = (
+  event_invite_response,
+  setEventInviteResponse,
+  setFetchingPendingEventInvites
+) => {
   useEffect(() => {
     if (event_invite_response) {
       console.log('event_invite_response:', event_invite_response)
@@ -71,7 +80,12 @@ export const useRespondToEventInvite = (event_invite_response, setEventInviteRes
   }, [event_invite_response]);
 };
 
-export const useFetchPendingEventInvites = (recipient, fetching_pending_event_invites, setFetchingPendingEventInvites, setPendingEventInvites) => {
+export const useFetchPendingEventInvites = (
+  recipient,
+  fetching_pending_event_invites,
+  setFetchingPendingEventInvites,
+  setPendingEventInvites
+) => {
   useEffect(() => {
     if (fetching_pending_event_invites) {
       fetch('/api/fetch_event_invites', {
@@ -97,7 +111,13 @@ export const useFetchPendingEventInvites = (recipient, fetching_pending_event_in
   }, [fetching_pending_event_invites]);
 };
 
-export const useAttendEventAndSendInvites = (is_creating_attending_event_relationship, attend_event_currently_active_data, setIsCreatingAttendingEventRelationship, setFriendsInvited, exitAttendEventMode) => {
+export const useAttendEventAndSendInvites = (
+  is_creating_attending_event_relationship,
+  attend_event_currently_active_data,
+  setIsCreatingAttendingEventRelationship,
+  setFriendsInvited,
+  exitAttendEventMode
+) => {
   useEffect(() => {
     if (is_creating_attending_event_relationship) {
       console.log('attend_event_currently_active_data:', attend_event_currently_active_data)
@@ -132,7 +152,11 @@ export const useAttendEventAndSendInvites = (is_creating_attending_event_relatio
   }, [is_creating_attending_event_relationship]);
 };
 
-export const useRespondToFriendRequest = (friend_request_response, setFriendRequestResponse, setFetchingPendingFriendRequests) => {
+export const useRespondToFriendRequest = (
+  friend_request_response,
+  setFriendRequestResponse,
+  setFetchingPendingFriendRequests
+) => {
   useEffect(() => {
     if (friend_request_response) {
       console.log('friend_request_response:', friend_request_response)
@@ -167,7 +191,12 @@ export const useRespondToFriendRequest = (friend_request_response, setFriendRequ
   }, [friend_request_response]);
 };
 
-export const useFetchPendingFriendRequests = (recipient, fetching_pending_friend_requests, setFetchingPendingFriendRequests, setPendingFriendRequests) => {
+export const useFetchPendingFriendRequests = (
+  recipient,
+  fetching_pending_friend_requests,
+  setFetchingPendingFriendRequests,
+  setPendingFriendRequests
+) => {
   useEffect(() => {
     if (fetching_pending_friend_requests) {
       fetch('/api/fetch_pending_friend_requests', {
@@ -195,7 +224,13 @@ export const useFetchPendingFriendRequests = (recipient, fetching_pending_friend
 };
 
 
-export const useCreateFriendRequestRelationshipIfNotExist = (username_sender, username_recipient, sending_friend_request, setSendingFriendRequest, setFriendRequestUsername) => {
+export const useCreateFriendRequestRelationshipIfNotExist = (
+  username_sender,
+  username_recipient,
+  sending_friend_request,
+  setSendingFriendRequest,
+  setFriendRequestUsername
+) => {
   useEffect(() => {
     if (sending_friend_request) {
       fetch('/api/create_friend_request_relationship_if_not_exists', {
@@ -279,7 +314,13 @@ export const useFetchUsername = (
   }, [fetching_username_is_taken]);
 };
 
-export const useCreateEventNode = (is_creating_event_node, create_event_context, setIsCreatingEventNode, setCreateEventStage, setIsFetchingEvents) => {
+export const useCreateEventNode = (
+  is_creating_event_node,
+  create_event_context,
+  setIsCreatingEventNode,
+  setCreateEventStage,
+  setIsFetchingEvents
+) => {
   useEffect(() => {
     if (is_creating_event_node) {
       console.log('create_event_context:', create_event_context)
@@ -308,7 +349,13 @@ export const useCreateEventNode = (is_creating_event_node, create_event_context,
   }, [is_creating_event_node]);
 };
 
-export const useCreatePersonNode = (is_creating_person_node, create_user_profile_context, setIsCreatingPersonNode, setUserSession, setCreateUserProfileManagerIsActive) => {
+export const useCreatePersonNode = (
+  is_creating_person_node,
+  create_user_profile_context,
+  setIsCreatingPersonNode,
+  setUserSession,
+  setCreateUserProfileManagerIsActive
+) => {
   useEffect(() => {
     if (is_creating_person_node) {
       fetch('/api/create_person_node', {
@@ -342,7 +389,14 @@ export const useCreatePersonNode = (is_creating_person_node, create_user_profile
   }, [is_creating_person_node]);
 };
 
-export const useFetchEvents = (is_fetching_events, start_timestamp, end_timestamp, setMapEventsFullDay, setIsFetchingEvents) => {
+export const useFetchEvents = (
+  is_fetching_events,
+  start_timestamp,
+  end_timestamp,
+  setMapEventsFullDay,
+  setIsFetchingEvents,
+  setMapEventsFiltered
+) => {
   useEffect(() => {
     if (is_fetching_events) {
       console.log('fetching events');
@@ -366,7 +420,13 @@ export const useFetchEvents = (is_fetching_events, start_timestamp, end_timestam
   }, [is_fetching_events, start_timestamp, end_timestamp, setMapEventsFullDay, setIsFetchingEvents]);
 };
 
-export const useFetchEventTypes = (first_run, setFirstRun, setEventTypes, event_types_selected, setEventTypesSelected) => {
+export const useFetchEventTypes = (
+  first_run,
+  setFirstRun,
+  setEventTypes,
+  event_types_selected,
+  setEventTypesSelected
+) => {
   useEffect(() => {
     if (first_run) {
       fetch('/api/get_event_type_mappings', {
@@ -479,7 +539,11 @@ export const useFetchGoogleProfile = (
   }, [fetching_google_profile]);
 };
 
-export const useSetGoogleClientId = (fetching_google_client_id, setFetchingGoogleClientId, setGoogleClientId) => {
+export const useSetGoogleClientId = (
+  fetching_google_client_id,
+  setFetchingGoogleClientId,
+  setGoogleClientId
+) => {
   useEffect(() => {
     if (fetching_google_client_id) {
       console.log('fetching_google_client_id:', fetching_google_client_id);
@@ -547,7 +611,11 @@ export const useAuthenticateUser = (
   }, [authentication_context]);
 };
 
-export const useBypassLoginIfInDebugMode = (setEmail, setFirstName, setLastName) => {
+export const useBypassLoginIfInDebugMode = (
+  setEmail,
+  setFirstName,
+  setLastName
+) => {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.hostname);
     const isDebugMode = urlParams.get('debug');
