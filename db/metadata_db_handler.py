@@ -209,6 +209,11 @@ class MetadataHandler(abc.ABC):
         try:
             self.cursor.execute(rds_queries.INSERT_EVENT_SUCCESSFULLY_INGESTED, data)
             self.connection.commit()
+        except psycopg2.errors.StringDataRightTruncation as error:
+            self.logger.error(msg=error)
+            self.logger.error(msg=f"An error occurred while inserting the following record: {record}")
+            self.logger.error(msg=traceback.format_exc())
+            raise error
         except Exception as error:
             self.logger.error(msg=error)
             self.logger.error(msg=f"An error occurred while inserting the following record: {record}")

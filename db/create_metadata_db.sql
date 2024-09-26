@@ -74,10 +74,10 @@ CREATE TABLE events_successful (
   EventTypeUUID varchar(255),
   StartTimestamp timestamp,
   EndTimestamp timestamp,
-  ImageURL varchar(255),
+  ImageURL varchar(350),
   Host varchar(255),
-  Lon decimal(10, 8),
-  Lat decimal(10, 8),
+  Lon decimal(11, 8),
+  Lat decimal(11, 8),
   Summary text,
   PublicEventFlag boolean,
   FreeEventFlag boolean,
@@ -132,15 +132,16 @@ INSERT INTO sources (source,source_url) VALUES
 INSERT INTO regions (city_code,state_code,country_code) VALUES
   -- ('boston','ma','us'),
   ('philadelphia','pa','us'),
-  ('miami','fl','us')
+  -- ('miami','fl','us')
+  ('san-francisco', 'ca', 'us')
 ;
 
 -- event_types
 INSERT INTO event_types (UUID,EventType,PinColor) VALUES
   ('1f1d1c1b-1b1b-4e6e-8e0e-1e1e1d1c1b1b','Science & Technology','#FF0000'),
   ('29c65158-0a9f-4b14-8606-4f6bd4798e11','Health, Fitness, Sports, Wellness, & Yoga','#FFA500'),
-  ('501c8388-b139-485e-9095-8bec01fa9945','Social','#FFD700'),
-  ('5398ab6b-a7fb-41cd-abde-e91ef2771170','Comedy','#20B2AA'),
+  -- ('501c8388-b139-485e-9095-8bec01fa9945','Social','#FFD700'),
+  -- ('5398ab6b-a7fb-41cd-abde-e91ef2771170','Comedy','#20B2AA'),
   ('7abfc211-b49b-4572-8646-acb8fdfffb6c','Food & Drinks Specials','#8A2BE2'),
   ('8e2fa9d6-62d9-4439-a3ce-e22d0efd389f','Live Music & Concerts','#00FF00'),
   ('9f730660-bf2e-40a9-9b04-33831eb91471','Professional & Networking','#0000FF');
@@ -157,8 +158,8 @@ INSERT INTO event_type_source_mappings (source_id,target_event_type_uuid,source_
   (2,'8e2fa9d6-62d9-4439-a3ce-e22d0efd389f','395','Music'),
   (2,'1f1d1c1b-1b1b-4e6e-8e0e-1e1e1d1c1b1b','436','Science & Education'),
   (2,'29c65158-0a9f-4b14-8606-4f6bd4798e11','482','Sports & Fitness'),
-  (2,'1f1d1c1b-1b1b-4e6e-8e0e-1e1e1d1c1b1b','546','Technology'),
-  (2,'501c8388-b139-485e-9095-8bec01fa9945','652','Social Activites')
+  (2,'1f1d1c1b-1b1b-4e6e-8e0e-1e1e1d1c1b1b','546','Technology') -- ,
+  -- (2,'501c8388-b139-485e-9095-8bec01fa9945','652','Social Activites')
 ;
 
 INSERT INTO users (UUID, Email, Username, FirstName, LastName, AccountCreatedTimestamp, TestUser) VALUES 
